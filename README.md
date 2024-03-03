@@ -2,7 +2,7 @@
 
 A browser extension that copies to the clipboard a Markdown link to the current page.
 
-After installing, just click the extension's icon to copy a link.
+After installing, just click the extension's icon to copy the current page's link.
 
 ## development
 

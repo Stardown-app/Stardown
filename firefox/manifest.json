@@ -9,7 +9,7 @@
     ],
     "background": {
         "scripts": [
-            "scripts/background.js"
+            "background.js"
         ]
     },
     "icons": {

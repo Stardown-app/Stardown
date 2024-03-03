@@ -1,5 +1,5 @@
 {
-    "manifest_version": 3,
+    "manifest_version": 2,
     "name": "Stardown",
     "description": "Copy to the clipboard a markdown link to the current page",
     "version": "0.0.1",
@@ -8,7 +8,9 @@
         "clipboardWrite"
     ],
     "background": {
-        "scripts": ["scripts/background.js"]
+        "scripts": [
+            "scripts/background.js"
+        ]
     },
     "icons": {
         "16": "images/icon-16.png",
@@ -17,7 +19,7 @@
         "96": "images/icon-96.png",
         "128": "images/icon-128.png"
     },
-    "action": {
+    "browser_action": {
         "default_icon": {
             "16": "images/icon-16.png",
             "32": "images/icon-32.png",

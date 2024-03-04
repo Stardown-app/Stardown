@@ -2,6 +2,9 @@
 
 A browser extension that copies to the clipboard a Markdown link to the current page.
 
+* [Add to Firefox](https://addons.mozilla.org/en-US/firefox/addon/stardown/)
+* Add to Chrome (coming soon)
+
 After installing, just click the extension's icon to copy the current page's link.
 
 ## development

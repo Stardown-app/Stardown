@@ -23,4 +23,17 @@ chrome.action.onClicked.addListener(async (tab) => {
             navigator.clipboard.writeText(`[${title}](${url})`);
         }
     });
+
+    await brieflyShowCheckmark();
 });
+
+async function brieflyShowCheckmark() {
+    chrome.action.setBadgeText({ text: '✓' });
+    chrome.action.setBadgeBackgroundColor({ color: 'green' });
+    await sleep(1000);
+    chrome.action.setBadgeText({ text: '' });
+}
+
+async function sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}

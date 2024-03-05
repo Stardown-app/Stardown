@@ -19,4 +19,17 @@ browser.browserAction.onClicked.addListener(async () => {
     const title = tab.title.replaceAll(' ', '');
     const url = tab.url;
     await navigator.clipboard.writeText(`[${title}](${url})`);
+
+    await brieflyShowCheckmark();
 });
+
+async function brieflyShowCheckmark() {
+    browser.browserAction.setBadgeText({ text: '✓' });
+    browser.browserAction.setBadgeBackgroundColor({ color: 'green' });
+    await sleep(1000);
+    browser.browserAction.setBadgeText({ text: '' });
+}
+
+async function sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}

@@ -1,6 +1,8 @@
 # Stardown
 
-A browser extension that copies to the clipboard a Markdown link to the current page.
+A browser extension that copies to the clipboard a markdown link to the current page.
+
+![demo](https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExMDJwYWdiZnF2MTQ4eGRib2J3c3RhaXF1cHJhc3RzeG80cjNuZDJzcyZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/L8eCYjgv1nzCCjq6v1/giphy.gif)
 
 * [Add to Firefox](https://addons.mozilla.org/en-US/firefox/addon/stardown/)
 * [Add to Chrome](https://chrome.google.com/webstore/detail/clicknohlhfdlfjfkaeongkbdgbmkbhb)

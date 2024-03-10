@@ -21,7 +21,7 @@ chrome.action.onClicked.addListener(async (tab) => {
 
 chrome.contextMenus.create({
     id: 'copy-markdown-link',
-    title: 'Copy markdown link',
+    title: 'Copy markdown link to here',
     contexts: ['all'],
 });
 

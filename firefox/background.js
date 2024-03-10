@@ -25,7 +25,7 @@ browser.browserAction.onClicked.addListener(async () => {
 
 browser.contextMenus.create({
     id: 'copy-markdown-link',
-    title: 'Copy markdown link',
+    title: 'Copy markdown link to here',
     contexts: ['all'],
 });
 

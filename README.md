@@ -10,10 +10,10 @@ A browser extension that copies to the clipboard a markdown link to the current 
 After installing, you can copy a markdown link by:
 
 * clicking the extension's icon
-* or by pressing `Ctrl/Command+Shift+U` (this can be customized in your browser's settings)
-* or by right-clicking the page and choosing "Copy markdown link"
+* or by pressing `Ctrl/Cmd+Shift+U` (this can be customized in your browser's settings)
+* or by right-clicking the page and choosing "Copy markdown link to here"
 
-When you right-click and choose "Copy markdown link", if the HTML element you right-clicked has an `id` attribute, the markdown link Stardown creates will link to that specific element.
+If you right-click the page and choose "Copy markdown link to here", the link Stardown creates will link to where you right-clicked if possible (if the HTML element you right-clicked has an `id` attribute).
 
 ## development
 

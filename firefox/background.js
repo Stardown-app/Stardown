@@ -16,17 +16,49 @@
 
 browser.browserAction.onClicked.addListener(async () => {
     const [tab] = await browser.tabs.query({ active: true, currentWindow: true });
-    const title = tab.title.replaceAll(' ', '');
+    const title = tab.title;
     const url = tab.url;
     await navigator.clipboard.writeText(`[${title}](${url})`);
 
     await brieflyShowCheckmark();
 });
 
+browser.contextMenus.create({
+    id: 'copy-markdown-link',
+    title: 'Copy markdown link',
+    contexts: ['all'],
+});
+
+browser.contextMenus.onClicked.addListener((info, tab) => {
+    if (info.menuItemId === 'copy-markdown-link') {
+        browser.tabs.sendMessage(
+            tab.id,
+            "getClickedElementId",
+            { frameId: info.frameId },
+            function (data) {
+                if (data) {
+                    const id = data.clickedElementId;
+                    const title = tab.title;
+                    const url = tab.url;
+
+                    let link = `[${title}](${url}`;
+                    if (id) {
+                        link += `#${id}`;
+                    }
+                    link += ')';
+
+                    navigator.clipboard.writeText(link);
+                    brieflyShowCheckmark();
+                }
+            },
+        );
+    }
+});
+
 async function brieflyShowCheckmark() {
     browser.browserAction.setBadgeText({ text: '✓' });
     browser.browserAction.setBadgeBackgroundColor({ color: 'green' });
-    await sleep(1000);
+    await sleep(1000);  // 1 second
     browser.browserAction.setBadgeText({ text: '' });
 }
 

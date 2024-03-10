@@ -51,7 +51,7 @@ async function writeLinkToClipboard(tab) {
         target: { tabId: tab.id },
         function: () => {
             const title = document.title;
-            const url = location.href.trimEnd('/');
+            const url = location.href;
             const link = `[${title}](${url})`;
             navigator.clipboard.writeText(link);
         },
@@ -70,12 +70,14 @@ async function writeLinkWithIDToClipboard(tab, id) {
         target: { tabId: tab.id },
         function: (id) => {
             const title = document.title;
-            const url = location.href.trimEnd('/');
+            const url = location.href;
+
             let link = `[${title}](${url}`;
             if (id) {
                 link += `#${id}`;
             }
             link += ')';
+
             navigator.clipboard.writeText(link);
         },
         args: [id],

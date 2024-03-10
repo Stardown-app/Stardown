@@ -15,7 +15,7 @@
 */
 
 chrome.action.onClicked.addListener(async (tab) => {
-    await writeLinkToClipboard(tab);  // writeLinkWithIDToClipboard cannot be used here.
+    await writeLinkToClipboard(tab, '');
     await brieflyShowCheckmark();
 });
 
@@ -34,7 +34,7 @@ chrome.contextMenus.onClicked.addListener((info, tab) => {
             function (data) {
                 if (data) {
                     const id = data.clickedElementId;
-                    writeLinkWithIDToClipboard(tab, id);
+                    writeLinkToClipboard(tab, id);
                     brieflyShowCheckmark();
                 }
             },
@@ -43,29 +43,15 @@ chrome.contextMenus.onClicked.addListener((info, tab) => {
 });
 
 /**
- * writeLinkToClipboard - Copies a markdown link to the clipboard.
- * @param {chrome.tabs.Tab} tab - The tab to copy the link from.
- */
-async function writeLinkToClipboard(tab) {
-    chrome.scripting.executeScript({
-        target: { tabId: tab.id },
-        function: () => {
-            const title = document.title;
-            const url = location.href;
-            const link = `[${title}](${url})`;
-            navigator.clipboard.writeText(link);
-        },
-    });
-}
-
-/**
- * writeLinkWithIDToClipboard - Copies a markdown link optionally with an ID to the
- * clipboard.
+ * writeLinkToClipboard copies a markdown link to the clipboard.
  * @param {chrome.tabs.Tab} tab - The tab to copy the link from.
  * @param {string} id - The ID of the element to link to. If empty, no ID is included in
  * the link.
  */
-async function writeLinkWithIDToClipboard(tab, id) {
+async function writeLinkToClipboard(tab, id) {
+    if (id === undefined) {
+        id = '';
+    }
     chrome.scripting.executeScript({
         target: { tabId: tab.id },
         function: (id) => {

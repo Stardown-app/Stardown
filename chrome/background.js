@@ -62,8 +62,8 @@ async function writeLinkToClipboard(tab) {
  * writeLinkWithIDToClipboard - Copies a markdown link optionally with an ID to the
  * clipboard.
  * @param {chrome.tabs.Tab} tab - The tab to copy the link from.
- * @param {string|undefined} id - The ID of the element to link to. If falsy, no ID is
- * included in the link.
+ * @param {string} id - The ID of the element to link to. If empty, no ID is included in
+ * the link.
  */
 async function writeLinkWithIDToClipboard(tab, id) {
     chrome.scripting.executeScript({

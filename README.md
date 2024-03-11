@@ -2,7 +2,7 @@
 
 A browser extension that copies to the clipboard a markdown link to the current page.
 
-![demo](https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExMDJwYWdiZnF2MTQ4eGRib2J3c3RhaXF1cHJhc3RzeG80cjNuZDJzcyZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/L8eCYjgv1nzCCjq6v1/giphy.gif)
+![demo](https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExbjZvZHNnZ2t2aXJhaGJydHMyZWN6cHliM3R5YmVjYjRncTNmNjB0NCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/7CtyDRiPZJm2HLB2IS/giphy.gif)
 
 * [Add to Firefox](https://addons.mozilla.org/en-US/firefox/addon/stardown/)
 * [Add to Chrome](https://chrome.google.com/webstore/detail/clicknohlhfdlfjfkaeongkbdgbmkbhb)
@@ -12,11 +12,10 @@ After installing, you can copy a markdown link by:
 * clicking the extension's icon
 * pressing `Ctrl/Cmd+Shift+U` (this can be customized in your browser's settings)
 * right-clicking the page and choosing "Copy markdown link to here"
-* selecting text, right-clicking it, and choosing the same option ("Copy markdown link to here")
 
-In Chrome, selecting text before right-clicking it gives the benefit of adding a [text fragment](https://web.dev/articles/text-fragments) to the markdown link.
+In Chrome, selecting text before right-clicking it and choosing "Copy markdown link to here" gives the benefit of adding a [text fragment](https://web.dev/articles/text-fragments) to the markdown link.
 
-In all browsers, Stardown's right-click copy option will attempt to make a link that directs to the part of the page you right-clicked (it works if the HTML element you right-clicked has an `id` attribute).
+In all browsers, Stardown's "Copy markdown link to here" context menu option attempts to make a link that directs to the specific part of the page you right-clicked. This uses a text fragment or any `id` attribute of the HTML element you right-clicked, or both.
 
 ## development
 

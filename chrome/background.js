@@ -17,7 +17,7 @@
 const browser = chrome || browser;
 
 browser.action.onClicked.addListener(async (tab) => {
-    await writeLinkToClipboard(tab, '', '');
+    await writeLinkToClipboard(tab, '');
     await brieflyShowCheckmark();
 });
 
@@ -47,7 +47,7 @@ function sendCopyMessage(info, tab) {
         function (data) {
             if (data) {
                 const id = data.clickedElementId;
-                writeLinkToClipboard(tab, id, info.selectionText);
+                writeLinkToClipboard(tab, id);
                 brieflyShowCheckmark();
             }
         },
@@ -55,35 +55,31 @@ function sendCopyMessage(info, tab) {
 }
 
 /**
- * writeLinkToClipboard copies a markdown link to the clipboard. If both an ID and a
- * text fragment are provided, both are included in the link. Browsers that support text
- * fragments will try to use them first, and use the ID as a fallback if necessary.
+ * writeLinkToClipboard copies a markdown link to the clipboard. The link may contain an
+ * HTML element ID, a text fragment, or both. Browsers that support text fragments will
+ * try to use them first, and use the ID as a fallback if necessary.
  * @param {any} tab - The tab to copy the link from.
  * @param {string|undefined} id - The ID of the HTML element to link to. If falsy, no ID
  * is included in the link.
- * @param {string|undefined} selectedText - The selected text to create a text fragment
- * from to include in the link. If falsy, no text fragment is included in the link.
  */
-async function writeLinkToClipboard(tab, id, selectedText) {
+async function writeLinkToClipboard(tab, id) {
     if (!id) {
         id = '';
-    }
-    if (!selectedText) {
-        selectedText = '';
     }
 
     browser.scripting.executeScript({
         target: { tabId: tab.id },
-        args: [id, selectedText],
-        function: (id, selectedText) => {
+        args: [id],
+        function: (id) => {
             const title = document.title;
             const url = location.href;
+            const selection = window.getSelection();
 
             let link = `[${title}](${url}`;
-            if (id || selectedText) {
+            const arg = createTextFragmentArg(selection);
+            if (id || arg) {
                 link += `#${id}`;
-                if (selectedText) {
-                    const arg = createTextFragmentArg(selectedText);
+                if (arg) {
                     link += `:~:text=${arg}`;
                 }
             }

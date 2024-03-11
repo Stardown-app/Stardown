@@ -36,25 +36,48 @@ window.onload = function () {
 }
 
 /**
- * createTextFragmentArg creates a text fragment argument for a markdown link. If the
- * text is more than 8 words long, only the first 4 and last 4 words are used. If the
- * text is empty, an empty string is returned.
- * @param {string} text - The text to create a text fragment for.
- * @returns {string} - The text fragment argument for a markdown link, or an empty
- * string if the given text is empty.
+ * createTextFragmentArg creates for a markdown link a text fragment argument (the part
+ * after the `#:~:text=`). Only selection objects with type 'Range' are used; all other
+ * selections result in an empty string because this extension needs to also allow
+ * creating links that do not include text fragments.
+ * @param {Selection} selection - A Selection object; the result of window.getSelection.
+ * @returns {string}
  */
-function createTextFragmentArg(text) {
-    if (!text) {
+function createTextFragmentArg(selection) {
+    if (selection.type !== 'Range') {
         return '';
     }
 
-    // if text is more than 8 words long, use only the first 4 and last 4 words
-    const words = text.split(' ');
-    if (words.length > 8) {
-        const first4 = encodeURIComponent(words.slice(0, 4).join(' '));
-        const last4 = encodeURIComponent(words.slice(-4).join(' '));
-        return `${first4},${last4}`;
-    } else {
-        return encodeURIComponent(text);
+    // https://web.dev/articles/text-fragments#programmatic_text_fragment_link_generation
+    const result = window.generateFragment(selection);
+    switch (result.status) {
+        case 1:
+            console.error('generateFragment: the selection provided could not be used');
+            return '';
+        case 2:
+            console.error('generateFragment: no unique fragment could be identified for this selection');
+            return '';
+        case 3:
+            console.error('generateFragment: computation could not complete in time');
+            return '';
+        case 4:
+            console.error('generateFragment: an exception was raised during generation');
+            return '';
     }
+
+    const fragment = result.fragment;
+
+    let arg = '';
+    if (fragment.prefix) {
+        arg += encodeURIComponent(fragment.prefix) + '-,';
+    }
+    arg += encodeURIComponent(fragment.textStart);
+    if (fragment.textEnd) {
+        arg += ',' + encodeURIComponent(fragment.textEnd);
+    }
+    if (fragment.suffix) {
+        arg += ',-' + encodeURIComponent(fragment.suffix);
+    }
+
+    return arg;
 }

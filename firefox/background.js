@@ -35,21 +35,24 @@ browser.contextMenus.onClicked.addListener((info, tab) => {
             tab.id,
             "getClickedElementId",
             { frameId: info.frameId },
-            function (data) {
-                if (data) {
-                    const id = data.clickedElementId;
-                    const title = tab.title;
-                    const url = tab.url;
-
-                    let link = `[${title}](${url}`;
-                    if (id) {
-                        link += `#${id}`;
-                    }
-                    link += ')';
-
-                    navigator.clipboard.writeText(link);
-                    brieflyShowCheckmark();
+            function (clickedElementId) {
+                if (!clickedElementId) {
+                    console.error('No clickedElementId received from sendMessage callback');
+                    return;
                 }
+
+                const id = clickedElementId;
+                const title = tab.title;
+                const url = tab.url;
+
+                let link = `[${title}](${url}`;
+                if (id) {
+                    link += `#${id}`;
+                }
+                link += ')';
+
+                navigator.clipboard.writeText(link);
+                brieflyShowCheckmark();
             },
         );
     }

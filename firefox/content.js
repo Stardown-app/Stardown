@@ -14,21 +14,19 @@
    limitations under the License.
 */
 
-window.onload = function () {
-    let clickedElement;
+let clickedElement;
 
-    document.addEventListener(
-        'contextmenu',
-        function (event) {
-            clickedElement = event.target;
-        },
-        true,
-    );
+document.addEventListener(
+    'contextmenu',
+    function (event) {
+        clickedElement = event.target;
+    },
+    true,
+);
 
-    browser.runtime.onMessage.addListener(function (request, sender, sendResponse) {
-        if (request === "getClickedElementId") {
-            sendResponse({ clickedElementId: clickedElement.id });
-        }
-        return true;
-    });
-}
+browser.runtime.onMessage.addListener(function (request, sender, sendResponse) {
+    if (request === "getClickedElementId") {
+        sendResponse(clickedElement.id);
+    }
+    return true;
+});

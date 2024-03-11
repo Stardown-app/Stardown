@@ -15,7 +15,7 @@
 */
 
 chrome.action.onClicked.addListener(async (tab) => {
-    await writeLinkToClipboard(tab, '');
+    await writeLinkToClipboard(tab, '', '');
     await brieflyShowCheckmark();
 });
 
@@ -27,46 +27,68 @@ chrome.contextMenus.create({
 
 chrome.contextMenus.onClicked.addListener((info, tab) => {
     if (info.menuItemId === 'copy-markdown-link') {
-        chrome.tabs.sendMessage(
-            tab.id,
-            "getClickedElementId",
-            { frameId: info.frameId },
-            function (data) {
-                if (data) {
-                    const id = data.clickedElementId;
-                    writeLinkToClipboard(tab, id);
-                    brieflyShowCheckmark();
-                }
-            },
-        );
+        sendCopyMessage(info, tab);
     }
 });
 
 /**
- * writeLinkToClipboard copies a markdown link to the clipboard.
- * @param {chrome.tabs.Tab} tab - The tab to copy the link from.
- * @param {string} id - The ID of the element to link to. If empty, no ID is included in
- * the link.
+ * sendCopyMessage sends a message to the content script to get the ID of the
+ * right-clicked HTML element and then writes a markdown link to the clipboard.
+ * @param {any} info - The context menu info.
+ * @param {any} tab - The tab that the context menu was clicked in.
  */
-async function writeLinkToClipboard(tab, id) {
-    if (id === undefined) {
+function sendCopyMessage(info, tab) {
+    chrome.tabs.sendMessage(
+        tab.id,
+        "getClickedElementId",
+        { frameId: info.frameId },
+        function (data) {
+            if (data) {
+                const id = data.clickedElementId;
+                writeLinkToClipboard(tab, id, info.selectionText);
+                brieflyShowCheckmark();
+            }
+        },
+    );
+}
+
+/**
+ * writeLinkToClipboard copies a markdown link to the clipboard. If both an ID and a
+ * text fragment are provided, both are included in the link. Browsers that support text
+ * fragments will try to use them first, and use the ID as a fallback if necessary.
+ * @param {any} tab - The tab to copy the link from.
+ * @param {string|undefined} id - The ID of the HTML element to link to. If falsy, no ID
+ * is included in the link.
+ * @param {string|undefined} selectedText - The selected text to create a text fragment
+ * from to include in the link. If falsy, no text fragment is included in the link.
+ */
+async function writeLinkToClipboard(tab, id, selectedText) {
+    if (!id) {
         id = '';
     }
+    if (!selectedText) {
+        selectedText = '';
+    }
+
     chrome.scripting.executeScript({
         target: { tabId: tab.id },
-        function: (id) => {
+        args: [id, selectedText],
+        function: (id, selectedText) => {
             const title = document.title;
             const url = location.href;
 
             let link = `[${title}](${url}`;
-            if (id) {
+            if (id || selectedText) {
                 link += `#${id}`;
+                if (selectedText) {
+                    const arg = createTextFragmentArg(selectedText);
+                    link += `:~:text=${arg}`;
+                }
             }
             link += ')';
 
             navigator.clipboard.writeText(link);
         },
-        args: [id],
     });
 }
 

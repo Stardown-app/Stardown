@@ -32,3 +32,27 @@ window.onload = function () {
         return true;
     });
 }
+
+/**
+ * createTextFragmentArg creates a text fragment argument for a markdown link. If the
+ * text is more than 8 words long, only the first 4 and last 4 words are used. If the
+ * text is empty, an empty string is returned.
+ * @param {string} text - The text to create a text fragment for.
+ * @returns {string} - The text fragment argument for a markdown link, or an empty
+ * string if the given text is empty.
+ */
+function createTextFragmentArg(text) {
+    if (!text) {
+        return '';
+    }
+
+    // if text is more than 8 words long, use only the first 4 and last 4 words
+    const words = text.split(' ');
+    if (words.length > 8) {
+        const first4 = encodeURIComponent(words.slice(0, 4).join(' '));
+        const last4 = encodeURIComponent(words.slice(-4).join(' '));
+        return `${first4},${last4}`;
+    } else {
+        return encodeURIComponent(text);
+    }
+}

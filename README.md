@@ -1,12 +1,15 @@
-# Stardown
+<h1 align="center"><img width="35" alt="Stardown's icon" src="firefox/images/icon.svg"> Stardown</h1>
 
-A browser extension that copies to the clipboard a markdown link to the current page.
+<p align="center">A browser extension that copies to the clipboard a markdown link to the current page.</p>
 
-![demo](https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExbjZvZHNnZ2t2aXJhaGJydHMyZWN6cHliM3R5YmVjYjRncTNmNjB0NCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/7CtyDRiPZJm2HLB2IS/giphy.gif)
+<p align="center">
+    <a href="https://addons.mozilla.org/en-US/firefox/addon/stardown/"><img alt="Firefox badge" src="https://img.shields.io/badge/Firefox-black.svg?logo=firefoxbrowser&style=for-the-badge"></a>
+    <a href="https://chrome.google.com/webstore/detail/clicknohlhfdlfjfkaeongkbdgbmkbhb"><img alt="Chrome badge" src="https://img.shields.io/badge/Chrome-black.svg?logo=googlechrome&style=for-the-badge&logoColor=238d41"></a>
+    <a><img alt="Edge badge" src="https://img.shields.io/badge/Edge%20(coming%20soon)-black.svg?logo=microsoftedge&style=for-the-badge&logoColor=33b9ab"></a>
+    <!-- <a><img alt="Safari badge" src="https://img.shields.io/badge/Safari-black.svg?logo=safari&style=for-the-badge&logoColor=188ff3"></a> -->
+</p>
 
-* [Add to Firefox](https://addons.mozilla.org/en-US/firefox/addon/stardown/)
-* [Add to Chrome](https://chrome.google.com/webstore/detail/clicknohlhfdlfjfkaeongkbdgbmkbhb)
-* Add to Edge (coming soon)
+<p align="center"><img alt="demo" src="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExbjZvZHNnZ2t2aXJhaGJydHMyZWN6cHliM3R5YmVjYjRncTNmNjB0NCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/7CtyDRiPZJm2HLB2IS/giphy.gif"></p>
 
 After installing, you can copy a markdown link by:
 

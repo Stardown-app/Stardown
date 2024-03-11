@@ -14,6 +14,8 @@
    limitations under the License.
 */
 
+const browser = chrome || browser;
+
 window.onload = function () {
     let clickedElement;
 
@@ -25,7 +27,7 @@ window.onload = function () {
         true,
     );
 
-    chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
+    browser.runtime.onMessage.addListener(function (request, sender, sendResponse) {
         if (request === "getClickedElementId") {
             sendResponse({ clickedElementId: clickedElement.id });
         }

@@ -14,18 +14,20 @@
    limitations under the License.
 */
 
-chrome.action.onClicked.addListener(async (tab) => {
+const browser = chrome || browser;
+
+browser.action.onClicked.addListener(async (tab) => {
     await writeLinkToClipboard(tab, '', '');
     await brieflyShowCheckmark();
 });
 
-chrome.contextMenus.create({
+browser.contextMenus.create({
     id: 'copy-markdown-link',
     title: 'Copy markdown link to here',
     contexts: ['all'],
 });
 
-chrome.contextMenus.onClicked.addListener((info, tab) => {
+browser.contextMenus.onClicked.addListener((info, tab) => {
     if (info.menuItemId === 'copy-markdown-link') {
         sendCopyMessage(info, tab);
     }
@@ -38,7 +40,7 @@ chrome.contextMenus.onClicked.addListener((info, tab) => {
  * @param {any} tab - The tab that the context menu was clicked in.
  */
 function sendCopyMessage(info, tab) {
-    chrome.tabs.sendMessage(
+    browser.tabs.sendMessage(
         tab.id,
         "getClickedElementId",
         { frameId: info.frameId },
@@ -70,7 +72,7 @@ async function writeLinkToClipboard(tab, id, selectedText) {
         selectedText = '';
     }
 
-    chrome.scripting.executeScript({
+    browser.scripting.executeScript({
         target: { tabId: tab.id },
         args: [id, selectedText],
         function: (id, selectedText) => {
@@ -93,10 +95,10 @@ async function writeLinkToClipboard(tab, id, selectedText) {
 }
 
 async function brieflyShowCheckmark() {
-    chrome.action.setBadgeText({ text: '✓' });
-    chrome.action.setBadgeBackgroundColor({ color: 'green' });
+    browser.action.setBadgeText({ text: '✓' });
+    browser.action.setBadgeBackgroundColor({ color: 'green' });
     await sleep(1000);  // 1 second
-    chrome.action.setBadgeText({ text: '' });
+    browser.action.setBadgeText({ text: '' });
 }
 
 async function sleep(ms) {

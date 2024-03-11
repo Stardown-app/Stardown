@@ -17,9 +17,7 @@ After installing, you can copy a markdown link by:
 * pressing `Ctrl/Cmd+Shift+U` (this can be customized in your browser's settings)
 * right-clicking the page and choosing "Copy markdown link to here"
 
-In Chrome and Edge, selecting text before right-clicking it and choosing "Copy markdown link to here" gives the benefit of adding a [text fragment](https://web.dev/articles/text-fragments) to the markdown link.
-
-In all browsers, Stardown's "Copy markdown link to here" context menu option attempts to make a link that directs to the specific part of the page you right-clicked. This uses a text fragment or any `id` attribute of the HTML element you right-clicked, or both.
+Stardown's "Copy markdown link to here" context menu option creates a link that directs to the specific part of the page you right-clicked, if possible. This uses a [text fragment](https://web.dev/articles/text-fragments) (in Chrome or Edge) or any `id` attribute of the HTML element you right-clicked, or both. In Chrome or Edge, select text before right-clicking it to use a text fragment.
 
 ## development
 

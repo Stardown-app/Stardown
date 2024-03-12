@@ -29,7 +29,15 @@ window.onload = function () {
 
     browser.runtime.onMessage.addListener(function (request, sender, sendResponse) {
         if (request === "getClickedElementId") {
-            sendResponse({ clickedElementId: clickedElement.id });
+            // if clickedElement doesn't have an id, look at its parent
+            while (clickedElement && !clickedElement.id) {
+                clickedElement = clickedElement.parentElement;
+            }
+            if (clickedElement === null) {
+                console.log('No HTML element with an ID was found in the clicked path');
+                return;
+            }
+            sendResponse(clickedElement.id);
         }
         return true;
     });

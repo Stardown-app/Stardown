@@ -44,12 +44,14 @@ function sendCopyMessage(info, tab) {
         tab.id,
         "getClickedElementId",
         { frameId: info.frameId },
-        function (data) {
-            if (data) {
-                const id = data.clickedElementId;
-                writeLinkToClipboard(tab, id);
-                brieflyShowCheckmark();
+        function (clickedElementId) {
+            if (!clickedElementId) {
+                console.error('No clickedElementId received from sendMessage callback');
+                return;
             }
+
+            writeLinkToClipboard(tab, clickedElementId);
+            brieflyShowCheckmark();
         },
     );
 }

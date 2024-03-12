@@ -30,11 +30,12 @@ browser.runtime.onMessage.addListener(function (request, sender, sendResponse) {
         while (clickedElement && !clickedElement.id) {
             clickedElement = clickedElement.parentElement;
         }
-        if (clickedElement === null) {
+        if (clickedElement && clickedElement.id) {
+            sendResponse(clickedElement.id);
+        } else {
             console.log('No HTML element with an ID was found in the clicked path');
-            return;
+            sendResponse('');
         }
-        sendResponse(clickedElement.id);
     }
     return true;
 });

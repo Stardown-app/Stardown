@@ -47,12 +47,7 @@ function sendCopyMessage(info, tab) {
         "getClickedElementId",
         { frameId: info.frameId },
         function (clickedElementId) {
-            if (!clickedElementId) {
-                console.error('No clickedElementId received from sendMessage callback');
-                return;
-            }
-
-            const id = clickedElementId;
+            const id = clickedElementId;  // may be an empty string
             const title = tab.title;
             const url = tab.url;
 

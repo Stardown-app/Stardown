@@ -45,11 +45,7 @@ function sendCopyMessage(info, tab) {
         "getClickedElementId",
         { frameId: info.frameId },
         function (clickedElementId) {
-            if (!clickedElementId) {
-                console.error('No clickedElementId received from sendMessage callback');
-                return;
-            }
-
+            // clickedElementId may be an empty string
             writeLinkToClipboard(tab, clickedElementId);
             brieflyShowCheckmark();
         },

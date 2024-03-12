@@ -31,32 +31,42 @@ browser.contextMenus.create({
 
 browser.contextMenus.onClicked.addListener((info, tab) => {
     if (info.menuItemId === 'copy-markdown-link') {
-        browser.tabs.sendMessage(
-            tab.id,
-            "getClickedElementId",
-            { frameId: info.frameId },
-            function (clickedElementId) {
-                if (!clickedElementId) {
-                    console.error('No clickedElementId received from sendMessage callback');
-                    return;
-                }
-
-                const id = clickedElementId;
-                const title = tab.title;
-                const url = tab.url;
-
-                let link = `[${title}](${url}`;
-                if (id) {
-                    link += `#${id}`;
-                }
-                link += ')';
-
-                navigator.clipboard.writeText(link);
-                brieflyShowCheckmark();
-            },
-        );
+        sendCopyMessage(info, tab);
     }
 });
+
+/**
+ * sendCopyMessage sends a message to the content script to get the ID of the
+ * right-clicked HTML element and then writes a markdown link to the clipboard.
+ * @param {any} info - The context menu info.
+ * @param {any} tab - The tab that the context menu was clicked in.
+ */
+function sendCopyMessage(info, tab) {
+    browser.tabs.sendMessage(
+        tab.id,
+        "getClickedElementId",
+        { frameId: info.frameId },
+        function (clickedElementId) {
+            if (!clickedElementId) {
+                console.error('No clickedElementId received from sendMessage callback');
+                return;
+            }
+
+            const id = clickedElementId;
+            const title = tab.title;
+            const url = tab.url;
+
+            let link = `[${title}](${url}`;
+            if (id) {
+                link += `#${id}`;
+            }
+            link += ')';
+
+            navigator.clipboard.writeText(link);
+            brieflyShowCheckmark();
+        },
+    );
+}
 
 async function brieflyShowCheckmark() {
     browser.browserAction.setBadgeText({ text: '✓' });

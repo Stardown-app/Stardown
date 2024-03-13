@@ -17,7 +17,7 @@
 const browser = chrome || browser;
 
 browser.action.onClicked.addListener(async (tab) => {
-    await writeLinkToClipboard(tab, '');
+    await scriptWriteLinkToClipboard(tab, '');
     await brieflyShowCheckmark();
 });
 
@@ -46,21 +46,21 @@ function sendCopyMessage(info, tab) {
         { frameId: info.frameId },
         function (clickedElementId) {
             // clickedElementId may be an empty string
-            writeLinkToClipboard(tab, clickedElementId);
+            scriptWriteLinkToClipboard(tab, clickedElementId);
             brieflyShowCheckmark();
         },
     );
 }
 
 /**
- * writeLinkToClipboard copies a markdown link to the clipboard. The link may contain an
+ * scriptWriteLinkToClipboard copies a markdown link to the clipboard. The link may contain an
  * HTML element ID, a text fragment, or both. Browsers that support text fragments will
  * try to use them first, and use the ID as a fallback if necessary.
  * @param {any} tab - The tab to copy the link from.
  * @param {string|undefined} id - The ID of the HTML element to link to. If falsy, no ID
  * is included in the link.
  */
-async function writeLinkToClipboard(tab, id) {
+async function scriptWriteLinkToClipboard(tab, id) {
     if (!id) {
         id = '';
     }

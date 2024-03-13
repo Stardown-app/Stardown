@@ -16,10 +16,7 @@
 
 browser.browserAction.onClicked.addListener(async () => {
     const [tab] = await browser.tabs.query({ active: true, currentWindow: true });
-    const title = tab.title;
-    const url = tab.url;
-    await navigator.clipboard.writeText(`[${title}](${url})`);
-
+    await writeLinkToClipboard(tab, '');
     await brieflyShowCheckmark();
 });
 
@@ -47,20 +44,35 @@ function sendCopyMessage(info, tab) {
         "getClickedElementId",
         { frameId: info.frameId },
         function (clickedElementId) {
-            const id = clickedElementId;  // may be an empty string
-            const title = tab.title;
-            const url = tab.url;
-
-            let link = `[${title}](${url}`;
-            if (id) {
-                link += `#${id}`;
-            }
-            link += ')';
-
-            navigator.clipboard.writeText(link);
+            // clickedElementId may be an empty string
+            writeLinkToClipboard(tab, clickedElementId);
             brieflyShowCheckmark();
         },
     );
+}
+
+/**
+ * writeLinkToClipboard copies a markdown link to the clipboard. The link may contain an
+ * HTML element ID.
+ * @param {any} tab - The tab to copy the link from.
+ * @param {string|undefined} id - The ID of the HTML element to link to. If falsy, no ID
+ * is included in the link.
+ */
+async function writeLinkToClipboard(tab, id) {
+    if (!id) {
+        id = '';
+    }
+
+    const title = tab.title;
+    const url = tab.url;
+
+    let link = `[${title}](${url}`;
+    if (id) {
+        link += `#${id}`;
+    }
+    link += ')';
+
+    await navigator.clipboard.writeText(link);
 }
 
 async function brieflyShowCheckmark() {

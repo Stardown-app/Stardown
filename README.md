@@ -9,19 +9,19 @@
     <!-- <a><img alt="Safari badge" src="https://img.shields.io/badge/Safari-black.svg?logo=safari&style=for-the-badge&logoColor=188ff3"></a> -->
 </p>
 
-<p align="center"><img alt="demo" src="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExbjZvZHNnZ2t2aXJhaGJydHMyZWN6cHliM3R5YmVjYjRncTNmNjB0NCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/7CtyDRiPZJm2HLB2IS/giphy.gif"></p>
+<p align="center"><img alt="demo" src="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExcnB5d2kwOXh6cDFnMnpudzFiem00Y3NsZjVxbXZhMWgwcWpvcG5yaSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/37MMWMqQyKSeKvDfk1/giphy.gif"></p>
 
 After installing, you can copy a markdown link by:
 
 * clicking the extension's icon
-* pressing `Ctrl/Cmd+Shift+U` (this can be customized in your browser's settings)
+* pressing `Ctrl+Shift+U` (Mac: `Cmd+Shift+U`), or whichever keyboard shortcut you prefer in your browser's settings
 * right-clicking the page and choosing "Copy markdown link to here"
 
-Stardown's "Copy markdown link to here" context menu option creates a link that directs to the specific part of the page you right-clicked, if possible. This uses a [text fragment](https://web.dev/articles/text-fragments) (in Chrome or Edge) or any `id` attribute of the HTML element you right-clicked, or both. In Chrome or Edge, select text before right-clicking it to use a text fragment.
+Stardown's "Copy markdown link to here" context menu option creates a link that directs to the specific part of the page you right-clicked, if possible. This uses a [text fragment](https://web.dev/articles/text-fragments) (in Chrome or Edge) or an `id` attribute in the HTML elements you right-clicked, or both. In Chrome or Edge, select text before right-clicking it to use a text fragment.
 
 ## development
 
-There are different versions of Stardown for Firefox and the Chromium browsers because of several bugs in the two browsers:
+There are different versions of Stardown for Firefox and the Chromium browsers because of bugs or limitations in them:
 
 * [Firefox does not yet support text fragments](https://bugzilla.mozilla.org/show_bug.cgi?id=1753933).
 * Since [Chromium does not support the Clipboard API in background scripts](https://stackoverflow.com/questions/61862872/how-to-copy-web-notification-content-to-clipboard/61977696#61977696), the Chromium version of Stardown also requires the `scripting` permission so it can run a script that puts text in the clipboard.

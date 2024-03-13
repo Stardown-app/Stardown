@@ -1,6 +1,6 @@
 <h1 align="center"><img width="35" alt="Stardown's icon" src="firefox/images/icon.svg"> Stardown</h1>
 
-<p align="center">A browser extension that copies to the clipboard a markdown link to the current page.</p>
+<p align="center">A browser extension that copies a markdown link for the current page.</p>
 
 <p align="center">
     <a href="https://addons.mozilla.org/en-US/firefox/addon/stardown/"><img alt="Firefox badge" src="https://img.shields.io/badge/Firefox-black.svg?logo=firefoxbrowser&style=for-the-badge"></a>
@@ -17,7 +17,11 @@ After installing, you can copy a markdown link by:
 * pressing `Ctrl+Shift+U` (Mac: `Cmd+Shift+U`), or whichever keyboard shortcut you prefer in your browser's settings
 * right-clicking the page and choosing "Copy markdown link to here"
 
-Stardown's "Copy markdown link to here" context menu option creates a link that directs to the specific part of the page you right-clicked, if possible. This uses a [text fragment](https://web.dev/articles/text-fragments) (in Chrome or Edge) or an `id` attribute in the HTML elements you right-clicked, or both. In Chrome or Edge, select text before right-clicking it to use a text fragment.
+Stardown's "Copy markdown link to here" option creates a link that directs to the specific part of the page you right-clicked, if possible. This uses a [text fragment](https://web.dev/articles/text-fragments) (in Chrome or Edge) or an `id` attribute in the HTML elements you right-clicked, or both. In Chrome or Edge, select text before right-clicking it to use a text fragment.
+
+## privacy
+
+Stardown will never sell any data to anyone, and does not collect nor send data anywhere besides putting links into your clipboard.
 
 ## development
 

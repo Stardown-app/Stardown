@@ -17,8 +17,11 @@
 const browser = chrome || browser;
 
 browser.action.onClicked.addListener(async (tab) => {
-    await scriptWriteLinkToClipboard(tab, '');
-    await brieflyShowCheckmark();
+    if (await scriptWriteLinkToClipboard(tab, '')) {
+        await brieflyShowCheckmark();
+    } else {
+        await brieflyShowX();
+    }
 });
 
 browser.contextMenus.create({
@@ -53,19 +56,21 @@ function sendCopyMessage(info, tab) {
 }
 
 /**
- * scriptWriteLinkToClipboard copies a markdown link to the clipboard. The link may contain an
- * HTML element ID, a text fragment, or both. Browsers that support text fragments will
- * try to use them first, and use the ID as a fallback if necessary.
+ * scriptWriteLinkToClipboard copies a markdown link to the clipboard. The link may
+ * contain an HTML element ID, a text fragment, or both. Browsers that support text
+ * fragments will try to use them first, and use the ID as a fallback if necessary.
  * @param {any} tab - The tab to copy the link from.
  * @param {string|undefined} id - The ID of the HTML element to link to. If falsy, no ID
  * is included in the link.
+ * @returns {Promise<boolean>} - A Promise that resolves to true if the script was
+ * executed successfully, and false otherwise.
  */
 async function scriptWriteLinkToClipboard(tab, id) {
     if (!id) {
         id = '';
     }
 
-    browser.scripting.executeScript({
+    const injectionResult = await browser.scripting.executeScript({
         target: { tabId: tab.id },
         args: [id],
         function: (id) => {
@@ -83,14 +88,31 @@ async function scriptWriteLinkToClipboard(tab, id) {
             }
             link += ')';
 
-            navigator.clipboard.writeText(link);
+            // writeText only works if the document is focused. For some reason,
+            // `document.body.focus()` doesn't work here.
+            if (document.hasFocus()) {
+                navigator.clipboard.writeText(link);
+                return true;
+            } else {
+                console.error('Cannot copy a markdown link for an unfocused document');
+                return false;
+            }
         },
     });
+
+    return injectionResult[0].result;
 }
 
 async function brieflyShowCheckmark() {
     browser.action.setBadgeText({ text: '✓' });
     browser.action.setBadgeBackgroundColor({ color: 'green' });
+    await sleep(1000);  // 1 second
+    browser.action.setBadgeText({ text: '' });
+}
+
+async function brieflyShowX() {
+    browser.action.setBadgeText({ text: '✗' });
+    browser.action.setBadgeBackgroundColor({ color: 'red' });
     await sleep(1000);  // 1 second
     browser.action.setBadgeText({ text: '' });
 }

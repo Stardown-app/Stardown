@@ -73,6 +73,12 @@ function sendCopyMessage(info, tab) {
  * copied successfully, or an error message if not.
  */
 async function scriptWriteLinkToClipboard(tab, id) {
+    if (tab.url === 'chrome://newtab/') {
+        return 'Cannot copy a markdown link for the new tab page';
+    } else if (tab.url.startsWith('chrome://')) {
+        return 'Cannot copy a markdown link for a chrome:// URL';
+    }
+
     if (!id) {
         id = '';
     }

@@ -17,9 +17,11 @@
 const browser = chrome || browser;
 
 browser.action.onClicked.addListener(async (tab) => {
-    if (await scriptWriteLinkToClipboard(tab, '')) {
+    const err = await scriptWriteLinkToClipboard(tab, '');
+    if (err === null) {
         await brieflyShowCheckmark();
     } else {
+        console.error(err);
         await brieflyShowX();
     }
 });
@@ -48,9 +50,14 @@ function sendCopyMessage(info, tab) {
         "getClickedElementId",
         { frameId: info.frameId },
         function (clickedElementId) {
-            // clickedElementId may be an empty string
-            scriptWriteLinkToClipboard(tab, clickedElementId);
-            brieflyShowCheckmark();
+            // clickedElementId may be an empty string or undefined
+            const err = scriptWriteLinkToClipboard(tab, clickedElementId);
+            if (err === null) {
+                brieflyShowCheckmark();
+            } else {
+                console.error(err);
+                brieflyShowX();
+            }
         },
     );
 }
@@ -62,8 +69,8 @@ function sendCopyMessage(info, tab) {
  * @param {any} tab - The tab to copy the link from.
  * @param {string|undefined} id - The ID of the HTML element to link to. If falsy, no ID
  * is included in the link.
- * @returns {Promise<boolean>} - A Promise that resolves to true if the script was
- * executed successfully, and false otherwise.
+ * @returns {Promise<string|null>} - A Promise that resolves to null if the link was
+ * copied successfully, or an error message if not.
  */
 async function scriptWriteLinkToClipboard(tab, id) {
     if (!id) {
@@ -88,18 +95,18 @@ async function scriptWriteLinkToClipboard(tab, id) {
             }
             link += ')';
 
-            // writeText only works if the document is focused. For some reason,
-            // `document.body.focus()` doesn't work here.
-            if (document.hasFocus()) {
-                navigator.clipboard.writeText(link);
-                return true;
-            } else {
-                console.error('Cannot copy a markdown link for an unfocused document');
-                return false;
+            // `navigator.clipboard.writeText` only works in a script if the document is
+            // focused. For some reason, `document.body.focus()` doesn't work here.
+            if (!document.hasFocus()) {
+                return 'Cannot copy a markdown link for an unfocused document';
             }
+
+            navigator.clipboard.writeText(link);
+            return null;
         },
     });
 
+    // `injectionResult[0].result` is whatever the injected script returned.
     return injectionResult[0].result;
 }
 

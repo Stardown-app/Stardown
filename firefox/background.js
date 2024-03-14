@@ -44,7 +44,7 @@ function sendCopyMessage(info, tab) {
         "getClickedElementId",
         { frameId: info.frameId },
         function (clickedElementId) {
-            // clickedElementId may be an empty string or undefined
+            // clickedElementId may be undefined, an empty string, or a non-empty string
             writeLinkToClipboard(tab, clickedElementId);
             brieflyShowCheckmark();
         },

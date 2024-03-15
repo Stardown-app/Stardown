@@ -11,17 +11,18 @@
 
 <p align="center"><img alt="demo" src="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExcnB5d2kwOXh6cDFnMnpudzFiem00Y3NsZjVxbXZhMWgwcWpvcG5yaSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/37MMWMqQyKSeKvDfk1/giphy.gif"></p>
 
-After installing, you can copy a markdown link by:
+After installing, there are multiple ways you can copy a markdown link:
 
-* clicking the extension's icon
-* pressing `Ctrl+Shift+U` (Mac: `Cmd+Shift+U`), or whichever keyboard shortcut you prefer in your browser's settings
-* right-clicking the page and choosing "Copy markdown link to here"
+* click the extension's icon
+* press `Ctrl+Shift+U` (Mac: `Cmd+Shift+U`), or whichever keyboard shortcut you prefer in your browser's settings
+* right-click where you want to link to and choose "Copy markdown link to here"
+* select text before using the right-click option to create a link with a [text fragment](https://web.dev/articles/text-fragments)
 
-Stardown's "Copy markdown link to here" option creates a link that directs to the specific part of the page you right-clicked, if possible. This uses a [text fragment](https://web.dev/articles/text-fragments) (in Chrome or Edge) or an `id` attribute in the HTML elements you right-clicked, or both. In Chrome or Edge, select text before right-clicking it to use a text fragment.
+Stardown's right-click option only adds a text fragment if you have selected text, but always tries to find an `id` attribute in the HTML elements you right-clicked so you can still link to specific parts of pages without text fragments. Firefox does not support text fragments yet, but the Firefox version of Stardown allows you to create links with text fragments.
 
 ## privacy
 
-Stardown will never sell any data to anyone, and does not collect nor send data anywhere besides putting links into your clipboard.
+Stardown will never sell any data to anyone, and does not collect nor send any data anywhere besides putting links into your clipboard.
 
 ## development
 

@@ -53,7 +53,8 @@ function sendCopyMessage(info, tab) {
 
 /**
  * writeLinkToClipboard copies a markdown link to the clipboard. The link may contain an
- * HTML element ID.
+ * HTML element ID, a text fragment, or both. Browsers that support text fragments will
+ * try to use them first, and use the ID as a fallback if necessary.
  * @param {any} tab - The tab to copy the link from.
  * @param {string|undefined} id - The ID of the HTML element to link to. If falsy, no ID
  * is included in the link.
@@ -66,9 +67,17 @@ async function writeLinkToClipboard(tab, id) {
     const title = tab.title;
     const url = tab.url;
 
+    const args = await browser.tabs.executeScript(tab.id, {
+        file: 'create-text-fragment-arg.js',
+    });
+    const arg = args[0];
+
     let link = `[${title}](${url}`;
-    if (id) {
+    if (id || arg) {
         link += `#${id}`;
+        if (arg) {
+            link += `:~:text=${arg}`;
+        }
     }
     link += ')';
 

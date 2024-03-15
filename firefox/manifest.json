@@ -19,7 +19,9 @@
                 "<all_urls>"
             ],
             "js": [
-                "content.js"
+                "content.js",
+                "create-text-fragment-arg.js",
+                "fragment-generation-utils.js"
             ]
         }
     ],

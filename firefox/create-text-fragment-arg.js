@@ -70,7 +70,7 @@ function createTextFragmentArg(selection) {
     if (fragment.suffix) {
         arg += ',-' + encodeURIComponent(fragment.suffix);
     }
-    arg.replaceAll('(', '%28').replaceAll(')', '%29');  // for markdown links
+    arg = arg.replaceAll('(', '%28').replaceAll(')', '%29');  // for markdown links
 
     return arg;
 }

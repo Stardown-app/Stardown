@@ -77,6 +77,8 @@ async function scriptWriteLinkToClipboard(tab, id) {
         return 'Cannot copy a markdown link for the new tab page';
     } else if (tab.url.startsWith('chrome://')) {
         return 'Cannot copy a markdown link for a chrome:// URL';
+    } else if (tab.url.startsWith('https://chromewebstore.google.com/')) {
+        return 'Cannot copy a markdown link for the Chrome Web Store';
     }
 
     if (!id) {

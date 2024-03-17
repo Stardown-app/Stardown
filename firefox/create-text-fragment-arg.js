@@ -30,7 +30,8 @@
  * createTextFragmentArg creates for a markdown link a text fragment argument (the part
  * after the `#:~:text=`). Only selection objects with type 'Range' are used; all other
  * selections result in an empty string because this extension needs to also allow
- * creating links that do not include text fragments.
+ * creating links that do not include text fragments. All parentheses are replaced with
+ * their URL-encoded equivalents.
  * @param {Selection} selection - A Selection object; the result of window.getSelection.
  * @returns {string}
  */
@@ -69,6 +70,7 @@ function createTextFragmentArg(selection) {
     if (fragment.suffix) {
         arg += ',-' + encodeURIComponent(fragment.suffix);
     }
+    arg.replaceAll('(', '%28').replaceAll(')', '%29');  // for markdown links
 
     return arg;
 }

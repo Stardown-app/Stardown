@@ -49,16 +49,16 @@ function sendCopyMessage(info, tab) {
         tab.id,
         "getClickedElementId",
         { frameId: info.frameId },
-        function (clickedElementId) {
+        async function (clickedElementId) {
             // clickedElementId may be undefined, an empty string, or a non-empty string
-            const err = scriptWriteLinkToClipboard(tab, clickedElementId);
+            const err = await scriptWriteLinkToClipboard(tab, clickedElementId);
             if (err === null) {
-                brieflyShowCheckmark();
+                await brieflyShowCheckmark();
             } else {
                 console.error(err);
-                brieflyShowX();
+                await brieflyShowX();
             }
-        },
+        }
     );
 }
 

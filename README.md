@@ -24,6 +24,40 @@ Stardown's right-click option only adds a text fragment if you have selected tex
 
 Stardown will never sell any data to anyone, and does not collect nor send any data anywhere besides putting links into your clipboard.
 
+## feature requests
+
+Although you're welcome to [make a feature request](https://github.com/wheelercj/Stardown/issues), there may already be another browser extension that meets all your needs. I am not affiliated with any of the below extensions and have not tried all of them. Use them at your own risk.
+
+**Copy links in other formats besides markdown**
+
+* [url2clipboard](https://github.com/asamuzaK/url2clipboard) supports HTML, Markdown, BBCode, Textile, AsciiDoc, MediaWiki, Jira, reStructuredText, LaTeX, Org Mode, and text.
+* [TabCopy](https://chromewebstore.google.com/detail/tabcopy/micdllihgoppmejpecmkilggmaagfdmb) might only be on the Chrome Web Store, but supports many formats including HTML, Markdown, BBCode, CSV, and JSON, and lets you create custom link formats.
+
+**Copy links for all tabs**
+
+* [copy-as-markdown](https://github.com/yorkxin/copy-as-markdown)
+
+**Copy a website's content as markdown**
+
+* [MarkDownload](https://github.com/deathau/markdownload) was developed by an Obsidian community moderator.
+* [copy-selection-as-markdown](https://github.com/0x6b/copy-selection-as-markdown) is only available for Firefox but may work manually installed in Chromium browsers.
+
+**Copy a URL with a text fragment**
+
+* [link-to-text-fragment](https://github.com/GoogleChromeLabs/link-to-text-fragment) was made by Google itself but is cross-browser.
+
+**Save a page for research**
+
+* [Zotero](https://www.zotero.org/)
+
+**Why use Stardown?**
+
+Unlike the extensions linked above, Stardown:
+
+* can create markdown links for specific parts of pages (using text fragments and/or HTML element IDs)
+* requires only one click to create a markdown link for the current page
+* is focused on just the most important features so it's more likely to be maintained
+
 ## development
 
 There are different versions of Stardown for Firefox and the Chromium browsers because of bugs or limitations in them:

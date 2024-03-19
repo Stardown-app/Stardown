@@ -64,7 +64,7 @@ async function writeLinkToClipboard(tab, id) {
         id = '';
     }
 
-    const title = tab.title;
+    const title = tab.title.replaceAll('[', '⦋').replaceAll(']', '⦌');
     const url = tab.url;
 
     const args = await browser.tabs.executeScript(tab.id, {

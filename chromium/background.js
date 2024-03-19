@@ -89,7 +89,7 @@ async function scriptWriteLinkToClipboard(tab, id) {
         target: { tabId: tab.id },
         args: [id],
         function: (id) => {
-            const title = document.title;
+            const title = document.title.replaceAll('[', '⦋').replaceAll(']', '⦌');
             const url = location.href;
             const selection = window.getSelection();
 

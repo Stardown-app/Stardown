@@ -16,8 +16,14 @@
 
 browser.browserAction.onClicked.addListener(async () => {
     const [tab] = await browser.tabs.query({ active: true, currentWindow: true });
-    await writeLinkToClipboard(tab, '');
-    await brieflyShowCheckmark();
+
+    const err = await writeLinkToClipboard(tab, '');
+    if (err === null) {
+        await brieflyShowCheckmark();
+    } else {
+        console.error(err);
+        await brieflyShowX();
+    }
 });
 
 browser.contextMenus.create({
@@ -58,6 +64,8 @@ function sendCopyMessage(info, tab) {
  * @param {any} tab - The tab to copy the link from.
  * @param {string|undefined} id - The ID of the HTML element to link to. If falsy, no ID
  * is included in the link.
+ * @returns {Promise<string|null>} - A Promise that resolves to null if the link was
+ * copied successfully, or an error message if not.
  */
 async function writeLinkToClipboard(tab, id) {
     if (!id) {
@@ -67,10 +75,15 @@ async function writeLinkToClipboard(tab, id) {
     const title = tab.title.replaceAll('[', '⦋').replaceAll(']', '⦌');
     const url = tab.url;
 
-    const args = await browser.tabs.executeScript(tab.id, {
-        file: 'create-text-fragment-arg.js',
-    });
-    const arg = args[0];
+    let arg;  // the text fragment argument
+    try {
+        const args = await browser.tabs.executeScript(tab.id, {
+            file: 'create-text-fragment-arg.js',
+        });
+        arg = args[0];
+    } catch (e) {
+        console.log(`(Creating text fragment) ${e}`);
+    }
 
     let link = `[${title}](${url}`;
     if (id || arg) {
@@ -82,11 +95,19 @@ async function writeLinkToClipboard(tab, id) {
     link += ')';
 
     await navigator.clipboard.writeText(link);
+    return null;
 }
 
 async function brieflyShowCheckmark() {
     browser.browserAction.setBadgeText({ text: '✓' });
     browser.browserAction.setBadgeBackgroundColor({ color: 'green' });
+    await sleep(1000);  // 1 second
+    browser.browserAction.setBadgeText({ text: '' });
+}
+
+async function brieflyShowX() {
+    browser.browserAction.setBadgeText({ text: '✗' });
+    browser.browserAction.setBadgeBackgroundColor({ color: 'red' });
     await sleep(1000);  // 1 second
     browser.browserAction.setBadgeText({ text: '' });
 }

@@ -73,12 +73,14 @@ function sendCopyMessage(info, tab) {
  * copied successfully, or an error message if not.
  */
 async function scriptWriteLinkToClipboard(tab, id) {
-    if (tab.url === 'chrome://newtab/') {
+    if (tab.url === 'chrome://newtab/' || tab.url === 'edge://newtab/') {
         return 'Cannot copy a markdown link for the new tab page';
-    } else if (tab.url.startsWith('chrome://')) {
-        return 'Cannot copy a markdown link for a chrome:// URL';
+    } else if (tab.url.startsWith('chrome://') || tab.url.startsWith('edge://')) {
+        return 'Cannot copy a markdown link for a chrome:// or edge:// URL';
     } else if (tab.url.startsWith('https://chromewebstore.google.com/')) {
         return 'Cannot copy a markdown link for the Chrome Web Store';
+    } else if (tab.url.startsWith('https://microsoftedge.microsoft.com/addons')) {
+        return 'Cannot copy a markdown link for the Edge Add-ons site';
     }
 
     if (!id) {

@@ -28,13 +28,17 @@ Stardown will never sell any data to anyone, and does not collect nor send any d
 
 ### How to change Stardown's keyboard shortcut
 
-* Chrome: `chrome://extensions/shortcuts`
 * [Firefox](https://support.mozilla.org/en-US/kb/manage-extension-shortcuts-firefox)
-* [Edge](https://www.webnots.com/how-to-assign-keyboard-shortcut-to-extension-in-microsoft-edge/)
+* Chrome: `chrome://extensions/shortcuts`
+* Edge: `edge://extensions/shortcuts`
+
+### Stardown's right-click option doesn't always create links for specific parts of pages
+
+Stardown looks for an HTML element ID where you right-clicked, but some parts of websites don't have any IDs. If there is no HTML element ID where you right-click and you don't select text before right-clicking, the link Stardown creates will be for the entire page, not for the part of the page where you right-clicked. Most websites assign an ID to each section title.
 
 ### Stardown's right-click option disappeared
 
-This is an occasional bug in browsers. Reinstalling Stardown should fix it.
+This is an occasionally reoccuring bug in browsers. Reinstalling Stardown should fix it.
 
 ### Stardown displayed a red X and didn't do anything
 
@@ -53,7 +57,7 @@ Although you're welcome to [make a feature request](https://github.com/wheelercj
 * [url2clipboard](https://github.com/asamuzaK/url2clipboard) supports HTML, Markdown, BBCode, Textile, AsciiDoc, MediaWiki, Jira, reStructuredText, LaTeX, Org Mode, and text.
 * [TabCopy](https://chromewebstore.google.com/detail/tabcopy/micdllihgoppmejpecmkilggmaagfdmb) might only be on the Chrome Web Store, but supports many formats including HTML, Markdown, BBCode, CSV, and JSON, and lets you create custom link formats.
 
-### Copy links for all tabs
+### Copy just the titles or just the URLs for all tabs
 
 * [copy-as-markdown](https://github.com/yorkxin/copy-as-markdown)
 
@@ -74,7 +78,7 @@ Although you're welcome to [make a feature request](https://github.com/wheelercj
 
 Unlike the extensions linked above, Stardown:
 
-* can create markdown links for specific parts of pages (using text fragments and/or HTML element IDs)
+* can create markdown links for specific parts of pages (using [text fragments](https://web.dev/articles/text-fragments) and/or HTML element IDs)
 * requires only one click to create a markdown link for the current page
 * is focused on just the most important features so it's more likely to be maintained and bug-free
 

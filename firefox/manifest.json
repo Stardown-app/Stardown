@@ -3,6 +3,11 @@
     "name": "Stardown",
     "description": "Copy to the clipboard a markdown link for the current page.",
     "version": "0.0.1",
+    "browser_specific_settings": {
+        "gecko": {
+            "id": "stardown@chriswheeler.dev"
+        }
+    },
     "permissions": [
         "activeTab",
         "clipboardWrite",

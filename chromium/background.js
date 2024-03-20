@@ -73,48 +73,43 @@ function sendCopyMessage(info, tab) {
  * copied successfully, or an error message if not.
  */
 async function scriptWriteLinkToClipboard(tab, id) {
-    if (tab.url === 'chrome://newtab/' || tab.url === 'edge://newtab/') {
-        return 'Cannot copy a markdown link for the new tab page';
-    } else if (tab.url.startsWith('chrome://') || tab.url.startsWith('edge://')) {
-        return 'Cannot copy a markdown link for a chrome:// or edge:// URL';
-    } else if (tab.url.startsWith('https://chromewebstore.google.com/')) {
-        return 'Cannot copy a markdown link for the Chrome Web Store';
-    } else if (tab.url.startsWith('https://microsoftedge.microsoft.com/addons')) {
-        return 'Cannot copy a markdown link for the Edge Add-ons site';
-    }
-
     if (!id) {
         id = '';
     }
 
-    const injectionResult = await browser.scripting.executeScript({
-        target: { tabId: tab.id },
-        args: [id],
-        function: (id) => {
-            const title = document.title.replaceAll('[', '⦋').replaceAll(']', '⦌');
-            const url = location.href;
-            const selection = window.getSelection();
+    let injectionResult;
+    try {
+        injectionResult = await browser.scripting.executeScript({
+            target: { tabId: tab.id },
+            args: [id],
+            function: (id) => {
+                const title = document.title.replaceAll('[', '⦋').replaceAll(']', '⦌');
+                const url = location.href;
+                const selection = window.getSelection();
 
-            let link = `[${title}](${url}`;
-            const arg = createTextFragmentArg(selection);
-            if (id || arg) {
-                link += `#${id}`;
-                if (arg) {
-                    link += `:~:text=${arg}`;
+                let link = `[${title}](${url}`;
+                const arg = createTextFragmentArg(selection);
+                if (id || arg) {
+                    link += `#${id}`;
+                    if (arg) {
+                        link += `:~:text=${arg}`;
+                    }
                 }
-            }
-            link += ')';
+                link += ')';
 
-            // `navigator.clipboard.writeText` only works in a script if the document is
-            // focused. For some reason, `document.body.focus()` doesn't work here.
-            if (!document.hasFocus()) {
-                return 'Cannot copy a markdown link for an unfocused document';
-            }
+                // `navigator.clipboard.writeText` only works in a script if the document is
+                // focused. For some reason, `document.body.focus()` doesn't work here.
+                if (!document.hasFocus()) {
+                    return 'Cannot copy a markdown link for an unfocused document';
+                }
 
-            navigator.clipboard.writeText(link);
-            return null;
-        },
-    });
+                navigator.clipboard.writeText(link);
+                return null;
+            },
+        });
+    } catch (e) {
+        return e;
+    }
 
     // `injectionResult[0].result` is whatever the injected script returned.
     return injectionResult[0].result;

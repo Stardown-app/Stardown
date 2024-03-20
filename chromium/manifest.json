@@ -3,6 +3,7 @@
     "name": "Stardown",
     "description": "Copy to the clipboard a markdown link for the current page.",
     "version": "0.0.1",
+    "homepage_url": "https://github.com/wheelercj/Stardown",
     "permissions": [
         "activeTab",
         "clipboardWrite",

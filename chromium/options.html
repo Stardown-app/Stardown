@@ -1,0 +1,49 @@
+<!-- 
+   Copyright 2024 Chris Wheeler
+
+   Licensed under the Apache License, Version 2.0 (the "License");
+   you may not use this file except in compliance with the License.
+   You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License.
+-->
+
+<!doctype html>
+
+<html lang="en">
+
+  <head>
+    <meta charset="utf-8" />
+    <style>
+      body {
+        font-size: 20px;
+        min-width: 350px;
+        min-height: 245px;
+      }
+    </style>
+  </head>
+
+  <body>
+    <form>
+      <label for="sub_brackets">Replace square brackets in link titles with</label>
+      <select id="sub_brackets" name="sub_brackets">
+        <option value="underlined">underlined brackets ⦋ ⦌</option>
+        <option value="escaped">escaped brackets \[ \]</option>
+        <option value="original">don't replace them [ ]</option>
+      </select>
+
+      </br>
+      <input type="submit" value="Save" />
+      <input type="reset" />
+    </form>
+
+    <script src="options.js"></script>
+  </body>
+
+</html>

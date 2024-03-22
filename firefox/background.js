@@ -72,8 +72,20 @@ async function writeLinkToClipboard(tab, id) {
         id = '';
     }
 
-    const title = tab.title.replaceAll('[', '⦋').replaceAll(']', '⦌');
     const url = tab.url;
+
+    let title = tab.title
+    let sub_brackets = 'underlined';  // what to replace brackets in the title with
+    try {
+        sub_brackets = (await browser.storage.sync.get('sub_brackets')).sub_brackets;
+    } catch (err) {
+        console.error(err);
+    }
+    if (sub_brackets === 'underlined') {
+        title = title.replaceAll('[', '⦋').replaceAll(']', '⦌');
+    } else if (sub_brackets === 'escaped') {
+        title = title.replaceAll('[', '\\[').replaceAll(']', '\\]');
+    }
 
     let arg;  // the text fragment argument
     try {
@@ -81,8 +93,8 @@ async function writeLinkToClipboard(tab, id) {
             file: 'create-text-fragment-arg.js',
         });
         arg = args[0];
-    } catch (e) {
-        console.log(`(Creating text fragment) ${e}`);
+    } catch (err) {
+        console.log(`(Creating text fragment) ${err}`);
     }
 
     let link = `[${title}](${url}`;

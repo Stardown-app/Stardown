@@ -24,19 +24,27 @@ Stardown's right-click option only adds a text fragment if you have selected tex
 
 Stardown will never sell any data to anyone, and does not collect nor send any data anywhere besides putting links into your clipboard.
 
-## troubleshooting
+## settings
 
-### How to change Stardown's keyboard shortcut
+To open Stardown's options page, right-click the extension's icon and choose:
+
+* Firefox: "Manange extension" and then "Options"
+* Chrome: "Options"
+* Edge: "Extension options"
+
+### How to change the keyboard shortcut
 
 * [Firefox](https://support.mozilla.org/en-US/kb/manage-extension-shortcuts-firefox)
 * Chrome: `chrome://extensions/shortcuts`
 * Edge: `edge://extensions/shortcuts`
 
-### Stardown's right-click option doesn't always create links for specific parts of pages
+## troubleshooting
+
+### The right-click option doesn't always create links for specific parts of pages
 
 Stardown looks for an HTML element ID where you right-clicked, but some parts of websites don't have any IDs. If there is no HTML element ID where you right-click and you don't select text before right-clicking, the link Stardown creates will be for the entire page, not for the part of the page where you right-clicked. Most websites assign an ID to each section title.
 
-### Stardown's right-click option disappeared
+### The right-click option disappeared
 
 This is an occasionally reoccuring bug in browsers. Reinstalling Stardown should fix it.
 
@@ -46,7 +54,7 @@ Rarely, websites limit what extensions can do and may prevent Stardown from work
 
 ### Something else is wrong
 
-If reinstalling Stardown doesn't fix it and [Stardown's issues page](https://github.com/wheelercj/Stardown/issues) doesn't have an issue for it yet, please make a new issue.
+If reinstalling Stardown doesn't fix it and [the issues page](https://github.com/wheelercj/Stardown/issues) doesn't have an issue for it yet, please make a new issue.
 
 ## feature requests
 

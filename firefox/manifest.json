@@ -12,8 +12,12 @@
     "permissions": [
         "activeTab",
         "clipboardWrite",
-        "contextMenus"
+        "contextMenus",
+        "storage"
     ],
+    "options_ui": {
+        "page": "options.html"
+    },
     "background": {
         "scripts": [
             "background.js"

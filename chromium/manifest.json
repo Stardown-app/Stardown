@@ -8,8 +8,12 @@
         "activeTab",
         "clipboardWrite",
         "contextMenus",
-        "scripting"
+        "scripting",
+        "storage"
     ],
+    "options_ui": {
+        "page": "options.html"
+    },
     "background": {
         "service_worker": "background.js"
     },

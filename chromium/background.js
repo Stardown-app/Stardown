@@ -83,32 +83,48 @@ async function scriptWriteLinkToClipboard(tab, id) {
             target: { tabId: tab.id },
             args: [id],
             function: (id) => {
-                const title = document.title.replaceAll('[', '⦋').replaceAll(']', '⦌');
-                const url = location.href;
-                const selection = window.getSelection();
+                return (async () => {
+                    const url = location.href;
 
-                let link = `[${title}](${url}`;
-                const arg = createTextFragmentArg(selection);
-                if (id || arg) {
-                    link += `#${id}`;
-                    if (arg) {
-                        link += `:~:text=${arg}`;
+                    let title = document.title
+                    let sub_brackets = 'underlined';  // what to replace brackets in the title with
+                    try {
+                        sub_brackets = (await browser.storage.sync.get('sub_brackets')).sub_brackets;
+                    } catch (err) {
+                        console.error(err);
                     }
-                }
-                link += ')';
+                    if (sub_brackets === 'underlined') {
+                        title = title.replaceAll('[', '⦋').replaceAll(']', '⦌');
+                    } else if (sub_brackets === 'escaped') {
+                        title = title.replaceAll('[', '\\[').replaceAll(']', '\\]');
+                    }
 
-                // `navigator.clipboard.writeText` only works in a script if the document is
-                // focused. For some reason, `document.body.focus()` doesn't work here.
-                if (!document.hasFocus()) {
-                    return 'Cannot copy a markdown link for an unfocused document';
-                }
+                    const selection = window.getSelection();
+                    const arg = createTextFragmentArg(selection);
 
-                navigator.clipboard.writeText(link);
-                return null;
+                    let link = `[${title}](${url}`;
+                    if (id || arg) {
+                        link += `#${id}`;
+                        if (arg) {
+                            link += `:~:text=${arg}`;
+                        }
+                    }
+                    link += ')';
+
+                    // `navigator.clipboard.writeText` only works in a script if the
+                    // document is focused. For some reason, `document.body.focus()`
+                    // doesn't work here. This doesn't seem to be necessary in Firefox.
+                    if (!document.hasFocus()) {
+                        return 'Cannot copy a markdown link for an unfocused document';
+                    }
+
+                    navigator.clipboard.writeText(link);
+                    return null;
+                })();
             },
         });
-    } catch (e) {
-        return e;
+    } catch (err) {
+        return err;
     }
 
     // `injectionResult[0].result` is whatever the injected script returned.

@@ -17,7 +17,10 @@
 async function saveOptions(e) {
     e.preventDefault();
     await browser.storage.sync.set(
-        { sub_brackets: document.querySelector("#sub_brackets").value },
+        {
+            sub_brackets: document.querySelector("#sub_brackets").value,
+            use_selected: document.querySelector("#use_selected").checked,
+        },
         () => {
             // indicate saving was successful
             const button = document.querySelector('#submit');
@@ -35,6 +38,13 @@ async function loadOptions() {
     try {
         const sub_brackets = (await browser.storage.sync.get("sub_brackets")).sub_brackets;
         document.querySelector("#sub_brackets").value = sub_brackets || "underlined";
+
+        let use_selected = (await browser.storage.sync.get("use_selected")).use_selected;
+        if (use_selected === undefined) {
+            use_selected = true;
+            await browser.storage.sync.set({ use_selected: true });
+        }
+        document.querySelector("#use_selected").checked = use_selected;
     } catch (err) {
         console.error(err);
     }

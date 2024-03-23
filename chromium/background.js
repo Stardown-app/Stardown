@@ -84,27 +84,25 @@ async function scriptWriteLinkToClipboard(tab, id) {
             args: [id],
             function: (id) => {
                 return (async () => {
+                    const title = document.title;
                     const url = location.href;
-
-                    let title = document.title
-                    let sub_brackets = 'underlined';  // what to replace brackets in the title with
-                    try {
-                        sub_brackets = (await browser.storage.sync.get('sub_brackets')).sub_brackets;
-                    } catch (err) {
-                        console.error(err);
-                    }
-                    if (sub_brackets === 'underlined') {
-                        title = title.replaceAll('[', '⦋').replaceAll(']', '⦌');
-                    } else if (sub_brackets === 'escaped') {
-                        title = title.replaceAll('[', '\\[').replaceAll(']', '\\]');
-                    }
-
                     const selection = window.getSelection();
+                    const selectedText = selection.toString();
                     const arg = createTextFragmentArg(selection);
 
-                    let link = `[${title}](${url}`;
+                    let link = '[';
+                    const useSelected = await getSetting('use_selected', true);
+                    if (selectedText && useSelected) {
+                        link += await replaceBrackets(selectedText.trim());
+                    } else {
+                        link += await replaceBrackets(title);
+                    }
+                    link += `](${url}`;
                     if (id || arg) {
-                        link += `#${id}`;
+                        link += '#';
+                        if (id) {
+                            link += id;
+                        }
                         if (arg) {
                             link += `:~:text=${arg}`;
                         }
@@ -147,4 +145,23 @@ async function brieflyShowX() {
 
 async function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+/**
+ * getSetting gets a setting from the browser's sync storage.
+ * @param {string} name - the name of the setting.
+ * @param {any} default_ - the default value of the setting.
+ * @returns {any}
+ */
+async function getSetting(name, default_) {
+    try {
+        const v = (await browser.storage.sync.get(name))[name];
+        if (v !== undefined) {
+            return v;
+        }
+        return default_;
+    } catch (err) {
+        console.error(err);
+        return default_;
+    }
 }

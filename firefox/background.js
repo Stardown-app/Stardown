@@ -68,38 +68,34 @@ function sendCopyMessage(info, tab) {
  * copied successfully, or an error message if not.
  */
 async function writeLinkToClipboard(tab, id) {
-    if (!id) {
-        id = '';
-    }
-
+    const title = tab.title;
     const url = tab.url;
 
-    let title = tab.title
-    let sub_brackets = 'underlined';  // what to replace brackets in the title with
-    try {
-        sub_brackets = (await browser.storage.sync.get('sub_brackets')).sub_brackets;
-    } catch (err) {
-        console.error(err);
-    }
-    if (sub_brackets === 'underlined') {
-        title = title.replaceAll('[', '⦋').replaceAll(']', '⦌');
-    } else if (sub_brackets === 'escaped') {
-        title = title.replaceAll('[', '\\[').replaceAll(']', '\\]');
-    }
-
     let arg;  // the text fragment argument
+    let selectedText;
     try {
-        const args = await browser.tabs.executeScript(tab.id, {
+        const results = await browser.tabs.executeScript(tab.id, {
             file: 'create-text-fragment-arg.js',
         });
-        arg = args[0];
+        arg = results[0].slice(0, -1);
+        selectedText = results[0].slice(-1)[0];
     } catch (err) {
         console.log(`(Creating text fragment) ${err}`);
     }
 
-    let link = `[${title}](${url}`;
+    let link = '[';
+    const useSelected = await getSetting('use_selected', true);
+    if (selectedText && useSelected) {
+        link += await replaceBrackets(selectedText.trim());
+    } else {
+        link += await replaceBrackets(title);
+    }
+    link += `](${url}`;
     if (id || arg) {
-        link += `#${id}`;
+        link += '#';
+        if (id) {
+            link += id;
+        }
         if (arg) {
             link += `:~:text=${arg}`;
         }
@@ -108,6 +104,22 @@ async function writeLinkToClipboard(tab, id) {
 
     await navigator.clipboard.writeText(link);
     return null;
+}
+
+/**
+ * replaceBrackets replaces square brackets in a link title with the character or escape
+ * sequence chosen in settings.
+ * @param {string} title - the raw link title.
+ * @returns {Promise<string>}
+ */
+async function replaceBrackets(title) {
+    let sub_brackets = await getSetting('sub_brackets', 'underlined');
+    if (sub_brackets === 'underlined') {
+        return title.replaceAll('[', '⦋').replaceAll(']', '⦌');
+    } else if (sub_brackets === 'escaped') {
+        return title.replaceAll('[', '\\[').replaceAll(']', '\\]');
+    }
+    return title;
 }
 
 async function brieflyShowCheckmark() {
@@ -126,4 +138,23 @@ async function brieflyShowX() {
 
 async function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+/**
+ * getSetting gets a setting from the browser's sync storage.
+ * @param {string} name - the name of the setting.
+ * @param {any} default_ - the default value of the setting.
+ * @returns {any}
+ */
+async function getSetting(name, default_) {
+    try {
+        const v = (await browser.storage.sync.get(name))[name];
+        if (v !== undefined) {
+            return v;
+        }
+        return default_;
+    } catch (err) {
+        console.error(err);
+        return default_;
+    }
 }

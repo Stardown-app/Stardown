@@ -75,6 +75,8 @@ function createTextFragmentArg(selection) {
     return arg;
 }
 
+var selection = window.getSelection();
+
 // The file's last expression's value is sent to where this file was run from with
 // `browser.tabs.executeScript`.
-createTextFragmentArg(window.getSelection());
+[createTextFragmentArg(selection), selection.toString()];

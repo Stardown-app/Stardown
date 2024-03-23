@@ -50,7 +50,7 @@ This is an occasionally reoccuring bug in browsers. Reinstalling Stardown should
 
 ### Stardown displayed a red X and didn't do anything
 
-This may happen if the current page is not focused, such as if your cursor is in the bookmarks sidebar. In this case, click the page and try again.
+This may happen if the current website is not focused, such as if you just clicked the bookmarks sidebar. In this case, click the page and try again.
 
 Another possibility is that some websites limit what extensions can do and may prevent Stardown from working. A few examples are the Chrome Web Store and Chrome pages that start with `chrome://`. Fortunately, very few websites do this.
 

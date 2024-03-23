@@ -53,10 +53,10 @@ window.onload = function () {
 async function getSetting(name, default_) {
     try {
         const v = (await browser.storage.sync.get(name))[name];
-        if (v !== undefined) {
-            return v;
+        if (v === undefined) {
+            return default_;
         }
-        return default_;
+        return v;
     } catch (err) {
         console.error(err);
         return default_;

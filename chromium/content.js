@@ -80,6 +80,16 @@ async function replaceBrackets(title) {
 }
 
 /**
+ * enc URL-encodes a string, but also replaces '-' with '%2D' because the text fragment
+ * generator appears to not handle '-' correctly.
+ * @param {string} text - the text to encode.
+ * @returns {string}
+ */
+function enc(text) {
+    return encodeURIComponent(text).replaceAll('-', '%2D');
+}
+
+/**
  * createTextFragmentArg creates for a markdown link a text fragment argument (the part
  * after the `#:~:text=`). Only selection objects with type 'Range' are used; all other
  * selections result in an empty string because this extension needs to also allow
@@ -114,14 +124,14 @@ function createTextFragmentArg(selection) {
 
     let arg = '';
     if (fragment.prefix) {
-        arg += encodeURIComponent(fragment.prefix) + '-,';
+        arg += enc(fragment.prefix) + '-,';
     }
-    arg += encodeURIComponent(fragment.textStart);
+    arg += enc(fragment.textStart);
     if (fragment.textEnd) {
-        arg += ',' + encodeURIComponent(fragment.textEnd);
+        arg += ',' + enc(fragment.textEnd);
     }
     if (fragment.suffix) {
-        arg += ',-' + encodeURIComponent(fragment.suffix);
+        arg += ',-' + enc(fragment.suffix);
     }
     arg = arg.replaceAll('(', '%28').replaceAll(')', '%29');  // for markdown links
 

@@ -16,9 +16,19 @@
 
 async function saveOptions(e) {
     e.preventDefault();
-    await browser.storage.sync.set({
-        sub_brackets: document.querySelector("#sub_brackets").value,
-    });
+    await browser.storage.sync.set(
+        { sub_brackets: document.querySelector("#sub_brackets").value },
+        () => {
+            // indicate saving was successful
+            const button = document.querySelector('#submit');
+            button.value = 'Saved ✔';
+            button.style.backgroundColor = '#00d26a';
+            setTimeout(() => {
+                button.value = 'Save';
+                button.style.backgroundColor = '';
+            }, 750);
+        }
+    );
 }
 
 async function loadOptions() {
@@ -30,5 +40,18 @@ async function loadOptions() {
     }
 }
 
+async function resetOptions() {
+    await browser.storage.sync.clear();
+    const button = document.querySelector('#reset');
+    button.value = 'Reset ✔';
+    button.style.backgroundColor = '#aadafa';
+    setTimeout(() => {
+        button.value = 'Reset';
+        button.style.backgroundColor = '';
+    }, 750);
+}
+
 document.addEventListener("DOMContentLoaded", loadOptions);
-document.querySelector("form").addEventListener("submit", saveOptions);
+const form = document.querySelector("form")
+form.addEventListener("submit", saveOptions);
+form.addEventListener("reset", resetOptions);

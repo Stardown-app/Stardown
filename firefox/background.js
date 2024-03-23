@@ -87,10 +87,8 @@ async function writeLinkToClipboard(tab, id) {
     const linkFormat = await getSetting('link_format', 'selected');
     if (selectedText && linkFormat === 'selected') {
         link += await replaceBrackets(selectedText.trim());
-    } else if (linkFormat === 'title') {
-        link += await replaceBrackets(title);
     } else {
-        throw `Link format option "${linkFormat}" not implemented`;
+        link += await replaceBrackets(title);
     }
     link += `](${url}`;
     if (id || arg) {

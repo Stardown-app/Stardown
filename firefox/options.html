@@ -31,14 +31,23 @@
   </head>
 
   <body>
-    <h2 style="text-align: center"><img width="30" alt="Stardown's icon" src="images/icon.svg"> Stardown</h2>
+    <h2 style="text-align: center">
+      <img width="30" alt="Stardown's icon" src="images/icon.svg"> Stardown
+    </h2>
     <p>
       A browser extension that copies a markdown link for the current page.<br /><br />
-      <a href="https://github.com/wheelercj/Stardown?tab=readme-ov-file#troubleshooting">Troubleshooting</a><br />
-      <a href="https://github.com/wheelercj/Stardown?tab=readme-ov-file#feature-requests">Request a feature</a><br />
-      <a href="https://github.com/wheelercj/Stardown?tab=readme-ov-file#how-to-change-the-keyboard-shortcut">How to change the keyboard shortcut</a><br />
-      <a href="https://github.com/wheelercj/Stardown">Source code</a><br />
+      <a href="https://github.com/wheelercj/Stardown?tab=readme-ov-file#troubleshooting">
+        Troubleshooting
+      </a><br />
+      <a href="https://github.com/wheelercj/Stardown?tab=readme-ov-file#feature-requests">
+        Request a feature
+      </a><br />
+      <a href="https://github.com/wheelercj/Stardown?tab=readme-ov-file#how-to-change-the-keyboard-shortcut">
+        How to change the keyboard shortcut
+      </a><br />
+      <a href="https://github.com/wheelercj/Stardown">Source code</a>
     </p>
+
     <h3 style="text-align: center">Options</h3>
     <form>
       <label for="sub_brackets">Replace square brackets in link titles with</label>
@@ -49,8 +58,12 @@
       </select>
       <br />
       <br />
-      <input id="use_selected" type="checkbox" name="use_selected" checked />
-      <label for="use_selected">Use selected text as link title.</label>
+      <label for="link_format">When linking to selected text,</label>
+      <select id="link_format" name="link_format" checked>
+        <option value="selected">use the selected text as the link title</option>
+        <option value="title">use the page title as the link title</option>
+        <!-- <option value="quote">create a markdown quote with a page title link</option> -->
+      </select>
       <br />
       <br />
       <input id="submit" type="submit" value="Save" />

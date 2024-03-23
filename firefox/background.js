@@ -84,11 +84,13 @@ async function writeLinkToClipboard(tab, id) {
     }
 
     let link = '[';
-    const useSelected = await getSetting('use_selected', true);
-    if (selectedText && useSelected) {
+    const linkFormat = await getSetting('link_format', 'selected');
+    if (selectedText && linkFormat === 'selected') {
         link += await replaceBrackets(selectedText.trim());
-    } else {
+    } else if (linkFormat === 'title') {
         link += await replaceBrackets(title);
+    } else {
+        throw `Link format option "${linkFormat}" not implemented`;
     }
     link += `](${url}`;
     if (id || arg) {

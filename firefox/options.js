@@ -19,7 +19,7 @@ async function saveOptions(e) {
     await browser.storage.sync.set(
         {
             sub_brackets: document.querySelector("#sub_brackets").value,
-            use_selected: document.querySelector("#use_selected").checked,
+            link_format: document.querySelector("#link_format").value,
         },
         () => {
             // indicate saving was successful
@@ -36,15 +36,11 @@ async function saveOptions(e) {
 
 async function loadOptions() {
     try {
-        const sub_brackets = (await browser.storage.sync.get("sub_brackets")).sub_brackets;
-        document.querySelector("#sub_brackets").value = sub_brackets || "underlined";
+        const sub_brackets = await getSetting("sub_brackets", "underlined");
+        document.querySelector("#sub_brackets").value = sub_brackets;
 
-        let use_selected = (await browser.storage.sync.get("use_selected")).use_selected;
-        if (use_selected === undefined) {
-            use_selected = true;
-            await browser.storage.sync.set({ use_selected: true });
-        }
-        document.querySelector("#use_selected").checked = use_selected;
+        const link_format = await getSetting("link_format", "selected");
+        document.querySelector("#link_format").value = link_format;
     } catch (err) {
         console.error(err);
     }
@@ -59,6 +55,25 @@ async function resetOptions() {
         button.value = 'Reset';
         button.style.backgroundColor = '';
     }, 750);
+}
+
+/**
+ * getSetting gets a setting from the browser's sync storage.
+ * @param {string} name - the name of the setting.
+ * @param {any} default_ - the default value of the setting.
+ * @returns {any}
+ */
+async function getSetting(name, default_) {
+    try {
+        const v = (await browser.storage.sync.get(name))[name];
+        if (v !== undefined) {
+            return v;
+        }
+        return default_;
+    } catch (err) {
+        console.error(err);
+        return default_;
+    }
 }
 
 document.addEventListener("DOMContentLoaded", loadOptions);

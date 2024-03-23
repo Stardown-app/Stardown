@@ -77,7 +77,7 @@ async function writeLinkToClipboard(tab, id) {
         const results = await browser.tabs.executeScript(tab.id, {
             file: 'create-text-fragment-arg.js',
         });
-        arg = results[0].slice(0, -1);
+        arg = results[0].slice(0, -1)[0];
         selectedText = results[0].slice(-1)[0];
     } catch (err) {
         console.log(`(Creating text fragment) ${err}`);

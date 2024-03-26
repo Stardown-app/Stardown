@@ -23,6 +23,7 @@ async function saveOptions(e) {
             subBrackets: document.querySelector("#subBrackets").value,
             linkFormat: document.querySelector("#linkFormat").value,
             bulletPoint: document.querySelector("#bulletPoint").value,
+            doubleClickWindows: document.querySelector("#doubleClickWindows").value,
             doubleClickInterval: document.querySelector("#doubleClickInterval").value,
         },
         () => {
@@ -48,6 +49,9 @@ async function loadOptions() {
 
         const bulletPoint = await getSetting("bulletPoint", "-");
         document.querySelector("#bulletPoint").value = bulletPoint;
+
+        const doubleClickWindows = await getSetting("doubleClickWindows", "current");
+        document.querySelector("#doubleClickWindows").value = doubleClickWindows;
 
         const doubleClickInterval = await getSetting("doubleClickInterval", 500);
         document.querySelector("#doubleClickInterval").value = doubleClickInterval;

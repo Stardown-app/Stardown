@@ -68,7 +68,12 @@ browser.contextMenus.onClicked.addListener((info, tab) => {
 async function handleDoubleClick() {
     let tabs = await browser.tabs.query({ currentWindow: true, highlighted: true });
     if (tabs.length === 1) {
-        tabs = await browser.tabs.query({ currentWindow: true });
+        const doubleClickWindows = await getSetting('doubleClickWindows', 'current');
+        if (doubleClickWindows === 'current') {
+            tabs = await browser.tabs.query({ currentWindow: true });
+        } else if (doubleClickWindows === 'all') {
+            tabs = await browser.tabs.query({});
+        }
     }
     const linkFormat = await getSetting('linkFormat', 'selected');
     const subBrackets = await getSetting('subBrackets', 'underlined');

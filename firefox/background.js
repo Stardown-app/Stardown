@@ -127,7 +127,7 @@ async function createMarkdownLink(tab, id, linkFormat, subBrackets, checkSelecte
     }
 
     const title = tab.title;
-    const url = tab.url;
+    const url = tab.url.replaceAll('(', '%28').replaceAll(')', '%29');
 
     let arg;  // the text fragment argument
     let selectedText;

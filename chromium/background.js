@@ -129,7 +129,7 @@ async function createMarkdownLink(tab, subBrackets) {
     }
 
     const title = await replaceBrackets(tab.title, subBrackets);
-    const url = tab.url;
+    const url = tab.url.replaceAll('(', '%28').replaceAll(')', '%29');
 
     return `[${title}](${url})`;
 }
@@ -196,7 +196,7 @@ async function scriptWriteLinkToClipboard(tab, id) {
             function: (id, subBrackets) => {
                 return (async () => {
                     const title = document.title;
-                    const url = location.href;
+                    const url = location.href.replaceAll('(', '%28').replaceAll(')', '%29');
 
                     let selectedText;
                     let arg;  // the text fragment argument

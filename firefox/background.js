@@ -45,8 +45,8 @@ browser.browserAction.onClicked.addListener(async () => {
     lastClick = now;
 
     const [tab] = await browser.tabs.query({ active: true, currentWindow: true });
-    const linkFormat = await getSetting('link_format', 'selected');
-    const subBrackets = await getSetting('sub_brackets', 'underlined');
+    const linkFormat = await getSetting('linkFormat', 'selected');
+    const subBrackets = await getSetting('subBrackets', 'underlined');
     const link = await createMarkdownLink(tab, '', linkFormat, subBrackets, false);
     await navigator.clipboard.writeText(link);
     await brieflyShowCheckmark(1);
@@ -70,8 +70,8 @@ async function handleDoubleClick() {
     if (tabs.length === 1) {
         tabs = await browser.tabs.query({ currentWindow: true });
     }
-    const linkFormat = await getSetting('link_format', 'selected');
-    const subBrackets = await getSetting('sub_brackets', 'underlined');
+    const linkFormat = await getSetting('linkFormat', 'selected');
+    const subBrackets = await getSetting('subBrackets', 'underlined');
     const links = await Promise.all(
         tabs.map(tab => createMarkdownLink(tab, '', linkFormat, subBrackets, false))
     );
@@ -94,8 +94,8 @@ function sendCopyMessage(info, tab) {
         { frameId: info.frameId },
         async function (clickedElementId) {
             // clickedElementId may be undefined, an empty string, or a non-empty string
-            const linkFormat = getSetting('link_format', 'selected');
-            const subBrackets = await getSetting('sub_brackets', 'underlined');
+            const linkFormat = getSetting('linkFormat', 'selected');
+            const subBrackets = await getSetting('subBrackets', 'underlined');
             const link = await createMarkdownLink(tab, clickedElementId, linkFormat, subBrackets, true);
             await navigator.clipboard.writeText(link);
             brieflyShowCheckmark(1);

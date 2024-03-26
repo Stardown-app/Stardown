@@ -73,7 +73,7 @@ async function handleDoubleClick() {
     if (tabs.length === 1) {
         tabs = await browser.tabs.query({ currentWindow: true });
     }
-    const subBrackets = await getSetting('sub_brackets', 'underlined');
+    const subBrackets = await getSetting('subBrackets', 'underlined');
     const links = await Promise.all(
         tabs.map(tab => createMarkdownLink(tab, subBrackets))
     );
@@ -186,7 +186,7 @@ async function scriptWriteLinkToClipboard(tab, id) {
         id = '';
     }
 
-    const subBrackets = await getSetting('sub_brackets', 'underlined');
+    const subBrackets = await getSetting('subBrackets', 'underlined');
 
     let injectionResult;
     try {
@@ -207,7 +207,7 @@ async function scriptWriteLinkToClipboard(tab, id) {
                     }
 
                     let link = '[';
-                    const linkFormat = await getSetting('link_format', 'selected');
+                    const linkFormat = await getSetting('linkFormat', 'selected');
                     if (selectedText && linkFormat === 'selected') {
                         link += await replaceBrackets(selectedText.trim(), subBrackets);
                     } else {

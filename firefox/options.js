@@ -18,8 +18,8 @@ async function saveOptions(e) {
     e.preventDefault();
     await browser.storage.sync.set(
         {
-            sub_brackets: document.querySelector("#sub_brackets").value,
-            link_format: document.querySelector("#link_format").value,
+            subBrackets: document.querySelector("#subBrackets").value,
+            linkFormat: document.querySelector("#linkFormat").value,
             bulletPoint: document.querySelector("#bulletPoint").value,
             doubleClickInterval: document.querySelector("#doubleClickInterval").value,
         },
@@ -38,11 +38,11 @@ async function saveOptions(e) {
 
 async function loadOptions() {
     try {
-        const sub_brackets = await getSetting("sub_brackets", "underlined");
-        document.querySelector("#sub_brackets").value = sub_brackets;
+        const subBrackets = await getSetting("subBrackets", "underlined");
+        document.querySelector("#subBrackets").value = subBrackets;
 
-        const link_format = await getSetting("link_format", "selected");
-        document.querySelector("#link_format").value = link_format;
+        const linkFormat = await getSetting("linkFormat", "selected");
+        document.querySelector("#linkFormat").value = linkFormat;
 
         const bulletPoint = await getSetting("bulletPoint", "-");
         document.querySelector("#bulletPoint").value = bulletPoint;

@@ -9,7 +9,7 @@
     <!-- <a><img alt="Safari badge" src="https://img.shields.io/badge/Safari-black.svg?logo=safari&style=for-the-badge&logoColor=188ff3"></a> -->
 </p>
 
-<p align="center"><img alt="demo gif" src="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExdmR4ajM2ODQxNGt0OXQ3b3J2dWl6NnQwbDB4a2Fndmt1dm41b2hlayZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/TWi9ZnGs0cTYc2jEOX/giphy.gif"></p>
+<p align="center"><img alt="demo gif" src="https://github.com/wheelercj/assets/blob/main/Stardown.gif"></p>
 
 After installing, there are multiple ways you can copy markdown links:
 

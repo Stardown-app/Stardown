@@ -14,16 +14,43 @@
    limitations under the License.
 */
 
-browser.browserAction.onClicked.addListener(async () => {
-    const [tab] = await browser.tabs.query({ active: true, currentWindow: true });
+let lastClick = new Date(0);
+let doubleClickInterval = 500;
+getSetting('doubleClickInterval', 500).then(value => doubleClickInterval = value);
 
-    const err = await writeLinkToClipboard(tab, '');
-    if (err === null) {
-        await brieflyShowCheckmark();
-    } else {
-        console.error(err);
-        await brieflyShowX();
+browser.browserAction.onClicked.addListener(async () => {
+    const now = new Date();
+    if (now - lastClick < doubleClickInterval) {
+        // it's a double-click
+        let havePerm;
+        try {
+            // The permissions request must be the first async function call in the
+            // event handler or it will throw an error. That's why the value for the
+            // doubleClickInterval setting is retrieved later.
+            havePerm = await browser.permissions.request({ permissions: ['tabs'] });
+        } catch (err) {
+            console.error(err);
+            brieflyShowX();
+            return;
+        }
+        if (!havePerm) {
+            return;
+        }
+
+        lastClick = new Date(0);
+        await handleDoubleClick();
+        return;
     }
+    // it's a single-click
+    lastClick = now;
+
+    const [tab] = await browser.tabs.query({ active: true, currentWindow: true });
+    const linkFormat = await getSetting('link_format', 'selected');
+    const subBrackets = await getSetting('sub_brackets', 'underlined');
+    const link = await createMarkdownLink(tab, '', linkFormat, subBrackets, false);
+    await navigator.clipboard.writeText(link);
+    await brieflyShowCheckmark(1);
+    doubleClickInterval = await getSetting('doubleClickInterval', 500);
 });
 
 browser.contextMenus.create({
@@ -38,57 +65,92 @@ browser.contextMenus.onClicked.addListener((info, tab) => {
     }
 });
 
+async function handleDoubleClick() {
+    let tabs = await browser.tabs.query({ currentWindow: true, highlighted: true });
+    if (tabs.length === 1) {
+        tabs = await browser.tabs.query({ currentWindow: true });
+    }
+    const linkFormat = await getSetting('link_format', 'selected');
+    const subBrackets = await getSetting('sub_brackets', 'underlined');
+    const links = await Promise.all(
+        tabs.map(tab => createMarkdownLink(tab, '', linkFormat, subBrackets, false))
+    );
+    const bulletPoint = await getSetting('bulletPoint', '-');
+    const text = links.map(link => `${bulletPoint} ${link}\n`).join('');
+    await navigator.clipboard.writeText(text);
+    await brieflyShowCheckmark(tabs.length);
+}
+
 /**
  * sendCopyMessage sends a message to the content script to get the ID of the
  * right-clicked HTML element and then writes a markdown link to the clipboard.
- * @param {any} info - The context menu info.
- * @param {any} tab - The tab that the context menu was clicked in.
+ * @param {any} info - the context menu info.
+ * @param {any} tab - the tab that the context menu was clicked in.
  */
 function sendCopyMessage(info, tab) {
     browser.tabs.sendMessage(
         tab.id,
         "getClickedElementId",
         { frameId: info.frameId },
-        function (clickedElementId) {
+        async function (clickedElementId) {
             // clickedElementId may be undefined, an empty string, or a non-empty string
-            writeLinkToClipboard(tab, clickedElementId);
-            brieflyShowCheckmark();
+            const linkFormat = getSetting('link_format', 'selected');
+            const subBrackets = await getSetting('sub_brackets', 'underlined');
+            const link = await createMarkdownLink(tab, clickedElementId, linkFormat, subBrackets, true);
+            await navigator.clipboard.writeText(link);
+            brieflyShowCheckmark(1);
         },
     );
 }
 
 /**
- * writeLinkToClipboard copies a markdown link to the clipboard. The link may contain an
- * HTML element ID, a text fragment, or both. Browsers that support text fragments will
- * try to use them first, and use the ID as a fallback if necessary.
- * @param {any} tab - The tab to copy the link from.
- * @param {string|undefined} id - The ID of the HTML element to link to. If falsy, no ID
+ * createMarkdownLink creates a markdown link for a tab, optionally including an HTML
+ * element ID and/or a text fragment. A text fragment is automatically included if
+ * checkSelected is true and text is selected. Browsers that support text fragments will
+ * try to use them first, and use the ID as a fallback if necessary. If the link format
+ * setting is set to "selected" and selected text is retrieved, the selected text will
+ * be used as the link title; otherwise, the tab title will be used as the link title.
+ * @param {any} tab - the tab to create the link from.
+ * @param {string|undefined} id - the ID of the HTML element to link to. If falsy, no ID
  * is included in the link.
- * @returns {Promise<string|null>} - A Promise that resolves to null if the link was
- * copied successfully, or an error message if not.
+ * @param {string} linkFormat - the format of the link to create; from the settings.
+ * @param {boolean} subBrackets - the setting for what to substitute any square brackets
+ * with.
+ * @param {boolean} checkSelected - whether to check if text is selected.
+ * @returns {Promise<string>} - a Promise that resolves to the markdown link.
  */
-async function writeLinkToClipboard(tab, id) {
+async function createMarkdownLink(tab, id, linkFormat, subBrackets, checkSelected) {
+    if (tab.title === undefined) {
+        console.error('tab.title is undefined');
+        throw new Error('tab.title is undefined');
+        // Were the necessary permissions granted?
+    }
+
     const title = tab.title;
     const url = tab.url;
 
     let arg;  // the text fragment argument
     let selectedText;
-    try {
-        const results = await browser.tabs.executeScript(tab.id, {
-            file: 'create-text-fragment-arg.js',
-        });
-        arg = results[0].slice(0, -1)[0];
-        selectedText = results[0].slice(-1)[0];
-    } catch (err) {
-        console.log(`(Creating text fragment) ${err}`);
+    if (checkSelected) {
+        let results;
+        try {
+            results = await browser.tabs.executeScript(tab.id, {
+                file: 'create-text-fragment-arg.js',
+            });
+        } catch (err) {
+            console.log(`(Creating text fragment) ${err}`);
+        }
+        if (results) {
+            arg = results[0].slice(0, -1)[0];
+            selectedText = results[0].slice(-1)[0];
+        }
     }
 
     let link = '[';
-    const linkFormat = await getSetting('link_format', 'selected');
     if (selectedText && linkFormat === 'selected') {
-        link += await replaceBrackets(selectedText.trim());
+        link += await replaceBrackets(selectedText.trim(), subBrackets);
     } else {
-        link += await replaceBrackets(title);
+        link += await replaceBrackets(title, subBrackets);
     }
     link += `](${url}`;
     if (id || arg) {
@@ -102,28 +164,35 @@ async function writeLinkToClipboard(tab, id) {
     }
     link += ')';
 
-    await navigator.clipboard.writeText(link);
-    return null;
+    return link;
 }
 
 /**
  * replaceBrackets replaces square brackets in a link title with the character or escape
  * sequence chosen in settings.
  * @param {string} title - the raw link title.
+ * @param {string} subBrackets - the setting for what to substitute any square brackets
+ * with.
  * @returns {Promise<string>}
  */
-async function replaceBrackets(title) {
-    let sub_brackets = await getSetting('sub_brackets', 'underlined');
-    if (sub_brackets === 'underlined') {
+async function replaceBrackets(title, subBrackets) {
+    if (subBrackets === 'underlined') {
         return title.replaceAll('[', '⦋').replaceAll(']', '⦌');
-    } else if (sub_brackets === 'escaped') {
+    } else if (subBrackets === 'escaped') {
         return title.replaceAll('[', '\\[').replaceAll(']', '\\]');
     }
     return title;
 }
 
-async function brieflyShowCheckmark() {
-    browser.browserAction.setBadgeText({ text: '✓' });
+async function brieflyShowCheckmark(linkCount) {
+    if (linkCount === 0) {
+        await brieflyShowX();
+        return;
+    } else if (linkCount === 1) {
+        browser.browserAction.setBadgeText({ text: '✓' });
+    } else {
+        browser.browserAction.setBadgeText({ text: `${linkCount} ✓` });
+    }
     browser.browserAction.setBadgeBackgroundColor({ color: 'green' });
     await sleep(1000);  // 1 second
     browser.browserAction.setBadgeText({ text: '' });

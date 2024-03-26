@@ -16,14 +16,44 @@
 
 const browser = chrome || browser;
 
+let lastClick = new Date(0);
+let doubleClickInterval = 500;
+getSetting('doubleClickInterval', 500).then(value => doubleClickInterval = value);
+
 browser.action.onClicked.addListener(async (tab) => {
+    const now = new Date();
+    if (now - lastClick < doubleClickInterval) {
+        // it's a double-click
+        let havePerm;
+        try {
+            // The permissions request must be the first async function call in the
+            // event handler or it will throw an error. That's why the value for the
+            // doubleClickInterval setting is retrieved later.
+            havePerm = await browser.permissions.request({ permissions: ['tabs'] });
+        } catch (err) {
+            console.error(err);
+            brieflyShowX();
+            return;
+        }
+        if (!havePerm) {
+            return;
+        }
+
+        lastClick = new Date(0);
+        await handleDoubleClick();
+        return;
+    }
+    // it's a single-click
+    lastClick = now;
+
     const err = await scriptWriteLinkToClipboard(tab, '');
     if (err === null) {
-        await brieflyShowCheckmark();
+        await brieflyShowCheckmark(1);
     } else {
         console.error(err);
         await brieflyShowX();
     }
+    doubleClickInterval = await getSetting('doubleClickInterval', 500);
 });
 
 browser.contextMenus.create({
@@ -38,11 +68,32 @@ browser.contextMenus.onClicked.addListener((info, tab) => {
     }
 });
 
+async function handleDoubleClick() {
+    let tabs = await browser.tabs.query({ currentWindow: true, highlighted: true });
+    if (tabs.length === 1) {
+        tabs = await browser.tabs.query({ currentWindow: true });
+    }
+    const subBrackets = await getSetting('sub_brackets', 'underlined');
+    const links = await Promise.all(
+        tabs.map(tab => createMarkdownLink(tab, subBrackets))
+    );
+    const bulletPoint = await getSetting('bulletPoint', '-');
+    const text = links.map(link => `${bulletPoint} ${link}\n`).join('');
+    const activeTab = tabs.find(tab => tab.active);
+    const err = await scriptWriteToClipboard(activeTab, text);
+    if (err === null) {
+        await brieflyShowCheckmark(tabs.length);
+    } else {
+        console.error(err);
+        await brieflyShowX();
+    }
+}
+
 /**
  * sendCopyMessage sends a message to the content script to get the ID of the
  * right-clicked HTML element and then writes a markdown link to the clipboard.
- * @param {any} info - The context menu info.
- * @param {any} tab - The tab that the context menu was clicked in.
+ * @param {any} info - the context menu info.
+ * @param {any} tab - the tab that the context menu was clicked in.
  */
 function sendCopyMessage(info, tab) {
     browser.tabs.sendMessage(
@@ -53,7 +104,7 @@ function sendCopyMessage(info, tab) {
             // clickedElementId may be undefined, an empty string, or a non-empty string
             const err = await scriptWriteLinkToClipboard(tab, clickedElementId);
             if (err === null) {
-                await brieflyShowCheckmark();
+                await brieflyShowCheckmark(1);
             } else {
                 console.error(err);
                 await brieflyShowX();
@@ -63,13 +114,71 @@ function sendCopyMessage(info, tab) {
 }
 
 /**
+ * createMarkdownLink creates a markdown link for a tab. The link does not include any
+ * HTML element ID nor text fragment. The tab title is used as the link title.
+ * @param {any} tab - the tab to create the link from.
+ * @param {boolean} subBrackets - the setting for what to substitute any square brackets
+ * with.
+ * @returns {Promise<string>} - a Promise that resolves to the markdown link.
+ */
+async function createMarkdownLink(tab, subBrackets) {
+    if (tab.title === undefined) {
+        console.error('tab.title is undefined');
+        throw new Error('tab.title is undefined');
+        // Were the necessary permissions granted?
+    }
+
+    const title = await replaceBrackets(tab.title, subBrackets);
+    const url = tab.url;
+
+    return `[${title}](${url})`;
+}
+
+/**
+ * scriptWriteToClipboard writes text to the clipboard in a tab. This function expects
+ * the tabs permission and will fail silently if the tabs permission has not been
+ * granted and the document is not focused.
+ * @param {any} tab - the tab to write text to the clipboard in.
+ * @param {string} text - the text to write to the clipboard.
+ * @returns {Promise<string|null>} - a Promise that resolves to null if the text was
+ * written to the clipboard successfully, or an error message if not.
+ */
+async function scriptWriteToClipboard(tab, text) {
+    let injectionResult;
+    try {
+        injectionResult = await browser.scripting.executeScript({
+            target: { tabId: tab.id },
+            args: [text],
+            function: (text) => {
+                return (async () => {
+                    // This script assumes the tabs permission has been granted. If it
+                    // has not been granted, `navigator.clipboard.writeText` will fail
+                    // silently when the document is not focused.
+                    // if (!document.hasFocus()) {
+                    //     return 'Cannot copy a markdown link for an unfocused document';
+                    // }
+
+                    await navigator.clipboard.writeText(text);
+                    return null;
+                })();
+            },
+        });
+    } catch (err) {
+        return err;
+    }
+
+    // `injectionResult[0].result` is whatever the injected script returned.
+    return injectionResult[0].result;
+}
+
+/**
  * scriptWriteLinkToClipboard copies a markdown link to the clipboard. The link may
  * contain an HTML element ID, a text fragment, or both. Browsers that support text
  * fragments will try to use them first, and use the ID as a fallback if necessary.
- * @param {any} tab - The tab to copy the link from.
- * @param {string|undefined} id - The ID of the HTML element to link to. If falsy, no ID
+ * @param {any} tab - the tab to copy the link from.
+ * @param {string|undefined} id - the ID of the HTML element to link to. If falsy, no ID
  * is included in the link.
- * @returns {Promise<string|null>} - A Promise that resolves to null if the link was
+ * @returns {Promise<string|null>} - a Promise that resolves to null if the link was
  * copied successfully, or an error message if not.
  */
 async function scriptWriteLinkToClipboard(tab, id) {
@@ -77,25 +186,32 @@ async function scriptWriteLinkToClipboard(tab, id) {
         id = '';
     }
 
+    const subBrackets = await getSetting('sub_brackets', 'underlined');
+
     let injectionResult;
     try {
         injectionResult = await browser.scripting.executeScript({
             target: { tabId: tab.id },
-            args: [id],
-            function: (id) => {
+            args: [id, subBrackets],
+            function: (id, subBrackets) => {
                 return (async () => {
                     const title = document.title;
                     const url = location.href;
+
+                    let selectedText;
+                    let arg;  // the text fragment argument
                     const selection = window.getSelection();
-                    const selectedText = selection.toString();
-                    const arg = createTextFragmentArg(selection);
+                    if (selection) {
+                        selectedText = selection.toString();
+                        arg = createTextFragmentArg(selection);
+                    }
 
                     let link = '[';
                     const linkFormat = await getSetting('link_format', 'selected');
                     if (selectedText && linkFormat === 'selected') {
-                        link += await replaceBrackets(selectedText.trim());
+                        link += await replaceBrackets(selectedText.trim(), subBrackets);
                     } else {
-                        link += await replaceBrackets(title);
+                        link += await replaceBrackets(title, subBrackets);
                     }
                     link += `](${url}`;
                     if (id || arg) {
@@ -110,13 +226,17 @@ async function scriptWriteLinkToClipboard(tab, id) {
                     link += ')';
 
                     // `navigator.clipboard.writeText` only works in a script if the
-                    // document is focused. For some reason, `document.body.focus()`
-                    // doesn't work here. This doesn't seem to be necessary in Firefox.
+                    // document is focused, or if the tabs permission has been granted.
+                    // Probably for security reasons, `document.body.focus()` doesn't
+                    // work here. Whether the document is focused doesn't seem to be an
+                    // issue in Firefox, unless that's just because the Firefox version
+                    // of Stardown doesn't have to inject a script to write to the
+                    // clipboard.
                     if (!document.hasFocus()) {
                         return 'Cannot copy a markdown link for an unfocused document';
                     }
 
-                    navigator.clipboard.writeText(link);
+                    await navigator.clipboard.writeText(link);
                     return null;
                 })();
             },
@@ -129,8 +249,32 @@ async function scriptWriteLinkToClipboard(tab, id) {
     return injectionResult[0].result;
 }
 
-async function brieflyShowCheckmark() {
-    browser.action.setBadgeText({ text: '✓' });
+/**
+ * replaceBrackets replaces square brackets in a link title with the character or escape
+ * sequence chosen in settings.
+ * @param {string} title - the raw link title.
+ * @param {string} subBrackets - the setting for what to substitute any square brackets
+ * with.
+ * @returns {Promise<string>}
+ */
+async function replaceBrackets(title, subBrackets) {
+    if (subBrackets === 'underlined') {
+        return title.replaceAll('[', '⦋').replaceAll(']', '⦌');
+    } else if (subBrackets === 'escaped') {
+        return title.replaceAll('[', '\\[').replaceAll(']', '\\]');
+    }
+    return title;
+}
+
+async function brieflyShowCheckmark(linkCount) {
+    if (linkCount === 0) {
+        await brieflyShowX();
+        return;
+    } else if (linkCount === 1) {
+        browser.action.setBadgeText({ text: '✓' });
+    } else {
+        browser.action.setBadgeText({ text: `${linkCount} ✓` });
+    }
     browser.action.setBadgeBackgroundColor({ color: 'green' });
     await sleep(1000);  // 1 second
     browser.action.setBadgeText({ text: '' });

@@ -15,6 +15,9 @@
         "contextMenus",
         "storage"
     ],
+    "optional_permissions": [
+        "tabs"
+    ],
     "options_ui": {
         "page": "options.html"
     },

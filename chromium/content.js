@@ -67,13 +67,14 @@ async function getSetting(name, default_) {
  * replaceBrackets replaces square brackets in a link title with the character or escape
  * sequence chosen in settings.
  * @param {string} title - the raw link title.
+ * @param {string} subBrackets - the setting for what to substitute any square brackets
+ * with.
  * @returns {Promise<string>}
  */
-async function replaceBrackets(title) {
-    let sub_brackets = await getSetting('sub_brackets', 'underlined');
-    if (sub_brackets === 'underlined') {
+async function replaceBrackets(title, subBrackets) {
+    if (subBrackets === 'underlined') {
         return title.replaceAll('[', '⦋').replaceAll(']', '⦌');
-    } else if (sub_brackets === 'escaped') {
+    } else if (subBrackets === 'escaped') {
         return title.replaceAll('[', '\\[').replaceAll(']', '\\]');
     }
     return title;

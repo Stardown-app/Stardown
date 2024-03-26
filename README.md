@@ -9,12 +9,14 @@
     <!-- <a><img alt="Safari badge" src="https://img.shields.io/badge/Safari-black.svg?logo=safari&style=for-the-badge&logoColor=188ff3"></a> -->
 </p>
 
-<p align="center"><img alt="demo" src="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExcnB5d2kwOXh6cDFnMnpudzFiem00Y3NsZjVxbXZhMWgwcWpvcG5yaSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/37MMWMqQyKSeKvDfk1/giphy.gif"></p>
+<p align="center"><img alt="demo gif" src="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExdmR4ajM2ODQxNGt0OXQ3b3J2dWl6NnQwbDB4a2Fndmt1dm41b2hlayZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/TWi9ZnGs0cTYc2jEOX/giphy.gif"></p>
 
-After installing, there are multiple ways you can copy a markdown link:
+After installing, there are multiple ways you can copy markdown links:
 
 * click the extension's icon
 * press `Ctrl+Shift+U` (Mac: `Cmd+Shift+U`), or whichever keyboard shortcut you prefer in your browser's settings
+* double-click the extension's icon to copy links for all tabs, or press `Ctrl+Shift+UU` (Mac: `Cmd+Shift+UU`)
+* select tabs before double-clicking the icon to copy links for only those tabs
 * right-click where you want to link to and choose "Copy markdown link to here"
 * select text before using the right-click option to create a link with a [text fragment](https://web.dev/articles/text-fragments)
 
@@ -22,7 +24,9 @@ Stardown's right-click option only adds a text fragment if you have selected tex
 
 ## privacy
 
-Stardown will never sell any data to anyone, and does not collect nor send any data anywhere besides putting links into your clipboard.
+Stardown will never sell any data to anyone, and does not collect nor send any of your data anywhere besides putting markdown text into your clipboard.
+
+If you use Stardown's feature that copies links for multiple tabs simultaneously, the first time you do, Stardown will request to "read your browsing history" or "access browser tabs" because that's the only way for an extension to see the titles and URLs of all tabs ([source for Chromium](https://developer.chrome.com/docs/extensions/reference/permissions-list#gc-wrapper:~:text=Warning%20displayed%3A-,read%20your%20browsing%20history.,-%22topSites%22), [source for Firefox](https://extensionworkshop.com/documentation/develop/request-the-right-permissions/#request-permissions-at-runtime#add-information-about-permissions-to-your-extensions-amo-page#advised-permissions:~:text=tabs-,access%20browser%20tabs,-topSites)). Granting this permission does NOT give access to existing browsing history; the request message only says that because malicious extensions that can see the titles and URLs of all tabs could start manually gathering your browsing activity. The permission can be revoked at any time. Other browser extensions that request direct, immediate, and complete access to browsing history, unlike Stardown, use request messages such as "read and change your browsing history on all signed-in devices" or "access browsing history".
 
 ## settings
 
@@ -52,7 +56,7 @@ This is an occasionally reoccuring bug in browsers. Reinstalling Stardown should
 
 This may happen if the current website is not focused, such as if you just clicked the bookmarks sidebar. In this case, click the page and try again.
 
-Another possibility is that some websites limit what extensions can do and may prevent Stardown from working. A few examples are the Chrome Web Store and Chrome pages that start with `chrome://`. Fortunately, very few websites do this.
+Another possibility is that some websites limit what extensions can do and may prevent Stardown from working. A few examples are the Chrome Web Store and Chrome pages that start with `chrome://`. Fortunately, very few websites do this and it doesn't prevent Stardown from copying links for multiple tabs simultaneously if the current tab is not one of those limiting websites.
 
 ### Something else is wrong
 
@@ -60,7 +64,7 @@ If reinstalling Stardown doesn't fix it and [the issues page](https://github.com
 
 ## feature requests
 
-Although you're welcome to [make a feature request](https://github.com/wheelercj/Stardown/issues), there may already be another browser extension that meets all your needs. I am not affiliated with any of the below extensions and have not tried all of them. Use them at your own risk.
+You're welcome to [make a feature request](https://github.com/wheelercj/Stardown/issues), and there may already be another browser extension that meets all your needs. I am not affiliated with any of the below extensions and have not tried all of them. Use them at your own risk.
 
 ### Copy links in other formats besides markdown
 

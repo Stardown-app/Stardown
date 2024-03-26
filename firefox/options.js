@@ -20,6 +20,8 @@ async function saveOptions(e) {
         {
             sub_brackets: document.querySelector("#sub_brackets").value,
             link_format: document.querySelector("#link_format").value,
+            bulletPoint: document.querySelector("#bulletPoint").value,
+            doubleClickInterval: document.querySelector("#doubleClickInterval").value,
         },
         () => {
             // indicate saving was successful
@@ -41,8 +43,15 @@ async function loadOptions() {
 
         const link_format = await getSetting("link_format", "selected");
         document.querySelector("#link_format").value = link_format;
+
+        const bulletPoint = await getSetting("bulletPoint", "-");
+        document.querySelector("#bulletPoint").value = bulletPoint;
+
+        const doubleClickInterval = await getSetting("doubleClickInterval", 500);
+        document.querySelector("#doubleClickInterval").value = doubleClickInterval;
     } catch (err) {
         console.error(err);
+        throw err;
     }
 }
 

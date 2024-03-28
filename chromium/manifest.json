@@ -1,7 +1,7 @@
 {
     "manifest_version": 3,
     "name": "Stardown",
-    "description": "Copy to the clipboard a markdown link for the current page.",
+    "description": "Copy a markdown link for the current page.",
     "version": "0.0.1",
     "homepage_url": "https://github.com/wheelercj/Stardown",
     "permissions": [
@@ -53,7 +53,7 @@
                 "default": "Ctrl+Shift+U",
                 "mac": "Command+Shift+U"
             },
-            "description": "Copy to the clipboard a markdown link for the current page"
+            "description": "Copy a markdown link for the current page"
         }
     }
 }

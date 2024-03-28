@@ -20,7 +20,7 @@ After installing, there are multiple ways you can copy markdown links:
 * right-click where you want to link to and choose "Copy markdown link to here"
 * select text before using the right-click option to create a link with a [text fragment](https://web.dev/articles/text-fragments)
 
-Stardown's right-click option only adds a text fragment if you have selected text, but always tries to find an `id` attribute in the HTML elements you right-clicked so you can still link to specific parts of pages without text fragments. Firefox does not support text fragments yet, but the Firefox version of Stardown allows you to create links with text fragments.
+Stardown's right-click option only adds a text fragment if you have selected text, but always tries to find an `id` attribute in the HTML elements you right-clicked so you can still link to specific parts of pages without text fragments. [Firefox does not support text fragments yet](https://bugzilla.mozilla.org/show_bug.cgi?id=1753933), but the Firefox version of Stardown allows you to create links with text fragments.
 
 ## privacy
 
@@ -100,7 +100,6 @@ Unlike the extensions linked above, Stardown:
 
 There are different versions of Stardown for Firefox and the Chromium browsers because of bugs or limitations in them:
 
-* [Firefox does not yet support text fragments](https://bugzilla.mozilla.org/show_bug.cgi?id=1753933).
 * Since [Chromium does not support the Clipboard API in background scripts](https://stackoverflow.com/questions/61862872/how-to-copy-web-notification-content-to-clipboard/61977696#61977696), the Chromium version of Stardown also requires the `scripting` permission so it can run a script that puts text in the clipboard.
 * In Firefox, [Manifest V3 extensions with low privilege activeTab shows annoying blue dot for all websites](https://bugzilla.mozilla.org/show_bug.cgi?id=1851083). This is why I changed the Firefox version of Stardown from manifest v3 to v2.
 * Although Stardown no longer uses Firefox's manifest v3, [Firefox does not support service_worker in manifest v3](https://stackoverflow.com/questions/75043889/manifest-v3-background-scripts-service-worker-on-firefox).

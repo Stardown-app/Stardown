@@ -64,7 +64,7 @@ If reinstalling Stardown doesn't fix it and [the issues page](https://github.com
 
 ## feature requests
 
-You're welcome to [make a feature request](https://github.com/wheelercj/Stardown/issues), and there may already be another browser extension that meets all your needs. I am not affiliated with any of the below extensions and have not tried all of them. Use them at your own risk.
+You're welcome to [make a feature request](https://github.com/wheelercj/Stardown/issues/new?assignees=&labels=enhancement&projects=&template=feature_request.md&title=), and there may already be another browser extension that meets all your needs. I am not affiliated with any of the below extensions and have not tried all of them. Use them at your own risk.
 
 ### Copy links in other formats besides markdown
 

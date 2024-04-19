@@ -45,7 +45,7 @@ browser.browserAction.onClicked.addListener(async () => {
     lastClick = now;
 
     const [tab] = await browser.tabs.query({ active: true, currentWindow: true });
-    const linkFormat = await getSetting('linkFormat', 'selected');
+    const linkFormat = await getSetting('linkFormat', 'blockquote');
     const subBrackets = await getSetting('subBrackets', 'underlined');
     const link = await createMarkdownLink(tab, '', linkFormat, subBrackets, false);
     await navigator.clipboard.writeText(link);
@@ -75,7 +75,7 @@ async function handleDoubleClick() {
             tabs = await browser.tabs.query({});
         }
     }
-    const linkFormat = await getSetting('linkFormat', 'selected');
+    const linkFormat = await getSetting('linkFormat', 'blockquote');
     const subBrackets = await getSetting('subBrackets', 'underlined');
     const links = await Promise.all(
         tabs.map(tab => createMarkdownLink(tab, '', linkFormat, subBrackets, false))
@@ -99,10 +99,10 @@ function sendCopyMessage(info, tab) {
         { frameId: info.frameId },
         async function (clickedElementId) {
             // clickedElementId may be undefined, an empty string, or a non-empty string
-            const linkFormat = getSetting('linkFormat', 'selected');
+            const linkFormat = await getSetting('linkFormat', 'blockquote');
             const subBrackets = await getSetting('subBrackets', 'underlined');
-            const link = await createMarkdownLink(tab, clickedElementId, linkFormat, subBrackets, true);
-            await navigator.clipboard.writeText(link);
+            const text = await createMarkdownLink(tab, clickedElementId, linkFormat, subBrackets, true);
+            await navigator.clipboard.writeText(text);
             brieflyShowCheckmark(1);
         },
     );
@@ -110,11 +110,10 @@ function sendCopyMessage(info, tab) {
 
 /**
  * createMarkdownLink creates a markdown link for a tab, optionally including an HTML
- * element ID and/or a text fragment. A text fragment is automatically included if
- * checkSelected is true and text is selected. Browsers that support text fragments will
- * try to use them first, and use the ID as a fallback if necessary. If the link format
- * setting is set to "selected" and selected text is retrieved, the selected text will
- * be used as the link title; otherwise, the tab title will be used as the link title.
+ * element ID, and/or a text fragment, and/or a markdown blockquote depending on the
+ * settings, whether checkSelected is true, and whether text is selected. Browsers that
+ * support text fragments will try to use them first, and use the ID as a fallback if
+ * necessary.
  * @param {any} tab - the tab to create the link from.
  * @param {string|undefined} id - the ID of the HTML element to link to. If falsy, no ID
  * is included in the link.
@@ -122,7 +121,7 @@ function sendCopyMessage(info, tab) {
  * @param {boolean} subBrackets - the setting for what to substitute any square brackets
  * with.
  * @param {boolean} checkSelected - whether to check if text is selected.
- * @returns {Promise<string>} - a Promise that resolves to the markdown link.
+ * @returns {Promise<string>} - the markdown text.
  */
 async function createMarkdownLink(tab, id, linkFormat, subBrackets, checkSelected) {
     if (tab.title === undefined) {
@@ -131,11 +130,11 @@ async function createMarkdownLink(tab, id, linkFormat, subBrackets, checkSelecte
         // Were the necessary permissions granted?
     }
 
-    const title = tab.title;
-    const url = tab.url.replaceAll('(', '%28').replaceAll(')', '%29');
+    let title = await replaceBrackets(tab.title, subBrackets);
+    let url = tab.url.replaceAll('(', '%28').replaceAll(')', '%29');
 
-    let arg;  // the text fragment argument
     let selectedText;
+    let arg;  // the text fragment argument
     if (checkSelected) {
         let results;
         try {
@@ -147,29 +146,66 @@ async function createMarkdownLink(tab, id, linkFormat, subBrackets, checkSelecte
         }
         if (results) {
             arg = results[0].slice(0, -1)[0];
-            selectedText = results[0].slice(-1)[0];
+            selectedText = results[0].slice(-1)[0].trim();
         }
     }
 
-    let link = '[';
-    if (selectedText && linkFormat === 'selected') {
-        link += await replaceBrackets(selectedText.trim(), subBrackets);
-    } else {
-        link += await replaceBrackets(title, subBrackets);
-    }
-    link += `](${url}`;
     if (id || arg) {
-        link += '#';
+        url += '#';
         if (id) {
-            link += id;
+            url += id;
         }
         if (arg) {
-            link += `:~:text=${arg}`;
+            url += `:~:text=${arg}`;
         }
     }
-    link += ')';
 
-    return link;
+    let text;
+    if (!selectedText) {
+        text = `[${title}](${url})`;
+    } else {
+        switch (linkFormat) {
+            case 'title':
+                text = `[${title}](${url})`;
+                break;
+            case 'selected':
+                title = await replaceBrackets(selectedText, subBrackets);
+                text = `[${title}](${url})`;
+                break;
+            case 'blockquote':
+                selectedText = selectedText
+                    .replaceAll('[', '\\[')
+                    .replaceAll('>', '\\>')
+                    .replaceAll('<', '\\<')
+                    .replaceAll('#', '\\#')
+                    .replaceAll('_', '\\_')
+                    .replaceAll('*', '\\*')
+                    .replaceAll('-', '\\-')
+                    .replaceAll('+', '\\+')
+                    .replaceAll('=', '\\=')
+                    .replaceAll('`', '\\`');
+                text = await createBlockquote(selectedText, title, url);
+                break;
+            default:
+                console.error(`Unknown linkFormat: ${linkFormat}`);
+                throw new Error(`Unknown linkFormat: ${linkFormat}`);
+        }
+    }
+
+    return text;
+}
+
+/**
+ * createBlockquote creates a markdown blockquote with a link at the end. Any character
+ * escaping or replacements should have already been done before calling this function.
+ * @param {string} text - the text of the blockquote.
+ * @param {string} title - the title of the link.
+ * @param {string} url - the URL of the link.
+ * @returns {Promise<string>}
+ */
+async function createBlockquote(text, title, url) {
+    text = text.replaceAll('\n', '\n> ');
+    return `> ${text}\n> \n> — [${title}](${url})\n`;
 }
 
 /**

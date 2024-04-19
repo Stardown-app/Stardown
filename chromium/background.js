@@ -177,9 +177,11 @@ async function scriptWriteToClipboard(tab, text) {
 }
 
 /**
- * scriptWriteLinkToClipboard copies a markdown link to the clipboard. The link may
- * contain an HTML element ID, a text fragment, or both. Browsers that support text
- * fragments will try to use them first, and use the ID as a fallback if necessary.
+ * scriptWriteLinkToClipboard copies to the clipboard a markdown link for a tab,
+ * optionally including an HTML element ID, and/or a text fragment, and/or a markdown
+ * blockquote depending on the settings and whether text is selected. Browsers that
+ * support text fragments will try to use them first, and use the ID as a fallback if
+ * necessary.
  * @param {any} tab - the tab to copy the link from.
  * @param {string|undefined} id - the ID of the HTML element to link to. If falsy, no ID
  * is included in the link.
@@ -200,35 +202,60 @@ async function scriptWriteLinkToClipboard(tab, id) {
             args: [id, subBrackets],
             function: (id, subBrackets) => {
                 return (async () => {
-                    const title = document.title;
-                    const url = location.href.replaceAll('(', '%28').replaceAll(')', '%29');
+                    let title = await replaceBrackets(document.title, subBrackets);
+                    let url = location.href.replaceAll('(', '%28').replaceAll(')', '%29');
 
                     let selectedText;
                     let arg;  // the text fragment argument
                     const selection = window.getSelection();
                     if (selection) {
-                        selectedText = selection.toString();
+                        selectedText = selection.toString().trim();
                         arg = createTextFragmentArg(selection);
                     }
 
-                    let link = '[';
-                    const linkFormat = await getSetting('linkFormat', 'selected');
-                    if (selectedText && linkFormat === 'selected') {
-                        link += await replaceBrackets(selectedText.trim(), subBrackets);
-                    } else {
-                        link += await replaceBrackets(title, subBrackets);
-                    }
-                    link += `](${url}`;
                     if (id || arg) {
-                        link += '#';
+                        url += '#';
                         if (id) {
-                            link += id;
+                            url += id;
                         }
                         if (arg) {
-                            link += `:~:text=${arg}`;
+                            url += `:~:text=${arg}`;
                         }
                     }
-                    link += ')';
+
+                    let text;
+                    if (!selectedText) {
+                        text = `[${title}](${url})`;
+                    } else {
+                        const linkFormat = await getSetting('linkFormat', 'blockquote');
+                        switch (linkFormat) {
+                            case 'title':
+                                text = `[${title}](${url})`;
+                                break;
+                            case 'selected':
+                                title = await replaceBrackets(selectedText, subBrackets);
+                                text = `[${title}](${url})`;
+                                break;
+                            case 'blockquote':
+                                selectedText = selectedText
+                                    .replaceAll('[', '\\[')
+                                    .replaceAll('>', '\\>')
+                                    .replaceAll('<', '\\<')
+                                    .replaceAll('#', '\\#')
+                                    .replaceAll('_', '\\_')
+                                    .replaceAll('*', '\\*')
+                                    .replaceAll('-', '\\-')
+                                    .replaceAll('+', '\\+')
+                                    .replaceAll('=', '\\=')
+                                    .replaceAll('`', '\\`');
+                                text = await createBlockquote(selectedText, title, url);
+                                break;
+                            default:
+                                console.error(`Unknown linkFormat: ${linkFormat}`);
+                                throw new Error(`Unknown linkFormat: ${linkFormat}`);
+                        }
+                    }
+
 
                     // `navigator.clipboard.writeText` only works in a script if the
                     // document is focused, or if the tabs permission has been granted.
@@ -238,10 +265,10 @@ async function scriptWriteLinkToClipboard(tab, id) {
                     // of Stardown doesn't have to inject a script to write to the
                     // clipboard.
                     if (!document.hasFocus()) {
-                        return 'Cannot copy a markdown link for an unfocused document';
+                        return 'Cannot copy text for an unfocused document';
                     }
 
-                    await navigator.clipboard.writeText(link);
+                    await navigator.clipboard.writeText(text);
                     return null;
                 })();
             },

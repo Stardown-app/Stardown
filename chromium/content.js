@@ -91,6 +91,19 @@ function enc(text) {
 }
 
 /**
+ * createBlockquote creates a markdown blockquote with a link at the end. Any character
+ * escaping or replacements should have already been done before calling this function.
+ * @param {string} text - the text of the blockquote.
+ * @param {string} title - the title of the link.
+ * @param {string} url - the URL of the link.
+ * @returns {Promise<string>}
+ */
+async function createBlockquote(text, title, url) {
+    text = text.replaceAll('\n', '\n> ');
+    return `> ${text}\n> \n> — [${title}](${url})\n`;
+}
+
+/**
  * createTextFragmentArg creates for a markdown link a text fragment argument (the part
  * after the `#:~:text=`). Only selection objects with type 'Range' are used; all other
  * selections result in an empty string because this extension needs to also allow

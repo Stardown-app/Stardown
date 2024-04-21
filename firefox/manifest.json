@@ -2,7 +2,7 @@
     "manifest_version": 2,
     "name": "Stardown",
     "description": "Copy a markdown link for the current page.",
-    "version": "0.0.1",
+    "version": "1.0.0",
     "homepage_url": "https://github.com/wheelercj/Stardown",
     "browser_specific_settings": {
         "gecko": {

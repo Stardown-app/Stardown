@@ -6,7 +6,7 @@
     "homepage_url": "https://github.com/wheelercj/Stardown",
     "browser_specific_settings": {
         "gecko": {
-            "id": "stardown@chriswheeler.dev"
+            "id": "{ca5c6573-af57-4607-a075-337cdbfffde7}"
         }
     },
     "permissions": [

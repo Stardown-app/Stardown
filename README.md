@@ -54,7 +54,7 @@ This is an occasionally reoccuring bug in browsers. Reinstalling Stardown should
 
 ### Stardown displayed a red X and didn't do anything
 
-This may happen if the current website is not focused, such as if you just clicked the bookmarks sidebar. In this case, click the page and try again.
+This may happen if the current website is not focused, such as if you just clicked the address bar. In this case, click the page and try again.
 
 Another possibility is that some websites limit what extensions can do and may prevent Stardown from working. A few examples are the Chrome Web Store and Chrome pages that start with `chrome://`. Fortunately, very few websites do this and it doesn't prevent Stardown from copying links for multiple tabs simultaneously if the current tab is not one of those limiting websites.
 
@@ -71,7 +71,7 @@ You're welcome to [make a feature request](https://github.com/wheelercj/Stardown
 * [url2clipboard](https://github.com/asamuzaK/url2clipboard) supports HTML, Markdown, BBCode, Textile, AsciiDoc, MediaWiki, Jira, reStructuredText, LaTeX, Org Mode, and text.
 * [TabCopy](https://chromewebstore.google.com/detail/tabcopy/micdllihgoppmejpecmkilggmaagfdmb) might only be on the Chrome Web Store, but supports many formats including HTML, Markdown, BBCode, CSV, and JSON, and lets you create custom link formats.
 
-### Copy just the titles or just the URLs for all tabs
+### Copy just the titles or just the URLs of all tabs
 
 * [copy-as-markdown](https://github.com/yorkxin/copy-as-markdown)
 

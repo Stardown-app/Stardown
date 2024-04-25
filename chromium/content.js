@@ -81,6 +81,26 @@ async function replaceBrackets(title, subBrackets) {
 }
 
 /**
+ * escapeMarkdown escapes some (not all!) markdown characters in a string. This function
+ * is useful for markdown link titles and blockquotes. It does not escape square
+ * brackets, among other characters.
+ * @param {string} text - the text to escape markdown characters in.
+ * @returns {Promise<string>}
+ */
+async function escapeMarkdown(text) {
+    return text
+        .replaceAll('>', '\\>')
+        .replaceAll('<', '\\<')
+        .replaceAll('#', '\\#')
+        .replaceAll('_', '\\_')
+        .replaceAll('*', '\\*')
+        .replaceAll('-', '\\-')
+        .replaceAll('+', '\\+')
+        .replaceAll('=', '\\=')
+        .replaceAll('`', '\\`')
+}
+
+/**
  * enc URL-encodes a string, but also replaces '-' with '%2D' because the text fragment
  * generator appears to not handle '-' correctly.
  * @param {string} text - the text to encode.

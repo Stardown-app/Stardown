@@ -130,7 +130,7 @@ async function createMarkdownLink(tab, id, linkFormat, subBrackets, checkSelecte
         // Were the necessary permissions granted?
     }
 
-    let title = await replaceBrackets(tab.title, subBrackets);
+    let title = tab.title;
     let url = tab.url.replaceAll('(', '%28').replaceAll(')', '%29');
 
     let selectedText;
@@ -162,28 +162,25 @@ async function createMarkdownLink(tab, id, linkFormat, subBrackets, checkSelecte
 
     let text;
     if (!selectedText) {
+        title = await replaceBrackets(title, subBrackets);
+        title = await escapeMarkdown(title);
         text = `[${title}](${url})`;
     } else {
         switch (linkFormat) {
             case 'title':
+                title = await replaceBrackets(title, subBrackets);
+                title = await escapeMarkdown(title);
                 text = `[${title}](${url})`;
                 break;
             case 'selected':
-                title = await replaceBrackets(selectedText, subBrackets);
-                text = `[${title}](${url})`;
+                selectedText = await replaceBrackets(selectedText, subBrackets);
+                selectedText = await escapeMarkdown(selectedText);
+                text = `[${selectedText}](${url})`;
                 break;
             case 'blockquote':
-                selectedText = selectedText
-                    .replaceAll('[', '\\[')
-                    .replaceAll('>', '\\>')
-                    .replaceAll('<', '\\<')
-                    .replaceAll('#', '\\#')
-                    .replaceAll('_', '\\_')
-                    .replaceAll('*', '\\*')
-                    .replaceAll('-', '\\-')
-                    .replaceAll('+', '\\+')
-                    .replaceAll('=', '\\=')
-                    .replaceAll('`', '\\`');
+                title = await replaceBrackets(title, subBrackets);
+                title = await escapeMarkdown(title);
+                selectedText = await escapeMarkdown(selectedText.replaceAll('[', '\\['));
                 text = await createBlockquote(selectedText, title, url);
                 break;
             default:
@@ -223,6 +220,26 @@ async function replaceBrackets(title, subBrackets) {
         return title.replaceAll('[', '\\[').replaceAll(']', '\\]');
     }
     return title;
+}
+
+/**
+ * escapeMarkdown escapes some (not all!) markdown characters in a string. This function
+ * is useful for markdown link titles and blockquotes. It does not escape square
+ * brackets, among other characters.
+ * @param {string} text - the text to escape markdown characters in.
+ * @returns {Promise<string>}
+ */
+async function escapeMarkdown(text) {
+    return text
+        .replaceAll('>', '\\>')
+        .replaceAll('<', '\\<')
+        .replaceAll('#', '\\#')
+        .replaceAll('_', '\\_')
+        .replaceAll('*', '\\*')
+        .replaceAll('-', '\\-')
+        .replaceAll('+', '\\+')
+        .replaceAll('=', '\\=')
+        .replaceAll('`', '\\`')
 }
 
 async function brieflyShowCheckmark(linkCount) {

@@ -202,7 +202,7 @@ async function scriptWriteLinkToClipboard(tab, id) {
             args: [id, subBrackets],
             function: (id, subBrackets) => {
                 return (async () => {
-                    let title = await replaceBrackets(document.title, subBrackets);
+                    let title = document.title;
                     let url = location.href.replaceAll('(', '%28').replaceAll(')', '%29');
 
                     let selectedText;
@@ -225,29 +225,26 @@ async function scriptWriteLinkToClipboard(tab, id) {
 
                     let text;
                     if (!selectedText) {
+                        title = await replaceBrackets(title, subBrackets);
+                        title = await escapeMarkdown(title);
                         text = `[${title}](${url})`;
                     } else {
                         const linkFormat = await getSetting('linkFormat', 'blockquote');
                         switch (linkFormat) {
                             case 'title':
+                                title = await replaceBrackets(title, subBrackets);
+                                title = await escapeMarkdown(title);
                                 text = `[${title}](${url})`;
                                 break;
                             case 'selected':
-                                title = await replaceBrackets(selectedText, subBrackets);
-                                text = `[${title}](${url})`;
+                                selectedText = await replaceBrackets(selectedText, subBrackets);
+                                selectedText = await escapeMarkdown(selectedText);
+                                text = `[${selectedText}](${url})`;
                                 break;
                             case 'blockquote':
-                                selectedText = selectedText
-                                    .replaceAll('[', '\\[')
-                                    .replaceAll('>', '\\>')
-                                    .replaceAll('<', '\\<')
-                                    .replaceAll('#', '\\#')
-                                    .replaceAll('_', '\\_')
-                                    .replaceAll('*', '\\*')
-                                    .replaceAll('-', '\\-')
-                                    .replaceAll('+', '\\+')
-                                    .replaceAll('=', '\\=')
-                                    .replaceAll('`', '\\`');
+                                title = await replaceBrackets(title, subBrackets);
+                                title = await escapeMarkdown(title);
+                                selectedText = await escapeMarkdown(selectedText.replaceAll('[', '\\['));
                                 text = await createBlockquote(selectedText, title, url);
                                 break;
                             default:

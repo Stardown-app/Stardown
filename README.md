@@ -78,6 +78,7 @@ You're welcome to [make a feature request](https://github.com/wheelercj/Stardown
 ### Copy a website's content as markdown
 
 * [MarkDownload](https://github.com/deathau/markdownload) was developed by an Obsidian community moderator.
+* [Obsidian Web Clipper Bookmarklet](https://gist.github.com/kepano/90c05f162c37cf730abb8ff027987ca3) is a bookmarklet for saving articles and pages from the web to Obsidian.
 * [copy-selection-as-markdown](https://github.com/0x6b/copy-selection-as-markdown) is only available for Firefox but may work manually installed in Chromium browsers.
 
 ### Copy just a URL with a text fragment

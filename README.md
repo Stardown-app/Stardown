@@ -101,6 +101,8 @@ Unlike the extensions linked above, Stardown:
 
 ## development
 
+I wrote some tips in [Making browser extensions](https://til.chriswheeler.dev/making-browser-extensions/).
+
 There are different versions of Stardown for Firefox and the Chromium browsers because of bugs or limitations in them:
 
 * Since [Chromium does not support the Clipboard API in background scripts](https://stackoverflow.com/questions/61862872/how-to-copy-web-notification-content-to-clipboard/61977696#61977696), the Chromium version of Stardown also requires the `scripting` permission so it can run a script that puts text in the clipboard.

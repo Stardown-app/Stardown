@@ -24,13 +24,13 @@ Stardown's right-click option only adds a text fragment if you have selected tex
 
 [How I use Stardown](https://chriswheeler.dev/posts/stardown-v1/)
 
-## privacy
+## Privacy
 
 Stardown will never sell any data to anyone, and does not collect nor send any of your data anywhere besides putting markdown text into your clipboard.
 
 In Chrome and Edge, if you use Stardown's feature that copies links for multiple tabs simultaneously, the first time you do, Stardown will request to "read your browsing history" because that's the only way for Chrome and Edge extensions to see the titles and URLs of all tabs ([source](https://developer.chrome.com/docs/extensions/reference/permissions-list#gc-wrapper:~:text=Warning%20displayed%3A-,read%20your%20browsing%20history.,-%22topSites%22)). Granting this permission does NOT give access to existing browsing history; the request message only sounds like it does because malicious extensions that can see the titles and URLs of all tabs could start manually gathering your browsing activity. The permission can be revoked at any time. The Firefox version of Stardown requests the exact same permission but has a less misleading request message. Other Chrome and Edge browser extensions that request immediate and complete access to browsing history, unlike Stardown, use the request message "read and change your browsing history on all signed-in devices".
 
-## settings
+## Settings
 
 To open Stardown's options page, right-click the extension's icon and choose:
 
@@ -44,7 +44,7 @@ To open Stardown's options page, right-click the extension's icon and choose:
 * Chrome: `chrome://extensions/shortcuts`
 * Edge: `edge://extensions/shortcuts`
 
-## troubleshooting
+## Troubleshooting
 
 ### The right-click option doesn't always create links for specific parts of pages
 
@@ -66,7 +66,7 @@ Another possibility is that some websites limit what extensions can do and may p
 
 If reinstalling Stardown doesn't fix it and [the issues page](https://github.com/wheelercj/Stardown/issues) doesn't have an issue for it yet, please make a new issue.
 
-## feature requests
+## Feature requests
 
 You're welcome to [make a feature request](https://github.com/wheelercj/Stardown/issues/new?assignees=&labels=enhancement&projects=&template=feature_request.md&title=), and there may already be another browser extension that meets all your needs. I am not affiliated with any of the below extensions and have not tried all of them. Use them at your own risk.
 
@@ -101,7 +101,7 @@ Unlike the extensions linked above, Stardown:
 * requires only one click to create a markdown link for the current page
 * is focused on just the most important features so it's more likely to be maintained and bug-free
 
-## development
+## Development
 
 I wrote some tips in [Making browser extensions](https://til.chriswheeler.dev/making-browser-extensions/).
 

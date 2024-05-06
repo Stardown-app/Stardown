@@ -22,6 +22,8 @@ After installing, there are multiple ways you can copy markdown links:
 
 Stardown's right-click option only adds a text fragment if you have selected text, but always tries to find an `id` attribute in the HTML elements you right-clicked so you can still link to specific parts of pages without text fragments. [Firefox does not support text fragments yet](https://bugzilla.mozilla.org/show_bug.cgi?id=1753933), but the Firefox version of Stardown allows you to create links with text fragments.
 
+[How I use Stardown](https://chriswheeler.dev/posts/stardown-v1/)
+
 ## privacy
 
 Stardown will never sell any data to anyone, and does not collect nor send any of your data anywhere besides putting markdown text into your clipboard.

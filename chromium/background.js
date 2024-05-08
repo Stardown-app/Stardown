@@ -107,6 +107,11 @@ async function handleDoubleClick() {
     }
 }
 
+function getImage(url) {
+    console.log('url of image:', url);
+    // pass this to content.js to build the markdown syntax
+}
+
 /**
  * sendCopyMessage sends a message to the content script to get the ID of the
  * right-clicked HTML element and then writes a markdown link to the clipboard.

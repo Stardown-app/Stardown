@@ -58,8 +58,14 @@ browser.action.onClicked.addListener(async (tab) => {
 
 browser.contextMenus.create({
     id: 'copy-markdown-link',
-    title: 'Copy markdown link to here',
+    title: 'Create markdown of selected text',
     contexts: ['all'],
+});
+
+browser.contextMenus.create({
+    id: 'copy-image-link',
+    title: 'Create markdown of image',
+    contexts: ['image']
 });
 
 browser.contextMenus.onClicked.addListener((info, tab) => {

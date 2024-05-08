@@ -119,8 +119,9 @@ function sendCopyMessage(info, tab) {
 }
 
 /**
- * createMarkdownLink creates a markdown link for a tab. The link does not include any
- * HTML element ID nor text fragment. The tab title is used as the link title.
+ * createMarkdownLink creates a markdown link for a tab. Stardown does not add to, or
+ * remove from, the link any HTML element ID or text fragment. The tab title is used as
+ * the link title.
  * @param {any} tab - the tab to create the link from.
  * @param {boolean} subBrackets - the setting for what to substitute any square brackets
  * with.
@@ -204,6 +205,19 @@ async function scriptWriteLinkToClipboard(tab, id) {
                 return (async () => {
                     let title = document.title;
                     let url = location.href.replaceAll('(', '%28').replaceAll(')', '%29');
+
+                    // Remove any preexisting HTML element ID and/or text fragment from
+                    // the URL. If the URL has an HTML element ID, any text fragment
+                    // will also be in the `hash` attribute of its URL object. However,
+                    // if the URL has a text fragment but no HTML element ID, the text
+                    // fragment may be in the `pathname` attribute of its URL object
+                    // along with part of the URL that should not be removed.
+                    const urlObj = new URL(url);
+                    urlObj.hash = '';  // remove HTML element ID and maybe text fragment
+                    if (urlObj.pathname.includes(':~:text=')) {
+                        urlObj.pathname = urlObj.pathname.split(':~:text=')[0];
+                    }
+                    url = urlObj.toString();
 
                     let selectedText;
                     let arg;  // the text fragment argument

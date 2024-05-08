@@ -69,8 +69,15 @@ browser.contextMenus.create({
 });
 
 browser.contextMenus.onClicked.addListener((info, tab) => {
-    if (info.menuItemId === 'copy-markdown-link') {
-        sendCopyMessage(info, tab);
+    switch (info.menuItemId) {
+        case 'copy-markdown-link':
+            sendCopyMessage(info, tab);
+            break;
+        case 'copy-image-link':
+            getImage(info.srcUrl);
+            break;
+        default:
+            console.log('Unknown menu item');
     }
 });
 

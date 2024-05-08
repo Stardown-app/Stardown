@@ -103,15 +103,6 @@ Unlike the extensions linked above, Stardown:
 
 ## Development
 
-I wrote some tips in [Making browser extensions](https://til.chriswheeler.dev/making-browser-extensions/).
+Contributions are welcome! Let me know (such as in [an issue](https://github.com/wheelercj/Stardown/issues) or [a discussion](https://github.com/wheelercj/Stardown/discussions)) what you have in mind ahead of time if you think there's a chance it won't be approved.
 
-There are different versions of Stardown for Firefox and the Chromium browsers because of bugs or limitations in them:
-
-* Since [Chromium does not support the Clipboard API in background scripts](https://stackoverflow.com/questions/61862872/how-to-copy-web-notification-content-to-clipboard/61977696#61977696), the Chromium version of Stardown also requires the `scripting` permission so it can run a script that puts text in the clipboard.
-* In Firefox, [Manifest V3 extensions with low privilege activeTab shows annoying blue dot for all websites](https://bugzilla.mozilla.org/show_bug.cgi?id=1851083). This is why I changed the Firefox version of Stardown from manifest v3 to v2.
-* Although Stardown no longer uses Firefox's manifest v3, [Firefox does not support service_worker in manifest v3](https://stackoverflow.com/questions/75043889/manifest-v3-background-scripts-service-worker-on-firefox).
-* Firefox [sometimes requires an add-on ID](https://extensionworkshop.com/documentation/develop/extensions-and-the-add-on-id/) in `browser_specific_settings` in manifest.json, but Chromium doesn't allow `browser_specific_settings`.
-
-### text fragments
-
-Text fragments and how to generate them is explained in [this web.dev article](https://web.dev/articles/text-fragments#programmatic_text_fragment_link_generation). The article mentions [a minified version of the text fragment generation code](https://unpkg.com/text-fragments-polyfill@5.7.0/dist/fragment-generation-utils.js), but Stardown doesn't use the minified version because extension stores need to be able to review the code and minifying code doesn't really help extensions.
+Also, please read [docs/develop.md](docs/develop.md).

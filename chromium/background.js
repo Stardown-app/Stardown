@@ -64,7 +64,7 @@ browser.contextMenus.create({
 
 browser.contextMenus.onClicked.addListener((info, tab) => {
     if (info.menuItemId === 'copy-markdown-link') {
-        sendCopyMessage(info, tab);
+        sendCopyMessage(info, tab, 'all');
     }
 });
 
@@ -99,11 +99,12 @@ async function handleDoubleClick() {
  * right-clicked HTML element and then writes a markdown link to the clipboard.
  * @param {any} info - the context menu info.
  * @param {any} tab - the tab that the context menu was clicked in.
+ * @param {string} category - the category of the content to copy.
  */
-function sendCopyMessage(info, tab) {
+function sendCopyMessage(info, tab, category) {
     browser.tabs.sendMessage(
         tab.id,
-        "getClickedElementId",
+        category,  // this will be the first input to the onMessage listener
         { frameId: info.frameId },
         async function (clickedElementId) {
             // clickedElementId may be undefined, an empty string, or a non-empty string

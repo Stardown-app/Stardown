@@ -25,7 +25,6 @@ When fully testing Stardown, test each feature below in each of the officially s
 - [ ] select text and an image, then right-click
 - [ ] select multiple images, then right-click
 - [ ] right-click the icon
-- [ ] right-click a tab (Firefox only)
 - [ ] double-click the icon 
 - [ ] select tabs, then double-click the icon
 - [ ] change settings and repeat as necessary

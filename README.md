@@ -64,7 +64,7 @@ Another possibility is that some websites limit what extensions can do and may p
 
 ### Something else is wrong
 
-If reinstalling Stardown doesn't fix it and [the issues page](https://github.com/wheelercj/Stardown/issues) doesn't have an issue for it yet, please make a new issue.
+If reinstalling Stardown doesn't fix it and [the issues page](https://github.com/wheelercj/Stardown/issues?q=is%3Aissue) doesn't have an issue for it yet, please make a new issue.
 
 ## Feature requests
 

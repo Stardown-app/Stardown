@@ -73,8 +73,8 @@ browser.contextMenus.onClicked.addListener((info, tab) => {
         case 'copy-markdown-link':
             sendCopyMessage(info, tab);
             break;
-        case 'copy-image-link':
-            getImage(info.srcUrl);
+        case 'image':
+            buildImageMarkdown(info, tab);
             break;
         default:
             console.log('Unknown menu item');
@@ -107,10 +107,21 @@ async function handleDoubleClick() {
     }
 }
 
-function getImage(url) {
-    console.log('url of image:', url);
-    // pass this to content.js to build the markdown syntax
+function buildImageMarkdown(info, tab) {
+    console.log('info: ', info);
+    console.log('tab: ', tab);
+    const url = info.srcUrl;
+    const { filename, filetype } = url => {
+        const endingPath = url.split('/').pop(); // converts string into a list object & removes the last element
+        const lastDot = endingPath.lastIndexOf('.');
+        if(lastDot > 0) {
+            const filename = endingPath.substring(0, lastDot); // substring of all characters before the '.'
+            const extension = endingPath.substring(lastDot); // substring of all characters after the '.'
+            return { filename, extension };
+        } else { return { filename: endingPath, extension: '' } } // cases where the image extension
+    } 
 }
+
 
 /**
  * sendCopyMessage sends a message to the content script to get the ID of the

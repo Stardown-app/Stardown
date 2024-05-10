@@ -56,12 +56,12 @@ browser.browserAction.onClicked.addListener(async () => {
 browser.contextMenus.create({
     id: 'copy-markdown-link',
     title: 'Copy markdown link to here',
-    contexts: ['all', 'tab'],
+    contexts: ['all'],
 });
 
 browser.contextMenus.onClicked.addListener((info, tab) => {
     if (info.menuItemId === 'copy-markdown-link') {
-        sendCopyMessage(info, tab);
+        sendCopyMessage(info, tab, 'all');
     }
 });
 
@@ -91,11 +91,12 @@ async function handleDoubleClick() {
  * right-clicked HTML element and then writes a markdown link to the clipboard.
  * @param {any} info - the context menu info.
  * @param {any} tab - the tab that the context menu was clicked in.
+ * @param {string} category - the category of the content to copy.
  */
-function sendCopyMessage(info, tab) {
+function sendCopyMessage(info, tab, category) {
     browser.tabs.sendMessage(
         tab.id,
-        "getClickedElementId",
+        category,  // this will be the first input to the onMessage listener
         { frameId: info.frameId },
         async function (clickedElementId) {
             // clickedElementId may be undefined, an empty string, or a non-empty string
@@ -132,6 +133,18 @@ async function createMarkdownLink(tab, id, linkFormat, subBrackets, checkSelecte
 
     let title = tab.title;
     let url = tab.url.replaceAll('(', '%28').replaceAll(')', '%29');
+
+    // Remove any preexisting HTML element ID and/or text fragment from the URL. If the
+    // URL has an HTML element ID, any text fragment will also be in the `hash`
+    // attribute of its URL object. However, if the URL has a text fragment but no HTML
+    // element ID, the text fragment may be in the `pathname` attribute of its URL
+    // object along with part of the URL that should not be removed.
+    const urlObj = new URL(url);
+    urlObj.hash = '';  // remove HTML element ID and maybe text fragment
+    if (urlObj.pathname.includes(':~:text=')) {
+        urlObj.pathname = urlObj.pathname.split(':~:text=')[0];
+    }
+    url = urlObj.toString();
 
     let selectedText;
     let arg;  // the text fragment argument

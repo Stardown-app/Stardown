@@ -27,8 +27,8 @@ window.onload = function () {
         true,
     );
 
-    browser.runtime.onMessage.addListener(function (request, sender, sendResponse) {
-        if (request === "getClickedElementId") {
+    browser.runtime.onMessage.addListener(function (category, sender, sendResponse) {
+        if (category === 'all') {
             // if clickedElement doesn't have an id, look at its parent
             while (clickedElement && !clickedElement.id) {
                 clickedElement = clickedElement.parentElement;

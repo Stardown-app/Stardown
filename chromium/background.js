@@ -108,20 +108,33 @@ async function handleDoubleClick() {
 }
 
 function buildImageMarkdown(info, tab) {
-    console.log('info: ', info);
-    console.log('tab: ', tab);
     const url = info.srcUrl;
-    const { filename, filetype } = url => {
+    const { filename, filetype } = (() => {
         const endingPath = url.split('/').pop(); // converts string into a list object & removes the last element
         const lastDot = endingPath.lastIndexOf('.');
+        console.log('endingPath: ', endingPath);
+        console.log('lastDot index: ', lastDot);
         if(lastDot > 0) {
             const filename = endingPath.substring(0, lastDot); // substring of all characters before the '.'
             const extension = endingPath.substring(lastDot); // substring of all characters after the '.'
             return { filename, extension };
         } else { return { filename: endingPath, extension: '' } } // cases where the image extension
-    } 
+    })();
+    const markdown = `![${filename}](${url})`;
+    const message = { category: 'image', markdown: markdown, filename: filename }
+    browser.tabs.sendMessage(tab.id, message, null, notifier);
 }
 
+function notifier(id) {
+    chrome.notifications.create(id, {
+        type: 'basic',
+        iconUrl: 'images/icon-16.png',
+        title: 'Markdown created',
+        message: `Your markdown of ${id} can now be pasted`
+      }, function(notificationId) {
+        console.log('Notification created with ID:', notificationId);
+      });
+}
 
 /**
  * sendCopyMessage sends a message to the content script to get the ID of the
@@ -133,7 +146,7 @@ function buildImageMarkdown(info, tab) {
 function sendCopyMessage(info, tab, category) {
     browser.tabs.sendMessage(
         tab.id,
-        category,  // this will be the first input to the onMessage listener
+        { category: category },  // this will be the first input to the onMessage listener
         { frameId: info.frameId },
         async function (clickedElementId) {
             // clickedElementId may be undefined, an empty string, or a non-empty string

@@ -58,13 +58,26 @@ browser.action.onClicked.addListener(async (tab) => {
 
 browser.contextMenus.create({
     id: 'copy-markdown-link',
-    title: 'Copy markdown link to here',
+    title: 'Create markdown of selected text',
     contexts: ['all'],
 });
 
+browser.contextMenus.create({
+    id: 'image',
+    title: 'Create markdown of image',
+    contexts: ['image']
+});
+
 browser.contextMenus.onClicked.addListener((info, tab) => {
-    if (info.menuItemId === 'copy-markdown-link') {
-        sendCopyMessage(info, tab, 'all');
+    switch (info.menuItemId) {
+        case 'copy-markdown-link':
+            sendCopyMessage(info, tab);
+            break;
+        case 'image':
+            buildImageMarkdown(info, tab);
+            break;
+        default:
+            console.log('Unknown menu item');
     }
 });
 
@@ -94,6 +107,35 @@ async function handleDoubleClick() {
     }
 }
 
+function buildImageMarkdown(info, tab) {
+    const url = info.srcUrl;
+    const { filename, filetype } = (() => {
+        const endingPath = url.split('/').pop(); // converts string into a list object & removes the last element
+        const lastDot = endingPath.lastIndexOf('.');
+        console.log('endingPath: ', endingPath);
+        console.log('lastDot index: ', lastDot);
+        if(lastDot > 0) {
+            const filename = endingPath.substring(0, lastDot); // substring of all characters before the '.'
+            const extension = endingPath.substring(lastDot); // substring of all characters after the '.'
+            return { filename, extension };
+        } else { return { filename: endingPath, extension: '' } } // cases where the image extension
+    })();
+    const markdown = `![${filename}](${url})`;
+    const message = { category: 'image', markdown: markdown, filename: filename }
+    browser.tabs.sendMessage(tab.id, message, null, notifier);
+}
+
+function notifier(id) {
+    chrome.notifications.create(id, {
+        type: 'basic',
+        iconUrl: 'images/icon-16.png',
+        title: 'Markdown created',
+        message: `Your markdown of ${id} can now be pasted`
+      }, function(notificationId) {
+        console.log('Notification created with ID:', notificationId);
+      });
+}
+
 /**
  * sendCopyMessage sends a message to the content script to get the ID of the
  * right-clicked HTML element and then writes a markdown link to the clipboard.
@@ -104,7 +146,7 @@ async function handleDoubleClick() {
 function sendCopyMessage(info, tab, category) {
     browser.tabs.sendMessage(
         tab.id,
-        category,  // this will be the first input to the onMessage listener
+        { category: category },  // this will be the first input to the onMessage listener
         { frameId: info.frameId },
         async function (clickedElementId) {
             // clickedElementId may be undefined, an empty string, or a non-empty string

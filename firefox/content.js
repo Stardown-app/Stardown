@@ -24,8 +24,8 @@ document.addEventListener(
     true,
 );
 
-browser.runtime.onMessage.addListener(function (category, sender, sendResponse) {
-    if (category === 'all') {
+browser.runtime.onMessage.addListener(function (message, sender, sendResponse) {
+    if (message.category === 'all') {
         // if clickedElement doesn't have an id, look at its parent
         while (clickedElement && !clickedElement.id) {
             clickedElement = clickedElement.parentElement;
@@ -36,6 +36,15 @@ browser.runtime.onMessage.addListener(function (category, sender, sendResponse) 
             console.log('No HTML element with an ID was found in the clicked path');
             sendResponse('');
         }
+    } else if (message.category === 'image') {
+        navigator.clipboard.writeText(message.markdown).then(() => {
+            sendResponse(`${message.category}:${message.filename}`);
+        }).catch((error) => {
+            console.error("Failed to copy text to clipboard:", error);
+        });
+    } else {
+        console.error('Unknown message category:', message.category);
     }
+
     return true;
 });

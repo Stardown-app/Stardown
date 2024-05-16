@@ -13,6 +13,7 @@
         "activeTab",
         "clipboardWrite",
         "contextMenus",
+        "notifications",
         "storage"
     ],
     "optional_permissions": [

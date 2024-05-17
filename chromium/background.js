@@ -128,7 +128,7 @@ function buildImageMarkdown(info, tab) {
 function notifier(id) {
     chrome.notifications.create(id, {
         type: 'basic',
-        iconUrl: 'images/icon-16.png',
+        iconUrl: 'images/icon-128.png',
         title: 'Markdown created',
         message: `Your markdown of ${id} can now be pasted`
       }, function(notificationId) {

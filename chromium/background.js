@@ -120,7 +120,7 @@ function buildImageMarkdown(info, tab) {
             return { filename, extension };
         } else { return { filename: endingPath, extension: '' } } // cases where the image extension
     })();
-    const markdown = `![${filename}](${url})`;
+    const markdown = `![${filename}](${url})\n`;
     const message = { category: 'image', markdown: markdown, filename: filename }
     browser.tabs.sendMessage(tab.id, message, null, notifier);
 }

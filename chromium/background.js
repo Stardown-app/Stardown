@@ -377,6 +377,7 @@ async function scriptWriteLinkToClipboard(tab, id) {
                             case 'selected':
                                 selectedText = await replaceBrackets(selectedText, subBrackets);
                                 selectedText = await escapeMarkdown(selectedText);
+                                selectedText = selectedText.replaceAll('\n', ' ');
                                 text = `[${selectedText}](${url})`;
                                 break;
                             case 'blockquote':

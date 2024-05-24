@@ -309,6 +309,7 @@ async function createTabLinkMarkdown(tab, id, linkFormat, subBrackets, checkSele
             case 'selected':
                 selectedText = await replaceBrackets(selectedText, subBrackets);
                 selectedText = await escapeMarkdown(selectedText);
+                selectedText = selectedText.replaceAll('\r\n', ' ');
                 text = `[${selectedText}](${url})`;
                 break;
             case 'blockquote':

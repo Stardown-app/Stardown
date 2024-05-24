@@ -8,12 +8,12 @@
         "activeTab",
         "clipboardWrite",
         "contextMenus",
-        "notifications",
         "scripting",
         "storage"
     ],
     "optional_permissions": [
-        "tabs"
+        "tabs",
+        "notifications"
     ],
     "options_ui": {
         "page": "options.html"

@@ -11,16 +11,15 @@
 
 <p align="center"><img alt="demo gif" src="https://github.com/wheelercj/assets/blob/main/Stardown.gif"></p>
 
-After installing, there are multiple ways you can copy markdown links:
+After installing, there are multiple ways you can copy markdown:
 
-* click the extension's icon
-* press `Ctrl+Shift+U` (Mac: `Cmd+Shift+U`), or whichever keyboard shortcut you prefer in your browser's settings
-* double-click the extension's icon to copy links for all tabs, or press `Ctrl+Shift+UU` (Mac: `Cmd+Shift+UU`)
-* select tabs before double-clicking the icon to copy links for only those tabs
-* right-click where you want to link to and choose "Copy markdown link to here"
-* select text before using the right-click option to create a link with a [text fragment](https://web.dev/articles/text-fragments)
+* **click the extension's icon** to copy a link for the current page, or press `Ctrl+Shift+U` (Mac: `Cmd+Shift+U`) or whichever keyboard shortcut you prefer in your browser's settings
+* **double-click the extension's icon** to copy links for all tabs, or press `Ctrl+Shift+UU` (Mac: `Cmd+Shift+UU`)
+* **select tabs before double-clicking the icon** to copy links for only those tabs
+* **right-click the page and choose Stardown's copy option** that changes depending on what you right-clicked
+* **select text before right-clicking** to create a link with a [text fragment](https://web.dev/articles/text-fragments)
 
-Stardown's right-click option only adds a text fragment if you have selected text, but always tries to find an `id` attribute in the HTML elements you right-clicked so you can still link to specific parts of pages without text fragments. [Firefox does not support text fragments yet](https://bugzilla.mozilla.org/show_bug.cgi?id=1753933), but the Firefox version of Stardown allows you to create links with text fragments.
+Stardown's "Copy markdown link to here" right-click option tries to find an `id` attribute in the HTML elements you right-clicked so you can still link to specific parts of pages even without text fragments. [Firefox does not support text fragments yet](https://bugzilla.mozilla.org/show_bug.cgi?id=1753933), but the Firefox version of Stardown allows you to create links with text fragments.
 
 [How I use Stardown](https://chriswheeler.dev/posts/stardown-v1/)
 
@@ -46,15 +45,19 @@ To open Stardown's options page, right-click the extension's icon and choose:
 
 ## Troubleshooting
 
-### The right-click option doesn't always create links for specific parts of pages
+### The right-click option copied a link for the entire page, not a specific part
 
 Stardown looks for an HTML element ID where you right-clicked, but some parts of websites don't have any IDs. If there is no HTML element ID where you right-click and you don't select text before right-clicking, the link Stardown creates will be for the entire page, not for the part of the page where you right-clicked. Most websites assign an ID to each section title.
 
-It's also not possible to link to text within the rarely used [HTML iframes](https://www.w3schools.com/html/html_iframe.asp) because text fragments don't support iframes. Lastly, a small number of sites allow creating text-fragment links but don't allow using them.
+It's also not possible to link to text within [HTML iframes](https://www.w3schools.com/html/html_iframe.asp) because text fragments don't support iframes.
 
-### The right-click option disappeared
+Lastly, a small number of sites allow creating text fragment links but don't allow using them.
 
-This is an occasionally reoccuring bug in browsers. Reinstalling Stardown should fix it.
+### The right-click options disappeared
+
+Due to browser limitations, Stardown's context menu options cannot appear for certain kinds of images and links. Specifically, they cannot appear for canvases, background images, inline SVGs, and for HTML anchors that contain both text and image(s).
+
+Besides those possibilities, browsers have an occasionally reoccuring bug that makes the context menu options disappear. Reinstalling Stardown should fix this.
 
 ### Stardown displayed a red X and didn't do anything
 

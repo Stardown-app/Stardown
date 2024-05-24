@@ -14,11 +14,9 @@
    limitations under the License.
 */
 
-let notify = false;
 let lastClick = new Date(0);
 let doubleClickInterval = 500;
 
-getSetting('notify', false).then(value => notify = value);
 getSetting('doubleClickInterval', 500).then(value => doubleClickInterval = value);
 
 browser.browserAction.onClicked.addListener(async () => {
@@ -99,6 +97,8 @@ browser.runtime.onMessage.addListener((message) => {
 });
 
 browser.contextMenus.onClicked.addListener(async (info, tab) => {
+    const notify = await getSetting('notify', false);
+
     switch (info.menuItemId) {
         case 'page':
             await sendIdLinkCopyMessage(info, tab, 'page');
@@ -143,8 +143,6 @@ browser.contextMenus.onClicked.addListener(async (info, tab) => {
         default:
             console.error(`Unknown context menu item: ${info.menuItemId}`);
     }
-
-    notify = await getSetting('notify', false);
 });
 
 async function handleDoubleClick() {

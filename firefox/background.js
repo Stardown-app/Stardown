@@ -33,8 +33,8 @@ browser.browserAction.onClicked.addListener(async () => {
             // doubleClickInterval setting is retrieved later.
             havePerm = await browser.permissions.request({ permissions: ['tabs'] });
         } catch (err) {
-            console.error(err);
-            brieflyShowX();
+            await showNotification('Error', err.message);
+            await brieflyShowX();
             return;
         }
         if (!havePerm) {
@@ -99,23 +99,6 @@ browser.runtime.onMessage.addListener((message) => {
 });
 
 browser.contextMenus.onClicked.addListener(async (info, tab) => {
-    if (notify) {
-        let havePerm;
-        try {
-            // The permissions request must be the first async function call in the
-            // event handler or it will throw an error. That's why the value for the
-            // notify setting is retrieved later.
-            havePerm = await browser.permissions.request({ permissions: ['notifications'] });
-        } catch (err) {
-            console.error(err);
-            brieflyShowX();
-            return;
-        }
-        if (!havePerm) {
-            return;
-        }
-    }
-
     switch (info.menuItemId) {
         case 'page':
             await sendIdLinkCopyMessage(info, tab, 'page');
@@ -412,6 +395,7 @@ async function showNotification(title, body) {
 
 async function brieflyShowCheckmark(linkCount) {
     if (linkCount === 0) {
+        await showNotification('Error', 'No links to copy');
         await brieflyShowX();
         return;
     } else if (linkCount === 1) {

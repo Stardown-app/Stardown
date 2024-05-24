@@ -59,12 +59,6 @@ Due to browser limitations, Stardown's context menu options cannot appear for ce
 
 Besides those possibilities, browsers have an occasionally reoccuring bug that makes the context menu options disappear. Reinstalling Stardown should fix this.
 
-### Stardown displayed a red X and didn't do anything
-
-This may happen if the current website is not focused, such as if you just clicked the address bar. In this case, click the page and try again.
-
-Another possibility is that some websites limit what extensions can do and may prevent Stardown from working. A few examples are the Chrome Web Store and Chrome pages that start with `chrome://`. Fortunately, very few websites do this and it doesn't prevent Stardown from copying links for multiple tabs simultaneously if the current tab is not one of those limiting websites.
-
 ### Something else is wrong
 
 If reinstalling Stardown doesn't fix it and [the issues page](https://github.com/wheelercj/Stardown/issues?q=is%3Aissue) doesn't have an issue for it yet, please make a new issue.

@@ -16,14 +16,18 @@
 
 const browser = chrome || browser;
 
+let notify = false;
 let lastClick = new Date(0);
 let doubleClickInterval = 500;
+
+getSetting('notify', false).then(value => notify = value);
 getSetting('doubleClickInterval', 500).then(value => doubleClickInterval = value);
 
 browser.action.onClicked.addListener(async (tab) => {
     const now = new Date();
-    if (now - lastClick < doubleClickInterval) {
-        // it's a double-click
+    const msSinceLastClick = now - lastClick; // milliseconds
+    const isDoubleClick = msSinceLastClick < doubleClickInterval;
+    if (isDoubleClick) {
         let havePerm;
         try {
             // The permissions request must be the first async function call in the
@@ -56,29 +60,120 @@ browser.action.onClicked.addListener(async (tab) => {
     doubleClickInterval = await getSetting('doubleClickInterval', 500);
 });
 
-browser.contextMenus.create({
-    id: 'copy-markdown-link',
-    title: 'Create markdown of selected text',
-    contexts: ['all'],
-});
+const pageMenuItem = {
+    id: 'page',
+    title: 'Copy markdown link to here',
+    contexts: ['page', 'editable', 'video', 'audio'],
+};
 
-browser.contextMenus.create({
+const linkMenuItem = {
+    id: 'link',
+    title: 'Copy markdown of link',
+    contexts: ['link'],
+};
+
+const selectionMenuItem = {
+    id: 'selection',
+    title: 'Copy markdown of selection',
+    contexts: ['selection'],
+};
+
+const imageMenuItem = {
     id: 'image',
-    title: 'Create markdown of image',
-    contexts: ['image']
+    title: 'Copy markdown of image',
+    contexts: ['image'],
+};
+
+browser.runtime.onMessage.addListener((message) => {
+    // These context menu updates are done with messages from a content script because
+    // the contextMenus.update method cannot update a context menu that is already open.
+    // The content script listens for mouseover events.
+
+    // Doing this with the `update` method doesn't work well in Chromium because the
+    // remaining context menu option would still be under a "Stardown" parent menu
+    // option instead of being directly in the context menu.
+    browser.contextMenus.removeAll();
+
+    if (message.isImage) {
+        browser.contextMenus.create(imageMenuItem);
+    } else if (message.isLink) {
+        browser.contextMenus.create(linkMenuItem);
+    } else {
+        browser.contextMenus.create(linkMenuItem);
+        browser.contextMenus.create(imageMenuItem);
+    }
+
+    browser.contextMenus.create(pageMenuItem);
+    browser.contextMenus.create(selectionMenuItem);
 });
 
-browser.contextMenus.onClicked.addListener((info, tab) => {
+browser.contextMenus.onClicked.addListener(async (info, tab) => {
+    if (notify) {
+        let havePerm;
+        try {
+            // The permissions request must be the first async function call in the
+            // event handler or it will throw an error. That's why the value for the
+            // notify setting is retrieved later.
+            havePerm = await browser.permissions.request({ permissions: ['notifications'] });
+        } catch (err) {
+            console.error(err);
+            brieflyShowX();
+            return;
+        }
+        if (!havePerm) {
+            return;
+        }
+    }
+
     switch (info.menuItemId) {
-        case 'copy-markdown-link':
-            sendCopyMessage(info, tab);
+        case 'page':
+            await sendIdLinkCopyMessage(info, tab, 'page');
+            await brieflyShowCheckmark(1);
+            if (notify) {
+                await showNotification('Markdown copied', 'Your markdown can now be pasted');
+            }
+            break;
+        case 'selection':
+            await sendIdLinkCopyMessage(info, tab, 'selection');
+            await brieflyShowCheckmark(1);
+            if (notify) {
+                await showNotification('Markdown copied', 'Your markdown can now be pasted');
+            }
+            break;
+        case 'link':
+            // In Chromium, `info.linkText` is undefined, and no other property in
+            // `info` has the link's text.
+            const linkText = await browser.tabs.sendMessage(tab.id, { category: 'getLinkText' });
+            const linkMd = await createLinkMarkdown(linkText, info.linkUrl);
+            const {
+                title: linkNotifTitle, body: linkNotifBody
+            } = await browser.tabs.sendMessage(tab.id, {
+                category: 'link',
+                markdown: linkMd,
+            });
+            await brieflyShowCheckmark(1);
+            if (notify) {
+                await showNotification(linkNotifTitle, linkNotifBody);
+            }
             break;
         case 'image':
-            buildImageMarkdown(info, tab);
+            const imageMd = await createImageMarkdown(info, tab);
+            const {
+                title: imgNotifTitle, body: imgNotifBody
+            } = await browser.tabs.sendMessage(tab.id, {
+                category: 'image',
+                markdown: imageMd + '\n',
+            });
+            await brieflyShowCheckmark(1);
+            if (notify) {
+                await showNotification(imgNotifTitle, imgNotifBody);
+            }
             break;
         default:
-            console.log('Unknown menu item');
+            console.error(`Unknown context menu item: ${info.menuItemId}`);
     }
+
+    notify = await getSetting('notify', false);
 });
 
 async function handleDoubleClick() {
@@ -93,7 +188,7 @@ async function handleDoubleClick() {
     }
     const subBrackets = await getSetting('subBrackets', 'underlined');
     const links = await Promise.all(
-        tabs.map(tab => createMarkdownLink(tab, subBrackets))
+        tabs.map(tab => createTabLinkMarkdown(tab, subBrackets))
     );
     const bulletPoint = await getSetting('bulletPoint', '-');
     const text = links.map(link => `${bulletPoint} ${link}\n`).join('');
@@ -107,43 +202,15 @@ async function handleDoubleClick() {
     }
 }
 
-function buildImageMarkdown(info, tab) {
-    const url = info.srcUrl;
-    const { filename, filetype } = (() => {
-        const endingPath = url.split('/').pop(); // converts string into a list object & removes the last element
-        const lastDot = endingPath.lastIndexOf('.');
-        console.log('endingPath: ', endingPath);
-        console.log('lastDot index: ', lastDot);
-        if(lastDot > 0) {
-            const filename = endingPath.substring(0, lastDot); // substring of all characters before the '.'
-            const extension = endingPath.substring(lastDot); // substring of all characters after the '.'
-            return { filename, extension };
-        } else { return { filename: endingPath, extension: '' } } // cases where the image extension
-    })();
-    const markdown = `![${filename}](${url})\n`;
-    const message = { category: 'image', markdown: markdown, filename: filename }
-    browser.tabs.sendMessage(tab.id, message, null, notifier);
-}
-
-function notifier(id) {
-    chrome.notifications.create(id, {
-        type: 'basic',
-        iconUrl: 'images/icon-128.png',
-        title: 'Markdown created',
-        message: `Your markdown of ${id} can now be pasted`
-      }, function(notificationId) {
-        console.log('Notification created with ID:', notificationId);
-      });
-}
-
 /**
- * sendCopyMessage sends a message to the content script to get the ID of the
+ * sendIdLinkCopyMessage sends a message to the content script to get the ID of the
  * right-clicked HTML element and then writes a markdown link to the clipboard.
  * @param {any} info - the context menu info.
  * @param {any} tab - the tab that the context menu was clicked in.
  * @param {string} category - the category of the content to copy.
+ * @returns {Promise<void>}
  */
-function sendCopyMessage(info, tab, category) {
+async function sendIdLinkCopyMessage(info, tab, category) {
     browser.tabs.sendMessage(
         tab.id,
         { category: category },  // this will be the first input to the onMessage listener
@@ -151,18 +218,32 @@ function sendCopyMessage(info, tab, category) {
         async function (clickedElementId) {
             // clickedElementId may be undefined, an empty string, or a non-empty string
             const err = await scriptWriteLinkToClipboard(tab, clickedElementId);
-            if (err === null) {
-                await brieflyShowCheckmark(1);
-            } else {
+            if (err !== null) {
                 console.error(err);
                 await brieflyShowX();
+                throw new Error(err);
             }
         }
     );
 }
 
 /**
- * createMarkdownLink creates a markdown link for a tab. Stardown does not add to, or
+ * createLinkMarkdown creates a markdown link. The title and URL are escaped, and any
+ * square brackets are replaced depending on the settings.
+ * @param {string} title - the title of the link.
+ * @param {string} url - the URL of the link.
+ * @returns {Promise<string>}
+ */
+async function createLinkMarkdown(title, url) {
+    const subBrackets = await getSetting('subBrackets', 'underlined');
+    title = await replaceBrackets(title, subBrackets);
+    title = await escapeMarkdown(title);
+    url = url.replaceAll('(', '%28').replaceAll(')', '%29');
+    return `[${title}](${url})`;
+}
+
+/**
+ * createTabLinkMarkdown creates a markdown link for a tab. Stardown does not add to, or
  * remove from, the link any HTML element ID or text fragment. The tab title is used as
  * the link title.
  * @param {any} tab - the tab to create the link from.
@@ -170,7 +251,7 @@ function sendCopyMessage(info, tab, category) {
  * with.
  * @returns {Promise<string>} - a Promise that resolves to the markdown link.
  */
-async function createMarkdownLink(tab, subBrackets) {
+async function createTabLinkMarkdown(tab, subBrackets) {
     if (tab.title === undefined) {
         console.error('tab.title is undefined');
         throw new Error('tab.title is undefined');
@@ -302,7 +383,7 @@ async function scriptWriteLinkToClipboard(tab, id) {
                                 title = await replaceBrackets(title, subBrackets);
                                 title = await escapeMarkdown(title);
                                 selectedText = await escapeMarkdown(selectedText.replaceAll('[', '\\['));
-                                text = await createBlockquote(selectedText, title, url);
+                                text = await createBlockquoteMarkdown(selectedText, title, url);
                                 break;
                             default:
                                 console.error(`Unknown linkFormat: ${linkFormat}`);
@@ -336,6 +417,32 @@ async function scriptWriteLinkToClipboard(tab, id) {
 }
 
 /**
+ * createBlockquoteMarkdown creates a markdown blockquote with a link at the end. Any
+ * character escaping or replacements should have already been done before calling this
+ * function.
+ * @param {string} text - the text of the blockquote.
+ * @param {string} title - the title of the link.
+ * @param {string} url - the URL of the link.
+ * @returns {Promise<string>}
+ */
+async function createBlockquoteMarkdown(text, title, url) {
+    text = text.replaceAll('\n', '\n> ');
+    return `> ${text}\n> \n> — [${title}](${url})\n`;
+}
+
+/**
+ * createImageMarkdown creates markdown of an image.
+ * @param {any} info - the context menu info.
+ * @param {any} tab - the tab that the context menu was clicked in.
+ * @returns {Promise<string>}
+ */
+async function createImageMarkdown(info, tab) {
+    const url = info.srcUrl;
+    const fileName = url.split('/').pop();
+    return `![${fileName}](${url})`;
+}
+
+/**
  * replaceBrackets replaces square brackets in a link title with the character or escape
  * sequence chosen in settings.
  * @param {string} title - the raw link title.
@@ -350,6 +457,46 @@ async function replaceBrackets(title, subBrackets) {
         return title.replaceAll('[', '\\[').replaceAll(']', '\\]');
     }
     return title;
+}
+
+/**
+ * escapeMarkdown escapes some (not all!) markdown characters in a string. This function
+ * is useful for markdown link titles and blockquotes. It does not escape square
+ * brackets, among other characters.
+ * @param {string} text - the text to escape markdown characters in.
+ * @returns {Promise<string>}
+ */
+async function escapeMarkdown(text) {
+    return text
+        .replaceAll('>', '\\>')
+        .replaceAll('<', '\\<')
+        .replaceAll('#', '\\#')
+        .replaceAll('_', '\\_')
+        .replaceAll('*', '\\*')
+        .replaceAll('-', '\\-')
+        .replaceAll('+', '\\+')
+        .replaceAll('=', '\\=')
+        .replaceAll('`', '\\`')
+}
+
+/**
+ * showNotification shows the user a notification.
+ * @param {string} title - the title of the notification.
+ * @param {string} body - the body of the notification.
+ * @returns {Promise<void>}
+ */
+async function showNotification(title, body) {
+    if (title === undefined) {
+        throw new Error('title is undefined');
+    } else if (body === undefined) {
+        throw new Error('body is undefined');
+    }
+    browser.notifications.create('', {
+        type: 'basic',
+        iconUrl: 'images/icon-128.png',
+        title: title,
+        message: body,
+    });
 }
 
 async function brieflyShowCheckmark(linkCount) {

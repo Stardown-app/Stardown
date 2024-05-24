@@ -14,14 +14,18 @@
    limitations under the License.
 */
 
+let notify = false;
 let lastClick = new Date(0);
 let doubleClickInterval = 500;
+
+getSetting('notify', false).then(value => notify = value);
 getSetting('doubleClickInterval', 500).then(value => doubleClickInterval = value);
 
 browser.browserAction.onClicked.addListener(async () => {
     const now = new Date();
-    if (now - lastClick < doubleClickInterval) {
-        // it's a double-click
+    const msSinceLastClick = now - lastClick; // milliseconds
+    const isDoubleClick = msSinceLastClick < doubleClickInterval;
+    if (isDoubleClick) {
         let havePerm;
         try {
             // The permissions request must be the first async function call in the
@@ -47,35 +51,117 @@ browser.browserAction.onClicked.addListener(async () => {
     const [tab] = await browser.tabs.query({ active: true, currentWindow: true });
     const linkFormat = await getSetting('linkFormat', 'blockquote');
     const subBrackets = await getSetting('subBrackets', 'underlined');
-    const link = await createMarkdownLink(tab, '', linkFormat, subBrackets, false);
+    const link = await createTabLinkMarkdown(tab, '', linkFormat, subBrackets, false);
     await navigator.clipboard.writeText(link);
     await brieflyShowCheckmark(1);
     doubleClickInterval = await getSetting('doubleClickInterval', 500);
 });
 
 browser.contextMenus.create({
-    id: 'copy-markdown-link',
-    title: 'Create markdown of selected text',
-    contexts: ['page', 'editable', 'selection', 'video', 'audio'],
+    id: 'page',
+    title: 'Copy markdown link to here',
+    contexts: ['page', 'editable', 'video', 'audio'],
+});
+
+browser.contextMenus.create({
+    id: 'link',
+    title: 'Copy markdown of link',
+    contexts: ['link'],
+});
+
+browser.contextMenus.create({
+    id: 'selection',
+    title: 'Copy markdown of selection',
+    contexts: ['selection'],
 });
 
 browser.contextMenus.create({
     id: 'image',
-    title: 'Create markdown of image',
+    title: 'Copy markdown of image',
     contexts: ['image'],
 });
 
-browser.contextMenus.onClicked.addListener((info, tab) => {
+browser.runtime.onMessage.addListener((message) => {
+    // These context menu updates are done with messages from a content script because
+    // the contextMenus.update method cannot update a context menu that is already open.
+    // The content script listens for mouseover events.
+
+    // Doing this with the `update` method doesn't work well in Chromium because the
+    // remaining context menu option would still be under a "Stardown" parent menu
+    // option instead of being directly in the context menu.
+    if (message.isImage) {
+        browser.contextMenus.update('link', { visible: false });
+        browser.contextMenus.update('image', { visible: true });
+    } else if (message.isLink) {
+        browser.contextMenus.update('link', { visible: true });
+        browser.contextMenus.update('image', { visible: false });
+    }
+});
+
+browser.contextMenus.onClicked.addListener(async (info, tab) => {
+    if (notify) {
+        let havePerm;
+        try {
+            // The permissions request must be the first async function call in the
+            // event handler or it will throw an error. That's why the value for the
+            // notify setting is retrieved later.
+            havePerm = await browser.permissions.request({ permissions: ['notifications'] });
+        } catch (err) {
+            console.error(err);
+            brieflyShowX();
+            return;
+        }
+        if (!havePerm) {
+            return;
+        }
+    }
+
     switch (info.menuItemId) {
-        case 'copy-markdown-link':
-            sendCopyMessage(info, tab, 'all');
+        case 'page':
+            await sendIdLinkCopyMessage(info, tab, 'page');
+            await brieflyShowCheckmark(1);
+            if (notify) {
+                await showNotification('Markdown copied', 'Your markdown can now be pasted');
+            }
+            break;
+        case 'selection':
+            await sendIdLinkCopyMessage(info, tab, 'selection');
+            await brieflyShowCheckmark(1);
+            if (notify) {
+                await showNotification('Markdown copied', 'Your markdown can now be pasted');
+            }
+            break;
+        case 'link':
+            const linkMd = await createLinkMarkdown(info.linkText, info.linkUrl);
+            const {
+                title: linkNotifTitle, body: linkNotifBody
+            } = await browser.tabs.sendMessage(tab.id, {
+                category: 'link',
+                markdown: linkMd,
+            });
+            await brieflyShowCheckmark(1);
+            if (notify) {
+                await showNotification(linkNotifTitle, linkNotifBody);
+            }
             break;
         case 'image':
-            buildImageMarkdown(info, tab);
+            const imageMd = await createImageMarkdown(info, tab);
+            const {
+                title: imgNotifTitle, body: imgNotifBody
+            } = await browser.tabs.sendMessage(tab.id, {
+                category: 'image',
+                markdown: imageMd + '\n',
+            });
+            await brieflyShowCheckmark(1);
+            if (notify) {
+                await showNotification(imgNotifTitle, imgNotifBody);
+            }
             break;
         default:
             console.error(`Unknown context menu item: ${info.menuItemId}`);
     }
+
+    notify = await getSetting('notify', false);
 });
 
 async function handleDoubleClick() {
@@ -91,7 +177,7 @@ async function handleDoubleClick() {
     const linkFormat = await getSetting('linkFormat', 'blockquote');
     const subBrackets = await getSetting('subBrackets', 'underlined');
     const links = await Promise.all(
-        tabs.map(tab => createMarkdownLink(tab, '', linkFormat, subBrackets, false))
+        tabs.map(tab => createTabLinkMarkdown(tab, '', linkFormat, subBrackets, false))
     );
     const bulletPoint = await getSetting('bulletPoint', '-');
     const text = links.map(link => `${bulletPoint} ${link}\n`).join('');
@@ -99,49 +185,20 @@ async function handleDoubleClick() {
     await brieflyShowCheckmark(tabs.length);
 }
 
-function buildImageMarkdown(info, tab) {
-    const url = info.srcUrl;
-    const { filename, filetype } = (() => {
-        const endingPath = url.split('/').pop(); // converts string into a list object & removes the last element
-        const lastDot = endingPath.lastIndexOf('.');
-        console.log('endingPath: ', endingPath);
-        console.log('lastDot index: ', lastDot);
-        if (lastDot > 0) {
-            const filename = endingPath.substring(0, lastDot); // substring of all characters before the '.'
-            const extension = endingPath.substring(lastDot); // substring of all characters after the '.'
-            return { filename, extension };
-        } else {
-            return {
-                filename: endingPath,
-                extension: '',
-            };
-        }
-    })();
-
-    const markdown = `![${filename}](${url})\n`;
-    const message = { category: 'image', markdown: markdown, filename: filename };
-    browser.tabs.sendMessage(tab.id, message, null, notifier);
-}
-
-function notifier(id) {
-    browser.notifications.create(id, {
-        type: 'basic',
-        iconUrl: 'images/icon-128.png',
-        title: 'Markdown created',
-        message: `Your markdown of ${id} can now be pasted`
-    }, function (notificationId) {
-        console.log('Notification created with ID:', notificationId);
-    });
+async function getClickedElementId(info, tab) {
+    return await browser.tabs.sendMessage(tab.id, { category: 'link' }, { frameId: info.frameId });
 }
 
 /**
- * sendCopyMessage sends a message to the content script to get the ID of the
- * right-clicked HTML element and then writes a markdown link to the clipboard.
+ * sendIdLinkCopyMessage sends a message to the content script to get the ID of the
+ * right-clicked HTML element and then writes a markdown link (and possibly a block
+ * quote, depending on the category and settings) to the clipboard.
  * @param {any} info - the context menu info.
  * @param {any} tab - the tab that the context menu was clicked in.
  * @param {string} category - the category of the content to copy.
+ * @returns {Promise<void>}
  */
-function sendCopyMessage(info, tab, category) {
+async function sendIdLinkCopyMessage(info, tab, category) {
     browser.tabs.sendMessage(
         tab.id,
         { category: category },  // this will be the first input to the onMessage listener
@@ -150,15 +207,31 @@ function sendCopyMessage(info, tab, category) {
             // clickedElementId may be undefined, an empty string, or a non-empty string
             const linkFormat = await getSetting('linkFormat', 'blockquote');
             const subBrackets = await getSetting('subBrackets', 'underlined');
-            const text = await createMarkdownLink(tab, clickedElementId, linkFormat, subBrackets, true);
+            const text = await createTabLinkMarkdown(
+                tab, clickedElementId, linkFormat, subBrackets, true,
+            );
             await navigator.clipboard.writeText(text);
-            brieflyShowCheckmark(1);
         },
     );
 }
 
 /**
- * createMarkdownLink creates a markdown link for a tab, optionally including an HTML
+ * createLinkMarkdown creates a markdown link. The title and URL are escaped, and any
+ * square brackets are replaced depending on the settings.
+ * @param {string} title - the title of the link.
+ * @param {string} url - the URL of the link.
+ * @returns {Promise<string>}
+ */
+async function createLinkMarkdown(title, url) {
+    const subBrackets = await getSetting('subBrackets', 'underlined');
+    title = await replaceBrackets(title, subBrackets);
+    title = await escapeMarkdown(title);
+    url = url.replaceAll('(', '%28').replaceAll(')', '%29');
+    return `[${title}](${url})`;
+}
+
+/**
+ * createTabLinkMarkdown creates a markdown link for a tab, optionally including an HTML
  * element ID, and/or a text fragment, and/or a markdown blockquote depending on the
  * settings, whether checkSelected is true, and whether text is selected. Browsers that
  * support text fragments will try to use them first, and use the ID as a fallback if
@@ -172,7 +245,7 @@ function sendCopyMessage(info, tab, category) {
  * @param {boolean} checkSelected - whether to check if text is selected.
  * @returns {Promise<string>} - the markdown text.
  */
-async function createMarkdownLink(tab, id, linkFormat, subBrackets, checkSelected) {
+async function createTabLinkMarkdown(tab, id, linkFormat, subBrackets, checkSelected) {
     if (tab.title === undefined) {
         console.error('tab.title is undefined');
         throw new Error('tab.title is undefined');
@@ -242,7 +315,7 @@ async function createMarkdownLink(tab, id, linkFormat, subBrackets, checkSelecte
                 title = await replaceBrackets(title, subBrackets);
                 title = await escapeMarkdown(title);
                 selectedText = await escapeMarkdown(selectedText.replaceAll('[', '\\['));
-                text = await createBlockquote(selectedText, title, url);
+                text = await createBlockquoteMarkdown(selectedText, title, url);
                 break;
             default:
                 console.error(`Unknown linkFormat: ${linkFormat}`);
@@ -254,16 +327,29 @@ async function createMarkdownLink(tab, id, linkFormat, subBrackets, checkSelecte
 }
 
 /**
- * createBlockquote creates a markdown blockquote with a link at the end. Any character
- * escaping or replacements should have already been done before calling this function.
+ * createBlockquoteMarkdown creates a markdown blockquote with a link at the end. Any
+ * character escaping or replacements should have already been done before calling this
+ * function.
  * @param {string} text - the text of the blockquote.
  * @param {string} title - the title of the link.
  * @param {string} url - the URL of the link.
  * @returns {Promise<string>}
  */
-async function createBlockquote(text, title, url) {
+async function createBlockquoteMarkdown(text, title, url) {
     text = text.replaceAll('\n', '\n> ');
     return `> ${text}\n> \n> — [${title}](${url})\n`;
+}
+
+/**
+ * createImageMarkdown creates markdown of an image.
+ * @param {any} info - the context menu info.
+ * @param {any} tab - the tab that the context menu was clicked in.
+ * @returns {Promise<string>}
+ */
+async function createImageMarkdown(info, tab) {
+    const url = info.srcUrl;
+    const fileName = url.split('/').pop();
+    return `![${fileName}](${url})`;
 }
 
 /**
@@ -301,6 +387,26 @@ async function escapeMarkdown(text) {
         .replaceAll('+', '\\+')
         .replaceAll('=', '\\=')
         .replaceAll('`', '\\`')
+}
+
+/**
+ * showNotification shows the user a notification.
+ * @param {string} title - the title of the notification.
+ * @param {string} body - the body of the notification.
+ * @returns {Promise<void>}
+ */
+async function showNotification(title, body) {
+    if (title === undefined) {
+        throw new Error('title is undefined');
+    } else if (body === undefined) {
+        throw new Error('body is undefined');
+    }
+    browser.notifications.create('', {
+        type: 'basic',
+        iconUrl: 'images/icon-128.png',
+        title: title,
+        message: body,
+    });
 }
 
 async function brieflyShowCheckmark(linkCount) {

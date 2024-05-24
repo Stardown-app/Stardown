@@ -16,6 +16,10 @@
 
 <!doctype html>
 
+<!-- All links in the options page must have the ` target="_blank"` attribute in each
+<a> tag, or else Chromium will try (and fail) to load the pages in the same modal window
+as the options page. -->
+
 <html lang="en">
 
   <head>
@@ -39,20 +43,28 @@
     </p>
     <p>
       A browser extension that copies a markdown link for the current page.<br /><br />
-      <a href="https://github.com/wheelercj/Stardown?tab=readme-ov-file#troubleshooting">
+      <a href="https://github.com/wheelercj/Stardown?tab=readme-ov-file#troubleshooting" target="_blank">
         Troubleshooting
       </a><br />
-      <a href="https://github.com/wheelercj/Stardown?tab=readme-ov-file#feature-requests">
+      <a href="https://github.com/wheelercj/Stardown/discussions" target="_blank">
+        Join the discussion
+      </a><br />
+      <a href="https://github.com/wheelercj/Stardown?tab=readme-ov-file#feature-requests" target="_blank">
         Request a feature
       </a><br />
-      <a href="https://github.com/wheelercj/Stardown?tab=readme-ov-file#how-to-change-the-keyboard-shortcut">
+      <a href="https://github.com/wheelercj/Stardown?tab=readme-ov-file#settings"
+        target="_blank">
         How to change the keyboard shortcut
       </a><br />
-      <a href="https://github.com/wheelercj/Stardown">Source code</a>
+      <a href="https://github.com/wheelercj/Stardown" target="_blank">Source code</a>
     </p>
 
     <h3 style="text-align: center">Options</h3>
     <form>
+      <input id="notify" type="checkbox" />
+      <label for="notify">Show a notification when a context menu option succeeds</label>
+      <br />
+      <br />
       <label for="subBrackets">Replace square brackets in link titles with</label>
       <select id="subBrackets" name="subBrackets">
         <option value="underlined">underlined brackets ⦋ ⦌</option>
@@ -61,11 +73,11 @@
       </select>
       <br />
       <br />
-      <label for="linkFormat">When linking to selected text,</label>
+      <label for="linkFormat">When creating markdown of a selection,</label>
       <select id="linkFormat" name="linkFormat" checked>
-        <option value="blockquote">create a blockquote and a page title link</option>
-        <option value="selected">use the selected text as the link title</option>
-        <option value="title">use the page title as the link title</option>
+        <option value="blockquote">create a block quote and a page title link</option>
+        <option value="selected">create a link with the selected text as the title</option>
+        <option value="title">create a link with the page title as the link title</option>
       </select>
       <br />
       <br />

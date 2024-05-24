@@ -27,6 +27,8 @@ Stardown's "Copy markdown link to here" right-click option tries to find an `id`
 
 Stardown will never sell any data to anyone, and does not collect nor send any of your data anywhere besides putting markdown text into your clipboard.
 
+Stardown requires permission to display notifications so it can show you important error messages and to optionally show you success messages.
+
 In Chrome and Edge, if you use Stardown's feature that copies links for multiple tabs simultaneously, the first time you do, Stardown will request to "read your browsing history" because that's the only way for Chrome and Edge extensions to see the titles and URLs of all tabs ([source](https://developer.chrome.com/docs/extensions/reference/permissions-list#gc-wrapper:~:text=Warning%20displayed%3A-,read%20your%20browsing%20history.,-%22topSites%22)). Granting this permission does NOT give access to existing browsing history; the request message only sounds like it does because malicious extensions that can see the titles and URLs of all tabs could start manually gathering your browsing activity. The permission can be revoked at any time. The Firefox version of Stardown requests the exact same permission but has a less misleading request message. Other Chrome and Edge browser extensions that request immediate and complete access to browsing history, unlike Stardown, use the request message "read and change your browsing history on all signed-in devices".
 
 ## Settings

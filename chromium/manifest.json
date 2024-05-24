@@ -9,11 +9,11 @@
         "clipboardWrite",
         "contextMenus",
         "scripting",
-        "storage"
+        "storage",
+        "notifications"
     ],
     "optional_permissions": [
-        "tabs",
-        "notifications"
+        "tabs"
     ],
     "options_ui": {
         "page": "options.html"

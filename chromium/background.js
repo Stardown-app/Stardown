@@ -36,7 +36,8 @@ browser.action.onClicked.addListener(async (tab) => {
             havePerm = await browser.permissions.request({ permissions: ['tabs'] });
         } catch (err) {
             console.error(err);
-            brieflyShowX();
+            await showNotification('Error', err.message);
+            await brieflyShowX();
             return;
         }
         if (!havePerm) {
@@ -50,11 +51,11 @@ browser.action.onClicked.addListener(async (tab) => {
     // it's a single-click
     lastClick = now;
 
-    const err = await scriptWriteLinkToClipboard(tab, '');
-    if (err === null) {
+    const errStr = await scriptWriteLinkToClipboard(tab, '');
+    if (errStr === null) {
         await brieflyShowCheckmark(1);
     } else {
-        console.error(err);
+        await showNotification('Error', errStr);
         await brieflyShowX();
     }
     doubleClickInterval = await getSetting('doubleClickInterval', 500);
@@ -108,23 +109,6 @@ browser.runtime.onMessage.addListener((message) => {
 });
 
 browser.contextMenus.onClicked.addListener(async (info, tab) => {
-    if (notify) {
-        let havePerm;
-        try {
-            // The permissions request must be the first async function call in the
-            // event handler or it will throw an error. That's why the value for the
-            // notify setting is retrieved later.
-            havePerm = await browser.permissions.request({ permissions: ['notifications'] });
-        } catch (err) {
-            console.error(err);
-            brieflyShowX();
-            return;
-        }
-        if (!havePerm) {
-            return;
-        }
-    }
-
     switch (info.menuItemId) {
         case 'page':
             await sendIdLinkCopyMessage(info, tab, 'page');
@@ -193,11 +177,11 @@ async function handleDoubleClick() {
     const bulletPoint = await getSetting('bulletPoint', '-');
     const text = links.map(link => `${bulletPoint} ${link}\n`).join('');
     const activeTab = tabs.find(tab => tab.active);
-    const err = await scriptWriteToClipboard(activeTab, text);
-    if (err === null) {
+    const errStr = await scriptWriteToClipboard(activeTab, text);
+    if (errStr === null) {
         await brieflyShowCheckmark(tabs.length);
     } else {
-        console.error(err);
+        await showNotification('Error', errStr);
         await brieflyShowX();
     }
 }
@@ -217,11 +201,10 @@ async function sendIdLinkCopyMessage(info, tab, category) {
         { frameId: info.frameId },
         async function (clickedElementId) {
             // clickedElementId may be undefined, an empty string, or a non-empty string
-            const err = await scriptWriteLinkToClipboard(tab, clickedElementId);
-            if (err !== null) {
-                console.error(err);
+            const errStr = await scriptWriteLinkToClipboard(tab, clickedElementId);
+            if (errStr !== null) {
+                await showNotification('Error', errStr);
                 await brieflyShowX();
-                throw new Error(err);
             }
         }
     );
@@ -285,7 +268,7 @@ async function scriptWriteToClipboard(tab, text) {
                     // has not been granted, `navigator.clipboard.writeText` will fail
                     // silently when the document is not focused.
                     // if (!document.hasFocus()) {
-                    //     return 'Cannot copy a markdown link for an unfocused document';
+                    //     return 'Click the page and try again';
                     // }
 
                     await navigator.clipboard.writeText(text);
@@ -294,7 +277,7 @@ async function scriptWriteToClipboard(tab, text) {
             },
         });
     } catch (err) {
-        return err;
+        return err.message;
     }
 
     // `injectionResult[0].result` is whatever the injected script returned.
@@ -310,7 +293,7 @@ async function scriptWriteToClipboard(tab, text) {
  * @param {any} tab - the tab to copy the link from.
  * @param {string|undefined} id - the ID of the HTML element to link to. If falsy, no ID
  * is included in the link.
- * @returns {Promise<string|null>} - a Promise that resolves to null if the link was
+ * @returns {Promise<string|null>} - a Promise that resolves to null if the text was
  * copied successfully, or an error message if not.
  */
 async function scriptWriteLinkToClipboard(tab, id) {
@@ -392,7 +375,6 @@ async function scriptWriteLinkToClipboard(tab, id) {
                         }
                     }
 
-
                     // `navigator.clipboard.writeText` only works in a script if the
                     // document is focused, or if the tabs permission has been granted.
                     // Probably for security reasons, `document.body.focus()` doesn't
@@ -401,7 +383,7 @@ async function scriptWriteLinkToClipboard(tab, id) {
                     // of Stardown doesn't have to inject a script to write to the
                     // clipboard.
                     if (!document.hasFocus()) {
-                        return 'Cannot copy text for an unfocused document';
+                        return 'Click the page and try again';
                     }
 
                     await navigator.clipboard.writeText(text);
@@ -410,7 +392,7 @@ async function scriptWriteLinkToClipboard(tab, id) {
             },
         });
     } catch (err) {
-        return err;
+        return err.message;
     }
 
     // `injectionResult[0].result` is whatever the injected script returned.
@@ -502,6 +484,7 @@ async function showNotification(title, body) {
 
 async function brieflyShowCheckmark(linkCount) {
     if (linkCount === 0) {
+        await showNotification('Error', 'No links to copy');
         await brieflyShowX();
         return;
     } else if (linkCount === 1) {

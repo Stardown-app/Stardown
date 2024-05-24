@@ -58,7 +58,7 @@ browser.browserAction.onClicked.addListener(async () => {
 browser.contextMenus.create({
     id: 'page',
     title: 'Copy markdown link to here',
-    contexts: ['page', 'editable', 'video', 'audio'],
+    contexts: ['page', 'editable', 'audio'],
 });
 
 browser.contextMenus.create({
@@ -78,6 +78,12 @@ browser.contextMenus.create({
     title: 'Copy markdown of image',
     contexts: ['image'],
 });
+
+browser.contextMenus.create({
+    id: 'video',
+    title: 'Copy markdown of video',
+    contexts: ['video'],
+})
 
 browser.runtime.onMessage.addListener((message) => {
     // These context menu updates are done with messages from a content script because
@@ -138,6 +144,24 @@ browser.contextMenus.onClicked.addListener(async (info, tab) => {
             await brieflyShowCheckmark(1);
             if (notify) {
                 await showNotification(imgNotifTitle, imgNotifBody);
+            }
+            break;
+        case 'video':
+            let url = info.srcUrl;
+            if (!url) {
+                url = info.pageUrl;
+            }
+            url = url.replaceAll('(', '%28').replaceAll(')', '%29');
+            const videoMd = `![video](${url})`;
+            const {
+                title: videoNotifTitle, body: videoNotifBody
+            } = await browser.tabs.sendMessage(tab.id, {
+                category: 'video',
+                markdown: videoMd,
+            });
+            await brieflyShowCheckmark(1);
+            if (notify) {
+                await showNotification(videoNotifTitle, videoNotifBody);
             }
             break;
         default:
@@ -330,7 +354,7 @@ async function createBlockquoteMarkdown(text, title, url) {
  */
 async function createImageMarkdown(info, tab) {
     const url = info.srcUrl;
-    const fileName = url.split('/').pop();
+    const fileName = url.replaceAll('(', '%28').replaceAll(')', '%29').split('/').pop();
     return `![${fileName}](${url})`;
 }
 

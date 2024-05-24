@@ -33,11 +33,7 @@ window.onload = function () {
     document.addEventListener('mouseover', (event) => {
         const isLink = event.target.nodeName === 'A';
         const isImage = event.target.nodeName === 'IMG';
-        browser.runtime.sendMessage({ isLink, isImage }).catch((err) => {
-            if (err.message !== 'Extension context invalidated.') {
-                throw err;
-            }
-        });
+        browser.runtime.sendMessage({ isLink, isImage });
     });
 
     browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
@@ -52,6 +48,7 @@ window.onload = function () {
                 break;
             case 'link':
             case 'image':
+            case 'video':
                 copyText(message.markdown, message.category, sendResponse);
                 break;
             default:

@@ -38,6 +38,7 @@ browser.runtime.onMessage.addListener(function (message, sender, sendResponse) {
             break;
         case 'link':
         case 'image':
+        case 'video':
             copyText(message.markdown, message.category, sendResponse);
             break;
         default:

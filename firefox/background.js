@@ -152,7 +152,12 @@ browser.contextMenus.onClicked.addListener(async (info, tab) => {
                 url = info.pageUrl;
             }
             url = url.replaceAll('(', '%28').replaceAll(')', '%29');
-            const videoMd = `![video](${url})`;
+            let videoMd;
+            if (info.srcUrl) {
+                videoMd = `[video](${url})`;
+            } else {
+                videoMd = `![video](${url})`;
+            }
             const {
                 title: videoNotifTitle, body: videoNotifBody
             } = await browser.tabs.sendMessage(tab.id, {

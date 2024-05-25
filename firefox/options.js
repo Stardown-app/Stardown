@@ -38,6 +38,11 @@ async function saveOptions(e) {
                 button.value = 'Save';
                 button.style.backgroundColor = '';
             }, 750);
+
+            // send the updated doubleClickInterval to the background script
+            browser.runtime.sendMessage({
+                doubleClickInterval: document.querySelector("#doubleClickInterval").value
+            });
         }
     );
 }

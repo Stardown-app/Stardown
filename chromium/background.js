@@ -33,8 +33,7 @@ browser.action.onClicked.addListener(async (tab) => {
         let havePerm;
         try {
             // The permissions request must be the first async function call in the
-            // event handler or it will throw an error. That's why the value for the
-            // doubleClickInterval setting is retrieved later.
+            // event handler or it will throw an error.
             havePerm = await browser.permissions.request({ permissions: ['tabs'] });
         } catch (err) {
             console.error(err);
@@ -60,7 +59,6 @@ browser.action.onClicked.addListener(async (tab) => {
         await showNotification('Error', errStr);
         await brieflyShowX();
     }
-    doubleClickInterval = await getSetting('doubleClickInterval', 500);
 });
 
 const pageMenuItem = {
@@ -183,6 +181,12 @@ browser.contextMenus.onClicked.addListener(async (info, tab) => {
             break;
         default:
             console.error(`Unknown context menu item: ${info.menuItemId}`);
+    }
+});
+
+browser.runtime.onMessage.addListener(function (message, sender, sendResponse) {
+    if (message.doubleClickInterval) {
+        doubleClickInterval = message.doubleClickInterval;
     }
 });
 

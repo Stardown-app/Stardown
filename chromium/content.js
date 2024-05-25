@@ -49,6 +49,7 @@ window.onload = function () {
             case 'link':
             case 'image':
             case 'video':
+            case 'audio':
                 copyText(message.markdown, message.category, sendResponse);
                 break;
             default:

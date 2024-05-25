@@ -14,6 +14,10 @@
    limitations under the License.
 */
 
+if (typeof browser === 'undefined') {
+    var browser = chrome;
+}
+
 async function saveOptions(e) {
     e.preventDefault();
     await browser.storage.sync.set(

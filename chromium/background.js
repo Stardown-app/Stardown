@@ -14,7 +14,9 @@
    limitations under the License.
 */
 
-const browser = chrome || browser;
+if (typeof browser === 'undefined') {
+    var browser = chrome;
+}
 
 let lastClick = new Date(0);
 let doubleClickInterval = 500;
@@ -65,16 +67,16 @@ const pageMenuItem = {
     contexts: ['page', 'editable'],
 };
 
-const linkMenuItem = {
-    id: 'link',
-    title: 'Copy markdown of link',
-    contexts: ['link'],
-};
-
 const selectionMenuItem = {
     id: 'selection',
     title: 'Copy markdown of selection',
     contexts: ['selection'],
+};
+
+const linkMenuItem = {
+    id: 'link',
+    title: 'Copy markdown of link',
+    contexts: ['link'],
 };
 
 const imageMenuItem = {
@@ -83,19 +85,23 @@ const imageMenuItem = {
     contexts: ['image'],
 };
 
-browser.contextMenus.create({
+const videoMenuItem = {
     id: 'video',
     title: 'Copy markdown of video',
     contexts: ['video'],
-});
+};
 
-browser.contextMenus.create({
+const audioMenuItem = {
     id: 'audio',
     title: 'Copy markdown of audio',
     contexts: ['audio'],
-});
+};
 
 browser.runtime.onMessage.addListener((message) => {
+    updateContextMenu(message);
+});
+
+function updateContextMenu(message) {
     // These context menu updates are done with messages from a content script because
     // the contextMenus.update method cannot update a context menu that is already open.
     // The content script listens for mouseover events.
@@ -116,7 +122,9 @@ browser.runtime.onMessage.addListener((message) => {
 
     browser.contextMenus.create(pageMenuItem);
     browser.contextMenus.create(selectionMenuItem);
-});
+    browser.contextMenus.create(videoMenuItem);
+    browser.contextMenus.create(audioMenuItem);
+}
 
 browser.contextMenus.onClicked.addListener(async (info, tab) => {
     const notify = await getSetting('notify', false);
@@ -166,45 +174,10 @@ browser.contextMenus.onClicked.addListener(async (info, tab) => {
             }
             break;
         case 'video':
-            let url = info.srcUrl;
-            if (!url) {
-                url = info.pageUrl;
-            }
-            url = url.replaceAll('(', '%28').replaceAll(')', '%29');
-            let videoMd;
-            if (info.srcUrl) {
-                videoMd = `[video](${url})`;
-            } else {
-                videoMd = `![video](${url})`;
-            }
-            const {
-                title: videoNotifTitle, body: videoNotifBody
-            } = await browser.tabs.sendMessage(tab.id, {
-                category: 'video',
-                markdown: videoMd,
-            });
-            await brieflyShowCheckmark(1);
-            if (notify) {
-                await showNotification(videoNotifTitle, videoNotifBody);
-            }
+            await copyMediaLinkMarkdown(info, tab, 'video');
             break;
         case 'audio':
-            let audioUrl = info.srcUrl;
-            if (!audioUrl) {
-                audioUrl = info.pageUrl;
-            }
-            audioUrl = audioUrl.replaceAll('(', '%28').replaceAll(')', '%29');
-            const audioMd = `[audio](${audioUrl})`;
-            const {
-                title: audioNotifTitle, body: audioNotifBody
-            } = await browser.tabs.sendMessage(tab.id, {
-                category: 'audio',
-                markdown: audioMd,
-            });
-            await brieflyShowCheckmark(1);
-            if (notify) {
-                await showNotification(audioNotifTitle, audioNotifBody);
-            }
+            await copyMediaLinkMarkdown(info, tab, 'audio');
             break;
         default:
             console.error(`Unknown context menu item: ${info.menuItemId}`);
@@ -474,6 +447,32 @@ async function createImageMarkdown(info, tab) {
     const url = info.srcUrl;
     const fileName = url.replaceAll('(', '%28').replaceAll(')', '%29').split('/').pop();
     return `![${fileName}](${url})`;
+}
+
+/**
+ * copyMediaLinkMarkdown creates and copies markdown of a media link.
+ * @param {any} info - the context menu info. This object should have a `pageUrl`
+ * property and maybe a `srcUrl` property.
+ * @param {any} tab - the tab that the context menu was clicked in.
+ * @param {string} category - the category of the media link.
+ */
+async function copyMediaLinkMarkdown(info, tab, category) {
+    let url = info.srcUrl;
+    if (!url) {
+        url = info.pageUrl;
+    }
+    url = url.replaceAll('(', '%28').replaceAll(')', '%29');
+    const md = `[${category}](${url})`;
+    const {
+        title: notifTitle, body: notifBody
+    } = await browser.tabs.sendMessage(tab.id, {
+        category: category,
+        markdown: md,
+    });
+    await brieflyShowCheckmark(1);
+    if (notify) {
+        await showNotification(notifTitle, notifBody);
+    }
 }
 
 /**

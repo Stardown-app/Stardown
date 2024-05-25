@@ -14,7 +14,9 @@
    limitations under the License.
 */
 
-const browser = chrome || browser;
+if (typeof browser === 'undefined') {
+    var browser = chrome;
+}
 
 window.onload = function () {
     let clickedElement;

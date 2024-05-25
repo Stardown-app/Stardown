@@ -14,6 +14,10 @@
    limitations under the License.
 */
 
+if (typeof browser === 'undefined') {
+    var browser = chrome;
+}
+
 let lastClick = new Date(0);
 let doubleClickInterval = 500;
 
@@ -55,43 +59,54 @@ browser.browserAction.onClicked.addListener(async () => {
     doubleClickInterval = await getSetting('doubleClickInterval', 500);
 });
 
-browser.contextMenus.create({
+const pageMenuItem = {
     id: 'page',
     title: 'Copy markdown link to here',
     contexts: ['page', 'editable'],
-});
+};
 
-browser.contextMenus.create({
-    id: 'link',
-    title: 'Copy markdown of link',
-    contexts: ['link'],
-});
-
-browser.contextMenus.create({
+const selectionMenuItem = {
     id: 'selection',
     title: 'Copy markdown of selection',
     contexts: ['selection'],
-});
+};
 
-browser.contextMenus.create({
+const linkMenuItem = {
+    id: 'link',
+    title: 'Copy markdown of link',
+    contexts: ['link'],
+};
+
+const imageMenuItem = {
     id: 'image',
     title: 'Copy markdown of image',
     contexts: ['image'],
-});
+};
 
-browser.contextMenus.create({
+const videoMenuItem = {
     id: 'video',
     title: 'Copy markdown of video',
     contexts: ['video'],
-});
+};
 
-browser.contextMenus.create({
+const audioMenuItem = {
     id: 'audio',
     title: 'Copy markdown of audio',
     contexts: ['audio'],
-});
+};
+
+browser.contextMenus.create(pageMenuItem);
+browser.contextMenus.create(selectionMenuItem);
+browser.contextMenus.create(linkMenuItem);
+browser.contextMenus.create(imageMenuItem);
+browser.contextMenus.create(videoMenuItem);
+browser.contextMenus.create(audioMenuItem);
 
 browser.runtime.onMessage.addListener((message) => {
+    updateContextMenu(message);
+});
+
+function updateContextMenu(message) {
     // These context menu updates are done with messages from a content script because
     // the contextMenus.update method cannot update a context menu that is already open.
     // The content script listens for mouseover events.
@@ -106,7 +121,7 @@ browser.runtime.onMessage.addListener((message) => {
         browser.contextMenus.update('link', { visible: true });
         browser.contextMenus.update('image', { visible: false });
     }
-});
+}
 
 browser.contextMenus.onClicked.addListener(async (info, tab) => {
     const notify = await getSetting('notify', false);
@@ -153,45 +168,10 @@ browser.contextMenus.onClicked.addListener(async (info, tab) => {
             }
             break;
         case 'video':
-            let videoUrl = info.srcUrl;
-            if (!videoUrl) {
-                videoUrl = info.pageUrl;
-            }
-            videoUrl = videoUrl.replaceAll('(', '%28').replaceAll(')', '%29');
-            let videoMd;
-            if (info.srcUrl) {
-                videoMd = `[video](${videoUrl})`;
-            } else {
-                videoMd = `![video](${videoUrl})`;
-            }
-            const {
-                title: videoNotifTitle, body: videoNotifBody
-            } = await browser.tabs.sendMessage(tab.id, {
-                category: 'video',
-                markdown: videoMd,
-            });
-            await brieflyShowCheckmark(1);
-            if (notify) {
-                await showNotification(videoNotifTitle, videoNotifBody);
-            }
+            await copyMediaLinkMarkdown(info, tab, 'video');
             break;
         case 'audio':
-            let audioUrl = info.srcUrl;
-            if (!audioUrl) {
-                audioUrl = info.pageUrl;
-            }
-            audioUrl = audioUrl.replaceAll('(', '%28').replaceAll(')', '%29');
-            const audioMd = `[audio](${audioUrl})`;
-            const {
-                title: audioNotifTitle, body: audioNotifBody
-            } = await browser.tabs.sendMessage(tab.id, {
-                category: 'audio',
-                markdown: audioMd,
-            });
-            await brieflyShowCheckmark(1);
-            if (notify) {
-                await showNotification(audioNotifTitle, audioNotifBody);
-            }
+            await copyMediaLinkMarkdown(info, tab, 'audio');
             break;
         default:
             console.error(`Unknown context menu item: ${info.menuItemId}`);
@@ -385,6 +365,32 @@ async function createImageMarkdown(info, tab) {
     const url = info.srcUrl;
     const fileName = url.replaceAll('(', '%28').replaceAll(')', '%29').split('/').pop();
     return `![${fileName}](${url})`;
+}
+
+/**
+ * copyMediaLinkMarkdown creates and copies markdown of a media link.
+ * @param {any} info - the context menu info. This object should have a `pageUrl`
+ * property and maybe a `srcUrl` property.
+ * @param {any} tab - the tab that the context menu was clicked in.
+ * @param {string} category - the category of the media link.
+ */
+async function copyMediaLinkMarkdown(info, tab, category) {
+    let url = info.srcUrl;
+    if (!url) {
+        url = info.pageUrl;
+    }
+    url = url.replaceAll('(', '%28').replaceAll(')', '%29');
+    const md = `[${category}](${url})`;
+    const {
+        title: notifTitle, body: notifBody
+    } = await browser.tabs.sendMessage(tab.id, {
+        category: category,
+        markdown: md,
+    });
+    await brieflyShowCheckmark(1);
+    if (notify) {
+        await showNotification(notifTitle, notifBody);
+    }
 }
 
 /**

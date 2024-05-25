@@ -14,7 +14,9 @@
    limitations under the License.
 */
 
-const browser = chrome || browser;
+if (typeof browser === 'undefined') {
+    var browser = chrome;
+}
 
 async function saveOptions(e) {
     e.preventDefault();

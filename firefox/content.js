@@ -14,6 +14,10 @@
    limitations under the License.
 */
 
+if (typeof browser === 'undefined') {
+    var browser = chrome;
+}
+
 let clickedElement;
 
 document.addEventListener(

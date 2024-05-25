@@ -62,7 +62,7 @@ browser.action.onClicked.addListener(async (tab) => {
 const pageMenuItem = {
     id: 'page',
     title: 'Copy markdown link to here',
-    contexts: ['page', 'editable', 'audio'],
+    contexts: ['page', 'editable'],
 };
 
 const linkMenuItem = {
@@ -87,7 +87,13 @@ browser.contextMenus.create({
     id: 'video',
     title: 'Copy markdown of video',
     contexts: ['video'],
-})
+});
+
+browser.contextMenus.create({
+    id: 'audio',
+    title: 'Copy markdown of audio',
+    contexts: ['audio'],
+});
 
 browser.runtime.onMessage.addListener((message) => {
     // These context menu updates are done with messages from a content script because
@@ -180,6 +186,24 @@ browser.contextMenus.onClicked.addListener(async (info, tab) => {
             await brieflyShowCheckmark(1);
             if (notify) {
                 await showNotification(videoNotifTitle, videoNotifBody);
+            }
+            break;
+        case 'audio':
+            let audioUrl = info.srcUrl;
+            if (!audioUrl) {
+                audioUrl = info.pageUrl;
+            }
+            audioUrl = audioUrl.replaceAll('(', '%28').replaceAll(')', '%29');
+            const audioMd = `[audio](${audioUrl})`;
+            const {
+                title: audioNotifTitle, body: audioNotifBody
+            } = await browser.tabs.sendMessage(tab.id, {
+                category: 'audio',
+                markdown: audioMd,
+            });
+            await brieflyShowCheckmark(1);
+            if (notify) {
+                await showNotification(audioNotifTitle, audioNotifBody);
             }
             break;
         default:

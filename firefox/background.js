@@ -58,7 +58,7 @@ browser.browserAction.onClicked.addListener(async () => {
 browser.contextMenus.create({
     id: 'page',
     title: 'Copy markdown link to here',
-    contexts: ['page', 'editable', 'audio'],
+    contexts: ['page', 'editable'],
 });
 
 browser.contextMenus.create({
@@ -83,7 +83,13 @@ browser.contextMenus.create({
     id: 'video',
     title: 'Copy markdown of video',
     contexts: ['video'],
-})
+});
+
+browser.contextMenus.create({
+    id: 'audio',
+    title: 'Copy markdown of audio',
+    contexts: ['audio'],
+});
 
 browser.runtime.onMessage.addListener((message) => {
     // These context menu updates are done with messages from a content script because
@@ -147,16 +153,16 @@ browser.contextMenus.onClicked.addListener(async (info, tab) => {
             }
             break;
         case 'video':
-            let url = info.srcUrl;
-            if (!url) {
-                url = info.pageUrl;
+            let videoUrl = info.srcUrl;
+            if (!videoUrl) {
+                videoUrl = info.pageUrl;
             }
-            url = url.replaceAll('(', '%28').replaceAll(')', '%29');
+            videoUrl = videoUrl.replaceAll('(', '%28').replaceAll(')', '%29');
             let videoMd;
             if (info.srcUrl) {
-                videoMd = `[video](${url})`;
+                videoMd = `[video](${videoUrl})`;
             } else {
-                videoMd = `![video](${url})`;
+                videoMd = `![video](${videoUrl})`;
             }
             const {
                 title: videoNotifTitle, body: videoNotifBody
@@ -167,6 +173,24 @@ browser.contextMenus.onClicked.addListener(async (info, tab) => {
             await brieflyShowCheckmark(1);
             if (notify) {
                 await showNotification(videoNotifTitle, videoNotifBody);
+            }
+            break;
+        case 'audio':
+            let audioUrl = info.srcUrl;
+            if (!audioUrl) {
+                audioUrl = info.pageUrl;
+            }
+            audioUrl = audioUrl.replaceAll('(', '%28').replaceAll(')', '%29');
+            const audioMd = `[audio](${audioUrl})`;
+            const {
+                title: audioNotifTitle, body: audioNotifBody
+            } = await browser.tabs.sendMessage(tab.id, {
+                category: 'audio',
+                markdown: audioMd,
+            });
+            await brieflyShowCheckmark(1);
+            if (notify) {
+                await showNotification(audioNotifTitle, audioNotifBody);
             }
             break;
         default:

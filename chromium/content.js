@@ -103,25 +103,6 @@ window.onload = function () {
 }
 
 /**
- * getSetting gets a setting from the browser's sync storage.
- * @param {string} name - the name of the setting.
- * @param {any} default_ - the default value of the setting.
- * @returns {any}
- */
-async function getSetting(name, default_) {
-    try {
-        const v = (await browser.storage.sync.get(name))[name];
-        if (v === undefined) {
-            return default_;
-        }
-        return v;
-    } catch (err) {
-        console.error(err);
-        return default_;
-    }
-}
-
-/**
  * replaceBrackets replaces square brackets in a link title with the character or escape
  * sequence chosen in settings.
  * @param {string} title - the raw link title.

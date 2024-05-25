@@ -14,6 +14,8 @@
    limitations under the License.
 */
 
+import { getSetting } from "./common";
+
 if (typeof browser === 'undefined') {
     var browser = chrome;
 }
@@ -76,25 +78,6 @@ async function resetOptions() {
         button.value = 'Reset';
         button.style.backgroundColor = '';
     }, 750);
-}
-
-/**
- * getSetting gets a setting from the browser's sync storage.
- * @param {string} name - the name of the setting.
- * @param {any} default_ - the default value of the setting.
- * @returns {any}
- */
-async function getSetting(name, default_) {
-    try {
-        const v = (await browser.storage.sync.get(name))[name];
-        if (v === undefined) {
-            return default_;
-        }
-        return v;
-    } catch (err) {
-        console.error(err);
-        return default_;
-    }
 }
 
 document.addEventListener("DOMContentLoaded", loadOptions);

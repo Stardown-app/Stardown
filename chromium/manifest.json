@@ -28,6 +28,7 @@
             ],
             "js": [
                 "content.js",
+                "common.js",
                 "fragment-generation-utils.js",
                 "text-fragment-utils.js"
             ]

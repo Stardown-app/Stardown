@@ -34,6 +34,7 @@
             ],
             "js": [
                 "content.js",
+                "common.js",
                 "create-text-fragment-arg.js",
                 "fragment-generation-utils.js",
                 "text-fragment-utils.js"

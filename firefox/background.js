@@ -179,8 +179,8 @@ browser.contextMenus.onClicked.addListener(async (info, tab) => {
 browser.runtime.onMessage.addListener(async (message, sender, sendResponse) => {
     if (message.doubleClickInterval) {
         doubleClickInterval = message.doubleClickInterval;
-    } else if (message.error) {
-        await showNotification('Error', message.error);
+    } else if (message.warning) {
+        await showNotification('Warning', message.warning);
     }
 });
 
@@ -219,20 +219,23 @@ async function getClickedElementId(info, tab) {
  * @returns {Promise<void>}
  */
 async function sendIdLinkCopyMessage(info, tab, category) {
-    browser.tabs.sendMessage(
-        tab.id,
-        { category: category },  // this will be the first input to the onMessage listener
-        { frameId: info.frameId },
-        async function (clickedElementId) {
-            // clickedElementId may be undefined, an empty string, or a non-empty string
-            const linkFormat = await getSetting('linkFormat', 'blockquote');
-            const subBrackets = await getSetting('subBrackets', 'underlined');
-            const text = await createTabLinkMarkdown(
-                tab, clickedElementId, linkFormat, subBrackets, true,
-            );
-            await navigator.clipboard.writeText(text);
-        },
-    );
+    return new Promise(async (resolve, reject) => {
+        await browser.tabs.sendMessage(
+            tab.id,
+            { category: category },  // this will be the first input to the onMessage listener
+            { frameId: info.frameId },
+            async function (clickedElementId) {
+                // clickedElementId may be undefined, an empty string, or a non-empty string
+                const linkFormat = await getSetting('linkFormat', 'blockquote');
+                const subBrackets = await getSetting('subBrackets', 'underlined');
+                const text = await createTabLinkMarkdown(
+                    tab, clickedElementId, linkFormat, subBrackets, true,
+                );
+                await navigator.clipboard.writeText(text);
+                resolve();
+            },
+        );
+    });
 }
 
 /**

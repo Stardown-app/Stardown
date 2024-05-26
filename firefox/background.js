@@ -178,9 +178,11 @@ browser.contextMenus.onClicked.addListener(async (info, tab) => {
     }
 });
 
-browser.runtime.onMessage.addListener(function (message, sender, sendResponse) {
+browser.runtime.onMessage.addListener(async (message, sender, sendResponse) => {
     if (message.doubleClickInterval) {
         doubleClickInterval = message.doubleClickInterval;
+    } else if (message.error) {
+        await showNotification('Error', message.error);
     }
 });
 

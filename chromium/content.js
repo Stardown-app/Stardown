@@ -197,19 +197,36 @@ function createTextFragmentArg(selection) {
     }
 
     // https://web.dev/articles/text-fragments#programmatic_text_fragment_link_generation
-    const result = window.generateFragment(selection);
+    let result;
+    try {
+        result = window.generateFragment(selection);
+    } catch (err) {
+        if (err.message !== 'window.generateFragment is not a function') {
+            browser.runtime.sendMessage({ error: err });
+            return '';
+        }
+    }
+
     switch (result.status) {
         case 1:
-            console.error('generateFragment: the selection provided could not be used');
+            browser.runtime.sendMessage({
+                error: 'text fragment: the selection provided could not be used'
+            });
             return '';
         case 2:
-            console.error('generateFragment: no unique fragment could be identified for this selection');
+            browser.runtime.sendMessage({
+                error: 'text fragment: no unique fragment could be identified for this selection'
+            });
             return '';
         case 3:
-            console.error('generateFragment: computation could not complete in time');
+            browser.runtime.sendMessage({
+                error: 'text fragment: computation could not complete in time'
+            });
             return '';
         case 4:
-            console.error('generateFragment: an exception was raised during generation');
+            browser.runtime.sendMessage({
+                error: 'text fragment: an exception was raised during generation'
+            });
             return '';
     }
 

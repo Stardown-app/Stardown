@@ -40,11 +40,13 @@ When fully testing Stardown, test each feature below in each of the officially s
 
 ### context types
 
-- The **selection** context type is anything that the user has selected by clicking and dragging with their mouse.
-- The **link** context type works for any link, except that Stardown tries to show only the image copy option for unselected images that are also links.
-- Many **image** types are supported including png, jpg, svg, webp, gif, and base64-encoded. However, types not supported include background images, `canvas` HTML elements, inline `svg` HTML elements, and sometimes images within `a` HTML elements for some reason.
-- The **video** context type may only work for videos rendered with the `video` HTML element, such as YouTube videos and mp4 files hosted by GitHub. Some sites like Vimeo don't seem to use that HTML element.
-- Similarly, the **audio** context type works for `audio` HTML elements.
+- **selection**: anything that the user has selected by clicking and dragging with their mouse.
+- **link**: works for any link, except that Stardown tries to show only the image copy option for unselected images that are also links.
+- **image**: types supported include png, jpg, svg, webp, gif, and base64-encoded. However, types not supported include background images, `canvas` HTML elements, inline `svg` HTML elements, and sometimes images within `a` HTML elements for some reason.
+- **video**: works for most videos rendered with the `video` HTML element, such as YouTube videos and mp4 files hosted by GitHub ([example](https://github.com/wheelercj/zq)). This option doesn't appear for some video sites like Vimeo probably because their `video` HTML element is buried under many other things, and Asciinema because they don't use the `video` HTML element.
+  - Markdown of YouTube videos is expected to render well in Obsidian and Discord, but not GitHub or VS Code.
+  - Markdown of GitHub mp4s is expected to render well only in GitHub.
+- **audio**: works for `audio` HTML elements.
 
 ## why separate browser versions
 

@@ -14,8 +14,16 @@
    limitations under the License.
 */
 
+let browserName;
 if (typeof browser === 'undefined') {
+    browserName = 'chromium';
     var browser = chrome;
+} else {
+    browserName = 'firefox';
+}
+
+if (typeof browser.action === 'undefined') {
+    browser.action = browser.browserAction; // for manifest v2 compatibility
 }
 
 let lastClick = new Date(0);
@@ -34,29 +42,22 @@ browser.action.onClicked.addListener(async (tab) => {
             // event handler or it will throw an error.
             havePerm = await browser.permissions.request({ permissions: ['tabs'] });
         } catch (err) {
-            console.error(err);
-            await showNotification('Error', err.message);
-            await brieflyShowX();
+            await showStatus(0, 'Error', err.message);
             return;
         }
         if (!havePerm) {
+            await showStatus(0, 'Error', 'Unable to copy links for multiple tabs without permission');
             return;
         }
 
         lastClick = new Date(0);
-        await handleDoubleClick();
+        await handleIconDoubleClick(tab);
         return;
     }
     // it's a single-click
     lastClick = now;
 
-    const errStr = await scriptWriteLinkToClipboard(tab, '');
-    if (errStr === null) {
-        await brieflyShowCheckmark(1);
-    } else {
-        await showNotification('Error', errStr);
-        await brieflyShowX();
-    }
+    await handleInteraction(tab, { category: 'iconSingleClick' });
 });
 
 const pageMenuItem = {
@@ -95,90 +96,102 @@ const audioMenuItem = {
     contexts: ['audio'],
 };
 
-browser.runtime.onMessage.addListener((message) => {
-    updateContextMenu(message);
-});
-
-function updateContextMenu(message) {
-    // These context menu updates are done with messages from a content script because
-    // the contextMenus.update method cannot update a context menu that is already open.
-    // The content script listens for mouseover events.
-
-    // Doing this with the `update` method doesn't work well in Chromium because the
-    // remaining context menu option would still be under a "Stardown" parent menu
-    // option instead of being directly in the context menu.
-    browser.contextMenus.removeAll();
-
-    if (message.isImage) {
-        browser.contextMenus.create(imageMenuItem);
-    } else if (message.isLink) {
-        browser.contextMenus.create(linkMenuItem);
-    } else {
-        browser.contextMenus.create(linkMenuItem);
-        browser.contextMenus.create(imageMenuItem);
-    }
-
+if (browserName === 'firefox') {
     browser.contextMenus.create(pageMenuItem);
     browser.contextMenus.create(selectionMenuItem);
+    browser.contextMenus.create(linkMenuItem);
+    browser.contextMenus.create(imageMenuItem);
     browser.contextMenus.create(videoMenuItem);
     browser.contextMenus.create(audioMenuItem);
 }
 
-browser.contextMenus.onClicked.addListener(async (info, tab) => {
-    const notify = await getSetting('notify', false);
+browser.runtime.onMessage.addListener((message) => {
+    // These context menu updates are done with messages from a content script because
+    // the contextMenus.update method cannot update a context menu that is already open.
+    // The content script listens for mouseover events.
+    updateContextMenu(message);
+});
 
+/**
+ * updateContextMenu updates the options in the context menu based on the message from
+ * the content script. This only works if the context menu is not visible.
+ * @param {object} message - the message from the content script.
+ * @param {boolean} message.isImage - whether the mouse is over an image.
+ * @param {boolean} message.isLink - whether the mouse is over a link.
+ * @returns {void}
+ * @throws {Error} - if the browser is unknown.
+ */
+function updateContextMenu(message) {
+    if (browserName === 'firefox') {
+        if (message.isImage) {
+            browser.contextMenus.update('link', { visible: false });
+            browser.contextMenus.update('image', { visible: true });
+        } else if (message.isLink) {
+            browser.contextMenus.update('link', { visible: true });
+            browser.contextMenus.update('image', { visible: false });
+        }
+    } else if (browserName === 'chromium') {
+        // The `update` method doesn't work well in Chromium because the one remaining
+        // context menu option would still be under a "Stardown" parent menu option
+        // instead of being in the root of the context menu.
+        browser.contextMenus.removeAll();
+
+        if (message.isImage) {
+            browser.contextMenus.create(imageMenuItem);
+        } else if (message.isLink) {
+            browser.contextMenus.create(linkMenuItem);
+        } else {
+            browser.contextMenus.create(linkMenuItem);
+            browser.contextMenus.create(imageMenuItem);
+        }
+
+        browser.contextMenus.create(pageMenuItem);
+        browser.contextMenus.create(selectionMenuItem);
+        browser.contextMenus.create(videoMenuItem);
+        browser.contextMenus.create(audioMenuItem);
+    } else {
+        console.error('Unknown browser');
+        throw new Error('Unknown browser');
+    }
+}
+
+browser.contextMenus.onClicked.addListener(async (info, tab) => {
     switch (info.menuItemId) {
         case 'page':
-            await sendIdLinkCopyMessage(info, tab, 'page');
-            await brieflyShowCheckmark(1);
-            if (notify) {
-                await showNotification('Markdown copied', 'Your markdown can now be pasted');
-            }
+            await handleInteraction(
+                tab, { category: 'pageRightClick' }, { frameId: info.frameId },
+            );
             break;
         case 'selection':
-            await sendIdLinkCopyMessage(info, tab, 'selection');
-            await brieflyShowCheckmark(1);
-            if (notify) {
-                await showNotification('Markdown copied', 'Your markdown can now be pasted');
-            }
+            await handleInteraction(
+                tab, { category: 'selectionRightClick' }, { frameId: info.frameId },
+            );
             break;
         case 'link':
-            // In Chromium, `info.linkText` is undefined, and no other property in
-            // `info` has the link's text.
-            const linkText = await browser.tabs.sendMessage(tab.id, { category: 'getLinkText' });
-            const linkMd = await createLinkMarkdown(linkText, info.linkUrl);
-            const {
-                title: linkNotifTitle, body: linkNotifBody
-            } = await browser.tabs.sendMessage(tab.id, {
-                category: 'link',
-                markdown: linkMd,
-            });
-            await brieflyShowCheckmark(1);
-            if (notify) {
-                await showNotification(linkNotifTitle, linkNotifBody);
-            }
+            // In Chromium, unlike in Firefox, `info.linkText` is undefined and no
+            // property in `info` has the link's text.
+            await handleInteraction(
+                tab, { category: 'linkRightClick', linkUrl: info.linkUrl },
+            );
             break;
         case 'image':
-            const imageMd = await createImageMarkdown(info, tab);
-            const {
-                title: imgNotifTitle, body: imgNotifBody
-            } = await browser.tabs.sendMessage(tab.id, {
-                category: 'image',
-                markdown: imageMd + '\n',
-            });
-            await brieflyShowCheckmark(1);
-            if (notify) {
-                await showNotification(imgNotifTitle, imgNotifBody);
-            }
+            await handleInteraction(
+                tab, { category: 'imageRightClick', srcUrl: info.srcUrl },
+            );
             break;
         case 'video':
-            await copyMediaLinkMarkdown(info, tab, 'video');
+            await handleInteraction(
+                tab, { category: 'videoRightClick', srcUrl: info.srcUrl, pageUrl: info.pageUrl },
+            )
             break;
         case 'audio':
-            await copyMediaLinkMarkdown(info, tab, 'audio');
+            await handleInteraction(
+                tab, { category: 'audioRightClick', srcUrl: info.srcUrl, pageUrl: info.pageUrl },
+            );
             break;
         default:
             console.error(`Unknown context menu item: ${info.menuItemId}`);
+            throw new Error(`Unknown context menu item: ${info.menuItemId}`);
     }
 });
 
@@ -190,9 +203,47 @@ browser.runtime.onMessage.addListener(async (message, sender, sendResponse) => {
     }
 });
 
-async function handleDoubleClick() {
+/**
+ * handleInteraction sends a message to the content script and then shows the user a
+ * status indicator.
+ * @param {any} tab - the tab the user interacted with.
+ * @param {object} message - the message to send to the content script. This must have a
+ * `category` property, and can have other properties depending on the category.
+ * @param {string} message.category - the category of the message.
+ * @param {object} options - the options for the message. For example, the `frameId`
+ * option can be used to specify the frame to send the message to.
+ * @returns {Promise<void>}
+ */
+async function handleInteraction(tab, message, options = {}) {
+    let status, notifTitle, notifBody;
+    try {
+        const response = await browser.tabs.sendMessage(tab.id, message, options);
+        if (response === undefined) {
+            await showStatus(0, 'Error', 'No response received from the content script');
+            return;
+        }
+        status = response.status;
+        notifTitle = response.notifTitle;
+        notifBody = response.notifBody;
+    } catch (err) {
+        await showStatus(0, 'Error', err.message);
+        return;
+    }
+    await showStatus(status, notifTitle, notifBody);
+}
+
+/**
+ * handleIconDoubleClick handles the user double-clicking the extension's icon by
+ * creating a markdown list of links and sending it to the content script to be copied.
+ * A status indicator is then shown to the user.
+ * @param {any} activeTab - the tab that was active when the icon was double-clicked.
+ * @returns {Promise<void>}
+ */
+async function handleIconDoubleClick(activeTab) {
+    // figure out which tabs to create links for
     let tabs = await browser.tabs.query({ currentWindow: true, highlighted: true });
-    if (tabs.length === 1) {
+    if (tabs.length === 1) { // if only one tab is highlighted
+        // get unhighlighted tabs
         const doubleClickWindows = await getSetting('doubleClickWindows', 'current');
         if (doubleClickWindows === 'current') {
             tabs = await browser.tabs.query({ currentWindow: true });
@@ -200,64 +251,25 @@ async function handleDoubleClick() {
             tabs = await browser.tabs.query({});
         }
     }
+
     const subBrackets = await getSetting('subBrackets', 'underlined');
     const links = await Promise.all(
         tabs.map(tab => createTabLinkMarkdown(tab, subBrackets))
     );
     const bulletPoint = await getSetting('bulletPoint', '-');
-    const text = links.map(link => `${bulletPoint} ${link}\n`).join('');
-    const activeTab = tabs.find(tab => tab.active);
-    const errStr = await scriptWriteToClipboard(activeTab, text);
-    if (errStr === null) {
-        await brieflyShowCheckmark(tabs.length);
-    } else {
-        await showNotification('Error', errStr);
-        await brieflyShowX();
-    }
-}
+    const linksListMd = links.map(link => `${bulletPoint} ${link}\n`).join('');
 
-/**
- * sendIdLinkCopyMessage sends a message to the content script to get the ID of the
- * right-clicked HTML element and then writes a markdown link to the clipboard.
- * @param {any} info - the context menu info.
- * @param {any} tab - the tab that the context menu was clicked in.
- * @param {string} category - the category of the content to copy.
- * @returns {Promise<void>}
- */
-async function sendIdLinkCopyMessage(info, tab, category) {
-    return new Promise(async (resolve, reject) => {
-        browser.tabs.sendMessage(
-            tab.id,
-            { category: category },  // this will be the first input to the onMessage listener
-            { frameId: info.frameId },
-            async function (clickedElementId) {
-                // clickedElementId may be undefined, an empty string, or a non-empty string
-                const errStr = await scriptWriteLinkToClipboard(tab, clickedElementId);
-                if (errStr !== null) {
-                    await showNotification('Error', errStr);
-                    await brieflyShowX();
-                    reject(errStr);
-                } else {
-                    resolve();
-                }
-            }
-        );
+    const {
+        status, notifTitle, notifBody,
+    } = await browser.tabs.sendMessage(activeTab.id, {
+        category: 'copy', text: linksListMd,
     });
-}
 
-/**
- * createLinkMarkdown creates a markdown link. The title and URL are escaped, and any
- * square brackets are replaced depending on the settings.
- * @param {string} title - the title of the link.
- * @param {string} url - the URL of the link.
- * @returns {Promise<string>}
- */
-async function createLinkMarkdown(title, url) {
-    const subBrackets = await getSetting('subBrackets', 'underlined');
-    title = await replaceBrackets(title, subBrackets);
-    title = await escapeMarkdown(title);
-    url = url.replaceAll('(', '%28').replaceAll(')', '%29');
-    return `[${title}](${url})`;
+    if (status === 0) { // failure
+        await showStatus(0, notifTitle, notifBody);
+    } else { // success
+        await showStatus(tabs.length, notifTitle, notifBody);
+    }
 }
 
 /**
@@ -276,162 +288,11 @@ async function createTabLinkMarkdown(tab, subBrackets) {
         // Were the necessary permissions granted?
     }
 
-    const title = await replaceBrackets(tab.title, subBrackets);
+    let title = await replaceBrackets(tab.title, subBrackets);
+    title = await escapeMarkdown(title);
     const url = tab.url.replaceAll('(', '%28').replaceAll(')', '%29');
 
     return `[${title}](${url})`;
-}
-
-/**
- * scriptWriteToClipboard writes text to the clipboard in a tab. This function expects
- * the tabs permission and will fail silently if the tabs permission has not been
- * granted and the document is not focused.
- * @param {any} tab - the tab to write text to the clipboard in.
- * @param {string} text - the text to write to the clipboard.
- * @returns {Promise<string|null>} - a Promise that resolves to null if the text was
- * written to the clipboard successfully, or an error message if not.
- */
-async function scriptWriteToClipboard(tab, text) {
-    let injectionResult;
-    try {
-        injectionResult = await browser.scripting.executeScript({
-            target: { tabId: tab.id },
-            args: [text],
-            function: (text) => {
-                return (async () => {
-                    // This script assumes the tabs permission has been granted. If it
-                    // has not been granted, `navigator.clipboard.writeText` will fail
-                    // silently when the document is not focused.
-                    // if (!document.hasFocus()) {
-                    //     return 'Click the page and try again';
-                    // }
-
-                    await navigator.clipboard.writeText(text);
-                    return null;
-                })();
-            },
-        });
-    } catch (err) {
-        return err.message;
-    }
-
-    // `injectionResult[0].result` is whatever the injected script returned.
-    return injectionResult[0].result;
-}
-
-/**
- * scriptWriteLinkToClipboard copies to the clipboard a markdown link for a tab,
- * optionally including an HTML element ID, and/or a text fragment, and/or a markdown
- * blockquote depending on the settings and whether text is selected. Browsers that
- * support text fragments will try to use them first, and use the ID as a fallback if
- * necessary.
- * @param {any} tab - the tab to copy the link from.
- * @param {string|undefined} id - the ID of the HTML element to link to. If falsy, no ID
- * is included in the link.
- * @returns {Promise<string|null>} - a Promise that resolves to null if the text was
- * copied successfully, or an error message if not.
- */
-async function scriptWriteLinkToClipboard(tab, id) {
-    if (!id) {
-        id = '';
-    }
-
-    const subBrackets = await getSetting('subBrackets', 'underlined');
-
-    let injectionResult;
-    try {
-        injectionResult = await browser.scripting.executeScript({
-            target: { tabId: tab.id },
-            args: [id, subBrackets],
-            function: (id, subBrackets) => {
-                return (async () => {
-                    let title = document.title;
-                    let url = location.href.replaceAll('(', '%28').replaceAll(')', '%29');
-
-                    // Remove any preexisting HTML element ID and/or text fragment from
-                    // the URL. If the URL has an HTML element ID, any text fragment
-                    // will also be in the `hash` attribute of its URL object. However,
-                    // if the URL has a text fragment but no HTML element ID, the text
-                    // fragment may be in the `pathname` attribute of its URL object
-                    // along with part of the URL that should not be removed.
-                    const urlObj = new URL(url);
-                    urlObj.hash = '';  // remove HTML element ID and maybe text fragment
-                    if (urlObj.pathname.includes(':~:text=')) {
-                        urlObj.pathname = urlObj.pathname.split(':~:text=')[0];
-                    }
-                    url = urlObj.toString();
-
-                    let selectedText;
-                    let arg;  // the text fragment argument
-                    const selection = window.getSelection();
-                    if (selection) {
-                        selectedText = selection.toString().trim();
-                        arg = createTextFragmentArg(selection);
-                    }
-
-                    if (id || arg) {
-                        url += '#';
-                        if (id) {
-                            url += id;
-                        }
-                        if (arg) {
-                            url += `:~:text=${arg}`;
-                        }
-                    }
-
-                    let text;
-                    if (!selectedText) {
-                        title = await replaceBrackets(title, subBrackets);
-                        title = await escapeMarkdown(title);
-                        text = `[${title}](${url})`;
-                    } else {
-                        const linkFormat = await getSetting('linkFormat', 'blockquote');
-                        switch (linkFormat) {
-                            case 'title':
-                                title = await replaceBrackets(title, subBrackets);
-                                title = await escapeMarkdown(title);
-                                text = `[${title}](${url})`;
-                                break;
-                            case 'selected':
-                                selectedText = await replaceBrackets(selectedText, subBrackets);
-                                selectedText = await escapeMarkdown(selectedText);
-                                selectedText = selectedText.replaceAll('\n', ' ');
-                                text = `[${selectedText}](${url})`;
-                                break;
-                            case 'blockquote':
-                                title = await replaceBrackets(title, subBrackets);
-                                title = await escapeMarkdown(title);
-                                selectedText = await escapeMarkdown(selectedText.replaceAll('[', '\\['));
-                                text = await createBlockquoteMarkdown(selectedText, title, url);
-                                break;
-                            default:
-                                console.error(`Unknown linkFormat: ${linkFormat}`);
-                                throw new Error(`Unknown linkFormat: ${linkFormat}`);
-                        }
-                    }
-
-                    // `navigator.clipboard.writeText` only works in a script if the
-                    // document is focused, or if the tabs permission has been granted.
-                    // Probably for security reasons, `document.body.focus()` doesn't
-                    // work here. Whether the document is focused doesn't seem to be an
-                    // issue in Firefox, unless that's just because the Firefox version
-                    // of Stardown doesn't have to inject a script to write to the
-                    // clipboard.
-                    if (!document.hasFocus()) {
-                        return 'Click the page and try again';
-                    }
-
-                    await navigator.clipboard.writeText(text);
-                    return null;
-                })();
-            },
-        });
-    } catch (err) {
-        return err.message;
-    }
-
-    // `injectionResult[0].result` is whatever the injected script returned.
-    return injectionResult[0].result;
 }
 
 /**
@@ -446,44 +307,6 @@ async function scriptWriteLinkToClipboard(tab, id) {
 async function createBlockquoteMarkdown(text, title, url) {
     text = text.replaceAll('\n', '\n> ');
     return `> ${text}\n> \n> — [${title}](${url})\n`;
-}
-
-/**
- * createImageMarkdown creates markdown of an image.
- * @param {any} info - the context menu info.
- * @param {any} tab - the tab that the context menu was clicked in.
- * @returns {Promise<string>}
- */
-async function createImageMarkdown(info, tab) {
-    const url = info.srcUrl;
-    const fileName = url.replaceAll('(', '%28').replaceAll(')', '%29').split('/').pop();
-    return `![${fileName}](${url})`;
-}
-
-/**
- * copyMediaLinkMarkdown creates and copies markdown of a media link.
- * @param {any} info - the context menu info. This object should have a `pageUrl`
- * property and maybe a `srcUrl` property.
- * @param {any} tab - the tab that the context menu was clicked in.
- * @param {string} category - the category of the media link.
- */
-async function copyMediaLinkMarkdown(info, tab, category) {
-    let url = info.srcUrl;
-    if (!url) {
-        url = info.pageUrl;
-    }
-    url = url.replaceAll('(', '%28').replaceAll(')', '%29');
-    const md = `[${category}](${url})`;
-    const {
-        title: notifTitle, body: notifBody
-    } = await browser.tabs.sendMessage(tab.id, {
-        category: category,
-        markdown: md,
-    });
-    await brieflyShowCheckmark(1);
-    if (notify) {
-        await showNotification(notifTitle, notifBody);
-    }
 }
 
 /**
@@ -524,7 +347,30 @@ async function escapeMarkdown(text) {
 }
 
 /**
- * showNotification shows the user a notification.
+ * showStatus indicates to the user whether an operation was successful. The indicators
+ * are badge text on the extension's icon and possibly a system notification.
+ * @param {number} status - the number of items successfully copied. Zero means failure,
+ * and one or above means success.
+ * @param {string} notifTitle - the title of the notification to show the user.
+ * @param {string} notifBody - the body of the notification to show the user.
+ * @returns {Promise<void>}
+ */
+async function showStatus(status, notifTitle, notifBody) {
+    if (status > 0) { // success
+        await brieflyShowCheck(status);
+        const notifyOnSuccess = await getSetting('notifyOnSuccess', false);
+        if (notifyOnSuccess) {
+            await showNotification(notifTitle, notifBody);
+        }
+    } else { // failure
+        console.error(`${notifTitle}: ${notifBody}`);
+        await brieflyShowX();
+        await showNotification(notifTitle, notifBody);
+    }
+}
+
+/**
+ * showNotification shows the user a system notification.
  * @param {string} title - the title of the notification.
  * @param {string} body - the body of the notification.
  * @returns {Promise<void>}
@@ -543,28 +389,40 @@ async function showNotification(title, body) {
     });
 }
 
-async function brieflyShowCheckmark(linkCount) {
-    if (linkCount === 0) {
-        await showNotification('Error', 'No links to copy');
-        await brieflyShowX();
-        return;
-    } else if (linkCount === 1) {
+/**
+ * brieflyShowCheck briefly shows a green check (✓) on the extension's icon.
+ * @param {number} itemCount - the number of items successfully created and written to
+ * the clipboard. Zero means failure, and one or above means success.
+ * @returns {Promise<void>}
+ */
+async function brieflyShowCheck(itemCount) {
+    if (!itemCount || itemCount === 1) {
         browser.action.setBadgeText({ text: '✓' });
     } else {
-        browser.action.setBadgeText({ text: `${linkCount} ✓` });
+        browser.action.setBadgeText({ text: `${itemCount} ✓` });
     }
     browser.action.setBadgeBackgroundColor({ color: 'green' });
-    await sleep(1000);  // 1 second
+    await sleep(1000); // 1 second
     browser.action.setBadgeText({ text: '' });
 }
 
+/**
+ * brieflyShowX briefly shows a red X (✗) on the extension's icon.
+ * @returns {Promise<void>}
+ */
 async function brieflyShowX() {
     browser.action.setBadgeText({ text: '✗' });
     browser.action.setBadgeBackgroundColor({ color: 'red' });
-    await sleep(1000);  // 1 second
+    await sleep(1000); // 1 second
     browser.action.setBadgeText({ text: '' });
 }
 
+/**
+ * sleep pauses the execution of the current async function for a number of
+ * milliseconds.
+ * @param {number} ms - the number of milliseconds to sleep.
+ * @returns {Promise<void>}
+ */
 async function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
@@ -573,7 +431,7 @@ async function sleep(ms) {
  * getSetting gets a setting from the browser's sync storage.
  * @param {string} name - the name of the setting.
  * @param {any} default_ - the default value of the setting.
- * @returns {any}
+ * @returns {Promise<any>}
  */
 async function getSetting(name, default_) {
     try {

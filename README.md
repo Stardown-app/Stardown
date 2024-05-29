@@ -16,7 +16,7 @@ After installing, there are multiple ways you can copy markdown:
 * **click the extension's icon** to copy a link for the current page, or press `Ctrl+Shift+U` (Mac: `Cmd+Shift+U`) or whichever keyboard shortcut you prefer in your browser's settings
 * **double-click the extension's icon** to copy links for all tabs, or press `Ctrl+Shift+UU` (Mac: `Cmd+Shift+UU`)
 * **select tabs before double-clicking the icon** to copy links for only those tabs
-* **right-click the page and choose Stardown's copy option** that changes depending on what you right-clicked
+* **right-click part of a page and choose Stardown's copy option** that changes depending on what you right-clicked
 * **select text before right-clicking** to create a link with a [text fragment](https://web.dev/articles/text-fragments)
 
 Stardown's "Copy markdown link to here" right-click option tries to find an `id` attribute in the HTML elements you right-clicked so you can still link to specific parts of pages even without text fragments. [Firefox does not support text fragments yet](https://bugzilla.mozilla.org/show_bug.cgi?id=1753933), but the Firefox version of Stardown allows you to create links with text fragments.
@@ -27,7 +27,7 @@ Stardown's "Copy markdown link to here" right-click option tries to find an `id`
 
 Stardown will never sell any data to anyone, and does not collect nor send any of your data anywhere besides putting markdown text into your clipboard.
 
-Stardown requires permission to display notifications so it can show you important error messages and to optionally show you success messages.
+Stardown requires permission to display notifications so it can show you important error messages.
 
 In Chrome and Edge, if you use Stardown's feature that copies links for multiple tabs simultaneously, the first time you do, Stardown will request to "read your browsing history" because that's the only way for Chrome and Edge extensions to see the titles and URLs of all tabs ([source](https://developer.chrome.com/docs/extensions/reference/permissions-list#gc-wrapper:~:text=Warning%20displayed%3A-,read%20your%20browsing%20history.,-%22topSites%22)). Granting this permission does NOT give access to existing browsing history; the request message only sounds like it does because malicious extensions that can see the titles and URLs of all tabs could start manually gathering your browsing activity. The permission can be revoked at any time. The Firefox version of Stardown requests the exact same permission but has a less misleading request message. Other Chrome and Edge browser extensions that request immediate and complete access to browsing history, unlike Stardown, use the request message "read and change your browsing history on all signed-in devices".
 
@@ -57,7 +57,7 @@ Lastly, a small number of sites allow creating text fragment links but don't all
 
 ### The right-click options disappeared
 
-Due to browser limitations, Stardown's context menu options cannot appear for certain kinds of images and links. Specifically, they cannot appear for canvases, background images, inline SVGs, and for HTML anchors that contain both text and image(s).
+Due to browser limitations, Stardown's context menu options cannot appear for certain kinds of links, images, and videos. Specifically, they cannot appear for canvases, background images, inline SVGs, HTML anchors that contain both text and image(s), videos that don't have a `<video>` HTML element, and videos with a `<video>` HTML element that's covered by other elements.
 
 Besides those possibilities, browsers have an occasionally reoccuring bug that makes the context menu options disappear. Reinstalling Stardown should fix this.
 
@@ -78,11 +78,10 @@ You're welcome to [make a feature request](https://github.com/wheelercj/Stardown
 
 * [copy-as-markdown](https://github.com/yorkxin/copy-as-markdown)
 
-### Copy a website's content as markdown
+### Copy markdown of an entire page
 
 * [MarkDownload](https://github.com/deathau/markdownload) was developed by an Obsidian community moderator.
 * [Obsidian Web Clipper Bookmarklet](https://gist.github.com/kepano/90c05f162c37cf730abb8ff027987ca3) is a bookmarklet for saving articles and pages from the web to Obsidian.
-* [copy-selection-as-markdown](https://github.com/0x6b/copy-selection-as-markdown) is only available for Firefox but may work manually installed in Chromium browsers.
 
 ### Copy just a URL with a text fragment
 

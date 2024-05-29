@@ -16,6 +16,8 @@
 
 if (typeof browser === 'undefined') {
     var browser = chrome;
+} else if (typeof browser.action === 'undefined') {
+    browser.action = browser.browserAction;
 }
 
 let lastClick = new Date(0);
@@ -23,7 +25,7 @@ let doubleClickInterval = 500;
 
 getSetting('doubleClickInterval', 500).then(value => doubleClickInterval = value);
 
-browser.browserAction.onClicked.addListener(async () => {
+browser.action.onClicked.addListener(async () => {
     const now = new Date();
     const msSinceLastClick = now - lastClick; // milliseconds
     const isDoubleClick = msSinceLastClick < doubleClickInterval;
@@ -54,7 +56,7 @@ browser.browserAction.onClicked.addListener(async () => {
     const subBrackets = await getSetting('subBrackets', 'underlined');
     const link = await createTabLinkMarkdown(tab, '', linkFormat, subBrackets, false);
     await navigator.clipboard.writeText(link);
-    await brieflyShowCheckmark(1);
+    await brieflyShowCheck(1);
 });
 
 const pageMenuItem = {
@@ -122,20 +124,20 @@ function updateContextMenu(message) {
 }
 
 browser.contextMenus.onClicked.addListener(async (info, tab) => {
-    const notify = await getSetting('notify', false);
+    const notifyOnSuccess = await getSetting('notifyOnSuccess', false);
 
     switch (info.menuItemId) {
         case 'page':
             await sendIdLinkCopyMessage(info, tab, 'page');
-            await brieflyShowCheckmark(1);
-            if (notify) {
+            await brieflyShowCheck(1);
+            if (notifyOnSuccess) {
                 await showNotification('Markdown copied', 'Your markdown can now be pasted');
             }
             break;
         case 'selection':
             await sendIdLinkCopyMessage(info, tab, 'selection');
-            await brieflyShowCheckmark(1);
-            if (notify) {
+            await brieflyShowCheck(1);
+            if (notifyOnSuccess) {
                 await showNotification('Markdown copied', 'Your markdown can now be pasted');
             }
             break;
@@ -147,8 +149,8 @@ browser.contextMenus.onClicked.addListener(async (info, tab) => {
                 category: 'link',
                 markdown: linkMd,
             });
-            await brieflyShowCheckmark(1);
-            if (notify) {
+            await brieflyShowCheck(1);
+            if (notifyOnSuccess) {
                 await showNotification(linkNotifTitle, linkNotifBody);
             }
             break;
@@ -160,8 +162,8 @@ browser.contextMenus.onClicked.addListener(async (info, tab) => {
                 category: 'image',
                 markdown: imageMd + '\n',
             });
-            await brieflyShowCheckmark(1);
-            if (notify) {
+            await brieflyShowCheck(1);
+            if (notifyOnSuccess) {
                 await showNotification(imgNotifTitle, imgNotifBody);
             }
             break;
@@ -202,11 +204,7 @@ async function handleDoubleClick() {
     const bulletPoint = await getSetting('bulletPoint', '-');
     const text = links.map(link => `${bulletPoint} ${link}\n`).join('');
     await navigator.clipboard.writeText(text);
-    await brieflyShowCheckmark(tabs.length);
-}
-
-async function getClickedElementId(info, tab) {
-    return await browser.tabs.sendMessage(tab.id, { category: 'link' }, { frameId: info.frameId });
+    await brieflyShowCheck(tabs.length);
 }
 
 /**
@@ -222,7 +220,7 @@ async function sendIdLinkCopyMessage(info, tab, category) {
     return new Promise(async (resolve, reject) => {
         await browser.tabs.sendMessage(
             tab.id,
-            { category: category },  // this will be the first input to the onMessage listener
+            { category: category }, // this will be the first input to the onMessage listener
             { frameId: info.frameId },
             async function (clickedElementId) {
                 // clickedElementId may be undefined, an empty string, or a non-empty string
@@ -284,14 +282,14 @@ async function createTabLinkMarkdown(tab, id, linkFormat, subBrackets, checkSele
     // element ID, the text fragment may be in the `pathname` attribute of its URL
     // object along with part of the URL that should not be removed.
     const urlObj = new URL(url);
-    urlObj.hash = '';  // remove HTML element ID and maybe text fragment
+    urlObj.hash = ''; // remove HTML element ID and maybe text fragment
     if (urlObj.pathname.includes(':~:text=')) {
         urlObj.pathname = urlObj.pathname.split(':~:text=')[0];
     }
     url = urlObj.toString();
 
     let selectedText;
-    let arg;  // the text fragment argument
+    let arg; // the text fragment argument
     if (checkSelected) {
         let results;
         try {
@@ -396,8 +394,8 @@ async function copyMediaLinkMarkdown(info, tab, category) {
         category: category,
         markdown: md,
     });
-    await brieflyShowCheckmark(1);
-    if (notify) {
+    await brieflyShowCheck(1);
+    if (notifyOnSuccess) {
         await showNotification(notifTitle, notifBody);
     }
 }
@@ -459,26 +457,26 @@ async function showNotification(title, body) {
     });
 }
 
-async function brieflyShowCheckmark(linkCount) {
+async function brieflyShowCheck(linkCount) {
     if (linkCount === 0) {
         await showNotification('Error', 'No links to copy');
         await brieflyShowX();
         return;
     } else if (linkCount === 1) {
-        browser.browserAction.setBadgeText({ text: '✓' });
+        browser.action.setBadgeText({ text: '✓' });
     } else {
-        browser.browserAction.setBadgeText({ text: `${linkCount} ✓` });
+        browser.action.setBadgeText({ text: `${linkCount} ✓` });
     }
-    browser.browserAction.setBadgeBackgroundColor({ color: 'green' });
-    await sleep(1000);  // 1 second
-    browser.browserAction.setBadgeText({ text: '' });
+    browser.action.setBadgeBackgroundColor({ color: 'green' });
+    await sleep(1000); // 1 second
+    browser.action.setBadgeText({ text: '' });
 }
 
 async function brieflyShowX() {
-    browser.browserAction.setBadgeText({ text: '✗' });
-    browser.browserAction.setBadgeBackgroundColor({ color: 'red' });
-    await sleep(1000);  // 1 second
-    browser.browserAction.setBadgeText({ text: '' });
+    browser.action.setBadgeText({ text: '✗' });
+    browser.action.setBadgeBackgroundColor({ color: 'red' });
+    await sleep(1000); // 1 second
+    browser.action.setBadgeText({ text: '' });
 }
 
 async function sleep(ms) {

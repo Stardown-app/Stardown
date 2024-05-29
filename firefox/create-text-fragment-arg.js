@@ -101,7 +101,7 @@ function createTextFragmentArg(selection) {
     if (fragment.suffix) {
         arg += ',-' + enc(fragment.suffix);
     }
-    arg = arg.replaceAll('(', '%28').replaceAll(')', '%29');  // for markdown links
+    arg = arg.replaceAll('(', '%28').replaceAll(')', '%29'); // for markdown links
 
     return arg;
 }
@@ -110,4 +110,4 @@ var selection = window.getSelection();
 
 // The file's last expression's value is sent to where this file was run from with
 // `browser.tabs.executeScript`.
-[createTextFragmentArg(selection), selection.toString()];
+[createTextFragmentArg(selection), selection.toString().trim()];

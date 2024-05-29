@@ -1,4 +1,4 @@
-<h1 align="center"><img width="35" alt="Stardown's icon" src="firefox/images/icon.svg"> Stardown</h1>
+<h1 align="center"><img width="35" alt="Stardown's icon" src="src/images/icon.svg"> Stardown</h1>
 
 <p align="center">A browser extension that copies a markdown link for the current page.</p>
 

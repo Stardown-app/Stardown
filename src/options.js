@@ -22,7 +22,7 @@ async function saveOptions(e) {
     e.preventDefault();
     await browser.storage.sync.set(
         {
-            notify: document.querySelector("#notify").checked,
+            notifyOnSuccess: document.querySelector("#notifyOnSuccess").checked,
             subBrackets: document.querySelector("#subBrackets").value,
             linkFormat: document.querySelector("#linkFormat").value,
             bulletPoint: document.querySelector("#bulletPoint").value,
@@ -49,8 +49,8 @@ async function saveOptions(e) {
 
 async function loadOptions() {
     try {
-        const notify = await getSetting("notify", false);
-        document.querySelector("#notify").checked = notify;
+        const notifyOnSuccess = await getSetting("notifyOnSuccess", false);
+        document.querySelector("#notifyOnSuccess").checked = notifyOnSuccess;
 
         const subBrackets = await getSetting("subBrackets", "underlined");
         document.querySelector("#subBrackets").value = subBrackets;

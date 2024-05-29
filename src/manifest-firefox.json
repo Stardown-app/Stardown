@@ -1,14 +1,18 @@
 {
-    "manifest_version": 3,
+    "manifest_version": 2,
     "name": "Stardown",
     "description": "Copy a markdown link for the current page.",
     "version": "1.0.0",
     "homepage_url": "https://github.com/wheelercj/Stardown",
+    "browser_specific_settings": {
+        "gecko": {
+            "id": "{ca5c6573-af57-4607-a075-337cdbfffde7}"
+        }
+    },
     "permissions": [
         "activeTab",
         "clipboardWrite",
         "contextMenus",
-        "scripting",
         "storage",
         "notifications"
     ],
@@ -19,7 +23,9 @@
         "page": "options.html"
     },
     "background": {
-        "service_worker": "background.js"
+        "scripts": [
+            "background.js"
+        ]
     },
     "content_scripts": [
         {
@@ -40,7 +46,7 @@
         "96": "images/icon-96.png",
         "128": "images/icon-128.png"
     },
-    "action": {
+    "browser_action": {
         "default_icon": {
             "16": "images/icon-16.png",
             "32": "images/icon-32.png",
@@ -50,7 +56,7 @@
         }
     },
     "commands": {
-        "_execute_action": {
+        "_execute_browser_action": {
             "suggested_key": {
                 "default": "Ctrl+Shift+U",
                 "mac": "Command+Shift+U"

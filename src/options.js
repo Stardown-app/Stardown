@@ -84,22 +84,31 @@ async function resetOptions() {
 }
 
 /**
- * getSetting gets a setting from the browser's sync storage.
+ * getSetting gets a setting from the browser's sync storage. If the setting does not
+ * exist there, the default value is returned.
  * @param {string} name - the name of the setting.
  * @param {any} default_ - the default value of the setting.
- * @returns {any}
+ * @returns {Promise<any>}
  */
 async function getSetting(name, default_) {
+    let obj;
     try {
-        const v = (await browser.storage.sync.get(name))[name];
-        if (v === undefined) {
-            return default_;
-        }
-        return v;
+        obj = await browser.storage.sync.get(name);
     } catch (err) {
         console.error(err);
         return default_;
     }
+    if (obj === undefined) {
+        console.error(`Tried to get undefined setting "${name}"`);
+        return default_;
+    }
+
+    const value = obj[name];
+    if (value === undefined) {
+        return default_;
+    }
+
+    return value;
 }
 
 document.addEventListener("DOMContentLoaded", loadOptions);

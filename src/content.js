@@ -365,23 +365,20 @@ async function createImageMarkdown(url) {
  * createMediaMarkdown creates markdown for video or audio. For rendering purposes, the
  * resulting markdown will only start with an exclamation mark if the page URL is used.
  * @param {string} altText - a description of the media to use in the markdown link.
- * @param {string} srcUrl - the URL of the media. If this is falsy, the page URL is used
- * instead.
+ * This function assumes the alt text is already markdown-escaped.
+ * @param {string} srcUrl - the URL of the media. If this is falsy or starts with
+ * `blob:`, the page URL is used instead.
  * @param {string} pageUrl - the URL of the page the media is on. This is used only if
- * the source URL is falsy.
+ * the source URL is falsy or starts with `blob:`.
  * @returns {Promise<string>}
  */
 async function createMediaMarkdown(altText, srcUrl, pageUrl) {
-    let url = srcUrl;
-    if (!url) {
-        url = pageUrl;
-    }
-    url = url.replaceAll('(', '%28').replaceAll(')', '%29');
-
-    if (srcUrl) {
-        return `[${altText}](${url})`;
+    if (srcUrl && !srcUrl.startsWith('blob:')) {
+        srcUrl = srcUrl.replaceAll('(', '%28').replaceAll(')', '%29');
+        return `[${altText}](${srcUrl})`;
     } else {
-        return `![${altText}](${url})`;
+        pageUrl = pageUrl.replaceAll('(', '%28').replaceAll(')', '%29');
+        return `![${altText}](${pageUrl})`;
     }
 }
 

@@ -14,6 +14,8 @@
    limitations under the License.
 */
 
+import * as menu from "./menu.js";
+
 let browserName;
 if (typeof browser === 'undefined') {
     browserName = 'chromium';
@@ -60,49 +62,13 @@ browser.action.onClicked.addListener(async (tab) => {
     await handleInteraction(tab, { category: 'iconSingleClick' });
 });
 
-const pageMenuItem = {
-    id: 'page',
-    title: 'Copy markdown link to here',
-    contexts: ['page', 'editable'],
-};
-
-const selectionMenuItem = {
-    id: 'selection',
-    title: 'Copy markdown of selection',
-    contexts: ['selection'],
-};
-
-const linkMenuItem = {
-    id: 'link',
-    title: 'Copy markdown of link',
-    contexts: ['link'],
-};
-
-const imageMenuItem = {
-    id: 'image',
-    title: 'Copy markdown of image',
-    contexts: ['image'],
-};
-
-const videoMenuItem = {
-    id: 'video',
-    title: 'Copy markdown of video',
-    contexts: ['video'],
-};
-
-const audioMenuItem = {
-    id: 'audio',
-    title: 'Copy markdown of audio',
-    contexts: ['audio'],
-};
-
 if (browserName === 'firefox') {
-    browser.contextMenus.create(pageMenuItem);
-    browser.contextMenus.create(selectionMenuItem);
-    browser.contextMenus.create(linkMenuItem);
-    browser.contextMenus.create(imageMenuItem);
-    browser.contextMenus.create(videoMenuItem);
-    browser.contextMenus.create(audioMenuItem);
+    browser.contextMenus.create(menu.page_item);
+    browser.contextMenus.create(menu.selection_item);
+    browser.contextMenus.create(menu.link_item);
+    browser.contextMenus.create(menu.image_item);
+    browser.contextMenus.create(menu.video_item);
+    browser.contextMenus.create(menu.audio_item);
 }
 
 browser.runtime.onMessage.addListener((message) => {
@@ -137,18 +103,18 @@ function updateContextMenu(message) {
         browser.contextMenus.removeAll();
 
         if (message.isImage) {
-            browser.contextMenus.create(imageMenuItem);
+            browser.contextMenus.create(menu.image_item);
         } else if (message.isLink) {
-            browser.contextMenus.create(linkMenuItem);
+            browser.contextMenus.create(menu.link_item);
         } else {
-            browser.contextMenus.create(linkMenuItem);
-            browser.contextMenus.create(imageMenuItem);
+            browser.contextMenus.create(menu.link_item);
+            browser.contextMenus.create(menu.image_item);
         }
 
-        browser.contextMenus.create(pageMenuItem);
-        browser.contextMenus.create(selectionMenuItem);
-        browser.contextMenus.create(videoMenuItem);
-        browser.contextMenus.create(audioMenuItem);
+        browser.contextMenus.create(menu.page_item);
+        browser.contextMenus.create(menu.selection_item);
+        browser.contextMenus.create(menu.video_item);
+        browser.contextMenus.create(menu.audio_item);
     } else {
         console.error('Unknown browser');
         throw new Error('Unknown browser');

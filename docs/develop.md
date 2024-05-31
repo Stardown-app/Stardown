@@ -8,6 +8,22 @@ To keep Stardown easy to use, I would like to avoid having a popup and to genera
 
 I would like to keep Stardown relatively simple so that it's reliable, has few bugs that get fixed quickly, and is easy to maintain.
 
+## Installing Stardown from source for development
+
+The installation instructions in [README.md](../README.md#install-from-source) can be used for development in Chrome and Edge, but development in Firefox should follow these steps instead:
+
+1. in a terminal, run `git clone https://github.com/wheelercj/Stardown.git && cd Stardown`
+2. then `npm install && npm run firefox`
+3. in Firefox, open `about:debugging#/runtime/this-firefox`
+4. click "Load Temporary Add-on..."
+5. select Stardown's `firefox/manifest.json` file (not `src/manifest.json`)
+
+To update Stardown after you make changes or you `git pull` changes:
+
+1. run `npm run firefox`
+2. in Firefox, open `about:debugging#/runtime/this-firefox`
+3. click Stardown's reload button
+
 ## Git workflow for collaboration
 
 Let's create feature branches with descriptive names and make pull requests as described in [Getting started with Git and GitHub](https://chriswheeler.dev/posts/getting-started-with-git-and-github/#git-workflows).
@@ -89,8 +105,7 @@ When something goes wrong, Stardown should still respond well.
 - In Firefox, [Manifest V3 extensions with low privilege activeTab shows annoying blue dot for all websites](https://bugzilla.mozilla.org/show_bug.cgi?id=1851083). This is why I changed the Firefox version of Stardown from manifest v3 to v2.
 - Although Stardown no longer uses Firefox's manifest v3, [Firefox does not support service_worker in manifest v3](https://stackoverflow.com/questions/75043889/manifest-v3-background-scripts-service-worker-on-firefox).
 - Firefox [sometimes requires an add-on ID](https://extensionworkshop.com/documentation/develop/extensions-and-the-add-on-id/) in `browser_specific_settings` in manifest.json, but Chromium doesn't allow `browser_specific_settings`.
-
-Stardown's code is written to work in both Firefox and Chromium, except that they require different manifest files.
+- Based on testing I took notes on in [#11](https://github.com/wheelercj/Stardown/issues/11), it appears Firefox manifest v2 does not allow use of the `import` and `export` keywords. That's why the Firefox version of Stardown requires using a bundler.
 
 ## Text fragments
 

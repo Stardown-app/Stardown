@@ -99,6 +99,37 @@ Unlike the extensions linked above, Stardown:
 * requires only one click to create a markdown link for the current page
 * is focused on just the most important features so it's more likely to be maintained and bug-free
 
+## Install from source
+
+Follow these steps to install Stardown using the source code.
+
+### Chrome and Edge
+
+1. in a terminal, run `git clone https://github.com/wheelercj/Stardown.git`
+2. in your browser, open `chrome://extensions/`
+3. click "Load unpacked"
+4. select Stardown's `src` folder
+
+To get updates:
+
+1. run `git pull`
+2. in your browser, open `chrome://extensions/`
+3. click Stardown's reload button
+
+### Firefox
+
+1. in a terminal, run `git clone https://github.com/wheelercj/Stardown.git && cd Stardown`
+2. then `npm run build`
+3. in Firefox, open `about:debugging#/runtime/this-firefox`
+4. click "Load Temporary Add-on..."
+5. select Stardown's `firefox/manifest.json` file
+
+To get updates:
+
+1. run `npm run update`
+2. in Firefox, open `about:debugging#/runtime/this-firefox`
+3. click Stardown's reload button
+
 ## Development
 
 Contributions are welcome! Let me know (such as in [an issue](https://github.com/wheelercj/Stardown/issues) or [a discussion](https://github.com/wheelercj/Stardown/discussions)) what you have in mind ahead of time if you think there's a chance it won't be approved.

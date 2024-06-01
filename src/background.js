@@ -14,19 +14,8 @@
    limitations under the License.
 */
 
-import * as menu from "./menu.js";
-
-let browserName;
-if (typeof browser === 'undefined') {
-    browserName = 'chromium';
-    var browser = chrome;
-} else {
-    browserName = 'firefox';
-}
-
-if (typeof browser.action === 'undefined') {
-    browser.action = browser.browserAction; // for manifest v2 compatibility
-}
+import { browser, updateContextMenu } from './config.js';
+import { getSetting } from './common.js';
 
 let lastClick = new Date(0);
 let doubleClickInterval = 500;
@@ -62,64 +51,12 @@ browser.action.onClicked.addListener(async (tab) => {
     await handleInteraction(tab, { category: 'iconSingleClick' });
 });
 
-if (browserName === 'firefox') {
-    browser.contextMenus.create(menu.page_item);
-    browser.contextMenus.create(menu.selection_item);
-    browser.contextMenus.create(menu.link_item);
-    browser.contextMenus.create(menu.image_item);
-    browser.contextMenus.create(menu.video_item);
-    browser.contextMenus.create(menu.audio_item);
-}
-
 browser.runtime.onMessage.addListener((message) => {
     // These context menu updates are done with messages from a content script because
     // the contextMenus.update method cannot update a context menu that is already open.
     // The content script listens for mouseover events.
     updateContextMenu(message);
 });
-
-/**
- * updateContextMenu updates the options in the context menu based on the message from
- * the content script. This only works if the context menu is not visible.
- * @param {object} message - the message from the content script.
- * @param {boolean} message.isImage - whether the mouse is over an image.
- * @param {boolean} message.isLink - whether the mouse is over a link.
- * @returns {void}
- * @throws {Error} - if the browser is unknown.
- */
-function updateContextMenu(message) {
-    if (browserName === 'firefox') {
-        if (message.isImage) {
-            browser.contextMenus.update('link', { visible: false });
-            browser.contextMenus.update('image', { visible: true });
-        } else if (message.isLink) {
-            browser.contextMenus.update('link', { visible: true });
-            browser.contextMenus.update('image', { visible: false });
-        }
-    } else if (browserName === 'chromium') {
-        // The `update` method doesn't work well in Chromium because the one remaining
-        // context menu option would still be under a "Stardown" parent menu option
-        // instead of being in the root of the context menu.
-        browser.contextMenus.removeAll();
-
-        if (message.isImage) {
-            browser.contextMenus.create(menu.image_item);
-        } else if (message.isLink) {
-            browser.contextMenus.create(menu.link_item);
-        } else {
-            browser.contextMenus.create(menu.link_item);
-            browser.contextMenus.create(menu.image_item);
-        }
-
-        browser.contextMenus.create(menu.page_item);
-        browser.contextMenus.create(menu.selection_item);
-        browser.contextMenus.create(menu.video_item);
-        browser.contextMenus.create(menu.audio_item);
-    } else {
-        console.error('Unknown browser');
-        throw new Error('Unknown browser');
-    }
-}
 
 browser.contextMenus.onClicked.addListener(async (info, tab) => {
     switch (info.menuItemId) {
@@ -165,6 +102,7 @@ browser.runtime.onMessage.addListener(async (message, sender, sendResponse) => {
     if (message.doubleClickInterval) {
         doubleClickInterval = message.doubleClickInterval;
     } else if (message.warning) {
+        console.warn(`Warning: ${message.warning}`);
         await showNotification('Warning', message.warning);
     }
 });
@@ -391,23 +329,4 @@ async function brieflyShowX() {
  */
 async function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
-}
-
-/**
- * getSetting gets a setting from the browser's sync storage.
- * @param {string} name - the name of the setting.
- * @param {any} default_ - the default value of the setting.
- * @returns {Promise<any>}
- */
-async function getSetting(name, default_) {
-    try {
-        const v = (await browser.storage.sync.get(name))[name];
-        if (v === undefined) {
-            return default_;
-        }
-        return v;
-    } catch (err) {
-        console.error(err);
-        return default_;
-    }
 }

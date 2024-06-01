@@ -14,15 +14,8 @@
    limitations under the License.
 */
 
-let browserName;
-if (typeof browser === 'undefined') {
-    browserName = 'chromium';
-    var browser = chrome;
-    window.onload = setUpListeners;
-} else {
-    browserName = 'firefox';
-    setUpListeners();
-}
+import { browser, handleCopyRequest } from './config.js';
+import { getSetting } from './common.js';
 
 /**
  * A response object sent from a content script to a background script.
@@ -35,46 +28,6 @@ if (typeof browser === 'undefined') {
 
 let clickedElement;
 let linkText = null;
-
-/**
- * setUpListeners sets up listeners.
- * @returns {void}
- */
-function setUpListeners() {
-
-    document.addEventListener('mouseover', (event) => {
-        // This event listener is used to determine if any element that may be
-        // right-clicked is a link or an image. This information is sent to the
-        // background script to determine if the context menu item for copying link or
-        // image markdown should be shown. This is necessary because the context menu
-        // cannot be updated while it is visible.
-        const isLink = event.target.nodeName === 'A';
-        const isImage = event.target.nodeName === 'IMG';
-        browser.runtime.sendMessage({ isLink, isImage });
-    });
-
-    document.addEventListener('contextmenu', (event) => {
-        clickedElement = event.target;
-
-        if (event.target.nodeName === 'A') {
-            linkText = event.target.textContent;
-        } else {
-            linkText = null;
-        }
-    });
-
-    browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
-        // In Chromium, this listener must be synchronous and must send a response
-        // immediately. True must be sent if the actual response will be sent
-        // asynchronously.
-
-        handleRequest(message).then((res) => {
-            sendResponse(res);
-        });
-
-        return true; // needed to keep the message channel open for async responses
-    });
-}
 
 /**
  * handleRequest processes a message sent from the background script and returns a
@@ -139,41 +92,6 @@ async function getClickedElementId(clickedElement) {
         console.log('No HTML element with an ID was found in the clicked path');
         return '';
     }
-}
-
-/**
- * handleCopyRequest writes text to the clipboard and returns a content response object.
- * @param {string} text - the text to copy to the clipboard.
- * @returns {Promise<ContentResponse>}
- */
-async function handleCopyRequest(text) {
-    // `navigator.clipboard.writeText` only works in Chromium if the document is
-    // focused. Probably for security reasons, `document.body.focus()` doesn't work
-    // here. Whether the document is focused doesn't seem to be an issue in Firefox.
-    if (browserName === 'chromium' && !document.hasFocus()) {
-        console.info('The document is not focused');
-        return {
-            status: 0, // failure
-            notifTitle: 'Error',
-            notifBody: 'Please click the page and try again',
-        };
-    }
-
-    try {
-        await navigator.clipboard.writeText(text);
-    } catch (err) {
-        console.error(err);
-        return {
-            status: 0, // failure
-            notifTitle: 'Failed to copy markdown',
-            notifBody: err.message,
-        };
-    }
-    return {
-        status: 1, // successfully copied one item
-        notifTitle: 'Markdown copied',
-        notifBody: 'Your markdown can now be pasted',
-    };
 }
 
 /**
@@ -259,25 +177,6 @@ async function handleSelectionRightClick(htmlId) {
     }
 
     return await handleCopyRequest(text);
-}
-
-/**
- * getSetting gets a setting from the browser's sync storage.
- * @param {string} name - the name of the setting.
- * @param {any} default_ - the default value of the setting.
- * @returns {Promise<any>}
- */
-async function getSetting(name, default_) {
-    try {
-        const v = (await browser.storage.sync.get(name))[name];
-        if (v === undefined) {
-            return default_;
-        }
-        return v;
-    } catch (err) {
-        console.error(err);
-        return default_;
-    }
 }
 
 /**

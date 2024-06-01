@@ -1,44 +1,35 @@
-const pageMenuItem = {
+export const pageItem = {
     id: 'page',
     title: 'Copy markdown link to here',
     contexts: ['page', 'editable'],
 };
 
-const selectionMenuItem = {
+export const selectionItem = {
     id: 'selection',
     title: 'Copy markdown of selection',
     contexts: ['selection'],
 };
 
-const linkMenuItem = {
+export const linkItem = {
     id: 'link',
     title: 'Copy markdown of link',
     contexts: ['link'],
 };
 
-const imageMenuItem = {
+export const imageItem = {
     id: 'image',
     title: 'Copy markdown of image',
     contexts: ['image'],
 };
 
-const videoMenuItem = {
+export const videoItem = {
     id: 'video',
     title: 'Copy markdown of video',
     contexts: ['video'],
 };
 
-const audioMenuItem = {
+export const audioItem = {
     id: 'audio',
     title: 'Copy markdown of audio',
     contexts: ['audio'],
 };
-
-export {
-    pageMenuItem as page_item,
-    selectionMenuItem as selection_item,
-    linkMenuItem as link_item,
-    imageMenuItem as image_item,
-    videoMenuItem as video_item,
-    audioMenuItem as audio_item
-}

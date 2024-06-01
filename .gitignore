@@ -1,3 +1,7 @@
+node_modules
 *.zip
 web-ext-artifacts
 .web-extension-id
+firefox/*
+!firefox/manifest.json
+!firefox/config.js

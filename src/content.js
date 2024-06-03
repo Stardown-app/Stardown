@@ -15,7 +15,7 @@
 */
 
 import { browser, handleCopyRequest } from './config.js';
-import { getSetting } from './common.js';
+import { getSetting, replaceBrackets, escapeMarkdown } from './common.js';
 
 /**
  * A response object sent from a content script to a background script.
@@ -223,40 +223,6 @@ async function handleSelectionRightClick(htmlId) {
     }
 
     return await handleCopyRequest(text);
-}
-
-/**
- * replaceBrackets replaces square brackets in a link title with the character or escape
- * sequence chosen in settings.
- * @param {string} title - the raw link title.
- * @param {string} subBrackets - the setting for what to substitute any square brackets
- * with.
- * @returns {Promise<string>}
- */
-async function replaceBrackets(title, subBrackets) {
-    if (subBrackets === 'underlined') {
-        return title.replaceAll('[', '⦋').replaceAll(']', '⦌');
-    } else if (subBrackets === 'escaped') {
-        return title.replaceAll('[', '\\[').replaceAll(']', '\\]');
-    }
-    return title;
-}
-
-/**
- * escapeMarkdown escapes some (not all!) markdown characters in a string. This function
- * is useful for markdown link titles and blockquotes. It does not escape square
- * brackets, among other characters.
- * @param {string} text - the text to escape markdown characters in.
- * @returns {Promise<string>}
- */
-async function escapeMarkdown(text) {
-    return text
-        .replaceAll('>', '\\>')
-        .replaceAll('<', '\\<')
-        .replaceAll('#', '\\#')
-        .replaceAll('_', '\\_')
-        .replaceAll('*', '\\*')
-        .replaceAll('`', '\\`')
 }
 
 /**

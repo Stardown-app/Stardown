@@ -17,6 +17,7 @@
 import { browser, handleCopyRequest } from './config.js';
 import { getSetting } from './common.js';
 import * as md from './md.js';
+import { createTextFragmentArg } from './createTextFragmentArg.js';
 
 /**
  * A response object sent from a content script to a background script.
@@ -207,82 +208,6 @@ async function handleSelectionRightClick(htmlId) {
     }
 
     return await handleCopyRequest(text);
-}
-
-/**
- * createTextFragmentArg creates for a markdown link a text fragment argument (the part
- * after the `#:~:text=`). Only selection objects with type 'Range' are used; all other
- * selections result in an empty string because this extension needs to also allow
- * creating links that do not include text fragments. All parentheses are replaced with
- * their URL-encoded equivalents.
- * @param {Selection} selection - A Selection object; the result of window.getSelection.
- * @returns {string}
- */
-function createTextFragmentArg(selection) {
-    if (selection.type !== 'Range') {
-        return '';
-    }
-
-    // https://web.dev/articles/text-fragments#programmatic_text_fragment_link_generation
-    let result;
-    try {
-        result = window.generateFragment(selection);
-    } catch (err) {
-        if (err.message !== 'window.generateFragment is not a function') {
-            browser.runtime.sendMessage({ warning: err.message });
-            return '';
-        }
-    }
-
-    switch (result.status) {
-        case 1:
-            browser.runtime.sendMessage({
-                warning: 'The selection provided could not be used to create a text fragment'
-            });
-            return '';
-        case 2:
-            browser.runtime.sendMessage({
-                warning: 'No unique text fragment could be identified for this selection'
-            });
-            return '';
-        case 3:
-            browser.runtime.sendMessage({
-                warning: 'Text fragment computation could not complete in time'
-            });
-            return '';
-        case 4:
-            browser.runtime.sendMessage({
-                warning: 'An exception was raised during text fragment generation'
-            });
-            return '';
-    }
-
-    const fragment = result.fragment;
-
-    let arg = '';
-    if (fragment.prefix) {
-        arg += urlEncode(fragment.prefix) + '-,';
-    }
-    arg += urlEncode(fragment.textStart);
-    if (fragment.textEnd) {
-        arg += ',' + urlEncode(fragment.textEnd);
-    }
-    if (fragment.suffix) {
-        arg += ',-' + urlEncode(fragment.suffix);
-    }
-    arg = arg.replaceAll('(', '%28').replaceAll(')', '%29'); // for markdown links
-
-    return arg;
-}
-
-/**
- * urlEncode URL-encodes a string, but also replaces '-' with '%2D' because the text
- * fragment generator appears to not handle '-' correctly.
- * @param {string} text - the text to encode.
- * @returns {string}
- */
-function urlEncode(text) {
-    return encodeURIComponent(text).replaceAll('-', '%2D');
 }
 
 /**

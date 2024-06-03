@@ -246,9 +246,6 @@ async function escapeMarkdown(text) {
         .replaceAll('#', '\\#')
         .replaceAll('_', '\\_')
         .replaceAll('*', '\\*')
-        .replaceAll('-', '\\-')
-        .replaceAll('+', '\\+')
-        .replaceAll('=', '\\=')
         .replaceAll('`', '\\`')
 }
 

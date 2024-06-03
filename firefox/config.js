@@ -21,12 +21,14 @@ browser.action = browser.browserAction; // for manifest v2 compatibility
 // createContextMenus creates the context menu options.
 // @returns {void}
 export function createContextMenus() {
-    browser.contextMenus.create(menu.pageItem);
-    browser.contextMenus.create(menu.selectionItem);
-    browser.contextMenus.create(menu.linkItem);
-    browser.contextMenus.create(menu.imageItem);
-    browser.contextMenus.create(menu.videoItem);
-    browser.contextMenus.create(menu.audioItem);
+    browser.runtime.onInstalled.addListener(() => {
+        browser.contextMenus.create(menu.pageItem);
+        browser.contextMenus.create(menu.selectionItem);
+        browser.contextMenus.create(menu.linkItem);
+        browser.contextMenus.create(menu.imageItem);
+        browser.contextMenus.create(menu.videoItem);
+        browser.contextMenus.create(menu.audioItem);
+    });
 }
 
 /**

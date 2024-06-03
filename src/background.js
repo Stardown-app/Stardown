@@ -15,7 +15,8 @@
 */
 
 import { browser, createContextMenus, updateContextMenu } from './config.js';
-import { getSetting, replaceBrackets, escapeMarkdown } from './common.js';
+import { getSetting } from './common.js';
+import { createTabLink } from './md.js';
 
 createContextMenus();
 
@@ -160,7 +161,7 @@ async function handleIconDoubleClick(activeTab) {
 
     const subBrackets = await getSetting('subBrackets', 'underlined');
     const links = await Promise.all(
-        tabs.map(tab => createTabLinkMarkdown(tab, subBrackets))
+        tabs.map(tab => createTabLink(tab, subBrackets))
     );
     const bulletPoint = await getSetting('bulletPoint', '-');
     const linksListMd = links.map(link => `${bulletPoint} ${link}\n`).join('');
@@ -176,29 +177,6 @@ async function handleIconDoubleClick(activeTab) {
     } else { // success
         await showStatus(tabs.length, notifTitle, notifBody);
     }
-}
-
-/**
- * createTabLinkMarkdown creates a markdown link for a tab. Stardown does not add to, or
- * remove from, the link any HTML element ID or text fragment. The tab title is used as
- * the link title.
- * @param {any} tab - the tab to create the link from.
- * @param {boolean} subBrackets - the setting for what to substitute any square brackets
- * with.
- * @returns {Promise<string>} - a Promise that resolves to the markdown link.
- */
-async function createTabLinkMarkdown(tab, subBrackets) {
-    if (tab.title === undefined) {
-        console.error('tab.title is undefined');
-        throw new Error('tab.title is undefined');
-        // Were the necessary permissions granted?
-    }
-
-    let title = await replaceBrackets(tab.title, subBrackets);
-    title = await escapeMarkdown(title);
-    const url = tab.url.replaceAll('(', '%28').replaceAll(')', '%29');
-
-    return `[${title}](${url})`;
 }
 
 /**

@@ -15,7 +15,8 @@
 */
 
 import { browser, handleCopyRequest } from './config.js';
-import { getSetting, replaceBrackets, escapeMarkdown } from './common.js';
+import { getSetting } from './common.js';
+import * as md from './md.js';
 
 /**
  * A response object sent from a content script to a background script.
@@ -88,7 +89,7 @@ async function handleRequest(message) {
         case 'copy':
             return await handleCopyRequest(message.text);
         case 'iconSingleClick':
-            const linkMd1 = await createLinkMarkdown(document.title, location.href);
+            const linkMd1 = await md.createLink(document.title, location.href);
             return await handleCopyRequest(linkMd1);
         case 'pageRightClick':
             const id1 = await getClickedElementId(clickedElement);
@@ -97,18 +98,18 @@ async function handleRequest(message) {
             const id2 = await getClickedElementId(clickedElement);
             return await handleSelectionRightClick(id2);
         case 'linkRightClick':
-            const linkMd2 = await createLinkMarkdown(linkText, message.linkUrl);
+            const linkMd2 = await md.createLink(linkText, message.linkUrl);
             return await handleCopyRequest(linkMd2);
         case 'imageRightClick':
-            const imageMd = await createImageMarkdown(message.srcUrl);
+            const imageMd = await md.createImage(message.srcUrl);
             return await handleCopyRequest(imageMd + '\n');
         case 'videoRightClick':
-            const videoMd = await createMediaMarkdown(
+            const videoMd = await md.createMedia(
                 'video', message.srcUrl, message.pageUrl
             );
             return await handleCopyRequest(videoMd + '\n');
         case 'audioRightClick':
-            const audioMd = await createMediaMarkdown(
+            const audioMd = await md.createMedia(
                 'audio', message.srcUrl, message.pageUrl
             );
             return await handleCopyRequest(audioMd + '\n');
@@ -147,19 +148,13 @@ async function getClickedElementId(clickedElement) {
  */
 async function handlePageRightClick(htmlId) {
     let title = document.title;
-    const subBrackets = await getSetting('subBrackets', 'underlined');
-    title = await replaceBrackets(title, subBrackets);
-    title = await escapeMarkdown(title);
-
     let url = location.href;
     if (htmlId) {
         url += '#' + htmlId;
     }
-    url = url.replaceAll('(', '%28').replaceAll(')', '%29');
 
-    const text = `[${title}](${url})`;
-
-    return await handleCopyRequest(text);
+    const link = await md.createLink(title, url);
+    return await handleCopyRequest(link);
 }
 
 /**
@@ -188,33 +183,22 @@ async function handleSelectionRightClick(htmlId) {
             url += `:~:text=${arg}`;
         }
     }
-    url = url.replaceAll('(', '%28').replaceAll(')', '%29');
 
     let text;
-    const subBrackets = await getSetting('subBrackets', 'underlined');
     if (!selectedText) {
-        title = await replaceBrackets(title, subBrackets);
-        title = await escapeMarkdown(title);
-        text = `[${title}](${url})`;
+        text = await md.createLink(title, url);
     } else {
         const selectionFormat = await getSetting('selectionFormat', 'blockquote');
         switch (selectionFormat) {
             case 'title':
-                title = await replaceBrackets(title, subBrackets);
-                title = await escapeMarkdown(title);
-                text = `[${title}](${url})`;
+                text = await md.createLink(title, url);
                 break;
             case 'selected':
-                selectedText = await replaceBrackets(selectedText, subBrackets);
-                selectedText = await escapeMarkdown(selectedText);
                 selectedText = selectedText.replaceAll('\r\n', ' ').replaceAll('\n', ' ');
-                text = `[${selectedText}](${url})`;
+                text = await md.createLink(selectedText, url);
                 break;
             case 'blockquote':
-                title = await replaceBrackets(title, subBrackets);
-                title = await escapeMarkdown(title);
-                selectedText = await escapeMarkdown(selectedText.replaceAll('[', '\\['));
-                text = await createBlockquoteMarkdown(selectedText, title, url);
+                text = await md.createBlockquote(selectedText, title, url);
                 break;
             default:
                 console.error(`Unknown selectionFormat: ${selectionFormat}`);
@@ -223,71 +207,6 @@ async function handleSelectionRightClick(htmlId) {
     }
 
     return await handleCopyRequest(text);
-}
-
-/**
- * createLinkMarkdown creates a markdown link. The title and URL are markdown-escaped
- * and encoded, and any square brackets in the title may be replaced depending on the
- * settings.
- * @param {string} title - the title of the link.
- * @param {string} url - the URL of the link.
- * @returns {Promise<string>}
- */
-async function createLinkMarkdown(title, url) {
-    const subBrackets = await getSetting('subBrackets', 'underlined');
-    title = await replaceBrackets(title, subBrackets);
-    title = await escapeMarkdown(title);
-    url = url.replaceAll('(', '%28').replaceAll(')', '%29');
-    return `[${title}](${url})`;
-}
-
-/**
- * createBlockquoteMarkdown creates a markdown blockquote with a link at the end. Any
- * character escaping or replacements should have already been done before calling this
- * function.
- * @param {string} text - the text of the blockquote.
- * @param {string} title - the title of the link.
- * @param {string} url - the URL of the link.
- * @returns {Promise<string>}
- */
-async function createBlockquoteMarkdown(text, title, url) {
-    text = text.replaceAll('\n', '\n> ');
-    return `> ${text}\n> \n> — [${title}](${url})\n`;
-}
-
-/**
- * createImageMarkdown creates markdown of an image.
- * @param {string} url - the URL of the image.
- * @returns {Promise<string>}
- */
-async function createImageMarkdown(url) {
-    let fileName = url.split('/').pop();
-    const subBrackets = await getSetting('subBrackets', 'underlined');
-    fileName = await replaceBrackets(fileName, subBrackets);
-    fileName = await escapeMarkdown(fileName);
-    url = url.replaceAll('(', '%28').replaceAll(')', '%29');
-    return `![${fileName}](${url})`;
-}
-
-/**
- * createMediaMarkdown creates markdown for video or audio. For rendering purposes, the
- * resulting markdown will only start with an exclamation mark if the page URL is used.
- * @param {string} altText - a description of the media to use in the markdown link.
- * This function assumes the alt text is already markdown-escaped.
- * @param {string} srcUrl - the URL of the media. If this is falsy or starts with
- * `blob:`, the page URL is used instead.
- * @param {string} pageUrl - the URL of the page the media is on. This is used only if
- * the source URL is falsy or starts with `blob:`.
- * @returns {Promise<string>}
- */
-async function createMediaMarkdown(altText, srcUrl, pageUrl) {
-    if (srcUrl && !srcUrl.startsWith('blob:')) {
-        srcUrl = srcUrl.replaceAll('(', '%28').replaceAll(')', '%29');
-        return `[${altText}](${srcUrl})`;
-    } else {
-        pageUrl = pageUrl.replaceAll('(', '%28').replaceAll(')', '%29');
-        return `![${altText}](${pageUrl})`;
-    }
 }
 
 /**

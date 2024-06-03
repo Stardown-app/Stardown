@@ -267,6 +267,9 @@ async function showStatus(status, notifTitle, notifBody) {
         }
     } else { // failure
         console.error(`${notifTitle}: ${notifBody}`);
+        if (notifBody === 'Could not establish connection. Receiving end does not exist.') {
+            notifBody = 'Could not copy markdown. Did the page finish loading?';
+        }
         await brieflyShowX();
         await showNotification(notifTitle, notifBody);
     }

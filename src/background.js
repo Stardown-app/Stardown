@@ -14,8 +14,10 @@
    limitations under the License.
 */
 
-import { browser, updateContextMenu } from './config.js';
+import { browser, createContextMenus, updateContextMenu } from './config.js';
 import { getSetting } from './common.js';
+
+createContextMenus();
 
 let lastClick = new Date(0);
 let doubleClickInterval = 500;

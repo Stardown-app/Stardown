@@ -30,6 +30,52 @@ let clickedElement;
 let linkText = null;
 
 /**
+ * setUpListeners sets up listeners.
+ * @returns {void}
+ */
+function setUpListeners() {
+
+    document.addEventListener('mouseover', (event) => {
+        // This event listener is used to determine if any element that may be
+        // right-clicked is a link or an image. This information is sent to the
+        // background script to determine if the context menu item for copying link or
+        // image markdown should be shown. This is necessary because the context menu
+        // cannot be updated while it is visible.
+        const isLink = event.target.nodeName === 'A';
+        const isImage = event.target.nodeName === 'IMG';
+        browser.runtime.sendMessage({ isLink, isImage });
+    });
+
+    document.addEventListener('contextmenu', (event) => {
+        clickedElement = event.target;
+
+        if (event.target.nodeName === 'A') {
+            linkText = event.target.textContent;
+        } else {
+            linkText = null;
+        }
+    });
+
+    browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
+        // In Chromium, this listener must be synchronous and must send a response
+        // immediately. True must be sent if the actual response will be sent
+        // asynchronously.
+
+        handleRequest(message).then((res) => {
+            sendResponse(res);
+        });
+
+        return true; // needed to keep the message channel open for async responses
+    });
+}
+
+// window.onload = setUpListeners; // TODO: is this needed in Chromium?
+setUpListeners(); // Firefox requires setUpListeners to be called immediately. If it's
+// called in window.onload instead, the content script will not be able to receive
+// messages and an error message will appear: "Error: Could not establish connection.
+// Receiving end does not exist."
+
+/**
  * handleRequest processes a message sent from the background script and returns a
  * response.
  * @param {object} message - the message object sent from the background script. Must

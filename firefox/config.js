@@ -1,13 +1,33 @@
+/*
+   Copyright 2024 Chris Wheeler
+
+   Licensed under the Apache License, Version 2.0 (the "License");
+   you may not use this file except in compliance with the License.
+   You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License.
+*/
+
 import * as menu from './menu.js';
 
 browser.action = browser.browserAction; // for manifest v2 compatibility
 
-browser.contextMenus.create(menu.pageItem);
-browser.contextMenus.create(menu.selectionItem);
-browser.contextMenus.create(menu.linkItem);
-browser.contextMenus.create(menu.imageItem);
-browser.contextMenus.create(menu.videoItem);
-browser.contextMenus.create(menu.audioItem);
+// createContextMenus creates the context menu options.
+// @returns {void}
+export function createContextMenus() {
+    browser.contextMenus.create(menu.pageItem);
+    browser.contextMenus.create(menu.selectionItem);
+    browser.contextMenus.create(menu.linkItem);
+    browser.contextMenus.create(menu.imageItem);
+    browser.contextMenus.create(menu.videoItem);
+    browser.contextMenus.create(menu.audioItem);
+}
 
 /**
  * updateContextMenu updates the options in the context menu based on the message from
@@ -49,47 +69,3 @@ export async function handleCopyRequest(text) {
         notifBody: 'Your markdown can now be pasted',
     };
 }
-
-/**
- * setUpListeners sets up listeners.
- * @returns {void}
- */
-function setUpListeners() {
-    // TODO: try to have only one copy of this function definition in the project.
-    // TODO: this function depends on handleRequest
-
-    document.addEventListener('mouseover', (event) => {
-        // This event listener is used to determine if any element that may be
-        // right-clicked is a link or an image. This information is sent to the
-        // background script to determine if the context menu item for copying link or
-        // image markdown should be shown. This is necessary because the context menu
-        // cannot be updated while it is visible.
-        const isLink = event.target.nodeName === 'A';
-        const isImage = event.target.nodeName === 'IMG';
-        browser.runtime.sendMessage({ isLink, isImage });
-    });
-
-    document.addEventListener('contextmenu', (event) => {
-        clickedElement = event.target;
-
-        if (event.target.nodeName === 'A') {
-            linkText = event.target.textContent;
-        } else {
-            linkText = null;
-        }
-    });
-
-    browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
-        // In Chromium, this listener must be synchronous and must send a response
-        // immediately. True must be sent if the actual response will be sent
-        // asynchronously.
-
-        handleRequest(message).then((res) => {
-            sendResponse(res);
-        });
-
-        return true; // needed to keep the message channel open for async responses
-    });
-}
-
-setUpListeners();

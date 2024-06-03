@@ -197,8 +197,8 @@ async function handleSelectionRightClick(htmlId) {
         title = await escapeMarkdown(title);
         text = `[${title}](${url})`;
     } else {
-        const linkFormat = await getSetting('linkFormat', 'blockquote');
-        switch (linkFormat) {
+        const selectionFormat = await getSetting('selectionFormat', 'blockquote');
+        switch (selectionFormat) {
             case 'title':
                 title = await replaceBrackets(title, subBrackets);
                 title = await escapeMarkdown(title);
@@ -217,8 +217,8 @@ async function handleSelectionRightClick(htmlId) {
                 text = await createBlockquoteMarkdown(selectedText, title, url);
                 break;
             default:
-                console.error(`Unknown linkFormat: ${linkFormat}`);
-                throw new Error(`Unknown linkFormat: ${linkFormat}`);
+                console.error(`Unknown selectionFormat: ${selectionFormat}`);
+                throw new Error(`Unknown selectionFormat: ${selectionFormat}`);
         }
     }
 

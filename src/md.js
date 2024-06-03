@@ -17,10 +17,9 @@
 import { getSetting, replaceBrackets } from './common.js';
 
 /**
- * escape escapes some (not all!) markdown characters in a string. This function is
- * useful for markdown link titles and blockquotes. It does not escape square brackets,
- * among other characters.
- * @param {string} text - the text to escape markdown characters in.
+ * escape escapes some (not all!) markdown characters in a string. It does not escape
+ * square brackets, among other characters.
+ * @param {string} text - the text to escape some markdown characters in.
  * @returns {Promise<string>}
  */
 export async function escape(text) {
@@ -35,12 +34,18 @@ export async function escape(text) {
 
 /**
  * createLink creates a markdown link.
- * @param {string} title - the title of the link.
- * @param {string} url - the URL of the link.
+ * @param {string} title - the title of the link. Square brackets are replaced, escaped,
+ * or unchanged depending on the settings. Some other markdown characters are escaped.
+ * @param {string} url - the URL of the link. Parentheses are URL-encoded.
+ * @param {string|null} subBrackets - the setting for what to substitute any square
+ * brackets with. If not given, the setting is read from storage.
  * @returns {Promise<string>}
  */
-export async function createLink(title, url) {
-    const subBrackets = await getSetting('subBrackets', 'underlined');
+export async function createLink(title, url, subBrackets = null) {
+    if (subBrackets === null) {
+        subBrackets = await getSetting('subBrackets', 'underlined');
+    }
+
     title = await replaceBrackets(title, subBrackets);
     title = await escape(title);
 
@@ -57,16 +62,13 @@ export async function createLink(title, url) {
  * @returns {Promise<string>}
  */
 export async function createBlockquote(text, title, url) {
-    text = await escape(text.replaceAll('[', '\\['));
+    text = text.replaceAll('[', '\\[');
+    text = await escape(text);
     text = text.replaceAll('\n', '\n> ');
 
-    const subBrackets = await getSetting('subBrackets', 'underlined');
-    title = await replaceBrackets(title, subBrackets);
-    title = await escape(title);
+    const link = await createLink(title, url);
 
-    url = url.replaceAll('(', '%28').replaceAll(')', '%29');
-
-    return `> ${text}\n> \n> — [${title}](${url})\n`;
+    return `> ${text}\n> \n> — ${link}\n`;
 }
 
 /**
@@ -75,21 +77,15 @@ export async function createBlockquote(text, title, url) {
  * @returns {Promise<string>}
  */
 export async function createImage(url) {
-    let fileName = url.split('/').pop();
-    const subBrackets = await getSetting('subBrackets', 'underlined');
-    fileName = await replaceBrackets(fileName, subBrackets);
-    fileName = await escape(fileName);
-
-    url = url.replaceAll('(', '%28').replaceAll(')', '%29');
-
-    return `![${fileName}](${url})`;
+    const fileName = url.split('/').pop() || 'image';
+    const link = await createLink(fileName, url);
+    return '!' + link;
 }
 
 /**
  * createMedia creates markdown for video or audio. For rendering purposes, the
  * resulting markdown will only start with an exclamation mark if the page URL is used.
  * @param {string} altText - a description of the media to use in the markdown link.
- * This function assumes the alt text is already markdown-escaped.
  * @param {string} srcUrl - the URL of the media. If this is falsy or starts with
  * `blob:`, the page URL is used instead.
  * @param {string} pageUrl - the URL of the page the media is on. This is used only if
@@ -98,11 +94,9 @@ export async function createImage(url) {
  */
 export async function createMedia(altText, srcUrl, pageUrl) {
     if (srcUrl && !srcUrl.startsWith('blob:')) {
-        srcUrl = srcUrl.replaceAll('(', '%28').replaceAll(')', '%29');
-        return `[${altText}](${srcUrl})`;
+        return await createLink(altText, srcUrl);
     } else {
-        pageUrl = pageUrl.replaceAll('(', '%28').replaceAll(')', '%29');
-        return `![${altText}](${pageUrl})`;
+        return '!' + await createLink(altText, pageUrl);
     }
 }
 
@@ -111,7 +105,7 @@ export async function createMedia(altText, srcUrl, pageUrl) {
  * from, the link any HTML element ID or text fragment. The tab title is used as the
  * link title.
  * @param {any} tab - the tab to create the link from.
- * @param {boolean} subBrackets - the setting for what to substitute any square brackets
+ * @param {string} subBrackets - the setting for what to substitute any square brackets
  * with.
  * @returns {Promise<string>} - a Promise that resolves to the markdown link.
  */
@@ -122,10 +116,5 @@ export async function createTabLink(tab, subBrackets) {
         // Were the necessary permissions granted?
     }
 
-    let title = await replaceBrackets(tab.title, subBrackets);
-    title = await escape(title);
-
-    const url = tab.url.replaceAll('(', '%28').replaceAll(')', '%29');
-
-    return `[${title}](${url})`;
+    return await createLink(tab.title, tab.url, subBrackets);
 }

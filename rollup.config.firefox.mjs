@@ -16,12 +16,16 @@
 
 // https://rollupjs.org/
 import copy from 'rollup-plugin-copy'; // https://www.npmjs.com/package/rollup-plugin-copy
+import del from 'rollup-plugin-delete'; // https://www.npmjs.com/package/rollup-plugin-delete
 
 // This is a Rollup configuration file for building the Firefox extension. It first
 // copies all the necessary files to the `firefox` directory, then replaces all imports
 // in background.js, content.js, and options.js with the code the imports correspond to.
-// Any existing files with the same names as those copied are overwritten. See
-// package.json for the build command that uses this configuration file.
+// Lastly, it deletes all files in the `firefox` directory that were imported into other
+// files there and are no longer needed.
+//
+// Each time this runs, any existing files with the same names as those copied are
+// overwritten.
 
 export default [
     {
@@ -88,5 +92,24 @@ export default [
             file: 'firefox/options.js',
             format: 'iife', // immediately-invoked function expression
         },
+        plugins: [
+            del({
+                // Delete all files in the `firefox` directory that were imported into
+                // other files there and are no longer needed.
+                targets: [
+                    'firefox/*', // Delete all files except the ones below.
+                    '!firefox/images',
+                    '!firefox/background.js',
+                    '!firefox/config.js',
+                    '!firefox/content.js',
+                    '!firefox/fragment-generation-utils.js',
+                    '!firefox/manifest.json',
+                    '!firefox/options.html',
+                    '!firefox/options.js',
+                    '!firefox/text-fragment-utils.js',
+                ],
+                hook: 'buildEnd', // Run the delete after the build ends.
+            })
+        ]
     }
 ];

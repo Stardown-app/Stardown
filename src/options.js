@@ -14,9 +14,8 @@
    limitations under the License.
 */
 
-if (typeof browser === 'undefined') {
-    var browser = chrome;
-}
+import { browser } from './config.js';
+import { getSetting } from './common.js';
 
 async function saveOptions(e) {
     e.preventDefault();
@@ -24,7 +23,7 @@ async function saveOptions(e) {
         {
             notifyOnSuccess: document.querySelector("#notifyOnSuccess").checked,
             subBrackets: document.querySelector("#subBrackets").value,
-            linkFormat: document.querySelector("#linkFormat").value,
+            selectionFormat: document.querySelector("#selectionFormat").value,
             bulletPoint: document.querySelector("#bulletPoint").value,
             doubleClickWindows: document.querySelector("#doubleClickWindows").value,
             doubleClickInterval: document.querySelector("#doubleClickInterval").value,
@@ -55,8 +54,8 @@ async function loadOptions() {
         const subBrackets = await getSetting("subBrackets", "underlined");
         document.querySelector("#subBrackets").value = subBrackets;
 
-        const linkFormat = await getSetting("linkFormat", "blockquote");
-        document.querySelector("#linkFormat").value = linkFormat;
+        const selectionFormat = await getSetting("selectionFormat", "blockquote");
+        document.querySelector("#selectionFormat").value = selectionFormat;
 
         const bulletPoint = await getSetting("bulletPoint", "-");
         document.querySelector("#bulletPoint").value = bulletPoint;
@@ -81,34 +80,6 @@ async function resetOptions() {
         button.value = 'Reset';
         button.style.backgroundColor = '';
     }, 750);
-}
-
-/**
- * getSetting gets a setting from the browser's sync storage. If the setting does not
- * exist there, the default value is returned.
- * @param {string} name - the name of the setting.
- * @param {any} default_ - the default value of the setting.
- * @returns {Promise<any>}
- */
-async function getSetting(name, default_) {
-    let obj;
-    try {
-        obj = await browser.storage.sync.get(name);
-    } catch (err) {
-        console.error(err);
-        return default_;
-    }
-    if (obj === undefined) {
-        console.error(`Tried to get undefined setting "${name}"`);
-        return default_;
-    }
-
-    const value = obj[name];
-    if (value === undefined) {
-        return default_;
-    }
-
-    return value;
 }
 
 document.addEventListener("DOMContentLoaded", loadOptions);

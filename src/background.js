@@ -14,17 +14,11 @@
    limitations under the License.
 */
 
-let browserName;
-if (typeof browser === 'undefined') {
-    browserName = 'chromium';
-    var browser = chrome;
-} else {
-    browserName = 'firefox';
-}
+import { browser, createContextMenus, updateContextMenu } from './config.js';
+import { getSetting } from './common.js';
+import { createTabLink } from './md.js';
 
-if (typeof browser.action === 'undefined') {
-    browser.action = browser.browserAction; // for manifest v2 compatibility
-}
+createContextMenus();
 
 let lastClick = new Date(0);
 let doubleClickInterval = 500;
@@ -60,100 +54,12 @@ browser.action.onClicked.addListener(async (tab) => {
     await handleInteraction(tab, { category: 'iconSingleClick' });
 });
 
-const pageMenuItem = {
-    id: 'page',
-    title: 'Copy markdown link to here',
-    contexts: ['page', 'editable'],
-};
-
-const selectionMenuItem = {
-    id: 'selection',
-    title: 'Copy markdown of selection',
-    contexts: ['selection'],
-};
-
-const linkMenuItem = {
-    id: 'link',
-    title: 'Copy markdown of link',
-    contexts: ['link'],
-};
-
-const imageMenuItem = {
-    id: 'image',
-    title: 'Copy markdown of image',
-    contexts: ['image'],
-};
-
-const videoMenuItem = {
-    id: 'video',
-    title: 'Copy markdown of video',
-    contexts: ['video'],
-};
-
-const audioMenuItem = {
-    id: 'audio',
-    title: 'Copy markdown of audio',
-    contexts: ['audio'],
-};
-
-if (browserName === 'firefox') {
-    browser.contextMenus.create(pageMenuItem);
-    browser.contextMenus.create(selectionMenuItem);
-    browser.contextMenus.create(linkMenuItem);
-    browser.contextMenus.create(imageMenuItem);
-    browser.contextMenus.create(videoMenuItem);
-    browser.contextMenus.create(audioMenuItem);
-}
-
 browser.runtime.onMessage.addListener((message) => {
     // These context menu updates are done with messages from a content script because
     // the contextMenus.update method cannot update a context menu that is already open.
     // The content script listens for mouseover events.
     updateContextMenu(message);
 });
-
-/**
- * updateContextMenu updates the options in the context menu based on the message from
- * the content script. This only works if the context menu is not visible.
- * @param {object} message - the message from the content script.
- * @param {boolean} message.isImage - whether the mouse is over an image.
- * @param {boolean} message.isLink - whether the mouse is over a link.
- * @returns {void}
- * @throws {Error} - if the browser is unknown.
- */
-function updateContextMenu(message) {
-    if (browserName === 'firefox') {
-        if (message.isImage) {
-            browser.contextMenus.update('link', { visible: false });
-            browser.contextMenus.update('image', { visible: true });
-        } else if (message.isLink) {
-            browser.contextMenus.update('link', { visible: true });
-            browser.contextMenus.update('image', { visible: false });
-        }
-    } else if (browserName === 'chromium') {
-        // The `update` method doesn't work well in Chromium because the one remaining
-        // context menu option would still be under a "Stardown" parent menu option
-        // instead of being in the root of the context menu.
-        browser.contextMenus.removeAll();
-
-        if (message.isImage) {
-            browser.contextMenus.create(imageMenuItem);
-        } else if (message.isLink) {
-            browser.contextMenus.create(linkMenuItem);
-        } else {
-            browser.contextMenus.create(linkMenuItem);
-            browser.contextMenus.create(imageMenuItem);
-        }
-
-        browser.contextMenus.create(pageMenuItem);
-        browser.contextMenus.create(selectionMenuItem);
-        browser.contextMenus.create(videoMenuItem);
-        browser.contextMenus.create(audioMenuItem);
-    } else {
-        console.error('Unknown browser');
-        throw new Error('Unknown browser');
-    }
-}
 
 browser.contextMenus.onClicked.addListener(async (info, tab) => {
     switch (info.menuItemId) {
@@ -199,6 +105,7 @@ browser.runtime.onMessage.addListener(async (message, sender, sendResponse) => {
     if (message.doubleClickInterval) {
         doubleClickInterval = message.doubleClickInterval;
     } else if (message.warning) {
+        console.warn(`Warning: ${message.warning}`);
         await showNotification('Warning', message.warning);
     }
 });
@@ -254,7 +161,7 @@ async function handleIconDoubleClick(activeTab) {
 
     const subBrackets = await getSetting('subBrackets', 'underlined');
     const links = await Promise.all(
-        tabs.map(tab => createTabLinkMarkdown(tab, subBrackets))
+        tabs.map(tab => createTabLink(tab, subBrackets))
     );
     const bulletPoint = await getSetting('bulletPoint', '-');
     const linksListMd = links.map(link => `${bulletPoint} ${link}\n`).join('');
@@ -270,80 +177,6 @@ async function handleIconDoubleClick(activeTab) {
     } else { // success
         await showStatus(tabs.length, notifTitle, notifBody);
     }
-}
-
-/**
- * createTabLinkMarkdown creates a markdown link for a tab. Stardown does not add to, or
- * remove from, the link any HTML element ID or text fragment. The tab title is used as
- * the link title.
- * @param {any} tab - the tab to create the link from.
- * @param {boolean} subBrackets - the setting for what to substitute any square brackets
- * with.
- * @returns {Promise<string>} - a Promise that resolves to the markdown link.
- */
-async function createTabLinkMarkdown(tab, subBrackets) {
-    if (tab.title === undefined) {
-        console.error('tab.title is undefined');
-        throw new Error('tab.title is undefined');
-        // Were the necessary permissions granted?
-    }
-
-    let title = await replaceBrackets(tab.title, subBrackets);
-    title = await escapeMarkdown(title);
-    const url = tab.url.replaceAll('(', '%28').replaceAll(')', '%29');
-
-    return `[${title}](${url})`;
-}
-
-/**
- * createBlockquoteMarkdown creates a markdown blockquote with a link at the end. Any
- * character escaping or replacements should have already been done before calling this
- * function.
- * @param {string} text - the text of the blockquote.
- * @param {string} title - the title of the link.
- * @param {string} url - the URL of the link.
- * @returns {Promise<string>}
- */
-async function createBlockquoteMarkdown(text, title, url) {
-    text = text.replaceAll('\n', '\n> ');
-    return `> ${text}\n> \n> — [${title}](${url})\n`;
-}
-
-/**
- * replaceBrackets replaces square brackets in a link title with the character or escape
- * sequence chosen in settings.
- * @param {string} title - the raw link title.
- * @param {string} subBrackets - the setting for what to substitute any square brackets
- * with.
- * @returns {Promise<string>}
- */
-async function replaceBrackets(title, subBrackets) {
-    if (subBrackets === 'underlined') {
-        return title.replaceAll('[', '⦋').replaceAll(']', '⦌');
-    } else if (subBrackets === 'escaped') {
-        return title.replaceAll('[', '\\[').replaceAll(']', '\\]');
-    }
-    return title;
-}
-
-/**
- * escapeMarkdown escapes some (not all!) markdown characters in a string. This function
- * is useful for markdown link titles and blockquotes. It does not escape square
- * brackets, among other characters.
- * @param {string} text - the text to escape markdown characters in.
- * @returns {Promise<string>}
- */
-async function escapeMarkdown(text) {
-    return text
-        .replaceAll('>', '\\>')
-        .replaceAll('<', '\\<')
-        .replaceAll('#', '\\#')
-        .replaceAll('_', '\\_')
-        .replaceAll('*', '\\*')
-        .replaceAll('-', '\\-')
-        .replaceAll('+', '\\+')
-        .replaceAll('=', '\\=')
-        .replaceAll('`', '\\`')
 }
 
 /**
@@ -364,6 +197,9 @@ async function showStatus(status, notifTitle, notifBody) {
         }
     } else { // failure
         console.error(`${notifTitle}: ${notifBody}`);
+        if (notifBody === 'Could not establish connection. Receiving end does not exist.') {
+            notifBody = 'Could not copy markdown. Did the page finish loading?';
+        }
         await brieflyShowX();
         await showNotification(notifTitle, notifBody);
     }
@@ -425,32 +261,4 @@ async function brieflyShowX() {
  */
 async function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
-}
-
-/**
- * getSetting gets a setting from the browser's sync storage. If the setting does not
- * exist there, the default value is returned.
- * @param {string} name - the name of the setting.
- * @param {any} default_ - the default value of the setting.
- * @returns {Promise<any>}
- */
-async function getSetting(name, default_) {
-    let obj;
-    try {
-        obj = await browser.storage.sync.get(name);
-    } catch (err) {
-        console.error(err);
-        return default_;
-    }
-    if (obj === undefined) {
-        console.error(`Tried to get undefined setting "${name}"`);
-        return default_;
-    }
-
-    const value = obj[name];
-    if (value === undefined) {
-        return default_;
-    }
-
-    return value;
 }

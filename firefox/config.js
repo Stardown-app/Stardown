@@ -18,8 +18,10 @@ import * as menu from './menu.js';
 
 browser.action = browser.browserAction; // for manifest v2 compatibility
 
-// createContextMenus creates the context menu options.
-// @returns {void}
+/**
+ * createContextMenus creates the context menu options.
+ * @returns {void}
+ */
 export function createContextMenus() {
     browser.runtime.onInstalled.addListener(() => {
         browser.contextMenus.create(menu.pageItem);
@@ -48,6 +50,10 @@ export function updateContextMenu(message) {
         browser.contextMenus.update('image', { visible: false });
     }
 }
+
+/**
+ * @typedef {import('../src/content.js').ContentResponse} ContentResponse
+ */
 
 /**
  * handleCopyRequest writes text to the clipboard and returns a content response object.

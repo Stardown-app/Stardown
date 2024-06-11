@@ -19,10 +19,10 @@ import copy from 'rollup-plugin-copy'; // https://www.npmjs.com/package/rollup-p
 import del from 'rollup-plugin-delete'; // https://www.npmjs.com/package/rollup-plugin-delete
 
 // This is a Rollup configuration file for building the Firefox extension. It first
-// copies all the necessary files to the `firefox` directory, then replaces all imports
-// in background.js, content.js, and options.js with the code the imports correspond to.
-// Lastly, it deletes all files in the `firefox` directory that were imported into other
-// files there and are no longer needed.
+// copies all the necessary files from `src` to the `firefox` directory, then replaces
+// all imports in background.js, content.js, and options.js with the code the imports
+// correspond to. Lastly, it deletes all files in the `firefox` directory that were
+// imported into other files there and are no longer needed.
 //
 // Each time this runs, any existing files with the same names as those copied are
 // overwritten.
@@ -39,14 +39,11 @@ export default [
                 targets: [
                     {
                         src: [
-                            // Copy everything except images, config.js, and
-                            // manifest.json. The copy call for the images folder is
-                            // below; it's separate because the transform function can
-                            // only run on files.
+                            // Copy everything except the images. The copy call for the
+                            // images folder is below. It's separate because the
+                            // transform function can only run on files.
                             'src/*',
                             '!src/images',
-                            '!src/config.js',
-                            '!src/manifest.json',
                         ],
                         dest: 'firefox',
                         transform: (contents, filename) => {

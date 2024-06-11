@@ -28,7 +28,12 @@ import { createTextFragmentArg } from './createTextFragmentArg.js';
  * @property {string} notifBody - the body of the notification to show to the user.
  */
 
+// clickedElement is the element the user most recently right-clicked. It is assigned
+// values by the contextmenu event listener in setUpListeners.
 let clickedElement;
+
+// linkText is the text of the link the user most recently right-clicked. It is assigned
+// values by the contextmenu event listener in setUpListeners.
 let linkText = null;
 
 /**
@@ -71,11 +76,16 @@ function setUpListeners() {
     });
 }
 
-// window.onload = setUpListeners; // TODO: is this needed in Chromium?
-setUpListeners(); // Firefox requires setUpListeners to be called immediately. If it's
-// called in window.onload instead, the content script will not be able to receive
-// messages and an error message will appear: "Error: Could not establish connection.
-// Receiving end does not exist."
+// Chromium requires setUpListeners to be called when the window loads. If it's only
+// called immediately, the content script will not be able to receive messages and no
+// error message will appear. It's fine to also call it immediately.
+window.onload = setUpListeners;
+
+// Firefox requires setUpListeners to be called immediately. If it's only called in
+// window.onload, the content script will not be able to receive messages and an error
+// message will appear: "Error: Could not establish connection. Receiving end does not
+// exist." It's fine to also call it when the window loads.
+setUpListeners();
 
 /**
  * handleRequest processes a message sent from the background script and returns a

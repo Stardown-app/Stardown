@@ -14,17 +14,17 @@
    limitations under the License.
 */
 
-// This file is for Chromium-specific code. It is not used in the Firefox extension.
-
 import * as menu from './menu.js';
 
 export const browser = chrome;
 
-// createContextMenus creates the context menu options.
-// @returns {void}
+/**
+ * createContextMenus creates the context menu options.
+ * @returns {void}
+ */
 export function createContextMenus() {
     // This function should do nothing. It needs to exist because the Firefox extension
-    // uses it and it is imported into the background script.
+    // uses a function by the same name that is imported into the background script.
 }
 
 /**
@@ -37,8 +37,9 @@ export function createContextMenus() {
  */
 export function updateContextMenu(message) {
     // The `browser.contextMenus.update` method doesn't work well in Chromium because
-    // the one remaining context menu option would still be under a "Stardown" parent
-    // menu option instead of being in the root of the context menu.
+    // when it is used to hide all but one context menu option, the one remaining would
+    // appear under a "Stardown" parent menu option instead of being in the root of the
+    // context menu.
     browser.contextMenus.removeAll();
 
     if (message.isImage) {
@@ -55,6 +56,10 @@ export function updateContextMenu(message) {
     browser.contextMenus.create(menu.videoItem);
     browser.contextMenus.create(menu.audioItem);
 }
+
+/**
+ * @typedef {import('../src/content.js').ContentResponse} ContentResponse
+ */
 
 /**
  * handleCopyRequest writes text to the clipboard and returns a content response object.

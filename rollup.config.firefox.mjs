@@ -48,13 +48,23 @@ export default [
                         dest: 'firefox',
                         transform: (contents, filename) => {
                             if (filename.endsWith('.js')) {
-                                // Remove all `browser` imports because
-                                // firefox/config.js doesn't define `browser` because
-                                // Firefox already has a global `browser` variable.
-                                return contents.toString().replace(
-                                    /(import \{.*?)browser,?(.*?\} from ['"])/,
-                                    '$1$2',
-                                );
+                                return contents.toString()
+                                    .replace(
+                                        // Remove all `browser` imports because
+                                        // firefox/config.js doesn't define `browser`
+                                        // because Firefox already has a global
+                                        // `browser` variable.
+                                        /(import \{.*?)browser,?(.*?\} from ['"])/,
+                                        '$1$2',
+                                    ).replace(
+                                        // Comment out `window.onload = setUpListeners`
+                                        // because although Chrome needs it, in Firefox
+                                        // it causes a "Clipboard write is not allowed"
+                                        // error on some sites despite not preventing
+                                        // clipboard writes.
+                                        /window\.onload = setUpListeners/,
+                                        '// window.onload = setUpListeners',
+                                    );
                             }
                             return contents;
                         },

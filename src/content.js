@@ -84,7 +84,10 @@ window.onload = setUpListeners;
 // Firefox requires setUpListeners to be called immediately. If it's only called in
 // window.onload, the content script will not be able to receive messages and an error
 // message will appear: "Error: Could not establish connection. Receiving end does not
-// exist." It's fine to also call it when the window loads.
+// exist." Firefox also requires setUpListeners to NOT be called in window.onload, or
+// else clicking Stardown's icon for some sites will show the error message "Clipboard
+// write is not allowed" even though writing to the clipboard is still successful. The
+// bundle script should comment out the `window.onload` assignment for Firefox.
 setUpListeners();
 
 /**

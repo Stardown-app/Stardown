@@ -108,8 +108,9 @@ Follow these steps to install Stardown using the source code. If you also want t
 1. in a terminal, run `git clone https://github.com/wheelercj/Stardown.git && cd Stardown`
 2. then run `npm run build-chrome`
 3. in your browser, open `chrome://extensions/`
-4. click "Load unpacked"
-5. select Stardown's `chrome` folder
+4. turn on developer mode
+5. click "Load unpacked"
+6. select Stardown's `chrome` folder
 
 To get updates:
 

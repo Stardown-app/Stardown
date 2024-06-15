@@ -15,8 +15,9 @@ I would like to keep Stardown relatively simple so that it's reliable, has few b
 1. in a terminal, run `git clone https://github.com/wheelercj/Stardown.git && cd Stardown`
 2. then run `npm install && npm run dev-chrome`
 3. in your browser, open `chrome://extensions/`
-4. click "Load unpacked"
-5. select Stardown's `chrome` folder
+4. turn on developer mode
+5. click "Load unpacked"
+6. select Stardown's `chrome` folder
 
 In the `chrome` folder, don't make any changes unless they're to `config.js` or `manifest.json` because the other files get overwritten or deleted each time `npm run dev-chrome` runs.
 

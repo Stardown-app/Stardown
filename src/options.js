@@ -21,6 +21,7 @@ async function saveOptions(e) {
     e.preventDefault();
     await browser.storage.sync.set(
         {
+            youtubeMd: document.querySelector("#youtubeMd").value,
             notifyOnSuccess: document.querySelector("#notifyOnSuccess").checked,
             subBrackets: document.querySelector("#subBrackets").value,
             selectionFormat: document.querySelector("#selectionFormat").value,
@@ -48,6 +49,9 @@ async function saveOptions(e) {
 
 async function loadOptions() {
     try {
+        const youtubeMd = await getSetting("youtubeMd", "Obsidian & Discord");
+        document.querySelector("#youtubeMd").value = youtubeMd;
+
         const notifyOnSuccess = await getSetting("notifyOnSuccess", false);
         document.querySelector("#notifyOnSuccess").checked = notifyOnSuccess;
 

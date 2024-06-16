@@ -118,14 +118,10 @@ async function handleRequest(message) {
             const imageMd = await md.createImage(message.srcUrl);
             return await handleCopyRequest(imageMd + '\n');
         case 'videoRightClick':
-            const videoMd = await md.createMedia(
-                'video', message.srcUrl, message.pageUrl
-            );
+            const videoMd = await md.createVideo(message.srcUrl, message.pageUrl);
             return await handleCopyRequest(videoMd + '\n');
         case 'audioRightClick':
-            const audioMd = await md.createMedia(
-                'audio', message.srcUrl, message.pageUrl
-            );
+            const audioMd = await md.createAudio(message.srcUrl, message.pageUrl);
             return await handleCopyRequest(audioMd + '\n');
         default:
             console.error('Unknown message category:', message.category);

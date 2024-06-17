@@ -83,21 +83,44 @@ export async function createImage(url) {
 }
 
 /**
- * createMedia creates markdown for video or audio. For rendering purposes, the
- * resulting markdown will only start with an exclamation mark if the page URL is used.
- * @param {string} altText - a description of the media to use in the markdown link.
- * @param {string} srcUrl - the URL of the media. If this is falsy or starts with
- * `blob:`, the page URL is used instead.
- * @param {string} pageUrl - the URL of the page the media is on. This is used only if
- * the source URL is falsy or starts with `blob:`.
+ * createVideo creates markdown of a video. The source URL is used if and only if it's
+ * truthy and does not start with `blob:`. For rendering purposes, the resulting
+ * markdown will only start with an exclamation mark if the page URL is used.
+ * @param {string} srcUrl - the URL of the video.
+ * @param {string} pageUrl - the URL of the page the video is on.
  * @returns {Promise<string>}
  */
-export async function createMedia(altText, srcUrl, pageUrl) {
-    if (srcUrl && !srcUrl.startsWith('blob:')) {
-        return await createLink(altText, srcUrl);
+export async function createVideo(srcUrl, pageUrl) {
+    const usingSrcUrl = srcUrl && !srcUrl.startsWith('blob:');
+    const url = usingSrcUrl ? srcUrl : pageUrl;
+
+    let youtubeId; // TODO
+    let isYoutube = false; // TODO
+    const youtubeMd = await getSetting('youtubeMd', 'Obsidian & Discord');
+
+    if (isYoutube && youtubeMd === 'GitHub') {
+        // TODO: use fwd-microservice
     } else {
-        return '!' + await createLink(altText, pageUrl);
+        const link = await createLink('video', url);
+        if (usingSrcUrl) {
+            return link;
+        } else {
+            return '!' + link;
+        }
     }
+}
+
+/**
+ * createAudio creates markdown of audio. The source URL is used if and only if it's
+ * truthy and does not start with `blob:`.
+ * @param {string} srcUrl - the URL of the audio.
+ * @param {string} pageUrl - the URL of the page the audio is on.
+ * @returns {Promise<string>}
+ */
+export async function createAudio(srcUrl, pageUrl) {
+    const usingSrcUrl = srcUrl && !srcUrl.startsWith('blob:');
+    const url = usingSrcUrl ? srcUrl : pageUrl;
+    return await createLink('audio', url);
 }
 
 /**

@@ -58,7 +58,7 @@ async function loadOptions() {
         const subBrackets = await getSetting("subBrackets", "underlined");
         document.querySelector("#subBrackets").value = subBrackets;
 
-        const selectionFormat = await getSetting("selectionFormat", "blockquote");
+        const selectionFormat = await getSetting("selectionFormat", "source with link");
         document.querySelector("#selectionFormat").value = selectionFormat;
 
         const bulletPoint = await getSetting("bulletPoint", "-");

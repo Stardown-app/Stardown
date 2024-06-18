@@ -18,6 +18,7 @@ import { browser, handleCopyRequest } from './config.js';
 import { getSetting } from './common.js';
 import * as md from './md.js';
 import { createTextFragmentArg } from './createTextFragmentArg.js';
+import { TurndownService } from './turndown.js';
 
 /**
  * A response object sent from a content script to a background script.
@@ -198,8 +199,28 @@ async function handleSelectionRightClick(htmlId) {
     if (!selectedText) {
         text = await md.createLink(title, url);
     } else {
-        const selectionFormat = await getSetting('selectionFormat', 'blockquote');
+        const selectionFormat = await getSetting('selectionFormat', 'source with link');
         switch (selectionFormat) {
+            case 'source with link':
+                const link = await md.createLink(title, url);
+                const html1 = await getSelectionHtml();
+                console.log(`html: ${html1}`);
+                if (html1 !== null) {
+                    text = selectedText + '\n\n — ' + link + '\n';
+                } else {
+                    const turndownService = new TurndownService();
+                    text = turndownService.turndown(html1) + '\n\n — ' + link + '\n';
+                }
+                break;
+            case 'source':
+                const html2 = await getSelectionHtml();
+                if (html2 !== null) {
+                    text = selectedText;
+                } else {
+                    const turndownService = new TurndownService();
+                    text = turndownService.turndown(html2);
+                }
+                break;
             case 'title':
                 text = await md.createLink(title, url);
                 break;
@@ -239,4 +260,30 @@ async function removeIdAndTextFragment(url) {
     url = urlObj.toString();
 
     return url;
+}
+
+/**
+ * getSelectionHtml gets a selection object and returns its HTML content. If no
+ * selection exists, null is returned.
+ * @returns {Promise<string|null>}
+ */
+async function getSelectionHtml() {
+    if (typeof window.getSelection != 'undefined') {
+        let s = window.getSelection();
+        if (s === null) {
+            return null;
+        } else if (s.rangeCount) {
+            let container = document.createElement('div');
+            for (let i = 0; i < s.rangeCount; i++) {
+                container.appendChild(s.getRangeAt(i).cloneContents());
+            }
+            return container.innerHTML;
+        }
+    } else if (typeof document.selection != 'undefined') {
+        if (document.selection.type == 'Text') {
+            return document.selection.createRange().htmlText;
+        }
+    }
+
+    return null;
 }

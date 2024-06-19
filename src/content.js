@@ -204,21 +204,20 @@ async function handleSelectionRightClick(htmlId) {
             case 'source with link':
                 const link = await md.createLink(title, url);
                 const html1 = await getSelectionHtml();
-                console.log(`html: ${html1}`);
-                if (html1 !== null) {
-                    text = selectedText + '\n\n — ' + link + '\n';
+                if (html1 === null) {
+                    text = `Excerpt from ${link}:\n\n` + selectedText + '\n';
                 } else {
                     const turndownService = new TurndownService();
-                    text = turndownService.turndown(html1) + '\n\n — ' + link + '\n';
+                    text = `Excerpt from ${link}:\n\n` + turndownService.turndown(html1) + '\n';
                 }
                 break;
             case 'source':
                 const html2 = await getSelectionHtml();
-                if (html2 !== null) {
-                    text = selectedText;
+                if (html2 === null) {
+                    text = selectedText + '\n';
                 } else {
                     const turndownService = new TurndownService();
-                    text = turndownService.turndown(html2);
+                    text = turndownService.turndown(html2) + '\n';
                 }
                 break;
             case 'title':
@@ -268,22 +267,38 @@ async function removeIdAndTextFragment(url) {
  * @returns {Promise<string|null>}
  */
 async function getSelectionHtml() {
-    if (typeof window.getSelection != 'undefined') {
-        let s = window.getSelection();
-        if (s === null) {
-            return null;
-        } else if (s.rangeCount) {
-            let container = document.createElement('div');
-            for (let i = 0; i < s.rangeCount; i++) {
-                container.appendChild(s.getRangeAt(i).cloneContents());
-            }
-            return container.innerHTML;
-        }
-    } else if (typeof document.selection != 'undefined') {
-        if (document.selection.type == 'Text') {
-            return document.selection.createRange().htmlText;
-        }
-    }
+    const s = window.getSelection();
+    if (s === null) {
+        console.error('Failed to get a selection');
+        return null;
+    } else if (s.rangeCount === 0) {
+        console.error('Selection range count is zero');
+        return null;
+    } else {
+        let startRange = s.getRangeAt(0).cloneRange();
+        let startNode = startRange.startContainer;
 
-    return null;
+        // While there is a parent node and either the parent node or its
+        // parent node is a header tag...
+        while (
+            startNode.parentNode && (
+                startNode.parentNode.nodeName.startsWith('H') || (
+                    startNode.parentNode.parentNode &&
+                    startNode.parentNode.parentNode.nodeName.startsWith('H')
+                )
+            )
+        ) {
+            // ...expand the start of the selection to include the header tag.
+            startNode = startNode.parentNode;
+            startRange.setStartBefore(startNode);
+        }
+
+        let container = document.createElement('div');
+        container.appendChild(startRange.cloneContents());
+        for (let i = 1; i < s.rangeCount; i++) {
+            container.appendChild(s.getRangeAt(i).cloneContents());
+        }
+
+        return container.innerHTML;
+    }
 }

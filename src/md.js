@@ -80,7 +80,7 @@ export async function createBlockquote(text, title, url) {
 
     const link = await createLink(title, url);
 
-    return `> ${text}\n> \n> — ${link}\n`;
+    return `> ${text}\n> \n> — ${link}`;
 }
 
 /**

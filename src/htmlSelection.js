@@ -126,5 +126,24 @@ async function getSelectionHtml() {
         container.appendChild(s.getRangeAt(i).cloneContents());
     }
 
-    return container.innerHTML;
+    return await makeUrlsAbsolute(container.innerHTML);
+}
+
+/**
+ * makeUrlsAbsolute makes all relative URLs in the HTML absolute. If there are no
+ * relative URLs, the HTML is returned unchanged. Relative URLs may start with a slash
+ * (/) or a number sign (#).
+ * @param {string} html - the HTML to make URLs absolute in.
+ * @returns {Promise<string>}
+ */
+async function makeUrlsAbsolute(html) {
+    // If a URL starts with a slash, insert the site's base URL before it. If a URL
+    // starts with a number sign, insert the page's href before it.
+    const href = window.location.href;
+    const url = new URL(href);
+    const base = url.origin;
+
+    return html
+        .replaceAll('href="/', `href="${base}/`)
+        .replaceAll('href="#', `href="${href}#`)
 }

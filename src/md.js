@@ -15,6 +15,9 @@
 */
 
 import { getSetting, replaceBrackets } from './common.js';
+import { TurndownService } from './turndown.js';
+
+const turndownService = new TurndownService();
 
 /**
  * escape escapes some (not all!) markdown characters in a string. It does not escape
@@ -30,6 +33,15 @@ export async function escape(text) {
         .replaceAll('_', '\\_')
         .replaceAll('*', '\\*')
         .replaceAll('`', '\\`')
+}
+
+/**
+ * htmlToMarkdown converts HTML to markdown.
+ * @param {string|HTMLElement} html - the HTML to convert to markdown.
+ * @returns {Promise<string>}
+ */
+export async function htmlToMarkdown(html) {
+    return turndownService.turndown(html);
 }
 
 /**
@@ -55,6 +67,23 @@ export async function createLink(title, url, subBrackets = null) {
 }
 
 /**
+ * createAlert creates a markdown alert. GitHub and Obsidian use the same format, but
+ * GitHub supports only specific alert types: note, tip, important, warning, and
+ * caution. More details here: https://github.com/orgs/community/discussions/16925.
+ * @param {string} type - the alert's type.
+ * @param {string} text - the alert's text.
+ * @returns {Promise<string>}
+ */
+export async function createAlert(type, text) {
+    let alert = '> [!' + type + ']';
+    if (text) {
+        alert += '\n> ' + text.replaceAll('\n', '\n> ');
+    }
+
+    return alert;
+}
+
+/**
  * createBlockquote creates a markdown blockquote with a link at the end.
  * @param {string} text - the text of the blockquote.
  * @param {string} title - the title of the link.
@@ -68,7 +97,7 @@ export async function createBlockquote(text, title, url) {
 
     const link = await createLink(title, url);
 
-    return `> ${text}\n> \n> — ${link}\n`;
+    return `> ${text}\n> \n> — ${link}`;
 }
 
 /**

@@ -15,8 +15,8 @@
 */
 
 import { browser, handleCopyRequest } from './config.js';
-import { getSetting } from './common.js';
 import * as md from './md.js';
+import * as htmlSelection from './htmlSelection.js';
 import { createTextFragmentArg } from './createTextFragmentArg.js';
 
 /**
@@ -194,29 +194,9 @@ async function handleSelectionRightClick(htmlId) {
         }
     }
 
-    let text;
-    if (!selectedText) {
-        text = await md.createLink(title, url);
-    } else {
-        const selectionFormat = await getSetting('selectionFormat', 'blockquote');
-        switch (selectionFormat) {
-            case 'title':
-                text = await md.createLink(title, url);
-                break;
-            case 'selected':
-                selectedText = selectedText.replaceAll('\r\n', ' ').replaceAll('\n', ' ');
-                text = await md.createLink(selectedText, url);
-                break;
-            case 'blockquote':
-                text = await md.createBlockquote(selectedText, title, url);
-                break;
-            default:
-                console.error(`Unknown selectionFormat: ${selectionFormat}`);
-                throw new Error(`Unknown selectionFormat: ${selectionFormat}`);
-        }
-    }
+    const markdown = await htmlSelection.createMd(title, url, selectedText);
 
-    return await handleCopyRequest(text);
+    return await handleCopyRequest(markdown);
 }
 
 /**

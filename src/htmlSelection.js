@@ -61,11 +61,12 @@ export async function createMd(title, url, selectedText) {
  */
 async function getSourceFormatMdWithLink(title, url, selectedText) {
     const link = await md.createLink(title, url);
+    const alert = await md.createAlert('note', `from ${link}`);
     const html = await getSelectionHtml();
     if (html === null) {
-        return `Excerpt from ${link}:\n\n` + selectedText + '\n';
+        return alert + '\n\n' + selectedText + '\n';
     } else {
-        return `Excerpt from ${link}:\n\n` + await md.htmlToMarkdown(html) + '\n';
+        return alert + '\n\n' + await md.htmlToMarkdown(html) + '\n';
     }
 }
 

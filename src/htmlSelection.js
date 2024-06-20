@@ -98,33 +98,33 @@ async function getSelectionHtml() {
     } else if (s.rangeCount === 0) {
         console.error('Selection range count is zero');
         return null;
-    } else {
-        let startRange = s.getRangeAt(0).cloneRange();
-        let startNode = startRange.startContainer;
-
-        // While there is a parent node and either the parent node or its parent node is
-        // a header tag...
-        while (
-            startNode.parentNode && (
-                startNode.parentNode.nodeName.startsWith('H') || (
-                    startNode.parentNode.parentNode &&
-                    startNode.parentNode.parentNode.nodeName.startsWith('H')
-                )
-            )
-        ) {
-            // ...expand the start of the selection to include the header tag. This is
-            // necessary because the selection may not include a header tag even if the
-            // user selected text within it.
-            startNode = startNode.parentNode;
-            startRange.setStartBefore(startNode);
-        }
-
-        let container = document.createElement('div');
-        container.appendChild(startRange.cloneContents());
-        for (let i = 1; i < s.rangeCount; i++) {
-            container.appendChild(s.getRangeAt(i).cloneContents());
-        }
-
-        return container.innerHTML;
     }
+
+    let startRange = s.getRangeAt(0).cloneRange();
+    let startNode = startRange.startContainer;
+
+    // While there is a parent node and either the parent node or its parent node is a
+    // header tag...
+    while (
+        startNode.parentNode && (
+            startNode.parentNode.nodeName.startsWith('H') || (
+                startNode.parentNode.parentNode &&
+                startNode.parentNode.parentNode.nodeName.startsWith('H')
+            )
+        )
+    ) {
+        // ...expand the start of the selection to include the header tag. This is
+        // necessary because the selection may not include a header tag even if the user
+        // selected text within it.
+        startNode = startNode.parentNode;
+        startRange.setStartBefore(startNode);
+    }
+
+    let container = document.createElement('div');
+    container.appendChild(startRange.cloneContents());
+    for (let i = 1; i < s.rangeCount; i++) {
+        container.appendChild(s.getRangeAt(i).cloneContents());
+    }
+
+    return container.innerHTML;
 }

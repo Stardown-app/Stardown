@@ -65,7 +65,7 @@ async function getSourceFormatMdWithLink(title, url, selectedText) {
     if (html === null) {
         return `Excerpt from ${link}:\n\n` + selectedText + '\n';
     } else {
-        return `Excerpt from ${link}:\n\n` + md.htmlToMarkdown(html) + '\n';
+        return `Excerpt from ${link}:\n\n` + await md.htmlToMarkdown(html) + '\n';
     }
 }
 
@@ -81,7 +81,7 @@ async function getSourceFormatMd(selectedText) {
     if (html === null) {
         return selectedText + '\n';
     } else {
-        return md.htmlToMarkdown(html) + '\n';
+        return await md.htmlToMarkdown(html) + '\n';
     }
 }
 

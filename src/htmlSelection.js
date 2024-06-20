@@ -37,13 +37,13 @@ export async function createMd(title, url, selectedText) {
             return await getSourceFormatMdWithLink(title, url, selectedText);
         case 'source':
             return await getSourceFormatMd(selectedText);
-        case 'title':
-            return await md.createLink(title, url);
-        case 'selected':
+        case 'blockquote with link':
+            return await md.createBlockquote(selectedText, title, url);
+        case 'link with selection as title':
             selectedText = selectedText.replaceAll('\r\n', ' ').replaceAll('\n', ' ');
             return await md.createLink(selectedText, url);
-        case 'blockquote':
-            return await md.createBlockquote(selectedText, title, url);
+        case 'link with page title as title':
+            return await md.createLink(title, url);
         default:
             console.error(`Unknown selectionFormat: ${selectionFormat}`);
             throw new Error(`Unknown selectionFormat: ${selectionFormat}`);

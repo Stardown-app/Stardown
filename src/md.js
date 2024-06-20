@@ -15,6 +15,9 @@
 */
 
 import { getSetting, replaceBrackets } from './common.js';
+import { TurndownService } from './turndown.js';
+
+const turndownService = new TurndownService();
 
 /**
  * escape escapes some (not all!) markdown characters in a string. It does not escape
@@ -30,6 +33,15 @@ export async function escape(text) {
         .replaceAll('_', '\\_')
         .replaceAll('*', '\\*')
         .replaceAll('`', '\\`')
+}
+
+/**
+ * htmlToMarkdown converts HTML to markdown.
+ * @param {string|HTMLElement} html - the HTML to convert to markdown.
+ * @returns {Promise<string>}
+ */
+export async function htmlToMarkdown(html) {
+    return turndownService.turndown(html);
 }
 
 /**

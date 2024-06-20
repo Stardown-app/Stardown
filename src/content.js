@@ -15,10 +15,9 @@
 */
 
 import { browser, handleCopyRequest } from './config.js';
-import { getSetting } from './common.js';
 import * as md from './md.js';
+import * as htmlSelection from './htmlSelection.js';
 import { createTextFragmentArg } from './createTextFragmentArg.js';
-import { TurndownService } from './turndown.js';
 
 /**
  * A response object sent from a content script to a background script.
@@ -195,48 +194,9 @@ async function handleSelectionRightClick(htmlId) {
         }
     }
 
-    let text;
-    if (!selectedText) {
-        text = await md.createLink(title, url);
-    } else {
-        const selectionFormat = await getSetting('selectionFormat', 'source with link');
-        switch (selectionFormat) {
-            case 'source with link':
-                const link = await md.createLink(title, url);
-                const html1 = await getSelectionHtml();
-                if (html1 === null) {
-                    text = `Excerpt from ${link}:\n\n` + selectedText + '\n';
-                } else {
-                    const turndownService = new TurndownService();
-                    text = `Excerpt from ${link}:\n\n` + turndownService.turndown(html1) + '\n';
-                }
-                break;
-            case 'source':
-                const html2 = await getSelectionHtml();
-                if (html2 === null) {
-                    text = selectedText + '\n';
-                } else {
-                    const turndownService = new TurndownService();
-                    text = turndownService.turndown(html2) + '\n';
-                }
-                break;
-            case 'title':
-                text = await md.createLink(title, url);
-                break;
-            case 'selected':
-                selectedText = selectedText.replaceAll('\r\n', ' ').replaceAll('\n', ' ');
-                text = await md.createLink(selectedText, url);
-                break;
-            case 'blockquote':
-                text = await md.createBlockquote(selectedText, title, url);
-                break;
-            default:
-                console.error(`Unknown selectionFormat: ${selectionFormat}`);
-                throw new Error(`Unknown selectionFormat: ${selectionFormat}`);
-        }
-    }
+    const markdown = await htmlSelection.createMd(title, url, selectedText);
 
-    return await handleCopyRequest(text);
+    return await handleCopyRequest(markdown);
 }
 
 /**
@@ -259,46 +219,4 @@ async function removeIdAndTextFragment(url) {
     url = urlObj.toString();
 
     return url;
-}
-
-/**
- * getSelectionHtml gets a selection object and returns its HTML content. If no
- * selection exists, null is returned.
- * @returns {Promise<string|null>}
- */
-async function getSelectionHtml() {
-    const s = window.getSelection();
-    if (s === null) {
-        console.error('Failed to get a selection');
-        return null;
-    } else if (s.rangeCount === 0) {
-        console.error('Selection range count is zero');
-        return null;
-    } else {
-        let startRange = s.getRangeAt(0).cloneRange();
-        let startNode = startRange.startContainer;
-
-        // While there is a parent node and either the parent node or its
-        // parent node is a header tag...
-        while (
-            startNode.parentNode && (
-                startNode.parentNode.nodeName.startsWith('H') || (
-                    startNode.parentNode.parentNode &&
-                    startNode.parentNode.parentNode.nodeName.startsWith('H')
-                )
-            )
-        ) {
-            // ...expand the start of the selection to include the header tag.
-            startNode = startNode.parentNode;
-            startRange.setStartBefore(startNode);
-        }
-
-        let container = document.createElement('div');
-        container.appendChild(startRange.cloneContents());
-        for (let i = 1; i < s.rangeCount; i++) {
-            container.appendChild(s.getRangeAt(i).cloneContents());
-        }
-
-        return container.innerHTML;
-    }
 }

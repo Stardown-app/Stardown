@@ -58,6 +58,7 @@ export async function htmlToMarkdown(html) {
         currentBulletPoint = newBulletPoint;
         turndownService = new TurndownService({
             bulletListMarker: currentBulletPoint,
+            headingStyle: 'atx',
         });
     }
 

@@ -93,7 +93,7 @@ async function getSourceFormatMd(selectedText) {
  */
 async function getSelectionHtml() {
     const s = window.getSelection();
-    if (s === null) {
+    if (s === null || s.type === 'None') {
         console.error('Failed to get a selection');
         return null;
     } else if (s.rangeCount === 0) {

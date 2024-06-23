@@ -179,7 +179,7 @@ async function handleSelectionRightClick(htmlId) {
     let selectedText;
     let arg; // the text fragment argument
     const selection = window.getSelection();
-    if (selection) {
+    if (selection && selection.type !== 'None') {
         selectedText = selection.toString().trim();
         arg = createTextFragmentArg(selection);
     }

@@ -14,7 +14,7 @@
    limitations under the License.
 */
 
-import { getSetting, replaceBrackets } from './common.js';
+import { getSetting } from './common.js';
 import { TurndownService } from './turndown.js';
 
 /**
@@ -30,6 +30,23 @@ let turndownService = null;
  * @type {string}
  */
 let currentBulletPoint = '-';
+
+/**
+ * replaceBrackets replaces any square brackets in text with the character or escape
+ * sequence chosen in settings.
+ * @param {string} text - the text.
+ * @param {string} subBrackets - the setting for what to substitute any square brackets
+ * with.
+ * @returns {Promise<string>}
+ */
+export async function replaceBrackets(text, subBrackets) {
+    if (subBrackets === 'underlined') {
+        return text.replaceAll('[', '⦋').replaceAll(']', '⦌');
+    } else if (subBrackets === 'escaped') {
+        return text.replaceAll('[', '\\[').replaceAll(']', '\\]');
+    }
+    return text;
+}
 
 /**
  * escape escapes some (not all!) markdown characters in a string. It does not escape

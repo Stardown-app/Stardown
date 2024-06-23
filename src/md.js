@@ -59,7 +59,7 @@ export async function htmlToMarkdown(html) {
         turndownService = new TurndownService({
             bulletListMarker: currentBulletPoint,
             headingStyle: 'atx',
-        });
+        }).remove('style').remove('script').remove('noscript').remove('link');
     }
 
     return turndownService.turndown(html);

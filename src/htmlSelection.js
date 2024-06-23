@@ -38,7 +38,7 @@ export async function createMd(title, url, selectedText) {
         case 'source':
             return await getSourceFormatMd(selectedText);
         case 'blockquote with link':
-            return await md.createBlockquote(selectedText, title, url) + '\n';
+            return await md.createBlockquote(selectedText.trim(), title, url) + '\n';
         case 'link with selection as title':
             selectedText = selectedText.replaceAll('\r\n', ' ').replaceAll('\n', ' ');
             return await md.createLink(selectedText, url);

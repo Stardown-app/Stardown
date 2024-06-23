@@ -16,29 +16,38 @@
 
 import { browser } from './config.js';
 
+const defaultSettings = {
+    youtubeMd: 'Obsidian & Discord',
+    notifyOnSuccess: false,
+    subBrackets: 'underlined',
+    selectionFormat: 'source with link',
+    bulletPoint: '-',
+    doubleClickWindows: 'current',
+    doubleClickInterval: 500,
+};
+
 /**
  * getSetting gets a setting from the browser's sync storage. If the setting does not
- * exist there, the default value is returned.
+ * exist there, its default value is returned.
  * @param {string} name - the name of the setting.
- * @param {any} default_ - the default value of the setting.
  * @returns {Promise<any>}
  */
-export async function getSetting(name, default_) {
+export async function getSetting(name) {
     let obj;
     try {
         obj = await browser.storage.sync.get(name);
     } catch (err) {
         console.error(err);
-        return default_;
+        return defaultSettings[name];
     }
     if (obj === undefined) {
         console.error(`Tried to get undefined setting "${name}"`);
-        return default_;
+        return defaultSettings[name];
     }
 
     const value = obj[name];
     if (value === undefined) {
-        return default_;
+        return defaultSettings[name];
     }
 
     return value;

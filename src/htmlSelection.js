@@ -146,5 +146,9 @@ async function makeUrlsAbsolute(html) {
 
     return html
         .replaceAll('href="/', `href="${base}/`)
+        .replaceAll("href='/", `href='${base}/`)
         .replaceAll('href="#', `href="${href}#`)
+        .replaceAll("href='#", `href='${href}#`)
+        .replaceAll('src="/', `src="${base}/`)
+        .replaceAll("src='/", `src='${base}/`)
 }

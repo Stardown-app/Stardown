@@ -17,7 +17,19 @@
 import { getSetting, replaceBrackets } from './common.js';
 import { TurndownService } from './turndown.js';
 
-const turndownService = new TurndownService();
+/**
+ * turndownService is a TurndownService instance used to convert HTML to markdown. Use
+ * the exported htmlToMarkdown async function to convert HTML to markdown.
+ * @type {TurndownService|null}
+ */
+let turndownService = null;
+
+/**
+ * currentBulletPoint is the current setting for the bullet point character. It is used
+ * to detect changes to the setting to update the TurndownService instance when needed.
+ * @type {string}
+ */
+let currentBulletPoint = '-';
 
 /**
  * escape escapes some (not all!) markdown characters in a string. It does not escape
@@ -41,6 +53,14 @@ export async function escape(text) {
  * @returns {Promise<string>}
  */
 export async function htmlToMarkdown(html) {
+    const newBulletPoint = await getSetting('bulletPoint');
+    if (!turndownService || newBulletPoint !== currentBulletPoint) {
+        currentBulletPoint = newBulletPoint;
+        turndownService = new TurndownService({
+            bulletListMarker: currentBulletPoint,
+        });
+    }
+
     return turndownService.turndown(html);
 }
 

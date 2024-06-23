@@ -21,13 +21,13 @@ async function saveOptions(e) {
     e.preventDefault();
     await browser.storage.sync.set(
         {
-            youtubeMd: document.querySelector("#youtubeMd").value,
-            notifyOnSuccess: document.querySelector("#notifyOnSuccess").checked,
-            subBrackets: document.querySelector("#subBrackets").value,
-            selectionFormat: document.querySelector("#selectionFormat").value,
-            bulletPoint: document.querySelector("#bulletPoint").value,
-            doubleClickWindows: document.querySelector("#doubleClickWindows").value,
-            doubleClickInterval: document.querySelector("#doubleClickInterval").value,
+            youtubeMd: document.querySelector('#youtubeMd').value,
+            notifyOnSuccess: document.querySelector('#notifyOnSuccess').checked,
+            subBrackets: document.querySelector('#subBrackets').value,
+            selectionFormat: document.querySelector('#selectionFormat').value,
+            bulletPoint: document.querySelector('#bulletPoint').value,
+            doubleClickWindows: document.querySelector('#doubleClickWindows').value,
+            doubleClickInterval: document.querySelector('#doubleClickInterval').value,
         },
         () => {
             // indicate saving was successful
@@ -41,7 +41,7 @@ async function saveOptions(e) {
 
             // send the updated doubleClickInterval to the background script
             browser.runtime.sendMessage({
-                doubleClickInterval: document.querySelector("#doubleClickInterval").value
+                doubleClickInterval: document.querySelector('#doubleClickInterval').value
             });
         }
     );
@@ -49,26 +49,26 @@ async function saveOptions(e) {
 
 async function loadOptions() {
     try {
-        const youtubeMd = await getSetting("youtubeMd", "Obsidian & Discord");
-        document.querySelector("#youtubeMd").value = youtubeMd;
+        const youtubeMd = await getSetting('youtubeMd');
+        document.querySelector('#youtubeMd').value = youtubeMd;
 
-        const notifyOnSuccess = await getSetting("notifyOnSuccess", false);
-        document.querySelector("#notifyOnSuccess").checked = notifyOnSuccess;
+        const notifyOnSuccess = await getSetting('notifyOnSuccess');
+        document.querySelector('#notifyOnSuccess').checked = notifyOnSuccess;
 
-        const subBrackets = await getSetting("subBrackets", "underlined");
-        document.querySelector("#subBrackets").value = subBrackets;
+        const subBrackets = await getSetting('subBrackets');
+        document.querySelector('#subBrackets').value = subBrackets;
 
-        const selectionFormat = await getSetting("selectionFormat", "source with link");
-        document.querySelector("#selectionFormat").value = selectionFormat;
+        const selectionFormat = await getSetting('selectionFormat');
+        document.querySelector('#selectionFormat').value = selectionFormat;
 
-        const bulletPoint = await getSetting("bulletPoint", "-");
-        document.querySelector("#bulletPoint").value = bulletPoint;
+        const bulletPoint = await getSetting('bulletPoint');
+        document.querySelector('#bulletPoint').value = bulletPoint;
 
-        const doubleClickWindows = await getSetting("doubleClickWindows", "current");
-        document.querySelector("#doubleClickWindows").value = doubleClickWindows;
+        const doubleClickWindows = await getSetting('doubleClickWindows');
+        document.querySelector('#doubleClickWindows').value = doubleClickWindows;
 
-        const doubleClickInterval = await getSetting("doubleClickInterval", 500);
-        document.querySelector("#doubleClickInterval").value = doubleClickInterval;
+        const doubleClickInterval = await getSetting('doubleClickInterval');
+        document.querySelector('#doubleClickInterval').value = doubleClickInterval;
     } catch (err) {
         console.error(err);
         throw err;
@@ -86,7 +86,7 @@ async function resetOptions() {
     }, 750);
 }
 
-document.addEventListener("DOMContentLoaded", loadOptions);
-const form = document.querySelector("form")
-form.addEventListener("submit", saveOptions);
-form.addEventListener("reset", resetOptions);
+document.addEventListener('DOMContentLoaded', loadOptions);
+const form = document.querySelector('form')
+form.addEventListener('submit', saveOptions);
+form.addEventListener('reset', resetOptions);

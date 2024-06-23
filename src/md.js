@@ -55,7 +55,7 @@ export async function htmlToMarkdown(html) {
  */
 export async function createLink(title, url, subBrackets = null) {
     if (subBrackets === null) {
-        subBrackets = await getSetting('subBrackets', 'underlined');
+        subBrackets = await getSetting('subBrackets');
     }
 
     title = await replaceBrackets(title, subBrackets);
@@ -125,7 +125,7 @@ export async function createVideo(srcUrl, pageUrl) {
 
     let youtubeId; // TODO
     let isYoutube = false; // TODO
-    const youtubeMd = await getSetting('youtubeMd', 'Obsidian & Discord');
+    const youtubeMd = await getSetting('youtubeMd');
 
     if (isYoutube && youtubeMd === 'GitHub') {
         // TODO: use fwd-microservice

@@ -31,7 +31,7 @@ export async function createMd(title, url, selectedText) {
         return await md.createLink(title, url);
     }
 
-    const selectionFormat = await getSetting('selectionFormat', 'source with link');
+    const selectionFormat = await getSetting('selectionFormat');
     switch (selectionFormat) {
         case 'source with link':
             return await getSourceFormatMdWithLink(title, url, selectedText);

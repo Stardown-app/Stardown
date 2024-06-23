@@ -23,7 +23,7 @@ createContextMenus();
 let lastClick = new Date(0);
 let doubleClickInterval = 500;
 
-getSetting('doubleClickInterval', 500).then(value => doubleClickInterval = value);
+getSetting('doubleClickInterval').then(value => doubleClickInterval = value);
 
 browser.action.onClicked.addListener(async (tab) => {
     const now = new Date();
@@ -151,7 +151,7 @@ async function handleIconDoubleClick(activeTab) {
     let tabs = await browser.tabs.query({ currentWindow: true, highlighted: true });
     if (tabs.length === 1) { // if only one tab is highlighted
         // get unhighlighted tabs
-        const doubleClickWindows = await getSetting('doubleClickWindows', 'current');
+        const doubleClickWindows = await getSetting('doubleClickWindows');
         if (doubleClickWindows === 'current') {
             tabs = await browser.tabs.query({ currentWindow: true });
         } else if (doubleClickWindows === 'all') {
@@ -159,11 +159,11 @@ async function handleIconDoubleClick(activeTab) {
         }
     }
 
-    const subBrackets = await getSetting('subBrackets', 'underlined');
+    const subBrackets = await getSetting('subBrackets');
     const links = await Promise.all(
         tabs.map(tab => createTabLink(tab, subBrackets))
     );
-    const bulletPoint = await getSetting('bulletPoint', '-');
+    const bulletPoint = await getSetting('bulletPoint');
     const linksListMd = links.map(link => `${bulletPoint} ${link}\n`).join('');
 
     const {
@@ -191,7 +191,7 @@ async function handleIconDoubleClick(activeTab) {
 async function showStatus(status, notifTitle, notifBody) {
     if (status > 0) { // success
         await brieflyShowCheck(status);
-        const notifyOnSuccess = await getSetting('notifyOnSuccess', false);
+        const notifyOnSuccess = await getSetting('notifyOnSuccess');
         if (notifyOnSuccess) {
             await showNotification(notifTitle, notifBody);
         }

@@ -56,13 +56,24 @@ export async function htmlToMarkdown(html) {
     const newBulletPoint = await getSetting('bulletPoint');
     if (!turndownService || newBulletPoint !== currentBulletPoint) {
         currentBulletPoint = newBulletPoint;
-        turndownService = new TurndownService({
-            bulletListMarker: currentBulletPoint,
-            headingStyle: 'atx',
-        }).remove('style').remove('script').remove('noscript').remove('link');
+        turndownService = newTurndownService(currentBulletPoint);
     }
 
     return turndownService.turndown(html);
+}
+
+/**
+ * newTurndownService creates a new TurndownService instance.
+ * @param {string} bulletPoint - the setting for the bullet point character.
+ * @returns {TurndownService}
+ */
+function newTurndownService(bulletPoint) {
+    const t = new TurndownService({
+        bulletListMarker: bulletPoint,
+        headingStyle: 'atx',
+    }).remove('style').remove('script').remove('noscript').remove('link');
+
+    return t;
 }
 
 /**

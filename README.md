@@ -1,6 +1,6 @@
 <h1 align="center"><img width="35" alt="Stardown's icon" src="src/images/icon.svg"> Stardown</h1>
 
-<p align="center">A browser extension that copies a markdown link for the current page.</p>
+<p align="center">Copy the web as markdown</p>
 
 <p align="center">
     <a href="https://addons.mozilla.org/en-US/firefox/addon/stardown/"><img alt="Firefox badge" src="https://img.shields.io/badge/Firefox-black.svg?logo=firefoxbrowser&style=for-the-badge"></a>
@@ -8,18 +8,27 @@
     <a href="https://microsoftedge.microsoft.com/addons/detail/stardown/apolhpopcbbillkbfkmdibedlgjffckf"><img alt="Edge badge" src="https://img.shields.io/badge/Edge-black.svg?logo=microsoftedge&style=for-the-badge&logoColor=33b9ab"></a>
     <!-- <a><img alt="Safari badge" src="https://img.shields.io/badge/Safari-black.svg?logo=safari&style=for-the-badge&logoColor=188ff3"></a> -->
 </p>
+<p align="center">
+    You can also
+    <a href="#install-from-source">
+        install from the source code</a>
+    to get updates early.
+</p>
 
 <p align="center"><img alt="demo gif" src="https://github.com/wheelercj/assets/blob/main/Stardown.gif"></p>
 
-After installing, there are multiple ways you can copy markdown:
+* Click the extension's icon to copy a link for the current page.
+* Right-click part of a page to copy it as markdown. Select before right-clicking to copy multiple parts.
+* Double-click the extension's icon to copy links for all tabs.
+* Select tabs before double-clicking the icon to copy links for only those tabs.
+* Press `Ctrl+Shift+U` (Mac: `Cmd+Shift+U`) or whichever keyboard shortcut you prefer in your browser's settings to copy a link for the current page.
+* Use [the options page](#settings) to customize these features.
 
-* **click the extension's icon** to copy a link for the current page, or press `Ctrl+Shift+U` (Mac: `Cmd+Shift+U`) or whichever keyboard shortcut you prefer in your browser's settings
-* **double-click the extension's icon** to copy links for all tabs, or press `Ctrl+Shift+UU` (Mac: `Cmd+Shift+UU`)
-* **select tabs before double-clicking the icon** to copy links for only those tabs
-* **right-click part of a page and choose Stardown's copy option** that changes depending on what you right-clicked
-* **select text before right-clicking** to create a link with a [text fragment](https://web.dev/articles/text-fragments)
+By default, the markdown created when selecting and right-clicking part of a page includes a link that navigates to the specific part of the page you selected, when possible. This is accomplished with [text fragments](https://web.dev/articles/text-fragments) and/or HTML element IDs. [Firefox does not support text fragments yet](https://bugzilla.mozilla.org/show_bug.cgi?id=1753933), but the Firefox version of Stardown allows you to create links with text fragments.
 
-Stardown's "Copy markdown link to here" right-click option tries to find an `id` attribute in the HTML elements you right-clicked so you can still link to specific parts of pages even without text fragments. [Firefox does not support text fragments yet](https://bugzilla.mozilla.org/show_bug.cgi?id=1753933), but the Firefox version of Stardown allows you to create links with text fragments.
+<!--
+Stardown is free except that if you get it from Apple's App Store, there is a small fee to help cover the $99 USD per year cost I'm paying to keep Stardown available in the App Store.
+-->
 
 [How I use Stardown](https://chriswheeler.dev/posts/stardown-v1/)
 
@@ -74,14 +83,16 @@ You're welcome to [make a feature request](https://github.com/wheelercj/Stardown
 * [url2clipboard](https://github.com/asamuzaK/url2clipboard) supports HTML, Markdown, BBCode, Textile, AsciiDoc, MediaWiki, Jira, reStructuredText, LaTeX, Org Mode, and text.
 * [TabCopy](https://chromewebstore.google.com/detail/tabcopy/micdllihgoppmejpecmkilggmaagfdmb) might only be on the Chrome Web Store, but supports many formats including HTML, Markdown, BBCode, CSV, and JSON, and lets you create custom link formats.
 
-### Copy just the titles or just the URLs of all tabs
+### Download markdown of an entire page
 
-* [copy-as-markdown](https://github.com/yorkxin/copy-as-markdown)
-
-### Copy markdown of an entire page
+Although Stardown can be used to copy an entire page's content as markdown all at once, other tools that specialize in that sometimes give results that look better.
 
 * [MarkDownload](https://github.com/deathau/markdownload) was developed by an Obsidian community moderator.
-* [Obsidian Web Clipper Bookmarklet](https://gist.github.com/kepano/90c05f162c37cf730abb8ff027987ca3) is a bookmarklet for saving articles and pages from the web to Obsidian.
+* [Obsidian Web Clipper Bookmarklet](https://gist.github.com/kepano/90c05f162c37cf730abb8ff027987ca3) is a bookmarklet for saving articles and pages from the web directly to Obsidian.
+
+### Copy just the titles or just the URLs of all tabs
+
+* [Copy as Markdown](https://github.com/yorkxin/copy-as-markdown) is similar to Stardown but has a popup menu with different options, and different priorities in what markdown it generates.
 
 ### Copy just a URL with a text fragment
 
@@ -95,9 +106,11 @@ You're welcome to [make a feature request](https://github.com/wheelercj/Stardown
 
 Unlike the extensions linked above, Stardown:
 
-* can create markdown links for specific parts of pages (using [text fragments](https://web.dev/articles/text-fragments) and/or HTML element IDs)
 * requires only one click to create a markdown link for the current page
-* is focused on just the most important features so it's more likely to be maintained and bug-free
+* can create markdown links for specific parts of pages (using [text fragments](https://web.dev/articles/text-fragments) and/or HTML element IDs)
+* can copy markdown of specific parts of pages while keeping almost all formatting supported by markdown
+* can create markdown of YouTube videos that renders well in GitHub
+* is focused on the most important features so it's more likely to be maintained and bug-free
 
 ## Install from source
 

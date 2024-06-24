@@ -38,7 +38,7 @@ export async function createMd(title, url, selectedText) {
         case 'source':
             return await getSourceFormatMd(selectedText);
         case 'blockquote with link':
-            return await md.createBlockquote(selectedText, title, url) + '\n';
+            return await md.createBlockquote(selectedText.trim(), title, url) + '\n';
         case 'link with selection as title':
             selectedText = selectedText.replaceAll('\r\n', ' ').replaceAll('\n', ' ');
             return await md.createLink(selectedText, url);
@@ -93,7 +93,7 @@ async function getSourceFormatMd(selectedText) {
  */
 async function getSelectionHtml() {
     const s = window.getSelection();
-    if (s === null) {
+    if (s === null || s.type === 'None') {
         console.error('Failed to get a selection');
         return null;
     } else if (s.rangeCount === 0) {
@@ -146,5 +146,11 @@ async function makeUrlsAbsolute(html) {
 
     return html
         .replaceAll('href="/', `href="${base}/`)
+        .replaceAll("href='/", `href='${base}/`)
         .replaceAll('href="#', `href="${href}#`)
+        .replaceAll("href='#", `href='${href}#`)
+        .replaceAll('src="//', `src="https://`)
+        .replaceAll("src='//", `src='https://`)
+        .replaceAll('src="/', `src="${base}/`)
+        .replaceAll("src='/", `src='${base}/`)
 }

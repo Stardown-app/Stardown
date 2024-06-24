@@ -52,20 +52,3 @@ export async function getSetting(name) {
 
     return value;
 }
-
-/**
- * replaceBrackets replaces square brackets in a link title with the character or escape
- * sequence chosen in settings.
- * @param {string} title - the raw link title.
- * @param {string} subBrackets - the setting for what to substitute any square brackets
- * with.
- * @returns {Promise<string>}
- */
-export async function replaceBrackets(title, subBrackets) {
-    if (subBrackets === 'underlined') {
-        return title.replaceAll('[', '⦋').replaceAll(']', '⦌');
-    } else if (subBrackets === 'escaped') {
-        return title.replaceAll('[', '\\[').replaceAll(']', '\\]');
-    }
-    return title;
-}

@@ -42,7 +42,7 @@ as the options page. -->
       v1.0.0
     </p>
     <p>
-      A browser extension that copies a markdown link for the current page.<br /><br />
+      Copy the web as markdown.<br /><br />
       <a href="https://github.com/wheelercj/Stardown?tab=readme-ov-file#troubleshooting" target="_blank">
         Troubleshooting
       </a><br />
@@ -67,18 +67,6 @@ as the options page. -->
       </select>
       <br />
       <br />
-      <input id="notifyOnSuccess" type="checkbox" />
-      <label for="notifyOnSuccess">Show a notification when a context menu option succeeds</label>
-      <br />
-      <br />
-      <label for="subBrackets">Replace square brackets in link titles with</label>
-      <select id="subBrackets" name="subBrackets">
-        <option value="underlined">underlined brackets ⦋ ⦌</option>
-        <option value="escaped">escaped brackets \[ \]</option>
-        <option value="original">don't replace them [ ]</option>
-      </select>
-      <br />
-      <br />
       <label for="selectionFormat">When creating markdown of a selection,</label>
       <select id="selectionFormat" name="selectionFormat">
         <option value="source with link">try to keep the same formatting and link to the source</option>
@@ -89,8 +77,22 @@ as the options page. -->
       </select>
       <br />
       <br />
+      <label for="subBrackets">
+        Replace square brackets in link titles and in selections that keep formatting with
+      </label>
+      <select id="subBrackets" name="subBrackets">
+        <option value="underlined">underlined brackets ⦋ ⦌</option>
+        <option value="escaped">escaped brackets \[ \]</option>
+        <option value="original">don't replace them [ ]</option>
+      </select>
+      <br />
+      <br />
       <label for="bulletPoint">Bullet point symbol:</label>
-      <input id="bulletPoint" type="text" value="-" />
+      <select id="bulletPoint" name="bulletPoint">
+        <option value="-">-</option>
+        <option value="+">+</option>
+        <option value="*">*</option>
+      </select>
       <br />
       <br />
       <label for="doubleClickWindows">Double-clicking the icon copies all tabs in</label>
@@ -102,6 +104,10 @@ as the options page. -->
       <br />
       <label for="doubleClickInterval">Double-click interval (milliseconds):</label>
       <input id="doubleClickInterval" type="number" min="0" max="100000" value="500" />
+      <br />
+      <br />
+      <input id="notifyOnSuccess" type="checkbox" />
+      <label for="notifyOnSuccess">Show a notification when a context menu option succeeds</label>
       <br />
       <br />
       <input id="submit" type="submit" value="Save" />

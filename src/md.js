@@ -14,25 +14,66 @@
    limitations under the License.
 */
 
-import { getSetting, replaceBrackets } from './common.js';
+import { getSetting } from './common.js';
 import { TurndownService } from './turndown.js';
-
-const turndownService = new TurndownService();
+import { turndownPluginGfm } from './turndown-plugin-gfm.js';
 
 /**
- * escape escapes some (not all!) markdown characters in a string. It does not escape
- * square brackets, among other characters.
- * @param {string} text - the text to escape some markdown characters in.
- * @returns {Promise<string>}
+ * turndownService is a TurndownService instance used to convert HTML to markdown. Use
+ * the exported htmlToMarkdown async function to convert HTML to markdown.
+ * @type {TurndownService|null}
  */
-export async function escape(text) {
+let turndownService = null;
+
+/**
+ * currentBulletPoint is used by the htmlToMarkdown function to detect changes to the
+ * bullet point setting to update the TurndownService instance when needed.
+ * @type {string}
+ */
+let currentBulletPoint = '-';
+
+/**
+ * currentSubBrackets is used by the htmlToMarkdown function to detect changes to the
+ * bracket substitution setting to update the TurndownService instance when needed.
+ */
+let currentSubBrackets = 'underlined';
+
+/**
+ * replaceBrackets replaces any square brackets in text with the character or escape
+ * sequence chosen in settings.
+ * @param {string} text - the text.
+ * @param {string} subBrackets - the setting for what to substitute any square brackets
+ * with.
+ * @returns {string}
+ */
+export function replaceBrackets(text, subBrackets) {
+    if (subBrackets === 'underlined') {
+        return text.replaceAll('[', '⦋').replaceAll(']', '⦌');
+    } else if (subBrackets === 'escaped') {
+        return text.replaceAll('[', '\\[').replaceAll(']', '\\]');
+    } else {
+        return text;
+    }
+}
+
+/**
+ * escape escapes many markdown patterns, but not square brackets.
+ * @param {string} text - the text to escape markdown characters in.
+ * @returns {string}
+ */
+export function escape(text) {
     return text
-        .replaceAll('>', '\\>')
-        .replaceAll('<', '\\<')
+        .replaceAll('\\', '\\\\')
         .replaceAll('#', '\\#')
         .replaceAll('_', '\\_')
         .replaceAll('*', '\\*')
         .replaceAll('`', '\\`')
+        .replaceAll(/^>/g, '\\>')
+        .replaceAll(/^-/g, '\\-')
+        .replaceAll(/^\+ /g, '\\+ ')
+        .replaceAll(/^(=+)/g, '\\$1')
+        .replaceAll(/^~~~/g, '\\~~~')
+        .replaceAll(/^(\d+)\. /g, '$1\\. ')
 }
 
 /**
@@ -41,7 +82,46 @@ export async function escape(text) {
  * @returns {Promise<string>}
  */
 export async function htmlToMarkdown(html) {
+    const newBulletPoint = await getSetting('bulletPoint');
+    const newSubBrackets = await getSetting('subBrackets');
+
+    if (
+        !turndownService ||
+        newBulletPoint !== currentBulletPoint ||
+        newSubBrackets !== currentSubBrackets
+    ) {
+        currentBulletPoint = newBulletPoint;
+        currentSubBrackets = newSubBrackets
+        turndownService = newTurndownService(currentBulletPoint, currentSubBrackets);
+    }
+
     return turndownService.turndown(html);
+}
+
+/**
+ * newTurndownService creates a new TurndownService instance.
+ * @param {string} bulletPoint - the setting for the bullet point character.
+ * @param {string} subBrackets - the setting for what to substitute square brackets
+ * with.
+ * @returns {TurndownService}
+ */
+function newTurndownService(bulletPoint, subBrackets) {
+    // https://github.com/mixmark-io/turndown
+    const t = new TurndownService({
+        bulletListMarker: bulletPoint,
+        headingStyle: 'atx',
+        codeBlockStyle: 'fenced',
+    }).remove('style').remove('script').remove('noscript').remove('link');
+
+    t.use(turndownPluginGfm.gfm); // GitHub Flavored Markdown
+
+    // Making Turndown's escape function async results in Turndown giving the error
+    // `TypeError: string.replace is not a function`.
+    t.escape = function (text) {
+        return replaceBrackets(escape(text), subBrackets);
+    };
+
+    return t;
 }
 
 /**
@@ -58,8 +138,15 @@ export async function createLink(title, url, subBrackets = null) {
         subBrackets = await getSetting('subBrackets');
     }
 
-    title = await replaceBrackets(title, subBrackets);
-    title = await escape(title);
+    title = replaceBrackets(title, subBrackets);
+    title = title
+        .replaceAll('\\', '\\\\')
+        .replaceAll('#', '\\#')
+        .replaceAll('_', '\\_')
+        .replaceAll('*', '\\*')
+        .replaceAll('`', '\\`')
+        .replaceAll('>', '\\>')
+        .replaceAll(' ', '')
 
     url = url.replaceAll('(', '%28').replaceAll(')', '%29');
 
@@ -85,15 +172,17 @@ export async function createAlert(type, text) {
 
 /**
  * createBlockquote creates a markdown blockquote with a link at the end.
- * @param {string} text - the text of the blockquote.
+ * @param {string} text - the text of the blockquote. Many markdown patterns are
+ * escaped.
  * @param {string} title - the title of the link.
  * @param {string} url - the URL of the link.
  * @returns {Promise<string>}
  */
 export async function createBlockquote(text, title, url) {
-    text = text.replaceAll('[', '\\[');
-    text = await escape(text);
-    text = text.replaceAll('\n', '\n> ');
+    text = escape(text)
+        .replaceAll('[', '\\[')
+        .replaceAll(']', '\\]')
+        .replaceAll('\n', '\n> ');
 
     const link = await createLink(title, url);
 

@@ -106,9 +106,11 @@ export async function htmlToMarkdown(html) {
  * @returns {TurndownService}
  */
 function newTurndownService(bulletPoint, subBrackets) {
+    // https://github.com/mixmark-io/turndown
     const t = new TurndownService({
         bulletListMarker: bulletPoint,
         headingStyle: 'atx',
+        codeBlockStyle: 'fenced',
     }).remove('style').remove('script').remove('noscript').remove('link');
 
     t.use(turndownPluginGfm.gfm); // GitHub Flavored Markdown

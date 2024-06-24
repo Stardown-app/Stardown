@@ -67,8 +67,14 @@ as the options page. -->
       </select>
       <br />
       <br />
-      <input id="notifyOnSuccess" type="checkbox" />
-      <label for="notifyOnSuccess">Show a notification when a context menu option succeeds</label>
+      <label for="selectionFormat">When creating markdown of a selection,</label>
+      <select id="selectionFormat" name="selectionFormat">
+        <option value="source with link">try to keep the same formatting and link to the source</option>
+        <option value="source">try to keep the same formatting</option>
+        <option value="blockquote with link">create a block quote and link to the source</option>
+        <option value="link with selection as title">create a link with the selected text as the title</option>
+        <option value="link with page title as title">create a link with the page title as the link title</option>
+      </select>
       <br />
       <br />
       <label for="subBrackets">
@@ -78,16 +84,6 @@ as the options page. -->
         <option value="underlined">underlined brackets ⦋ ⦌</option>
         <option value="escaped">escaped brackets \[ \]</option>
         <option value="original">don't replace them [ ]</option>
-      </select>
-      <br />
-      <br />
-      <label for="selectionFormat">When creating markdown of a selection,</label>
-      <select id="selectionFormat" name="selectionFormat">
-        <option value="source with link">try to keep the same formatting and link to the source</option>
-        <option value="source">try to keep the same formatting</option>
-        <option value="blockquote with link">create a block quote and link to the source</option>
-        <option value="link with selection as title">create a link with the selected text as the title</option>
-        <option value="link with page title as title">create a link with the page title as the link title</option>
       </select>
       <br />
       <br />
@@ -108,6 +104,10 @@ as the options page. -->
       <br />
       <label for="doubleClickInterval">Double-click interval (milliseconds):</label>
       <input id="doubleClickInterval" type="number" min="0" max="100000" value="500" />
+      <br />
+      <br />
+      <input id="notifyOnSuccess" type="checkbox" />
+      <label for="notifyOnSuccess">Show a notification when a context menu option succeeds</label>
       <br />
       <br />
       <input id="submit" type="submit" value="Save" />

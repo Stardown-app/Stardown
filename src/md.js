@@ -16,6 +16,7 @@
 
 import { getSetting } from './common.js';
 import { TurndownService } from './turndown.js';
+import { turndownPluginGfm } from './turndown-plugin-gfm.js';
 
 /**
  * turndownService is a TurndownService instance used to convert HTML to markdown. Use
@@ -109,6 +110,8 @@ function newTurndownService(bulletPoint, subBrackets) {
         bulletListMarker: bulletPoint,
         headingStyle: 'atx',
     }).remove('style').remove('script').remove('noscript').remove('link');
+
+    t.use(turndownPluginGfm.gfm); // GitHub Flavored Markdown
 
     // Making Turndown's escape function async results in Turndown giving the error
     // `TypeError: string.replace is not a function`.

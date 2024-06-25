@@ -134,6 +134,8 @@ function newTurndownService(bulletPoint, subBrackets) {
     }
 
     t.addRule('inlineLink', {
+        // For each HTML element, if it matches the filter, run the replacement function
+        // on it.
         filter: function (node, options) {
             return (
                 options.linkStyle === 'inlined' &&
@@ -142,12 +144,13 @@ function newTurndownService(bulletPoint, subBrackets) {
             )
         },
         replacement: function (content, node) {
-            if (!content) {
-                return '';
+            if (!content) { // if the link's title would be empty
+                return ''; // don't create the link
             }
 
             let href = node.getAttribute('href');
             if (href) {
+                // make the URL absolute
                 if (href.startsWith('/')) {
                     const url = new URL(location.href);
                     const base = url.origin;
@@ -156,9 +159,11 @@ function newTurndownService(bulletPoint, subBrackets) {
                     href = location.href + href;
                 }
 
+                // escape parentheses
                 href = href.replace(/([()])/g, '\\$1');
             }
 
+            // remove excess whitespace and escape quotation marks
             let title = node.getAttribute('title');
             if (title) {
                 title = cleanAttribute(title);
@@ -170,22 +175,32 @@ function newTurndownService(bulletPoint, subBrackets) {
     });
 
     t.addRule('img', {
+        // For each HTML element, if it matches the filter, run the replacement function
+        // on it.
         filter: 'img',
         replacement: function (content, node) {
-            let alt = cleanAttribute(node.getAttribute('alt'));
             let src = node.getAttribute('src') || '';
-            if (src) {
-                if (src.startsWith('//')) {
-                    src = 'https:' + src;
-                } else if (src.startsWith('/')) {
-                    const url = new URL(location.href);
-                    const base = url.origin;
-                    src = base + src;
-                }
+            if (!src) {
+                return '';
             }
+
+            // remove excess whitespace
+            let alt = cleanAttribute(node.getAttribute('alt'));
+
+            // make the URL absolute
+            if (src.startsWith('//')) {
+                src = 'https:' + src;
+            } else if (src.startsWith('/')) {
+                const url = new URL(location.href);
+                const base = url.origin;
+                src = base + src;
+            }
+
+            // remove excess whitespace
             let title = cleanAttribute(node.getAttribute('title'));
             let titlePart = title ? ' "' + title + '"' : '';
-            return src ? '![' + alt + ']' + '(' + src + titlePart + ')' : ''
+
+            return '![' + alt + '](' + src + titlePart + ')';
         },
     });
 

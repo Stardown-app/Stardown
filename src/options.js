@@ -27,38 +27,42 @@ const doubleClickWindowsEl = document.querySelector('#doubleClickWindows');
 const doubleClickIntervalEl = document.querySelector('#doubleClickInterval');
 const notifyOnSuccessEl = document.querySelector('#notifyOnSuccess');
 
-const submitButton = document.querySelector('#submit');
 const resetButton = document.querySelector('#reset');
 
-async function saveOptions(e) {
-    e.preventDefault();
-    await browser.storage.sync.set(
-        {
-            youtubeMd: youtubeMdEl.value,
-            selectionFormat: selectionFormatEl.value,
-            subBrackets: subBracketsEl.value,
-            bulletPoint: bulletPointEl.value,
-            doubleClickWindows: doubleClickWindowsEl.value,
-            doubleClickInterval: doubleClickIntervalEl.value,
-            notifyOnSuccess: notifyOnSuccessEl.checked,
-        },
-        () => {
-            // indicate saving was successful
-            submitButton.value = 'Saved ✔';
-            submitButton.style.backgroundColor = '#00d26a';
-            setTimeout(() => {
-                submitButton.value = 'Save';
-                submitButton.style.backgroundColor = '';
-            }, 750);
+// set up setting autosaving
+initAutosave('youtubeMd', youtubeMdEl, 'value');
+initAutosave('selectionFormat', selectionFormatEl, 'value');
+initAutosave('subBrackets', subBracketsEl, 'value');
+initAutosave('bulletPoint', bulletPointEl, 'value');
+initAutosave('notifyOnSuccess', notifyOnSuccessEl, 'checked');
+initAutosave('doubleClickWindows', doubleClickWindowsEl, 'value');
+initAutosave('doubleClickInterval', doubleClickIntervalEl, 'value', () => {
+    // send the updated doubleClickInterval to the background script
+    browser.runtime.sendMessage({
+        doubleClickInterval: doubleClickIntervalEl.value
+    });
+});
 
-            // send the updated doubleClickInterval to the background script
-            browser.runtime.sendMessage({
-                doubleClickInterval: doubleClickIntervalEl.value
-            });
-        }
-    );
+/**
+ * initAutosave initializes autosaving for a setting.
+ * @param {string} settingName - the name of the setting.
+ * @param {HTMLElement} el - the HTML element of the setting's input field.
+ * @param {string} valueProperty - the HTML element's property that holds the setting's
+ * value.
+ * @param {function|undefined} then - an optional function to run after applying the
+ * setting completes.
+ */
+function initAutosave(settingName, el, valueProperty, then) {
+    el.addEventListener('input', async (event) => {
+        const obj = {};
+        obj[settingName] = el[valueProperty];
+        await browser.storage.sync.set(obj).then(then);
+    });
 }
 
+/**
+ * loadOptions loads the options from browser storage into the options page.
+ */
 async function loadOptions() {
     try {
         youtubeMdEl.value = await getSetting('youtubeMd');
@@ -74,6 +78,9 @@ async function loadOptions() {
     }
 }
 
+/**
+ * resetOptions resets the options on the options page and indicates success.
+ */
 async function resetOptions() {
     await browser.storage.sync.clear();
     resetButton.value = 'Reset ✔';
@@ -85,5 +92,4 @@ async function resetOptions() {
 }
 
 document.addEventListener('DOMContentLoaded', loadOptions);
-form.addEventListener('submit', saveOptions);
 form.addEventListener('reset', resetOptions);

@@ -142,6 +142,10 @@ function newTurndownService(bulletPoint, subBrackets) {
             )
         },
         replacement: function (content, node) {
+            if (!content) {
+                return '';
+            }
+
             let href = node.getAttribute('href');
             if (href) {
                 if (href.startsWith('/')) {

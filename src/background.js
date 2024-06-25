@@ -196,7 +196,10 @@ async function showStatus(status, notifTitle, notifBody) {
     } else { // failure
         console.error(`${notifTitle}: ${notifBody}`);
         if (notifBody === 'Could not establish connection. Receiving end does not exist.') {
-            notifBody = 'Could not copy markdown. Did the page finish loading?';
+            notifBody = "Stardown wasn't ready or wasn't allowed to load into the frame.";
+            // This can happen when the page wasn't finished loading when the user
+            // interacted with it, or if the user tried to use Stardown within an
+            // iframe.
         }
         await brieflyShowX();
         await showNotification(notifTitle, notifBody);

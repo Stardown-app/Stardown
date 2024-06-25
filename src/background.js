@@ -54,11 +54,18 @@ browser.action.onClicked.addListener(async (tab) => {
     await handleInteraction(tab, { category: 'iconSingleClick' });
 });
 
-browser.runtime.onMessage.addListener((message) => {
-    // These context menu updates are done with messages from a content script because
-    // the contextMenus.update method cannot update a context menu that is already open.
-    // The content script listens for mouseover events.
-    updateContextMenu(message);
+browser.runtime.onMessage.addListener(async (message, sender, sendResponse) => {
+    if (message.isImage || message.isLink) {
+        // These context menu updates are done with messages from a content script
+        // because the contextMenus.update method cannot update a context menu that is
+        // already open. The content script listens for mouseover events.
+        updateContextMenu(message);
+    } else if (message.doubleClickInterval) {
+        doubleClickInterval = message.doubleClickInterval;
+    } else if (message.warning) {
+        console.warn(`Warning: ${message.warning}`);
+        await showNotification('Warning', message.warning);
+    }
 });
 
 browser.contextMenus.onClicked.addListener(async (info, tab) => {
@@ -98,15 +105,6 @@ browser.contextMenus.onClicked.addListener(async (info, tab) => {
         default:
             console.error(`Unknown context menu item: ${info.menuItemId}`);
             throw new Error(`Unknown context menu item: ${info.menuItemId}`);
-    }
-});
-
-browser.runtime.onMessage.addListener(async (message, sender, sendResponse) => {
-    if (message.doubleClickInterval) {
-        doubleClickInterval = message.doubleClickInterval;
-    } else if (message.warning) {
-        console.warn(`Warning: ${message.warning}`);
-        await showNotification('Warning', message.warning);
     }
 });
 

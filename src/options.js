@@ -61,9 +61,9 @@ function initAutosave(settingName, el, valueProperty, then) {
 }
 
 /**
- * loadOptions loads the options from browser storage into the options page.
+ * loadSettings loads the settings from browser storage into the options page.
  */
-async function loadOptions() {
+async function loadSettings() {
     try {
         youtubeMdEl.value = await getSetting('youtubeMd');
         selectionFormatEl.value = await getSetting('selectionFormat');
@@ -79,9 +79,11 @@ async function loadOptions() {
 }
 
 /**
- * resetOptions resets the options on the options page and indicates success.
+ * resetSettings deletes all settings from browser storage and indicates success. It
+ * assumes it's being used as a form event listener for the 'reset' event so that it
+ * doesn't have to reset the options page.
  */
-async function resetOptions() {
+async function resetSettings() {
     await browser.storage.sync.clear();
     resetButton.value = 'Reset ✔';
     resetButton.style.backgroundColor = '#aadafa';
@@ -91,5 +93,5 @@ async function resetOptions() {
     }, 750);
 }
 
-document.addEventListener('DOMContentLoaded', loadOptions);
-form.addEventListener('reset', resetOptions);
+document.addEventListener('DOMContentLoaded', loadSettings);
+form.addEventListener('reset', resetSettings);

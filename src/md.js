@@ -99,7 +99,8 @@ export async function htmlToMarkdown(html) {
 }
 
 /**
- * newTurndownService creates a new TurndownService instance.
+ * newTurndownService creates a new TurndownService instance. The instance has been
+ * customized in a way that depends on the `location` object.
  * @param {string} bulletPoint - the setting for the bullet point character.
  * @param {string} subBrackets - the setting for what to substitute square brackets
  * with.
@@ -120,6 +121,69 @@ function newTurndownService(bulletPoint, subBrackets) {
     t.escape = function (text) {
         return replaceBrackets(escape(text), subBrackets);
     };
+
+    /**
+     * cleanAttribute replaces each group of whitespace characters containing at least
+     * one newline character with one newline character. If the input is falsy, an empty
+     * string is returned.
+     * @param {string} attribute - the attribute to clean.
+     * @returns {string}
+     */
+    function cleanAttribute(attribute) {
+        return attribute ? attribute.replace(/(\n+\s*)+/g, '\n') : ''
+    }
+
+    t.addRule('inlineLink', {
+        filter: function (node, options) {
+            return (
+                options.linkStyle === 'inlined' &&
+                node.nodeName === 'A' &&
+                node.getAttribute('href')
+            )
+        },
+        replacement: function (content, node) {
+            let href = node.getAttribute('href');
+            if (href) {
+                if (href.startsWith('/')) {
+                    const url = new URL(location.href);
+                    const base = url.origin;
+                    href = base + href;
+                } else if (href.startsWith('#')) {
+                    href = location.href + href;
+                }
+
+                href = href.replace(/([()])/g, '\\$1');
+            }
+
+            let title = node.getAttribute('title');
+            if (title) {
+                title = cleanAttribute(title);
+                title = ' "' + title.replace(/"/g, '\\"') + '"';
+            }
+
+            return '[' + content + '](' + href + title + ')';
+        },
+    });
+
+    t.addRule('img', {
+        filter: 'img',
+        replacement: function (content, node) {
+            let alt = cleanAttribute(node.getAttribute('alt'));
+            let src = node.getAttribute('src') || '';
+            if (src) {
+                if (src.startsWith('//')) {
+                    src = 'https:' + src;
+                } else if (src.startsWith('/')) {
+                    const url = new URL(location.href);
+                    const base = url.origin;
+                    src = base + src;
+                }
+            }
+            let title = cleanAttribute(node.getAttribute('title'));
+            let titlePart = title ? ' "' + title + '"' : '';
+            return src ? '![' + alt + ']' + '(' + src + titlePart + ')' : ''
+        },
+    });
 
     return t;
 }

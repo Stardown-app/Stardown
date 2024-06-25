@@ -17,31 +17,43 @@
 import { browser } from './config.js';
 import { getSetting } from './common.js';
 
+const form = document.querySelector('form');
+
+const youtubeMdEl = document.querySelector('#youtubeMd');
+const notifyOnSuccessEl = document.querySelector('#notifyOnSuccess');
+const subBracketsEl = document.querySelector('#subBrackets');
+const selectionFormatEl = document.querySelector('#selectionFormat');
+const bulletPointEl = document.querySelector('#bulletPoint');
+const doubleClickWindowsEl = document.querySelector('#doubleClickWindows');
+const doubleClickIntervalEl = document.querySelector('#doubleClickInterval');
+
+const submitButton = document.querySelector('#submit');
+const resetButton = document.querySelector('#reset');
+
 async function saveOptions(e) {
     e.preventDefault();
     await browser.storage.sync.set(
         {
-            youtubeMd: document.querySelector('#youtubeMd').value,
-            notifyOnSuccess: document.querySelector('#notifyOnSuccess').checked,
-            subBrackets: document.querySelector('#subBrackets').value,
-            selectionFormat: document.querySelector('#selectionFormat').value,
-            bulletPoint: document.querySelector('#bulletPoint').value,
-            doubleClickWindows: document.querySelector('#doubleClickWindows').value,
-            doubleClickInterval: document.querySelector('#doubleClickInterval').value,
+            youtubeMd: youtubeMdEl.value,
+            notifyOnSuccess: notifyOnSuccessEl.checked,
+            subBrackets: subBracketsEl.value,
+            selectionFormat: selectionFormatEl.value,
+            bulletPoint: bulletPointEl.value,
+            doubleClickWindows: doubleClickWindowsEl.value,
+            doubleClickInterval: doubleClickIntervalEl.value,
         },
         () => {
             // indicate saving was successful
-            const button = document.querySelector('#submit');
-            button.value = 'Saved ✔';
-            button.style.backgroundColor = '#00d26a';
+            submitButton.value = 'Saved ✔';
+            submitButton.style.backgroundColor = '#00d26a';
             setTimeout(() => {
-                button.value = 'Save';
-                button.style.backgroundColor = '';
+                submitButton.value = 'Save';
+                submitButton.style.backgroundColor = '';
             }, 750);
 
             // send the updated doubleClickInterval to the background script
             browser.runtime.sendMessage({
-                doubleClickInterval: document.querySelector('#doubleClickInterval').value
+                doubleClickInterval: doubleClickIntervalEl.value
             });
         }
     );
@@ -49,26 +61,13 @@ async function saveOptions(e) {
 
 async function loadOptions() {
     try {
-        const youtubeMd = await getSetting('youtubeMd');
-        document.querySelector('#youtubeMd').value = youtubeMd;
-
-        const notifyOnSuccess = await getSetting('notifyOnSuccess');
-        document.querySelector('#notifyOnSuccess').checked = notifyOnSuccess;
-
-        const subBrackets = await getSetting('subBrackets');
-        document.querySelector('#subBrackets').value = subBrackets;
-
-        const selectionFormat = await getSetting('selectionFormat');
-        document.querySelector('#selectionFormat').value = selectionFormat;
-
-        const bulletPoint = await getSetting('bulletPoint');
-        document.querySelector('#bulletPoint').value = bulletPoint;
-
-        const doubleClickWindows = await getSetting('doubleClickWindows');
-        document.querySelector('#doubleClickWindows').value = doubleClickWindows;
-
-        const doubleClickInterval = await getSetting('doubleClickInterval');
-        document.querySelector('#doubleClickInterval').value = doubleClickInterval;
+        youtubeMdEl.value = await getSetting('youtubeMd');
+        notifyOnSuccessEl.checked = await getSetting('notifyOnSuccess');
+        subBracketsEl.value = await getSetting('subBrackets');
+        selectionFormatEl.value = await getSetting('selectionFormat');
+        bulletPointEl.value = await getSetting('bulletPoint');
+        doubleClickWindowsEl.value = await getSetting('doubleClickWindows');
+        doubleClickIntervalEl.value = await getSetting('doubleClickInterval');
     } catch (err) {
         console.error(err);
         throw err;
@@ -77,16 +76,14 @@ async function loadOptions() {
 
 async function resetOptions() {
     await browser.storage.sync.clear();
-    const button = document.querySelector('#reset');
-    button.value = 'Reset ✔';
-    button.style.backgroundColor = '#aadafa';
+    resetButton.value = 'Reset ✔';
+    resetButton.style.backgroundColor = '#aadafa';
     setTimeout(() => {
-        button.value = 'Reset';
-        button.style.backgroundColor = '';
+        resetButton.value = 'Reset';
+        resetButton.style.backgroundColor = '';
     }, 750);
 }
 
 document.addEventListener('DOMContentLoaded', loadOptions);
-const form = document.querySelector('form')
 form.addEventListener('submit', saveOptions);
 form.addEventListener('reset', resetOptions);

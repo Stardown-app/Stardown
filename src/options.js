@@ -20,12 +20,12 @@ import { getSetting } from './common.js';
 const form = document.querySelector('form');
 
 const youtubeMdEl = document.querySelector('#youtubeMd');
-const notifyOnSuccessEl = document.querySelector('#notifyOnSuccess');
-const subBracketsEl = document.querySelector('#subBrackets');
 const selectionFormatEl = document.querySelector('#selectionFormat');
+const subBracketsEl = document.querySelector('#subBrackets');
 const bulletPointEl = document.querySelector('#bulletPoint');
 const doubleClickWindowsEl = document.querySelector('#doubleClickWindows');
 const doubleClickIntervalEl = document.querySelector('#doubleClickInterval');
+const notifyOnSuccessEl = document.querySelector('#notifyOnSuccess');
 
 const submitButton = document.querySelector('#submit');
 const resetButton = document.querySelector('#reset');
@@ -35,12 +35,12 @@ async function saveOptions(e) {
     await browser.storage.sync.set(
         {
             youtubeMd: youtubeMdEl.value,
-            notifyOnSuccess: notifyOnSuccessEl.checked,
-            subBrackets: subBracketsEl.value,
             selectionFormat: selectionFormatEl.value,
+            subBrackets: subBracketsEl.value,
             bulletPoint: bulletPointEl.value,
             doubleClickWindows: doubleClickWindowsEl.value,
             doubleClickInterval: doubleClickIntervalEl.value,
+            notifyOnSuccess: notifyOnSuccessEl.checked,
         },
         () => {
             // indicate saving was successful
@@ -62,12 +62,12 @@ async function saveOptions(e) {
 async function loadOptions() {
     try {
         youtubeMdEl.value = await getSetting('youtubeMd');
-        notifyOnSuccessEl.checked = await getSetting('notifyOnSuccess');
-        subBracketsEl.value = await getSetting('subBrackets');
         selectionFormatEl.value = await getSetting('selectionFormat');
+        subBracketsEl.value = await getSetting('subBrackets');
         bulletPointEl.value = await getSetting('bulletPoint');
         doubleClickWindowsEl.value = await getSetting('doubleClickWindows');
         doubleClickIntervalEl.value = await getSetting('doubleClickInterval');
+        notifyOnSuccessEl.checked = await getSetting('notifyOnSuccess');
     } catch (err) {
         console.error(err);
         throw err;

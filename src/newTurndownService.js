@@ -45,6 +45,13 @@ function addRules(t) {
         filter: 'img',
         replacement: convertImageToMarkdown,
     });
+
+    t.addRule('strikethrough', {
+        filter: ['del', 's', 'strike'],
+        replacement: function (content) {
+            return '~~' + content + '~~';
+        },
+    });
 }
 
 /**

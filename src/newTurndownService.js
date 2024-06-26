@@ -24,9 +24,9 @@ export function newTurndownService(bulletPoint, turndownEscape) {
 
     addRules(t);
 
-    t.keep('u'); // underline
+    t.keep('u').keep('sub').keep('sup');
 
-    t.remove('style').remove('script').remove('noscript').remove('link')
+    t.remove('style').remove('script').remove('noscript').remove('link');
 
     return t;
 }

@@ -44,9 +44,9 @@ export function newTurndownService(bulletPoint, subBrackets, turndownEscape) {
 
     addRules(t, subBrackets);
 
-    t.keep('u').keep('sub').keep('sup').keep('dl').keep('dt').keep('dd');
+    t.keep(['u', 'sub', 'sup', 'dl', 'dt', 'dd']);
 
-    t.remove('style').remove('script').remove('noscript').remove('link');
+    t.remove(['style', 'script', 'noscript', 'link']);
 
     return t;
 }

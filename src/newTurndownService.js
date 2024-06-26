@@ -44,7 +44,17 @@ export function newTurndownService(bulletPoint, subBrackets, turndownEscape) {
 
     addRules(t, subBrackets);
 
-    t.keep(['u', 'sub', 'sup', 'dl', 'dt', 'dd']);
+    t.keep(['u', 'dl', 'dt', 'dd']);
+
+    // Keep subscript and superscript nodes as HTML if and only if they don't contain
+    // HTML anchor elements because they are not clickable at least in Obsidian. Also,
+    // if URLs aren't processed, they can't be made absolute.
+    t.keep((node) => {
+        return (
+            (node.nodeName === 'SUB' || node.nodeName === 'SUP') &&
+            !node.querySelectorAll('a').length
+        );
+    });
 
     t.remove(['style', 'script', 'noscript', 'link']);
 

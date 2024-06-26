@@ -2,14 +2,34 @@ import { TurndownService } from './turndown.js';
 import { turndownPluginGfm } from './turndown-plugin-gfm.js';
 
 /**
+ * replaceBrackets replaces any square brackets in text with the character or escape
+ * sequence chosen in settings.
+ * @param {string} text - the text.
+ * @param {string} subBrackets - the setting for what to substitute any square brackets
+ * with.
+ * @returns {string}
+ */
+export function replaceBrackets(text, subBrackets) {
+    if (subBrackets === 'underlined') {
+        return text.replaceAll('[', '⦋').replaceAll(']', '⦌');
+    } else if (subBrackets === 'escaped') {
+        return text.replaceAll('[', '\\[').replaceAll(']', '\\]');
+    } else {
+        return text;
+    }
+}
+
+/**
  * newTurndownService creates a new TurndownService instance. The instance has been
  * customized in a way that depends on the `location` object.
  * @param {string} bulletPoint - the setting for the bullet point character.
+ * @param {string} subBrackets - the Stardown setting for what to substitute square
+ * brackets with.
  * @param {Function(string): string} turndownEscape - the markdown escape function for
  * the Turndown service instance to use.
  * @returns {TurndownService}
  */
-export function newTurndownService(bulletPoint, turndownEscape) {
+export function newTurndownService(bulletPoint, subBrackets, turndownEscape) {
     // https://github.com/mixmark-io/turndown
     const t = new TurndownService({
         bulletListMarker: bulletPoint,
@@ -22,7 +42,7 @@ export function newTurndownService(bulletPoint, turndownEscape) {
 
     t.escape = turndownEscape;
 
-    addRules(t);
+    addRules(t, subBrackets);
 
     t.keep('u').keep('sub').keep('sup');
 
@@ -34,15 +54,17 @@ export function newTurndownService(bulletPoint, turndownEscape) {
 /**
  * addRules adds custom Turndown rules to a Turndown service instance.
  * @param {TurndownService} t - the Turndown service instance.
+ * @param {string} subBrackets - the Stardown setting for what to substitute square
+ * brackets with.
  * @returns {void}
  */
-function addRules(t) {
+function addRules(t, subBrackets) {
     // Each Turndown rule runs on each yet-unreplaced HTML element. If the element
     // matches the rule's filter, the rule's replacement function runs on it.
 
     t.addRule('inlineLink', {
         filter: isInlineLink,
-        replacement: convertLinkToMarkdown,
+        replacement: newConvertLinkToMarkdown(subBrackets),
     });
 
     t.addRule('img', {
@@ -80,39 +102,49 @@ function isInlineLink(node, options) {
 }
 
 /**
- * convertLinkToMarkdown converts an HTML link to a markdown link.
- * @param {string} content - the page's content within the HTML anchor. If the anchor
- * contains some elements like inline SVGs, this variable will be falsy.
- * @param {*} node - the HTML element node.
- * @returns {string}
+ * newConvertLinkToMarkdown returns a function that converts an HTML link to a markdown
+ * link.
+ * @param {string} subBrackets - the Stardown setting for what to substitute square
+ * brackets with.
+ * @returns {Function(string, any): string}
  */
-function convertLinkToMarkdown(content, node) {
-    if (!content) { // if the link's title would be empty
-        return ''; // don't create the link
-    }
-
-    let href = node.getAttribute('href') || '';
-    if (href) {
-        href = href.replaceAll(' ', '%20').replaceAll('(', '%28').replaceAll(')', '%29');
-
-        // make the URL absolute
-        if (href.startsWith('/')) {
-            const url = new URL(location.href);
-            const base = url.origin;
-            href = base + href;
-        } else if (href.startsWith('#')) {
-            href = location.href + href;
+function newConvertLinkToMarkdown(subBrackets) {
+    /**
+     * @param {string} content - the page's content within the HTML anchor. If the anchor
+     * contains some elements like inline SVGs, this variable will be falsy.
+     * @param {*} node - the HTML element node.
+     * @returns {string}
+     */
+    return function (content, node) {
+        if (!content) { // if the link's title would be empty
+            return ''; // don't create the link
         }
-    }
 
-    // remove excess whitespace and escape quotation marks
-    let title = node.getAttribute('title') || '';
-    if (title) {
-        title = cleanAttribute(title);
-        title = ' "' + title.replace(/"/g, '\\"') + '"';
-    }
+        content = replaceBrackets(content, subBrackets);
 
-    return '[' + content + '](' + href + title + ')';
+        let href = node.getAttribute('href') || '';
+        if (href) {
+            href = href.replaceAll(' ', '%20').replaceAll('(', '%28').replaceAll(')', '%29');
+
+            // make the URL absolute
+            if (href.startsWith('/')) {
+                const url = new URL(location.href);
+                const base = url.origin;
+                href = base + href;
+            } else if (href.startsWith('#')) {
+                href = location.href + href;
+            }
+        }
+
+        // remove excess whitespace and escape quotation marks
+        let title = node.getAttribute('title') || '';
+        if (title) {
+            title = cleanAttribute(title);
+            title = ' "' + title.replace(/"/g, '\\"') + '"';
+        }
+
+        return '[' + content + '](' + href + title + ')';
+    };
 }
 
 /**

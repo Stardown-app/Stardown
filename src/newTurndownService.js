@@ -74,6 +74,8 @@ function convertLinkToMarkdown(content, node) {
 
     let href = node.getAttribute('href') || '';
     if (href) {
+        href = href.replaceAll(' ', '%20').replaceAll('(', '%28').replaceAll(')', '%29');
+
         // make the URL absolute
         if (href.startsWith('/')) {
             const url = new URL(location.href);
@@ -82,9 +84,6 @@ function convertLinkToMarkdown(content, node) {
         } else if (href.startsWith('#')) {
             href = location.href + href;
         }
-
-        // escape parentheses
-        href = href.replace(/([()])/g, '\\$1');
     }
 
     // remove excess whitespace and escape quotation marks
@@ -114,7 +113,7 @@ function convertImageToMarkdown(content, node) {
 
     // make the URL absolute
     if (src.startsWith('//')) {
-        src = 'https:' + src;
+        src = 'https:' + src.replaceAll(' ', '%20');
     } else if (src.startsWith('/')) {
         const url = new URL(location.href);
         const base = url.origin;

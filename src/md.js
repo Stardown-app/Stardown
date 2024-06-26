@@ -147,6 +147,8 @@ export async function createLink(title, url, subBrackets = null) {
  * createAlert creates a markdown alert. GitHub and Obsidian use the same format, but
  * GitHub supports only specific alert types: note, tip, important, warning, and
  * caution. More details here: https://github.com/orgs/community/discussions/16925.
+ * Obsidian calls these callouts
+ * https://help.obsidian.md/Editing+and+formatting/Callouts.
  * @param {string} type - the alert's type.
  * @param {string} text - the alert's text.
  * @returns {Promise<string>}

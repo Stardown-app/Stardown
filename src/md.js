@@ -16,7 +16,7 @@
 
 import { getSetting } from './common.js';
 import { TurndownService } from './turndown.js';
-import { turndownPluginGfm } from './turndown-plugin-gfm.js';
+import { newTurndownService } from './newTurndownService.js';
 
 /**
  * turndownService is a TurndownService instance used to convert HTML to markdown. Use
@@ -92,36 +92,26 @@ export async function htmlToMarkdown(html) {
     ) {
         currentBulletPoint = newBulletPoint;
         currentSubBrackets = newSubBrackets
-        turndownService = newTurndownService(currentBulletPoint, currentSubBrackets);
+        turndownService = newTurndownService(
+            currentBulletPoint, newTurndownEscape(currentSubBrackets)
+        );
     }
 
     return turndownService.turndown(html);
 }
 
 /**
- * newTurndownService creates a new TurndownService instance.
- * @param {string} bulletPoint - the setting for the bullet point character.
- * @param {string} subBrackets - the setting for what to substitute square brackets
- * with.
- * @returns {TurndownService}
+ * newTurndownEscape returns a function that escapes markdown. The returned function is
+ * intended for use in a Turndown service.
+ * @param {string} subBrackets - the setting for what to replace square brackets with.
+ * @returns {Function(string): string}
  */
-function newTurndownService(bulletPoint, subBrackets) {
-    // https://github.com/mixmark-io/turndown
-    const t = new TurndownService({
-        bulletListMarker: bulletPoint,
-        headingStyle: 'atx',
-        codeBlockStyle: 'fenced',
-    }).remove('style').remove('script').remove('noscript').remove('link');
-
-    t.use(turndownPluginGfm.gfm); // GitHub Flavored Markdown
-
+function newTurndownEscape(subBrackets) {
     // Making Turndown's escape function async results in Turndown giving the error
     // `TypeError: string.replace is not a function`.
-    t.escape = function (text) {
+    return function turndownEscape(text) {
         return replaceBrackets(escape(text), subBrackets);
-    };
-
-    return t;
+    }
 }
 
 /**

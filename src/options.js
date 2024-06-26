@@ -17,76 +17,81 @@
 import { browser } from './config.js';
 import { getSetting } from './common.js';
 
-async function saveOptions(e) {
-    e.preventDefault();
-    await browser.storage.sync.set(
-        {
-            youtubeMd: document.querySelector('#youtubeMd').value,
-            notifyOnSuccess: document.querySelector('#notifyOnSuccess').checked,
-            subBrackets: document.querySelector('#subBrackets').value,
-            selectionFormat: document.querySelector('#selectionFormat').value,
-            bulletPoint: document.querySelector('#bulletPoint').value,
-            doubleClickWindows: document.querySelector('#doubleClickWindows').value,
-            doubleClickInterval: document.querySelector('#doubleClickInterval').value,
-        },
-        () => {
-            // indicate saving was successful
-            const button = document.querySelector('#submit');
-            button.value = 'Saved ✔';
-            button.style.backgroundColor = '#00d26a';
-            setTimeout(() => {
-                button.value = 'Save';
-                button.style.backgroundColor = '';
-            }, 750);
+const form = document.querySelector('form');
 
-            // send the updated doubleClickInterval to the background script
-            browser.runtime.sendMessage({
-                doubleClickInterval: document.querySelector('#doubleClickInterval').value
-            });
-        }
-    );
+const youtubeMdEl = document.querySelector('#youtubeMd');
+const selectionFormatEl = document.querySelector('#selectionFormat');
+const subBracketsEl = document.querySelector('#subBrackets');
+const bulletPointEl = document.querySelector('#bulletPoint');
+const doubleClickWindowsEl = document.querySelector('#doubleClickWindows');
+const doubleClickIntervalEl = document.querySelector('#doubleClickInterval');
+const notifyOnSuccessEl = document.querySelector('#notifyOnSuccess');
+
+const resetButton = document.querySelector('#reset');
+
+// set up setting autosaving
+initAutosave('youtubeMd', youtubeMdEl, 'value');
+initAutosave('selectionFormat', selectionFormatEl, 'value');
+initAutosave('subBrackets', subBracketsEl, 'value');
+initAutosave('bulletPoint', bulletPointEl, 'value');
+initAutosave('notifyOnSuccess', notifyOnSuccessEl, 'checked');
+initAutosave('doubleClickWindows', doubleClickWindowsEl, 'value');
+initAutosave('doubleClickInterval', doubleClickIntervalEl, 'value', () => {
+    // send the updated doubleClickInterval to the background script
+    browser.runtime.sendMessage({
+        doubleClickInterval: doubleClickIntervalEl.value
+    });
+});
+
+/**
+ * initAutosave initializes autosaving for a setting.
+ * @param {string} settingName - the name of the setting.
+ * @param {HTMLElement} el - the HTML element of the setting's input field.
+ * @param {string} valueProperty - the HTML element's property that holds the setting's
+ * value.
+ * @param {function|undefined} then - an optional function to run after applying the
+ * setting completes.
+ */
+function initAutosave(settingName, el, valueProperty, then) {
+    el.addEventListener('input', async (event) => {
+        const obj = {};
+        obj[settingName] = el[valueProperty];
+        await browser.storage.sync.set(obj).then(then);
+    });
 }
 
-async function loadOptions() {
+/**
+ * loadSettings loads the settings from browser storage into the options page.
+ */
+async function loadSettings() {
     try {
-        const youtubeMd = await getSetting('youtubeMd');
-        document.querySelector('#youtubeMd').value = youtubeMd;
-
-        const notifyOnSuccess = await getSetting('notifyOnSuccess');
-        document.querySelector('#notifyOnSuccess').checked = notifyOnSuccess;
-
-        const subBrackets = await getSetting('subBrackets');
-        document.querySelector('#subBrackets').value = subBrackets;
-
-        const selectionFormat = await getSetting('selectionFormat');
-        document.querySelector('#selectionFormat').value = selectionFormat;
-
-        const bulletPoint = await getSetting('bulletPoint');
-        document.querySelector('#bulletPoint').value = bulletPoint;
-
-        const doubleClickWindows = await getSetting('doubleClickWindows');
-        document.querySelector('#doubleClickWindows').value = doubleClickWindows;
-
-        const doubleClickInterval = await getSetting('doubleClickInterval');
-        document.querySelector('#doubleClickInterval').value = doubleClickInterval;
+        youtubeMdEl.value = await getSetting('youtubeMd');
+        selectionFormatEl.value = await getSetting('selectionFormat');
+        subBracketsEl.value = await getSetting('subBrackets');
+        bulletPointEl.value = await getSetting('bulletPoint');
+        doubleClickWindowsEl.value = await getSetting('doubleClickWindows');
+        doubleClickIntervalEl.value = await getSetting('doubleClickInterval');
+        notifyOnSuccessEl.checked = await getSetting('notifyOnSuccess');
     } catch (err) {
         console.error(err);
         throw err;
     }
 }
 
-async function resetOptions() {
+/**
+ * resetSettings deletes all settings from browser storage and indicates success. It
+ * assumes it's being used as a form event listener for the 'reset' event so that it
+ * doesn't have to reset the options page.
+ */
+async function resetSettings() {
     await browser.storage.sync.clear();
-    const button = document.querySelector('#reset');
-    button.value = 'Reset ✔';
-    button.style.backgroundColor = '#aadafa';
+    resetButton.value = 'Reset ✔';
+    resetButton.style.backgroundColor = '#aadafa';
     setTimeout(() => {
-        button.value = 'Reset';
-        button.style.backgroundColor = '';
+        resetButton.value = 'Reset';
+        resetButton.style.backgroundColor = '';
     }, 750);
 }
 
-document.addEventListener('DOMContentLoaded', loadOptions);
-const form = document.querySelector('form')
-form.addEventListener('submit', saveOptions);
-form.addEventListener('reset', resetOptions);
+document.addEventListener('DOMContentLoaded', loadSettings);
+form.addEventListener('reset', resetSettings);

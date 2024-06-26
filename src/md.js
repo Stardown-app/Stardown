@@ -16,7 +16,7 @@
 
 import { getSetting } from './common.js';
 import { TurndownService } from './turndown.js';
-import { turndownPluginGfm } from './turndown-plugin-gfm.js';
+import { newTurndownService } from './newTurndownService.js';
 
 /**
  * turndownService is a TurndownService instance used to convert HTML to markdown. Use
@@ -92,119 +92,26 @@ export async function htmlToMarkdown(html) {
     ) {
         currentBulletPoint = newBulletPoint;
         currentSubBrackets = newSubBrackets
-        turndownService = newTurndownService(currentBulletPoint, currentSubBrackets);
+        turndownService = newTurndownService(
+            currentBulletPoint, newTurndownEscape(currentSubBrackets)
+        );
     }
 
     return turndownService.turndown(html);
 }
 
 /**
- * newTurndownService creates a new TurndownService instance. The instance has been
- * customized in a way that depends on the `location` object.
- * @param {string} bulletPoint - the setting for the bullet point character.
- * @param {string} subBrackets - the setting for what to substitute square brackets
- * with.
- * @returns {TurndownService}
+ * newTurndownEscape returns a function that escapes markdown. The returned function is
+ * intended for use in a Turndown service.
+ * @param {string} subBrackets - the setting for what to replace square brackets with.
+ * @returns {Function(string): string}
  */
-function newTurndownService(bulletPoint, subBrackets) {
-    // https://github.com/mixmark-io/turndown
-    const t = new TurndownService({
-        bulletListMarker: bulletPoint,
-        headingStyle: 'atx',
-        codeBlockStyle: 'fenced',
-    }).remove('style').remove('script').remove('noscript').remove('link');
-
-    t.use(turndownPluginGfm.gfm); // GitHub Flavored Markdown
-
+function newTurndownEscape(subBrackets) {
     // Making Turndown's escape function async results in Turndown giving the error
     // `TypeError: string.replace is not a function`.
-    t.escape = function (text) {
+    return function turndownEscape(text) {
         return replaceBrackets(escape(text), subBrackets);
-    };
-
-    /**
-     * cleanAttribute replaces each group of whitespace characters containing at least
-     * one newline character with one newline character. If the input is falsy, an empty
-     * string is returned.
-     * @param {string} attribute - the attribute to clean.
-     * @returns {string}
-     */
-    function cleanAttribute(attribute) {
-        return attribute ? attribute.replace(/(\n+\s*)+/g, '\n') : ''
     }
-
-    t.addRule('inlineLink', {
-        // For each HTML element, if it matches the filter, run the replacement function
-        // on it.
-        filter: function (node, options) {
-            return (
-                options.linkStyle === 'inlined' &&
-                node.nodeName === 'A' &&
-                node.getAttribute('href')
-            )
-        },
-        replacement: function (content, node) {
-            if (!content) { // if the link's title would be empty
-                return ''; // don't create the link
-            }
-
-            let href = node.getAttribute('href');
-            if (href) {
-                // make the URL absolute
-                if (href.startsWith('/')) {
-                    const url = new URL(location.href);
-                    const base = url.origin;
-                    href = base + href;
-                } else if (href.startsWith('#')) {
-                    href = location.href + href;
-                }
-
-                // escape parentheses
-                href = href.replace(/([()])/g, '\\$1');
-            }
-
-            // remove excess whitespace and escape quotation marks
-            let title = node.getAttribute('title');
-            if (title) {
-                title = cleanAttribute(title);
-                title = ' "' + title.replace(/"/g, '\\"') + '"';
-            }
-
-            return '[' + content + '](' + href + title + ')';
-        },
-    });
-
-    t.addRule('img', {
-        // For each HTML element, if it matches the filter, run the replacement function
-        // on it.
-        filter: 'img',
-        replacement: function (content, node) {
-            let src = node.getAttribute('src') || '';
-            if (!src) {
-                return '';
-            }
-
-            // remove excess whitespace
-            let alt = cleanAttribute(node.getAttribute('alt'));
-
-            // make the URL absolute
-            if (src.startsWith('//')) {
-                src = 'https:' + src;
-            } else if (src.startsWith('/')) {
-                const url = new URL(location.href);
-                const base = url.origin;
-                src = base + src;
-            }
-
-            // remove excess whitespace
-            let title = cleanAttribute(node.getAttribute('title'));
-            let titlePart = title ? ' "' + title + '"' : '';
-
-            return '![' + alt + '](' + src + titlePart + ')';
-        },
-    });
-
-    return t;
 }
 
 /**

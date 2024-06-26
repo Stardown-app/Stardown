@@ -72,7 +72,7 @@ function convertLinkToMarkdown(content, node) {
         return ''; // don't create the link
     }
 
-    let href = node.getAttribute('href');
+    let href = node.getAttribute('href') || '';
     if (href) {
         // make the URL absolute
         if (href.startsWith('/')) {
@@ -88,7 +88,7 @@ function convertLinkToMarkdown(content, node) {
     }
 
     // remove excess whitespace and escape quotation marks
-    let title = node.getAttribute('title');
+    let title = node.getAttribute('title') || '';
     if (title) {
         title = cleanAttribute(title);
         title = ' "' + title.replace(/"/g, '\\"') + '"';
@@ -110,7 +110,7 @@ function convertImageToMarkdown(content, node) {
     }
 
     // remove excess whitespace
-    let alt = cleanAttribute(node.getAttribute('alt'));
+    let alt = cleanAttribute(node.getAttribute('alt') || '');
 
     // make the URL absolute
     if (src.startsWith('//')) {
@@ -122,7 +122,7 @@ function convertImageToMarkdown(content, node) {
     }
 
     // remove excess whitespace
-    let title = cleanAttribute(node.getAttribute('title'));
+    let title = cleanAttribute(node.getAttribute('title') || '');
     let titlePart = title ? ' "' + title + '"' : '';
 
     return '![' + alt + '](' + src + titlePart + ')';

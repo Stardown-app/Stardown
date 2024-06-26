@@ -52,6 +52,13 @@ function addRules(t) {
             return '~~' + content + '~~';
         },
     });
+
+    t.addRule('highlight', {
+        filter: 'mark',
+        replacement: function (content) {
+            return '==' + content + '==';
+        },
+    });
 }
 
 /**

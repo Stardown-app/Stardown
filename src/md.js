@@ -16,7 +16,7 @@
 
 import { getSetting } from './common.js';
 import { TurndownService } from './turndown.js';
-import { newTurndownService } from './newTurndownService.js';
+import { newTurndownService, replaceBrackets } from './newTurndownService.js';
 
 /**
  * turndownService is a TurndownService instance used to convert HTML to markdown. Use
@@ -37,24 +37,6 @@ let currentBulletPoint = '-';
  * bracket substitution setting to update the TurndownService instance when needed.
  */
 let currentSubBrackets = 'underlined';
-
-/**
- * replaceBrackets replaces any square brackets in text with the character or escape
- * sequence chosen in settings.
- * @param {string} text - the text.
- * @param {string} subBrackets - the setting for what to substitute any square brackets
- * with.
- * @returns {string}
- */
-export function replaceBrackets(text, subBrackets) {
-    if (subBrackets === 'underlined') {
-        return text.replaceAll('[', '⦋').replaceAll(']', '⦌');
-    } else if (subBrackets === 'escaped') {
-        return text.replaceAll('[', '\\[').replaceAll(']', '\\]');
-    } else {
-        return text;
-    }
-}
 
 /**
  * escape escapes many markdown patterns, but not square brackets.
@@ -91,27 +73,13 @@ export async function htmlToMarkdown(html) {
         newSubBrackets !== currentSubBrackets
     ) {
         currentBulletPoint = newBulletPoint;
-        currentSubBrackets = newSubBrackets
+        currentSubBrackets = newSubBrackets;
         turndownService = newTurndownService(
-            currentBulletPoint, newTurndownEscape(currentSubBrackets)
+            currentBulletPoint, currentSubBrackets, escape,
         );
     }
 
     return turndownService.turndown(html);
-}
-
-/**
- * newTurndownEscape returns a function that escapes markdown. The returned function is
- * intended for use in a Turndown service.
- * @param {string} subBrackets - the setting for what to replace square brackets with.
- * @returns {Function(string): string}
- */
-function newTurndownEscape(subBrackets) {
-    // Making Turndown's escape function async results in Turndown giving the error
-    // `TypeError: string.replace is not a function`.
-    return function turndownEscape(text) {
-        return replaceBrackets(escape(text), subBrackets);
-    }
 }
 
 /**
@@ -147,6 +115,8 @@ export async function createLink(title, url, subBrackets = null) {
  * createAlert creates a markdown alert. GitHub and Obsidian use the same format, but
  * GitHub supports only specific alert types: note, tip, important, warning, and
  * caution. More details here: https://github.com/orgs/community/discussions/16925.
+ * Obsidian calls these callouts
+ * https://help.obsidian.md/Editing+and+formatting/Callouts.
  * @param {string} type - the alert's type.
  * @param {string} text - the alert's text.
  * @returns {Promise<string>}

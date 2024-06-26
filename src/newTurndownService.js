@@ -14,6 +14,7 @@ export function newTurndownService(bulletPoint, turndownEscape) {
     const t = new TurndownService({
         bulletListMarker: bulletPoint,
         headingStyle: 'atx',
+        emDelimiter: '*',
         codeBlockStyle: 'fenced',
     }).remove('style').remove('script').remove('noscript').remove('link');
 

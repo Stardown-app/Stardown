@@ -16,13 +16,17 @@ export function newTurndownService(bulletPoint, turndownEscape) {
         headingStyle: 'atx',
         emDelimiter: '*',
         codeBlockStyle: 'fenced',
-    }).remove('style').remove('script').remove('noscript').remove('link');
+    });
 
     t.use(turndownPluginGfm.gfm); // GitHub Flavored Markdown
 
     t.escape = turndownEscape;
 
     addRules(t);
+
+    t.keep('u'); // underline
+
+    t.remove('style').remove('script').remove('noscript').remove('link')
 
     return t;
 }

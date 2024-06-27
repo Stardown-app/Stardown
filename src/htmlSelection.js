@@ -23,10 +23,11 @@ import * as md from './md.js';
  * created.
  * @param {string} title - the title of the page.
  * @param {string} url - the URL of the page.
- * @param {string} selectedText - the selected text.
+ * @param {Selection|null} selection - a selection object.
  * @returns {Promise<string>}
  */
-export async function createMd(title, url, selectedText) {
+export async function createMd(title, url, selection) {
+    const selectedText = selection.toString().trim();
     if (!selectedText) {
         return await md.createLink(title, url);
     }
@@ -34,11 +35,11 @@ export async function createMd(title, url, selectedText) {
     const selectionFormat = await getSetting('selectionFormat');
     switch (selectionFormat) {
         case 'source with link':
-            return await getSourceFormatMdWithLink(title, url, selectedText);
+            return await getSourceFormatMdWithLink(title, url, selection, selectedText);
         case 'source':
-            return await getSourceFormatMd(selectedText);
+            return await getSourceFormatMd(selection, selectedText);
         case 'blockquote with link':
-            return await md.createBlockquote(selectedText.trim(), title, url) + '\n';
+            return await md.createBlockquote(selectedText, title, url) + '\n';
         case 'link with selection as title':
             selectedText = selectedText.replaceAll('\r\n', ' ').replaceAll('\n', ' ');
             return await md.createLink(selectedText, url);
@@ -56,13 +57,14 @@ export async function createMd(title, url, selectedText) {
  * text is used as a fallback if the source formatting cannot be obtained.
  * @param {string} title - the page's title.
  * @param {string} url - the page's URL.
+ * @param {Selection|null} - a selection object.
  * @param {string} selectedText - the selected text.
  * @returns {Promise<string>}
  */
-async function getSourceFormatMdWithLink(title, url, selectedText) {
+async function getSourceFormatMdWithLink(title, url, selection, selectedText) {
     const link = await md.createLink(title, url);
     const alert = await md.createAlert('note', `from ${link}`);
-    const html = await getSelectionHtml();
+    const html = await getSelectionHtml(selection);
     if (html === null) {
         return alert + '\n\n' + selectedText + '\n';
     } else {
@@ -74,11 +76,12 @@ async function getSourceFormatMdWithLink(title, url, selectedText) {
  * getSourceFormatMd gets markdown of the selected part of the document and attempts to
  * keep the source formatting. The selected text is used as a fallback if the source
  * formatting cannot be obtained.
+ * @param {Selection|null} - a selection object.
  * @param {string} selectedText - the selected text.
  * @returns {Promise<string>}
  */
-async function getSourceFormatMd(selectedText) {
-    const html = await getSelectionHtml();
+async function getSourceFormatMd(selection, selectedText) {
+    const html = await getSelectionHtml(selection);
     if (html === null) {
         return selectedText + '\n';
     } else {
@@ -89,19 +92,19 @@ async function getSourceFormatMd(selectedText) {
 /**
  * getSelectionHtml gets a selection object and returns its HTML content. If no
  * selection exists, null is returned.
+ * @param {Selection|null} - a selection object.
  * @returns {Promise<string|null>}
  */
-async function getSelectionHtml() {
-    const s = window.getSelection();
-    if (s === null || s.type === 'None') {
+async function getSelectionHtml(selection) {
+    if (selection === null || selection.type === 'None') {
         console.error('Failed to get a selection');
         return null;
-    } else if (s.rangeCount === 0) {
+    } else if (selection.rangeCount === 0) {
         console.error('Selection range count is zero');
         return null;
     }
 
-    let startRange = s.getRangeAt(0).cloneRange();
+    let startRange = selection.getRangeAt(0).cloneRange();
     let startNode = startRange.startContainer;
 
     // While there is a parent node and either the parent node or its parent node is a
@@ -123,8 +126,8 @@ async function getSelectionHtml() {
 
     let container = document.createElement('div');
     container.appendChild(startRange.cloneContents());
-    for (let i = 1; i < s.rangeCount; i++) {
-        container.appendChild(s.getRangeAt(i).cloneContents());
+    for (let i = 1; i < selection.rangeCount; i++) {
+        container.appendChild(selection.getRangeAt(i).cloneContents());
     }
 
     return container.innerHTML;

@@ -17,7 +17,7 @@
 import { browser } from './config.js';
 
 const defaultSettings = {
-    youtubeMd: 'Obsidian & Discord',
+    youtubeMd: 'almost everywhere',
     notifyOnSuccess: false,
     subBrackets: 'underlined',
     selectionFormat: 'source with link',

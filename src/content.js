@@ -176,11 +176,9 @@ async function handleSelectionRightClick(htmlId) {
     let title = document.title;
     let url = await removeIdAndTextFragment(location.href);
 
-    let selectedText;
     let arg; // the text fragment argument
     const selection = window.getSelection();
     if (selection && selection.type !== 'None') {
-        selectedText = selection.toString().trim();
         arg = createTextFragmentArg(selection);
     }
 
@@ -194,7 +192,7 @@ async function handleSelectionRightClick(htmlId) {
         }
     }
 
-    const markdown = await htmlSelection.createMd(title, url, selectedText);
+    const markdown = await htmlSelection.createMd(title, url, selection);
 
     return await handleCopyRequest(markdown);
 }

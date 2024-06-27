@@ -76,19 +76,21 @@ If reinstalling Stardown doesn't fix it and [the issues page](https://github.com
 
 ## Feature requests
 
-You're welcome to [make a feature request](https://github.com/wheelercj/Stardown/issues/new?assignees=&labels=enhancement&projects=&template=feature_request.md&title=), and there may already be another browser extension that meets all your needs. I am not affiliated with any of the below extensions and have not tried all of them. Use them at your own risk.
+You're welcome to [make a feature request](https://github.com/wheelercj/Stardown/issues/new?assignees=&labels=enhancement&projects=&template=feature_request.md&title=), and there may already be another browser extension that meets all of your needs. I am not affiliated with any of the below extensions and have not tried all of them; use them at your own risk.
+
+### Download an entire page
+
+Although Stardown can be used to copy an entire page's content as markdown all at once, other tools that specialize in that sometimes give better results.
+
+* [MarkDownload](https://github.com/deathau/markdownload) was developed by an Obsidian community moderator.
+* [Obsidian Web Clipper Bookmarklet](https://gist.github.com/kepano/90c05f162c37cf730abb8ff027987ca3) is a bookmarklet for saving web pages directly to Obsidian.
+* [Omnivore](https://omnivore.app/) doesn't save pages as markdown but can export them as markdown.
+* [Zotero](https://www.zotero.org/) doesn't save pages as markdown (at least by default), but is one of the best tools for research.
 
 ### Copy links in other formats besides markdown
 
 * [url2clipboard](https://github.com/asamuzaK/url2clipboard) supports HTML, Markdown, BBCode, Textile, AsciiDoc, MediaWiki, Jira, reStructuredText, LaTeX, Org Mode, and text.
 * [TabCopy](https://chromewebstore.google.com/detail/tabcopy/micdllihgoppmejpecmkilggmaagfdmb) might only be on the Chrome Web Store, but supports many formats including HTML, Markdown, BBCode, CSV, and JSON, and lets you create custom link formats.
-
-### Download markdown of an entire page
-
-Although Stardown can be used to copy an entire page's content as markdown all at once, other tools that specialize in that sometimes give results that look better.
-
-* [MarkDownload](https://github.com/deathau/markdownload) was developed by an Obsidian community moderator.
-* [Obsidian Web Clipper Bookmarklet](https://gist.github.com/kepano/90c05f162c37cf730abb8ff027987ca3) is a bookmarklet for saving articles and pages from the web directly to Obsidian.
 
 ### Copy just the titles or just the URLs of all tabs
 
@@ -98,17 +100,13 @@ Although Stardown can be used to copy an entire page's content as markdown all a
 
 * [link-to-text-fragment](https://github.com/GoogleChromeLabs/link-to-text-fragment) was made by Google itself but is cross-browser.
 
-### Save a page for research
-
-* [Zotero](https://www.zotero.org/)
-
 ### Why use Stardown?
 
 Unlike the extensions linked above, Stardown:
 
 * requires only one click to create a markdown link for the current page
 * can create markdown links for specific parts of pages (using [text fragments](https://web.dev/articles/text-fragments) and/or HTML element IDs)
-* can copy markdown of specific parts of pages while keeping almost all formatting supported by markdown
+* can create markdown of specific parts of pages while keeping almost all formatting supported by markdown
 * can create markdown of YouTube videos that renders well in GitHub
 * is focused on the most important features so it's more likely to be maintained and bug-free
 

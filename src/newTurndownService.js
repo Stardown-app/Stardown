@@ -38,11 +38,11 @@ export function newTurndownService(bulletPoint, subBrackets, turndownEscape) {
         codeBlockStyle: 'fenced',
     });
 
+    addRules(t, subBrackets);
+
     t.use(turndownPluginGfm.gfm); // GitHub Flavored Markdown
 
     t.escape = turndownEscape;
-
-    addRules(t, subBrackets);
 
     t.keep(['u', 'dl', 'dt', 'dd']);
 

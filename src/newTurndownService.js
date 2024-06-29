@@ -120,8 +120,8 @@ function isInlineLink(node, options) {
  */
 function newConvertLinkToMarkdown(subBrackets) {
     /**
-     * @param {string} content - the page's content within the HTML anchor. If the anchor
-     * contains some elements like inline SVGs, this variable will be falsy.
+     * @param {string} content - the page's content within the HTML anchor. If the
+     * anchor contains some elements like inline SVGs, this variable will be falsy.
      * @param {*} node - the HTML element node.
      * @returns {string}
      */
@@ -130,7 +130,12 @@ function newConvertLinkToMarkdown(subBrackets) {
             return ''; // don't create the link
         }
 
-        content = replaceBrackets(content, subBrackets);
+        // replace square brackets in the anchor element's content if and only if it
+        // isn't an image
+        const mdImagePattern = /^!\[[^\]]*\]\([^\)]*\)$/;
+        if (!content.match(mdImagePattern)) {
+            content = replaceBrackets(content, subBrackets);
+        }
 
         let href = node.getAttribute('href') || '';
         if (href) {

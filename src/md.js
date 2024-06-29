@@ -132,21 +132,15 @@ export async function createAlert(type, text) {
 
 /**
  * createBlockquote creates a markdown blockquote with a link at the end.
- * @param {string} text - the text of the blockquote. Many markdown patterns are
- * escaped.
+ * @param {string} body - the body of the blockquote.
  * @param {string} title - the title of the link.
  * @param {string} url - the URL of the link.
  * @returns {Promise<string>}
  */
-export async function createBlockquote(text, title, url) {
-    text = escape(text)
-        .replaceAll('[', '\\[')
-        .replaceAll(']', '\\]')
-        .replaceAll('\n', '\n> ');
-
+export async function createBlockquote(body, title, url) {
+    body = body.replaceAll('\n', '\n> ');
     const link = await createLink(title, url);
-
-    return `> ${text}\n> \n> — ${link}`;
+    return `> ${body}\n> \n> — ${link}`;
 }
 
 /**

@@ -39,6 +39,12 @@ let currentBulletPoint = '-';
 let currentSubBrackets = 'underlined';
 
 /**
+ * currentSelectionFormat is used by the htmlToMarkdown function to detect changes to
+ * the selection format setting to update the TurndownService instance when needed.
+ */
+let currentSelectionFormat = 'source with link';
+
+/**
  * escape escapes many markdown patterns, but not square brackets.
  * @param {string} text - the text to escape markdown characters in.
  * @returns {string}
@@ -66,16 +72,20 @@ export function escape(text) {
 export async function htmlToMarkdown(html) {
     const newBulletPoint = await getSetting('bulletPoint');
     const newSubBrackets = await getSetting('subBrackets');
+    const newSelectionFormat = await getSetting('selectionFormat');
 
     if (
         !turndownService ||
         newBulletPoint !== currentBulletPoint ||
-        newSubBrackets !== currentSubBrackets
+        newSubBrackets !== currentSubBrackets ||
+        newSelectionFormat !== currentSelectionFormat
     ) {
         currentBulletPoint = newBulletPoint;
         currentSubBrackets = newSubBrackets;
+        currentSelectionFormat = newSelectionFormat;
+
         turndownService = newTurndownService(
-            currentBulletPoint, currentSubBrackets, escape,
+            currentBulletPoint, currentSubBrackets, currentSelectionFormat, escape,
         );
     }
 

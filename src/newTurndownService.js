@@ -22,14 +22,15 @@ export function replaceBrackets(text, subBrackets) {
 /**
  * newTurndownService creates a new TurndownService instance. The instance has been
  * customized in a way that depends on the `location` object.
- * @param {string} bulletPoint - the setting for the bullet point character.
+ * @param {string} bulletPoint - the Stardown setting for the bullet point character.
  * @param {string} subBrackets - the Stardown setting for what to substitute square
  * brackets with.
+ * @param {string} selectionFormat - the Stardown setting for the selection format.
  * @param {Function(string): string} turndownEscape - the markdown escape function for
  * the Turndown service instance to use.
  * @returns {TurndownService}
  */
-export function newTurndownService(bulletPoint, subBrackets, turndownEscape) {
+export function newTurndownService(bulletPoint, subBrackets, selectionFormat, turndownEscape) {
     // https://github.com/mixmark-io/turndown
     const t = new TurndownService({
         bulletListMarker: bulletPoint,
@@ -38,9 +39,20 @@ export function newTurndownService(bulletPoint, subBrackets, turndownEscape) {
         codeBlockStyle: 'fenced',
     });
 
-    addRules(t, subBrackets);
+    // Turndown rules have precedence. For added rules specifically, for each HTML
+    // element, the first encountered rule that has a matching filter is used. However,
+    // it appears that using Turndown's addRule method with an existing rule's name
+    // replaces the existing rule. That is why Stardown's addRules function is called
+    // after `t.use(turndownPluginGfm.gfm);`, which adds some rules that Stardown
+    // overwrites. More details about Turndown rule precedence here:
+    // https://github.com/mixmark-io/turndown?tab=readme-ov-file#rule-precedence
 
     t.use(turndownPluginGfm.gfm); // GitHub Flavored Markdown
+
+    addRules(t, subBrackets);
+    if (selectionFormat === 'blockquote with link') {
+        addBlockquoteRules(t);
+    }
 
     t.escape = turndownEscape;
 
@@ -95,6 +107,63 @@ function addRules(t, subBrackets) {
             return '==' + content + '==';
         },
     });
+
+    // The following rules are for tables, and they apply to both source-formatted
+    // markdown and markdown in a block quote. Even though most or all markdown
+    // renderers don't render tables within block quotes, Stardown puts into block
+    // quotes not just the content of tables but also their markdown syntax because the
+    // output will (at least usually) not look good either way, keeping table syntax is
+    // more intuitive and easier for the user to edit into a table that's outside a
+    // block quote, and maybe some markdown renderers do allow tables to be in block
+    // quotes.
+
+    t.addRule('tableCell', {
+        filter: ['th', 'td'],
+        replacement: function (content, node) {
+            return ' | ' + content.replaceAll('\n', ' ').replaceAll(/\s+/g, ' ');
+        },
+    });
+
+    t.addRule('tableRow', {
+        filter: 'tr',
+        replacement: function (content, node) {
+            return content.trim() + ' |\n';
+        },
+    });
+
+    t.addRule('tableHeader', {
+        filter: 'thead',
+        replacement: function (content, node) {
+            let columnCount = 0;
+            const headTRs = node.childNodes;
+            if (headTRs && headTRs.length > 0) {
+                const headTHs = headTRs[0].childNodes;
+                if (headTHs) {
+                    columnCount = headTHs.length;
+                }
+            }
+
+            if (columnCount === 0) {
+                return content + '\n';
+            } else {
+                content = content + '\n';
+                for (let i = 0; i < columnCount; i++) {
+                    content += '| --- ';
+                }
+                return content + '|\n';
+            }
+        },
+    });
+}
+
+/**
+ * addBlockquoteRules adds to a Turndown service instance custom Turndown rules for
+ * handling markdown that will be put into a block quote.
+ * @param {TurndownService} t - the Turndown service instance.
+ * @returns {void}
+ */
+function addBlockquoteRules(t) {
+    // TODO: handle headers in a better way
 }
 
 /**

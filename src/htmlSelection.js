@@ -35,11 +35,12 @@ export async function createMd(title, url, selection) {
     const selectionFormat = await getSetting('selectionFormat');
     switch (selectionFormat) {
         case 'source with link':
-            return await getSourceFormatMdWithLink(title, url, selection, selectedText);
+            return await getSourceFormatMdWithLink(title, url, selection, selectedText) + '\n';
         case 'source':
-            return await getSourceFormatMd(selection, selectedText);
+            return await getSourceFormatMd(selection, selectedText) + '\n';
         case 'blockquote with link':
-            return await md.createBlockquote(selectedText, title, url) + '\n';
+            const body = await getSourceFormatMd(selection, selectedText);
+            return await md.createBlockquote(body, title, url) + '\n';
         case 'link with selection as title':
             selectedText = selectedText.replaceAll('\r\n', ' ').replaceAll('\n', ' ');
             return await md.createLink(selectedText, url);
@@ -66,9 +67,9 @@ async function getSourceFormatMdWithLink(title, url, selection, selectedText) {
     const alert = await md.createAlert('note', `from ${link}`);
     const html = await getSelectionHtml(selection);
     if (html === null) {
-        return alert + '\n\n' + selectedText + '\n';
+        return alert + '\n\n' + selectedText;
     } else {
-        return alert + '\n\n' + await md.htmlToMarkdown(html) + '\n';
+        return alert + '\n\n' + await md.htmlToMarkdown(html);
     }
 }
 
@@ -83,9 +84,9 @@ async function getSourceFormatMdWithLink(title, url, selection, selectedText) {
 async function getSourceFormatMd(selection, selectedText) {
     const html = await getSelectionHtml(selection);
     if (html === null) {
-        return selectedText + '\n';
+        return selectedText;
     } else {
-        return await md.htmlToMarkdown(html) + '\n';
+        return await md.htmlToMarkdown(html);
     }
 }
 

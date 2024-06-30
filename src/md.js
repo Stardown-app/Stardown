@@ -39,6 +39,12 @@ let currentBulletPoint = '-';
 let currentSubBrackets = 'underlined';
 
 /**
+ * currentSelectionFormat is used by the htmlToMarkdown function to detect changes to
+ * the selection format setting to update the TurndownService instance when needed.
+ */
+let currentSelectionFormat = 'source with link';
+
+/**
  * escape escapes many markdown patterns, but not square brackets.
  * @param {string} text - the text to escape markdown characters in.
  * @returns {string}
@@ -66,16 +72,20 @@ export function escape(text) {
 export async function htmlToMarkdown(html) {
     const newBulletPoint = await getSetting('bulletPoint');
     const newSubBrackets = await getSetting('subBrackets');
+    const newSelectionFormat = await getSetting('selectionFormat');
 
     if (
         !turndownService ||
         newBulletPoint !== currentBulletPoint ||
-        newSubBrackets !== currentSubBrackets
+        newSubBrackets !== currentSubBrackets ||
+        newSelectionFormat !== currentSelectionFormat
     ) {
         currentBulletPoint = newBulletPoint;
         currentSubBrackets = newSubBrackets;
+        currentSelectionFormat = newSelectionFormat;
+
         turndownService = newTurndownService(
-            currentBulletPoint, currentSubBrackets, escape,
+            currentBulletPoint, currentSubBrackets, currentSelectionFormat, escape,
         );
     }
 
@@ -132,21 +142,15 @@ export async function createAlert(type, text) {
 
 /**
  * createBlockquote creates a markdown blockquote with a link at the end.
- * @param {string} text - the text of the blockquote. Many markdown patterns are
- * escaped.
+ * @param {string} body - the body of the blockquote.
  * @param {string} title - the title of the link.
  * @param {string} url - the URL of the link.
  * @returns {Promise<string>}
  */
-export async function createBlockquote(text, title, url) {
-    text = escape(text)
-        .replaceAll('[', '\\[')
-        .replaceAll(']', '\\]')
-        .replaceAll('\n', '\n> ');
-
+export async function createBlockquote(body, title, url) {
+    body = body.replaceAll('\n', '\n> ');
     const link = await createLink(title, url);
-
-    return `> ${text}\n> \n> — ${link}`;
+    return `> ${body}\n> \n> — ${link}`;
 }
 
 /**

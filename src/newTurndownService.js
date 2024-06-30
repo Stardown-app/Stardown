@@ -85,7 +85,7 @@ function defaultReplacement(content, node) {
     // Escape square brackets that are around markdown links because at least
     // some markdown renderers including Obsidian don't allow links to be within
     // unescaped square brackets.
-    const pattern = /\[([^\[\]]*(?<!!)\[[^\[\]]*\]\([^\(\)]+\)[^\[\]]*)\]/g;
+    const pattern = /\[((?:[^\[\]]*(?<!!)\[[^\[\]]*\]\([^\(\)]+\)[^\[\]]*)+)\]/g;
     content = content.replaceAll(pattern, '\\[$1\\]');
 
     return node.isBlock ? '\n\n' + content + '\n\n' : content
@@ -243,14 +243,7 @@ function newConvertLinkToMarkdown(subBrackets) {
             }
         }
 
-        // remove excess whitespace and escape quotation marks
-        let title = node.getAttribute('title') || '';
-        if (title) {
-            title = cleanAttribute(title);
-            title = ' "' + title.replace(/"/g, '\\"') + '"';
-        }
-
-        return '[' + content + '](' + href + title + ')';
+        return '[' + content + '](' + href + ')';
     };
 }
 

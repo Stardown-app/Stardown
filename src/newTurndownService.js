@@ -37,6 +37,7 @@ export function newTurndownService(bulletPoint, subBrackets, selectionFormat, tu
         headingStyle: 'atx',
         emDelimiter: '*',
         codeBlockStyle: 'fenced',
+        defaultReplacement: defaultReplacement,
     });
 
     // Turndown rules have precedence. For added rules specifically, for each HTML
@@ -71,6 +72,23 @@ export function newTurndownService(bulletPoint, subBrackets, selectionFormat, tu
     t.remove(['style', 'script', 'noscript', 'link']);
 
     return t;
+}
+
+/**
+ * defaultReplacement handles conversion to markdown for any and all nodes which are not
+ * recognized by any other rule.
+ * @param {string} content - the page's content within the unrecognized element.
+ * @param {*} node - the HTML element node.
+ * @returns {string}
+ */
+function defaultReplacement(content, node) {
+    // Escape square brackets that are around markdown links because at least
+    // some markdown renderers including Obsidian don't allow links to be within
+    // unescaped square brackets.
+    const pattern = /\[([^\[\]]*\[[^\[\]]*\]\([^\(\)]+\)[^\[\]]*)\]/g;
+    content = content.replaceAll(pattern, '\\[$1\\]');
+
+    return node.isBlock ? '\n\n' + content + '\n\n' : content
 }
 
 /**

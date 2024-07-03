@@ -1,7 +1,7 @@
 {
   "name": "stardown",
   "version": "1.0.0",
-  "description": "Copy a markdown link for the current page.",
+  "description": "Copy the web as markdown.",
   "scripts": {
     "dev-firefox": "rollup --config rollup.config.firefox.mjs",
     "build-firefox": "npm install && npm run dev-firefox && npm run assert-clean && rm -r src && rm -r chrome",

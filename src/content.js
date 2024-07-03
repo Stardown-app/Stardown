@@ -109,14 +109,14 @@ async function handleRequest(message) {
         case 'copy':
             return await handleCopyRequest(message.text);
         case 'iconSingleClick':
-            const linkMd1 = await md.createLink(document.title, location.href);
-            return await handleCopyRequest(linkMd1);
+            return await handleIconSingleClick();
         case 'pageRightClick':
             const id1 = await getClickedElementId(clickedElement);
             return await handlePageRightClick(id1);
         case 'selectionRightClick':
+            const selection = window.getSelection();
             const id2 = await getClickedElementId(clickedElement);
-            return await handleSelectionRightClick(id2);
+            return await handleSelectionRightClick(id2, selection);
         case 'linkRightClick':
             const linkMd2 = await md.createLink(linkText, message.linkUrl);
             return await handleCopyRequest(linkMd2);
@@ -158,6 +158,20 @@ async function getClickedElementId(clickedElement) {
 }
 
 /**
+ * handleIconSingleClick handles a single left-click on the browser action icon.
+ * @returns {Promise<ContentResponse>}
+ */
+async function handleIconSingleClick() {
+    const selection = window.getSelection();
+    if (selection && selection.type !== 'None') {
+        return await handleSelectionRightClick('', selection);
+    } else {
+        const linkMd1 = await md.createLink(document.title, location.href);
+        return await handleCopyRequest(linkMd1);
+    }
+}
+
+/**
  * handlePageRightClick handles a right-click on a page.
  * @param {string} htmlId - the ID of the HTML element that was right-clicked.
  * @returns {Promise<ContentResponse>}
@@ -176,15 +190,15 @@ async function handlePageRightClick(htmlId) {
 /**
  * handleSelectionRightClick handles a right-click on a selection.
  * @param {string} htmlId - the ID of the HTML element that was right-clicked.
+ * @param {Selection} selection - a selection object.
  * @returns {Promise<ContentResponse>}
  */
-async function handleSelectionRightClick(htmlId) {
+async function handleSelectionRightClick(htmlId, selection) {
     let title = document.title;
     let url = await removeIdAndTextFragment(location.href);
 
-    let arg; // the text fragment argument
-    const selection = window.getSelection();
-    if (selection && selection.type !== 'None') {
+    let arg = ''; // the text fragment argument
+    if (selection && selection.type === 'Range') {
         arg = createTextFragmentArg(selection);
     }
 

@@ -61,7 +61,7 @@
                 "default": "Ctrl+Shift+U",
                 "mac": "Command+Shift+U"
             },
-            "description": "Copy a markdown link for the current page"
+            "description": "Copy markdown links or selections"
         }
     }
 }

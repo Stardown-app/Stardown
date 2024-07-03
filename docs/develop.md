@@ -57,7 +57,7 @@ In Stardown, every user interaction (except on the options page) sends a request
 
 Here are the steps Stardown goes through with each user interaction (except on the options page):
 
-1. The user interacts with the extension by clicking the icon or choosing a context menu option. This interaction is received in the background script.
+1. The user interacts with the extension by clicking the icon, choosing a context menu option, or using the keyboard shortcut. This interaction is received in the background script.
 2. The background script gets some data about the interaction, may process the data a little, and then sends it to the content script.
 3. The content script does most or all of the data processing needed, writes markdown to the clipboard, and sends the background script some info about whether it succeeded and what to tell the user.
 4. The background script tells the user whether all of this succeeded by showing a green check (✓) for success or a red X (✗) for failure on the extension's icon, and possibly a system notification. (Any error notifications are always shown. Warning and/or success notifications are shown if the user chose that in settings.)
@@ -83,9 +83,9 @@ When fully testing Stardown, use the descriptions in this section in each of the
 
 ### Features
 
-- [ ] **Clicking the icon** copies a markdown link for the page.
-- [ ] **Double-clicking the icon** copies a markdown unordered list of markdown links for all open tabs.
-- [ ] **Selecting tabs, then double-clicking the icon** copies a markdown unordered list of markdown links for all selected tabs.
+- [ ] **Clicking the icon or pressing Ctrl+Shift+U** copies a markdown link for the page, unless part of the page is selected in which case markdown of the selection is copied instead.
+- [ ] **Double-clicking the icon or pressing Ctrl+Shift+UU** copies a markdown unordered list of markdown links for all open tabs.
+- [ ] **Selecting tabs, then double-clicking the icon or pressing Ctrl+Shift+UU** copies a markdown unordered list of markdown links for all selected tabs.
 - [ ] **Right-clicking an empty part of a page** shows the "Copy markdown link to here" option.
 - [ ] **Right-clicking a website's unselected header** shows the "Copy markdown link to here" option.
 - [ ] **Right-clicking selected text** shows the "Copy markdown of selection" option.

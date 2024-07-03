@@ -30,7 +30,7 @@ By default, the markdown created when selecting and right-clicking part of a pag
 Stardown is free except that if you get it from Apple's App Store, there is a small fee to help cover the $99 USD per year cost I'm paying to keep Stardown available in the App Store.
 -->
 
-Want to easily copy a markdown link for the current page but don't want to install an extension? You can use a [bookmarklet](https://en.wikipedia.org/wiki/Bookmarklet) instead. Drag this into your bookmarks bar: <a href="javascript: navigator.clipboard.writeText('[' + document.title + '](' + location.href + ')');">copy markdown link</a>
+Want to easily copy a markdown link for the current page but don't want to install an extension? You can use a [bookmarklet](https://en.wikipedia.org/wiki/Bookmarklet) instead: `javascript: navigator.clipboard.writeText('[' + document.title + '](' + location.href + ')');`
 
 ## Privacy
 

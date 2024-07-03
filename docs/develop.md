@@ -4,7 +4,7 @@ I wrote some general extension development tips in [Making browser extensions](h
 
 ## Priorities
 
-To keep Stardown easy to use, I would like to avoid having a popup and to generally have only one context menu option visible at a time. The options page can have many options as long as they are well organized and useful. Stardown's output to the clipboard should render well on at least Obsidian and GitHub, if not also other markdown renderers like VS Code and Discord.
+To keep Stardown easy to use, I would like to avoid having a popup and to have only one context menu option visible at a time. The options page can have many options as long as they are well organized and useful. Stardown's output to the clipboard should render well on at least Obsidian and GitHub, if not also other markdown renderers like VS Code and Discord.
 
 I would like to keep Stardown relatively simple so that it's reliable, has few bugs that get fixed quickly, and is easy to maintain.
 
@@ -90,9 +90,10 @@ When fully testing Stardown, use the descriptions in this section in each of the
 - [ ] **Right-clicking a website's unselected header** shows the "Copy markdown link to here" option.
 - [ ] **Right-clicking selected text** shows the "Copy markdown of selection" option.
 - [ ] **Right-clicking an unselected image** shows the "Copy markdown of image" option.
-- [ ] **Selecting text, then right-clicking an unselected image** shows the "Copy markdown of image" option, but may or may not also show the "Copy markdown of selection" option.
+- [ ] **Selecting text, then right-clicking an unselected image**, due to browser limitations, shows no context menu option in Chromium and shows "Copy markdown of selection" in Firefox.
 - [ ] **Selecting text and image(s), then right-clicking the selected text** shows the "Copy markdown of selection" option.
-- [ ] **Selecting text and image(s), then right-clicking a selected image** shows the "Copy markdown of selection" option, and may or may not also show the "Copy markdown of image" option.
+- [ ] **Selecting text and image(s), then right-clicking a selected image** shows the "Copy markdown of selection" option.
+- [ ] **Selecting text and link(s), then right-clicking a selected link** shows the "Copy markdown of selection" option.
 - [ ] **Right-clicking a link that is not an image** shows the "Copy markdown of link" option.
 - [ ] **Right-clicking a link that is an image** might not show any context menu options due to browser limitations. If a context menu option appears, it should be "Copy markdown of image".
 - [ ] **Right-clicking a video** shows the "Copy markdown of video" option, but may require a second right-click for the correct context menu to appear because some videos (e.g. YouTube videos) have a special context menu.

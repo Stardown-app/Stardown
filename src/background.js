@@ -55,11 +55,11 @@ browser.action.onClicked.addListener(async (tab) => {
 });
 
 browser.runtime.onMessage.addListener(async (message, sender, sendResponse) => {
-    if (message.isImage || message.isLink) {
+    if (message.mouseover) {
         // These context menu updates are done with messages from a content script
         // because the contextMenus.update method cannot update a context menu that is
         // already open. The content script listens for mouseover events.
-        updateContextMenu(message);
+        updateContextMenu(message.mouseover);
     } else if (message.doubleClickInterval) {
         doubleClickInterval = message.doubleClickInterval;
     } else if (message.warning) {

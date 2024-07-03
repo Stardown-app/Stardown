@@ -43,14 +43,20 @@ let linkText = null;
 function setUpListeners() {
 
     document.addEventListener('mouseover', (event) => {
-        // This event listener is used to determine if any element that may be
-        // right-clicked is a link or an image. This information is sent to the
-        // background script to determine if the context menu item for copying link or
-        // image markdown should be shown. This is necessary because the context menu
-        // cannot be updated while it is visible.
-        const isLink = event.target.nodeName === 'A';
-        const isImage = event.target.nodeName === 'IMG';
-        browser.runtime.sendMessage({ isLink, isImage });
+        // This event listener detects when the mouse is over an element that is a
+        // selection, image, or link and sends a message to the background script so it
+        // can load the correct context menu items. This is necessary because the
+        // context menu cannot be updated while it is visible. If the mouse is over more
+        // than one of selection, image, and link, the one message sent will only
+        // contain the first of those that was detected.
+        const s = window.getSelection();
+        if (s && s.type === 'Range') {
+            browser.runtime.sendMessage({ mouseover: 'selection' });
+        } else if (event.target.nodeName === 'IMG') {
+            browser.runtime.sendMessage({ mouseover: 'image' });
+        } else if (event.target.nodeName === 'A') {
+            browser.runtime.sendMessage({ mouseover: 'link' });
+        }
     });
 
     document.addEventListener('contextmenu', (event) => {

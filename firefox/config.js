@@ -34,20 +34,29 @@ export function createContextMenus() {
 }
 
 /**
- * updateContextMenu updates the options in the context menu based on the message from
- * the content script. This only works if the context menu is not visible.
- * @param {object} message - the message from the content script.
- * @param {boolean} message.isImage - whether the mouse is over an image.
- * @param {boolean} message.isLink - whether the mouse is over a link.
+ * updateContextMenu changes which options are in the context menu based on the category
+ * of HTML element the mouse is over. This only has an effect if the context menu is not
+ * currently visible.
+ * @param {string} category - the category of the element the mouse is over.
  * @returns {void}
  */
-export function updateContextMenu(message) {
-    if (message.isImage) {
-        browser.contextMenus.update('link', { visible: false });
-        browser.contextMenus.update('image', { visible: true });
-    } else if (message.isLink) {
-        browser.contextMenus.update('link', { visible: true });
-        browser.contextMenus.update('image', { visible: false });
+export function updateContextMenu(category) {
+    switch (category) {
+        case 'selection':
+            browser.contextMenus.update('link', { visible: false });
+            browser.contextMenus.update('image', { visible: false });
+            break;
+        case 'image':
+            browser.contextMenus.update('link', { visible: false });
+            browser.contextMenus.update('image', { visible: true });
+            break;
+        case 'link':
+            browser.contextMenus.update('link', { visible: true });
+            browser.contextMenus.update('image', { visible: false });
+            break;
+        default:
+            console.error('Invalid category', category);
+            throw new Error('Invalid category ' + category);
     }
 }
 

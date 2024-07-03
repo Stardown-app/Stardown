@@ -244,10 +244,10 @@ function newConvertLinkToMarkdown(subBrackets) {
             return ''; // don't create the link
         }
 
-        // replace square brackets in the anchor element's content if and only if it
-        // isn't an image
-        const mdImagePattern = /^!\[[^\]]*\]\([^\)]*\)$/;
-        if (!content.match(mdImagePattern)) {
+        // replace square brackets in the anchor element's content if and only if they
+        // aren't all for images
+        const mdImagesPattern = /^\s*(?:!\[[^\]]*\]\([^\)]*\)\s*)+\s*$/;
+        if (!content.match(mdImagesPattern)) {
             content = replaceBrackets(content, subBrackets);
         }
 

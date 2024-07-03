@@ -106,7 +106,7 @@ Unlike the extensions linked above, Stardown:
 
 * requires only one click to create a markdown link for the current page
 * can create markdown links for specific parts of pages (using [text fragments](https://web.dev/articles/text-fragments) and/or HTML element IDs)
-* can create markdown of specific parts of pages while keeping almost all formatting supported by markdown
+* keeps almost all formatting when copying specific parts of pages
 * can create markdown of YouTube videos that renders well in GitHub
 * is focused on the most important features so it's more likely to be maintained and bug-free
 

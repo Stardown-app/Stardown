@@ -42,11 +42,14 @@ export function replaceBrackets(text, subBrackets) {
  * @param {string} subBrackets - the Stardown setting for what to substitute square
  * brackets with.
  * @param {string} selectionFormat - the Stardown setting for the selection format.
+ * @param {boolean} omitNav - the Stardown setting for whether to omit nav elements.
  * @param {Function(string): string} turndownEscape - the markdown escape function for
  * the Turndown service instance to use.
  * @returns {TurndownService}
  */
-export function newTurndownService(bulletPoint, subBrackets, selectionFormat, turndownEscape) {
+export function newTurndownService(
+    bulletPoint, subBrackets, selectionFormat, omitNav, turndownEscape,
+) {
     // https://github.com/mixmark-io/turndown
     const t = new TurndownService({
         bulletListMarker: bulletPoint,
@@ -86,6 +89,9 @@ export function newTurndownService(bulletPoint, subBrackets, selectionFormat, tu
     });
 
     t.remove(['style', 'script', 'noscript', 'link']);
+    if (omitNav) {
+        t.remove('nav');
+    }
 
     return t;
 }

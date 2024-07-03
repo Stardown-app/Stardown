@@ -64,7 +64,10 @@ browser.runtime.onMessage.addListener(async (message, sender, sendResponse) => {
         doubleClickInterval = message.doubleClickInterval;
     } else if (message.warning) {
         console.warn(`Warning: ${message.warning}`);
-        await showNotification('Warning', message.warning);
+        const notifyOnWarning = await getSetting('notifyOnWarning');
+        if (notifyOnWarning) {
+            await showNotification('Warning', message.warning);
+        }
     }
 });
 

@@ -1,3 +1,19 @@
+/*
+   Copyright 2024 Chris Wheeler
+
+   Licensed under the Apache License, Version 2.0 (the "License");
+   you may not use this file except in compliance with the License.
+   You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License.
+*/
+
 import { TurndownService } from './turndown.js';
 import { turndownPluginGfm } from './turndown-plugin-gfm.js';
 
@@ -26,11 +42,16 @@ export function replaceBrackets(text, subBrackets) {
  * @param {string} subBrackets - the Stardown setting for what to substitute square
  * brackets with.
  * @param {string} selectionFormat - the Stardown setting for the selection format.
+ * @param {boolean} omitNav - the Stardown setting for whether to omit nav elements.
+ * @param {boolean} omitFooter - the Stardown setting for whether to omit footer
+ * elements.
  * @param {Function(string): string} turndownEscape - the markdown escape function for
  * the Turndown service instance to use.
  * @returns {TurndownService}
  */
-export function newTurndownService(bulletPoint, subBrackets, selectionFormat, turndownEscape) {
+export function newTurndownService(
+    bulletPoint, subBrackets, selectionFormat, omitNav, omitFooter, turndownEscape,
+) {
     // https://github.com/mixmark-io/turndown
     const t = new TurndownService({
         bulletListMarker: bulletPoint,
@@ -70,6 +91,12 @@ export function newTurndownService(bulletPoint, subBrackets, selectionFormat, tu
     });
 
     t.remove(['style', 'script', 'noscript', 'link']);
+    if (omitNav) {
+        t.remove('nav');
+    }
+    if (omitFooter) {
+        t.remove('footer');
+    }
 
     return t;
 }
@@ -145,31 +172,31 @@ function addRules(t, subBrackets) {
     t.addRule('tableRow', {
         filter: 'tr',
         replacement: function (content, node) {
-            return content.trim() + ' |\n';
+            content = content.trim() + ' |\n';
+
+            if (!isFirstBodyRow(node)) {
+                return content;
+            }
+
+            const cells = node.childNodes;
+            if (!cells || cells.length === 0) {
+                return content;
+            }
+
+            content = '\n' + content;
+            for (let i = 0; i < cells.length; i++) {
+                content = ' --- |' + content;
+            }
+            return '\n| ' + content.trim() + '\n';
         },
     });
 
-    t.addRule('tableHeader', {
-        filter: 'thead',
-        replacement: function (content, node) {
-            let columnCount = 0;
-            const headTRs = node.childNodes;
-            if (headTRs && headTRs.length > 0) {
-                const headTHs = headTRs[0].childNodes;
-                if (headTHs) {
-                    columnCount = headTHs.length;
-                }
-            }
-
-            if (columnCount === 0) {
-                return content + '\n';
-            } else {
-                content = content + '\n';
-                for (let i = 0; i < columnCount; i++) {
-                    content += '| --- ';
-                }
-                return content + '|\n';
-            }
+    t.addRule('table', {
+        filter: function (node) {
+            return node.nodeName === 'TABLE';
+        },
+        replacement: function (content) {
+            return '\n' + content + '\n';
         },
     });
 }
@@ -204,6 +231,53 @@ function isInlineLink(node, options) {
 }
 
 /**
+ * isFirstBodyRow reports whether a given tr element is the first row in the body of a
+ * table. A tr is the first body row if it's the table's second child, or if it's the
+ * first child of the table's first tbody, but if the table has tbody(s) but no thead,
+ * then the first tbody's second child is considered the first body row.
+ * @param {*} tr - the tr element.
+ * @returns {boolean}
+ */
+function isFirstBodyRow(tr) {
+    const parentNode = tr.parentNode;
+    const children = parentNode.childNodes;
+    switch (parentNode.nodeName) {
+        case 'TABLE':
+            if (children.length === 1) {
+                return false;
+            }
+            return children[1] === tr; // the tr is the table's second child?
+        case 'TBODY':
+            const tbody = parentNode;
+            if (!isFirstTbody(tbody)) { // if the tbody isn't the first tbody
+                return false;
+            }
+            if (!tbody.previousSibling) { // if there is no thead
+                if (children.length === 1) {
+                    return false;
+                }
+                return children[1] === tr; // the tr is the first tbody's second child?
+            }
+            return children[0] === tr; // the tr is the first tbody's first child?
+        default:
+            return false;
+    }
+}
+
+/**
+ * isFirstTBody reports whether an element is the first tbody element in a table.
+ * @param {*} element - the element to check.
+ * @returns {boolean}
+ */
+function isFirstTbody(element) {
+    if (!element || element.nodeName !== 'TBODY') {
+        return false;
+    }
+    const prev = element.previousSibling;
+    return !prev || prev.nodeName === 'THEAD';
+}
+
+/**
  * newConvertLinkToMarkdown returns a function that converts an HTML link to a markdown
  * link.
  * @param {string} subBrackets - the Stardown setting for what to substitute square
@@ -222,10 +296,10 @@ function newConvertLinkToMarkdown(subBrackets) {
             return ''; // don't create the link
         }
 
-        // replace square brackets in the anchor element's content if and only if it
-        // isn't an image
-        const mdImagePattern = /^!\[[^\]]*\]\([^\)]*\)$/;
-        if (!content.match(mdImagePattern)) {
+        // replace square brackets in the anchor element's content if and only if they
+        // aren't all for images
+        const mdImagesPattern = /^\s*(?:!\[[^\]]*\]\([^\)]*\)\s*)+\s*$/;
+        if (!content.match(mdImagesPattern)) {
             content = replaceBrackets(content, subBrackets);
         }
 

@@ -21,16 +21,16 @@
 * Right-click part of a page to copy it as markdown. Select before right-clicking to copy multiple parts.
 * Double-click the extension's icon to copy links for all tabs.
 * Select tabs before double-clicking the icon to copy links for only those tabs.
-* Press `Ctrl+Shift+U` (Mac: `Cmd+Shift+U`) or whichever keyboard shortcut you prefer in your browser's settings to copy a link for the current page.
+* Press `Ctrl+Shift+U` (Mac: `Cmd+Shift+U`) to copy a page's link or selection.
 * Use [the options page](#settings) to customize these features.
 
-By default, the markdown created when selecting and right-clicking part of a page includes a link that navigates to the specific part of the page you selected, when possible. This is accomplished with [text fragments](https://web.dev/articles/text-fragments) and/or HTML element IDs. [Firefox does not support text fragments yet](https://bugzilla.mozilla.org/show_bug.cgi?id=1753933), but the Firefox version of Stardown allows you to create links with text fragments.
+By default, the markdown created from a selection includes a link that navigates to the part of the page you selected, when possible. This is accomplished with [text fragments](https://web.dev/articles/text-fragments) and/or HTML element IDs. [Firefox does not support text fragments yet](https://bugzilla.mozilla.org/show_bug.cgi?id=1753933), but the Firefox version of Stardown allows you to create links with text fragments.
 
 <!--
 Stardown is free except that if you get it from Apple's App Store, there is a small fee to help cover the $99 USD per year cost I'm paying to keep Stardown available in the App Store.
 -->
 
-Want to easily copy a markdown link for the current page but don't want to install an extension? You can use a [bookmarklet](https://en.wikipedia.org/wiki/Bookmarklet) instead: `javascript: navigator.clipboard.writeText('[' + document.title + '](' + location.href + ')');`
+Want to just copy markdown links for pages without installing an extension? You can use this [bookmarklet](https://en.wikipedia.org/wiki/Bookmarklet) instead: `javascript: navigator.clipboard.writeText('[' + document.title + '](' + location.href + ')');`
 
 ## Privacy
 
@@ -106,7 +106,7 @@ Unlike the extensions linked above, Stardown:
 
 * requires only one click to create a markdown link for the current page
 * can create markdown links for specific parts of pages (using [text fragments](https://web.dev/articles/text-fragments) and/or HTML element IDs)
-* can create markdown of specific parts of pages while keeping almost all formatting supported by markdown
+* keeps almost all formatting when copying specific parts of pages
 * can create markdown of YouTube videos that renders well in GitHub
 * is focused on the most important features so it's more likely to be maintained and bug-free
 

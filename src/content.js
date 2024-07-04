@@ -43,14 +43,20 @@ let linkText = null;
 function setUpListeners() {
 
     document.addEventListener('mouseover', (event) => {
-        // This event listener is used to determine if any element that may be
-        // right-clicked is a link or an image. This information is sent to the
-        // background script to determine if the context menu item for copying link or
-        // image markdown should be shown. This is necessary because the context menu
-        // cannot be updated while it is visible.
-        const isLink = event.target.nodeName === 'A';
-        const isImage = event.target.nodeName === 'IMG';
-        browser.runtime.sendMessage({ isLink, isImage });
+        // This event listener detects when the mouse is over an element that is a
+        // selection, image, or link and sends a message to the background script so it
+        // can load the correct context menu items. This is necessary because the
+        // context menu cannot be updated while it is visible. If the mouse is over more
+        // than one of selection, image, and link, the one message sent will only
+        // contain the first of those that was detected.
+        const s = window.getSelection();
+        if (s && s.type === 'Range') {
+            browser.runtime.sendMessage({ mouseover: 'selection' });
+        } else if (event.target.nodeName === 'IMG') {
+            browser.runtime.sendMessage({ mouseover: 'image' });
+        } else if (event.target.nodeName === 'A') {
+            browser.runtime.sendMessage({ mouseover: 'link' });
+        }
     });
 
     document.addEventListener('contextmenu', (event) => {
@@ -103,14 +109,14 @@ async function handleRequest(message) {
         case 'copy':
             return await handleCopyRequest(message.text);
         case 'iconSingleClick':
-            const linkMd1 = await md.createLink(document.title, location.href);
-            return await handleCopyRequest(linkMd1);
+            return await handleIconSingleClick();
         case 'pageRightClick':
             const id1 = await getClickedElementId(clickedElement);
             return await handlePageRightClick(id1);
         case 'selectionRightClick':
+            const selection = window.getSelection();
             const id2 = await getClickedElementId(clickedElement);
-            return await handleSelectionRightClick(id2);
+            return await handleSelectionRightClick(id2, selection);
         case 'linkRightClick':
             const linkMd2 = await md.createLink(linkText, message.linkUrl);
             return await handleCopyRequest(linkMd2);
@@ -152,6 +158,22 @@ async function getClickedElementId(clickedElement) {
 }
 
 /**
+ * handleIconSingleClick handles a single left-click on the browser action icon.
+ * @returns {Promise<ContentResponse>}
+ */
+async function handleIconSingleClick() {
+    const selection = window.getSelection();
+    if (selection && selection.type === 'Range') {
+        // only allow Range (and not Caret) selections or else every icon click will
+        // count as a selection click
+        return await handleSelectionRightClick('', selection);
+    } else {
+        const linkMd1 = await md.createLink(document.title, location.href);
+        return await handleCopyRequest(linkMd1);
+    }
+}
+
+/**
  * handlePageRightClick handles a right-click on a page.
  * @param {string} htmlId - the ID of the HTML element that was right-clicked.
  * @returns {Promise<ContentResponse>}
@@ -170,15 +192,15 @@ async function handlePageRightClick(htmlId) {
 /**
  * handleSelectionRightClick handles a right-click on a selection.
  * @param {string} htmlId - the ID of the HTML element that was right-clicked.
+ * @param {Selection} selection - a selection object.
  * @returns {Promise<ContentResponse>}
  */
-async function handleSelectionRightClick(htmlId) {
+async function handleSelectionRightClick(htmlId, selection) {
     let title = document.title;
     let url = await removeIdAndTextFragment(location.href);
 
-    let arg; // the text fragment argument
-    const selection = window.getSelection();
-    if (selection && selection.type !== 'None') {
+    let arg = ''; // the text fragment argument
+    if (selection && selection.type === 'Range') {
         arg = createTextFragmentArg(selection);
     }
 

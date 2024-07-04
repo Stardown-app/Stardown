@@ -18,6 +18,9 @@ import { browser } from './config.js';
 
 const defaultSettings = {
     youtubeMd: 'almost everywhere',
+    omitNav: true,
+    omitFooter: true,
+    notifyOnWarning: false,
     notifyOnSuccess: false,
     subBrackets: 'underlined',
     selectionFormat: 'source with link',

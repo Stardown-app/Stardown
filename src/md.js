@@ -26,23 +26,14 @@ import { newTurndownService, replaceBrackets } from './newTurndownService.js';
 let turndownService = null;
 
 /**
- * currentBulletPoint is used by the htmlToMarkdown function to detect changes to the
- * bullet point setting to update the TurndownService instance when needed.
- * @type {string}
+ * The current* variables are used by the htmlToMarkdown function to detect changes to
+ * the settings to update the TurndownService instance when needed.
  */
 let currentBulletPoint = '-';
-
-/**
- * currentSubBrackets is used by the htmlToMarkdown function to detect changes to the
- * bracket substitution setting to update the TurndownService instance when needed.
- */
 let currentSubBrackets = 'underlined';
-
-/**
- * currentSelectionFormat is used by the htmlToMarkdown function to detect changes to
- * the selection format setting to update the TurndownService instance when needed.
- */
 let currentSelectionFormat = 'source with link';
+let currentOmitNav = true;
+let currentOmitFooter = true;
 
 /**
  * escape escapes many markdown patterns, but not square brackets.
@@ -73,19 +64,30 @@ export async function htmlToMarkdown(html) {
     const newBulletPoint = await getSetting('bulletPoint');
     const newSubBrackets = await getSetting('subBrackets');
     const newSelectionFormat = await getSetting('selectionFormat');
+    const newOmitNav = await getSetting('omitNav');
+    const newOmitFooter = await getSetting('omitFooter');
 
     if (
         !turndownService ||
         newBulletPoint !== currentBulletPoint ||
         newSubBrackets !== currentSubBrackets ||
-        newSelectionFormat !== currentSelectionFormat
+        newSelectionFormat !== currentSelectionFormat ||
+        newOmitNav !== currentOmitNav ||
+        newOmitFooter !== currentOmitFooter
     ) {
         currentBulletPoint = newBulletPoint;
         currentSubBrackets = newSubBrackets;
         currentSelectionFormat = newSelectionFormat;
+        currentOmitNav = newOmitNav;
+        currentOmitFooter = newOmitFooter;
 
         turndownService = newTurndownService(
-            currentBulletPoint, currentSubBrackets, currentSelectionFormat, escape,
+            currentBulletPoint,
+            currentSubBrackets,
+            currentSelectionFormat,
+            currentOmitNav,
+            currentOmitFooter,
+            escape,
         );
     }
 

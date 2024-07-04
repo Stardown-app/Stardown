@@ -28,31 +28,27 @@ export function createContextMenus() {
 }
 
 /**
- * updateContextMenu updates the options in the context menu based on the message from
- * the content script. This only works if the context menu is not visible.
- * @param {object} message - the message from the content script.
- * @param {boolean} message.isImage - whether the mouse is over an image.
- * @param {boolean} message.isLink - whether the mouse is over a link.
+ * updateContextMenu changes which options are in the context menu based on the category
+ * of HTML element the mouse is over. This only has an effect if the context menu is not
+ * currently visible.
+ * @param {string} category - the category of the element the mouse is over.
  * @returns {void}
  */
-export function updateContextMenu(message) {
+export function updateContextMenu(category) {
     // The `browser.contextMenus.update` method doesn't work well in Chromium because
-    // when it is used to hide all but one context menu option, the one remaining would
+    // when it's used to hide all but one context menu option, the one remaining would
     // appear under a "Stardown" parent menu option instead of being in the root of the
     // context menu.
     browser.contextMenus.removeAll();
 
-    if (message.isImage) {
+    if (category === 'image') {
         browser.contextMenus.create(menu.imageItem);
-    } else if (message.isLink) {
+    } else if (category === 'link') {
         browser.contextMenus.create(menu.linkItem);
-    } else {
-        browser.contextMenus.create(menu.linkItem);
-        browser.contextMenus.create(menu.imageItem);
     }
 
-    browser.contextMenus.create(menu.pageItem);
     browser.contextMenus.create(menu.selectionItem);
+    browser.contextMenus.create(menu.pageItem);
     browser.contextMenus.create(menu.videoItem);
     browser.contextMenus.create(menu.audioItem);
 }

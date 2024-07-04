@@ -4,7 +4,7 @@ I wrote some general extension development tips in [Making browser extensions](h
 
 ## Priorities
 
-To keep Stardown easy to use, I would like to avoid having a popup and to generally have only one context menu option visible at a time. The options page can have many options as long as they are well organized and useful. Stardown's output to the clipboard should render well on at least Obsidian and GitHub, if not also other markdown renderers like VS Code and Discord.
+To keep Stardown easy to use, I would like to avoid having a popup and to have only one context menu option visible at a time. The options page can have many options as long as they are well organized and useful. Stardown's output to the clipboard should render well on at least Obsidian and GitHub, if not also other markdown renderers like VS Code and Discord.
 
 I would like to keep Stardown relatively simple so that it's reliable, has few bugs that get fixed quickly, and is easy to maintain.
 
@@ -57,10 +57,10 @@ In Stardown, every user interaction (except on the options page) sends a request
 
 Here are the steps Stardown goes through with each user interaction (except on the options page):
 
-1. The user interacts with the extension by clicking the icon or choosing a context menu option. This interaction is received in the background script.
+1. The user interacts with the extension by clicking the icon, choosing a context menu option, or using the keyboard shortcut. This interaction is received in the background script.
 2. The background script gets some data about the interaction, may process the data a little, and then sends it to the content script.
 3. The content script does most or all of the data processing needed, writes markdown to the clipboard, and sends the background script some info about whether it succeeded and what to tell the user.
-4. The background script tells the user whether all of this succeeded by showing a green check (✓) for success or a red X (✗) for failure on the extension's icon, and possibly a system notification. (Any error and warning notifications are always shown, and success notifications are shown if the user chose that in settings.)
+4. The background script tells the user whether all of this succeeded by showing a green check (✓) for success or a red X (✗) for failure on the extension's icon, and possibly a system notification. (Any error notifications are always shown. Warning and/or success notifications are shown if the user chose that in settings.)
 
 [Message passing](https://developer.chrome.com/docs/extensions/develop/concepts/messaging) allows the background and content scripts to communicate with each other. Most of Stardown's message passing is done between the `browser.contextMenus.onClicked` listener in `background.js` and the `browser.runtime.onMessage` listener in `content.js`.
 
@@ -83,16 +83,17 @@ When fully testing Stardown, use the descriptions in this section in each of the
 
 ### Features
 
-- [ ] **Clicking the icon** copies a markdown link for the page.
-- [ ] **Double-clicking the icon** copies a markdown unordered list of markdown links for all open tabs.
-- [ ] **Selecting tabs, then double-clicking the icon** copies a markdown unordered list of markdown links for all selected tabs.
+- [ ] **Clicking the icon or pressing Ctrl+Shift+U** copies a markdown link for the page, unless part of the page is selected in which case markdown of the selection is copied instead.
+- [ ] **Double-clicking the icon or pressing Ctrl+Shift+UU** copies a markdown unordered list of markdown links for all open tabs.
+- [ ] **Selecting tabs, then double-clicking the icon or pressing Ctrl+Shift+UU** copies a markdown unordered list of markdown links for all selected tabs.
 - [ ] **Right-clicking an empty part of a page** shows the "Copy markdown link to here" option.
 - [ ] **Right-clicking a website's unselected header** shows the "Copy markdown link to here" option.
 - [ ] **Right-clicking selected text** shows the "Copy markdown of selection" option.
 - [ ] **Right-clicking an unselected image** shows the "Copy markdown of image" option.
-- [ ] **Selecting text, then right-clicking an unselected image** shows the "Copy markdown of image" option, but may or may not also show the "Copy markdown of selection" option.
+- [ ] **Selecting text, then right-clicking an unselected image**, due to browser limitations, shows no context menu option in Chromium and shows "Copy markdown of selection" in Firefox.
 - [ ] **Selecting text and image(s), then right-clicking the selected text** shows the "Copy markdown of selection" option.
-- [ ] **Selecting text and image(s), then right-clicking a selected image** shows the "Copy markdown of selection" option, and may or may not also show the "Copy markdown of image" option.
+- [ ] **Selecting text and image(s), then right-clicking a selected image** shows the "Copy markdown of selection" option.
+- [ ] **Selecting text and link(s), then right-clicking a selected link** shows the "Copy markdown of selection" option.
 - [ ] **Right-clicking a link that is not an image** shows the "Copy markdown of link" option.
 - [ ] **Right-clicking a link that is an image** might not show any context menu options due to browser limitations. If a context menu option appears, it should be "Copy markdown of image".
 - [ ] **Right-clicking a video** shows the "Copy markdown of video" option, but may require a second right-click for the correct context menu to appear because some videos (e.g. YouTube videos) have a special context menu.
@@ -111,10 +112,11 @@ When something goes wrong, Stardown should still respond well.
 
 #### Text fragment timeout
 
-1. Go to https://markdownguide.offshoot.io/basic-syntax/#blockquotes-1
-2. Select the text "rendered output" (this phrase appears 32 times on this somewhat long page)
-3. Right-click the selection and choose "Copy markdown of selection"
-4. After several seconds:
+1. Turn on the "Show warning notifications" setting
+2. Go to https://markdownguide.offshoot.io/basic-syntax/#blockquotes-1
+3. Select the text "rendered output" (this phrase appears 32 times on this somewhat long page)
+4. Right-click the selection and choose "Copy markdown of selection"
+5. After several seconds:
   - Stardown's icon should display a green check (✓) to indicate success.
   - A system notification should appear that says "Warning" and explains that the fragment generator timed out.
   - The clipboard should now have a markdown link without a text fragment.

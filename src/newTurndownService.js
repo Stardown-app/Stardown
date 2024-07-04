@@ -167,31 +167,21 @@ function addRules(t, subBrackets) {
     t.addRule('tableRow', {
         filter: 'tr',
         replacement: function (content, node) {
+            content = content.trim() + ' |\n';
+            if (!isHeadingRow(node)) {
+                return content;
+            }
+
+            const cells = node.childNodes;
+            if (!cells || cells.length === 0) {
+                return content;
+            }
+
+            content += '\n';
+            for (let i = 0; i < cells.length; i++) {
+                content += '| --- ';
+            }
             return content.trim() + ' |\n';
-        },
-    });
-
-    t.addRule('tableHeader', {
-        filter: 'thead',
-        replacement: function (content, node) {
-            let columnCount = 0;
-            const headTRs = node.childNodes;
-            if (headTRs && headTRs.length > 0) {
-                const headTHs = headTRs[0].childNodes;
-                if (headTHs) {
-                    columnCount = headTHs.length;
-                }
-            }
-
-            if (columnCount === 0) {
-                return content + '\n';
-            } else {
-                content = content + '\n';
-                for (let i = 0; i < columnCount; i++) {
-                    content += '| --- ';
-                }
-                return content + '|\n';
-            }
         },
     });
 }
@@ -222,6 +212,49 @@ function isInlineLink(node, options) {
         options.linkStyle === 'inlined' &&
         node.nodeName === 'A' &&
         node.getAttribute('href')
+    )
+}
+
+/**
+ * isHeadingRow reports whether a given TR element is a heading row. This function
+ * was copied from turndown-plugin-gfm.js.
+ * 
+ * A tr is a heading row if:
+ * - the parent is a thead
+ * - or its the table's first child or the first tbody (possibly following a blank thead)
+ * - and every cell is a th
+ * 
+ * @param {*} tr - the tr element.
+ * @returns {boolean}
+ */
+function isHeadingRow(tr) {
+    var parentNode = tr.parentNode;
+    return (
+        parentNode.nodeName === 'THEAD' ||
+        (
+            parentNode.firstChild === tr &&
+            (parentNode.nodeName === 'TABLE' || isFirstTbody(parentNode)) &&
+            Array.prototype.every.call(tr.childNodes, function (n) { return n.nodeName === 'TH' })
+        )
+    )
+}
+
+/**
+ * isFirstTBody reports whether an element is the first tbody element in a table. This
+ * function was copied from turndown-plugin-gfm.js.
+ * @param {*} element - the element to check.
+ * @returns {boolean}
+ */
+function isFirstTbody(element) {
+    var previousSibling = element.previousSibling;
+    return (
+        element.nodeName === 'TBODY' && (
+            !previousSibling ||
+            (
+                previousSibling.nodeName === 'THEAD' &&
+                /^\s*$/i.test(previousSibling.textContent)
+            )
+        )
     )
 }
 

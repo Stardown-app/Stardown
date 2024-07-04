@@ -168,7 +168,8 @@ function addRules(t, subBrackets) {
         filter: 'tr',
         replacement: function (content, node) {
             content = content.trim() + ' |\n';
-            if (!isHeadingRow(node)) {
+
+            if (!isFirstBodyRow(node)) {
                 return content;
             }
 
@@ -177,11 +178,11 @@ function addRules(t, subBrackets) {
                 return content;
             }
 
-            content += '\n';
+            content = '\n' + content;
             for (let i = 0; i < cells.length; i++) {
-                content += '| --- ';
+                content = ' --- |' + content;
             }
-            return content.trim() + ' |\n';
+            return '\n| ' + content.trim() + '\n';
         },
     });
 }
@@ -216,46 +217,50 @@ function isInlineLink(node, options) {
 }
 
 /**
- * isHeadingRow reports whether a given TR element is a heading row. This function
- * was copied from turndown-plugin-gfm.js.
- * 
- * A tr is a heading row if:
- * - the parent is a thead
- * - or its the table's first child or the first tbody (possibly following a blank thead)
- * - and every cell is a th
- * 
+ * isFirstBodyRow reports whether a given tr element is the first row in the body of a
+ * table. A tr is the first body row if it's the table's second child, or if it's the
+ * first child of the table's first tbody, but if the table has tbody(s) but no thead,
+ * then the first tbody's second child is considered the first body row.
  * @param {*} tr - the tr element.
  * @returns {boolean}
  */
-function isHeadingRow(tr) {
-    var parentNode = tr.parentNode;
-    return (
-        parentNode.nodeName === 'THEAD' ||
-        (
-            parentNode.firstChild === tr &&
-            (parentNode.nodeName === 'TABLE' || isFirstTbody(parentNode)) &&
-            Array.prototype.every.call(tr.childNodes, function (n) { return n.nodeName === 'TH' })
-        )
-    )
+function isFirstBodyRow(tr) {
+    const parentNode = tr.parentNode;
+    const children = parentNode.childNodes;
+    switch (parentNode.nodeName) {
+        case 'TABLE':
+            if (children.length === 1) {
+                return false;
+            }
+            return children[1] === tr; // the tr is the table's second child?
+        case 'TBODY':
+            const tbody = parentNode;
+            if (!isFirstTbody(tbody)) { // if the tbody isn't the first tbody
+                return false;
+            }
+            if (!tbody.previousSibling) { // if there is no thead
+                if (children.length === 1) {
+                    return false;
+                }
+                return children[1] === tr; // the tr is the first tbody's second child?
+            }
+            return children[0] === tr; // the tr is the first tbody's first child?
+        default:
+            return false;
+    }
 }
 
 /**
- * isFirstTBody reports whether an element is the first tbody element in a table. This
- * function was copied from turndown-plugin-gfm.js.
+ * isFirstTBody reports whether an element is the first tbody element in a table.
  * @param {*} element - the element to check.
  * @returns {boolean}
  */
 function isFirstTbody(element) {
-    var previousSibling = element.previousSibling;
-    return (
-        element.nodeName === 'TBODY' && (
-            !previousSibling ||
-            (
-                previousSibling.nodeName === 'THEAD' &&
-                /^\s*$/i.test(previousSibling.textContent)
-            )
-        )
-    )
+    if (!element || element.nodeName !== 'TBODY') {
+        return false;
+    }
+    const prev = element.previousSibling;
+    return !prev || prev.nodeName === 'THEAD';
 }
 
 /**

@@ -33,6 +33,7 @@ let currentBulletPoint = '-';
 let currentSubBrackets = 'underlined';
 let currentSelectionFormat = 'source with link';
 let currentOmitNav = true;
+let currentOmitFooter = true;
 
 /**
  * escape escapes many markdown patterns, but not square brackets.
@@ -64,24 +65,28 @@ export async function htmlToMarkdown(html) {
     const newSubBrackets = await getSetting('subBrackets');
     const newSelectionFormat = await getSetting('selectionFormat');
     const newOmitNav = await getSetting('omitNav');
+    const newOmitFooter = await getSetting('omitFooter');
 
     if (
         !turndownService ||
         newBulletPoint !== currentBulletPoint ||
         newSubBrackets !== currentSubBrackets ||
         newSelectionFormat !== currentSelectionFormat ||
-        newOmitNav !== currentOmitNav
+        newOmitNav !== currentOmitNav ||
+        newOmitFooter !== currentOmitFooter
     ) {
         currentBulletPoint = newBulletPoint;
         currentSubBrackets = newSubBrackets;
         currentSelectionFormat = newSelectionFormat;
         currentOmitNav = newOmitNav;
+        currentOmitFooter = newOmitFooter;
 
         turndownService = newTurndownService(
             currentBulletPoint,
             currentSubBrackets,
             currentSelectionFormat,
             currentOmitNav,
+            currentOmitFooter,
             escape,
         );
     }

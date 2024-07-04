@@ -26,6 +26,7 @@ const bulletPointEl = document.querySelector('#bulletPoint');
 const doubleClickWindowsEl = document.querySelector('#doubleClickWindows');
 const doubleClickIntervalEl = document.querySelector('#doubleClickInterval');
 const omitNavEl = document.querySelector('#omitNav');
+const omitFooterEl = document.querySelector('#omitFooter');
 const notifyOnWarningEl = document.querySelector('#notifyOnWarning');
 const notifyOnSuccessEl = document.querySelector('#notifyOnSuccess');
 
@@ -37,6 +38,7 @@ initAutosave('selectionFormat', selectionFormatEl, 'value');
 initAutosave('subBrackets', subBracketsEl, 'value');
 initAutosave('bulletPoint', bulletPointEl, 'value');
 initAutosave('omitNav', omitNavEl, 'checked');
+initAutosave('omitFooter', omitFooterEl, 'checked');
 initAutosave('notifyOnWarning', notifyOnWarningEl, 'checked');
 initAutosave('notifyOnSuccess', notifyOnSuccessEl, 'checked');
 initAutosave('doubleClickWindows', doubleClickWindowsEl, 'value');
@@ -76,6 +78,7 @@ async function loadSettings() {
         doubleClickWindowsEl.value = await getSetting('doubleClickWindows');
         doubleClickIntervalEl.value = await getSetting('doubleClickInterval');
         omitNavEl.checked = await getSetting('omitNav');
+        omitFooterEl.checked = await getSetting('omitFooter');
         notifyOnWarningEl.checked = await getSetting('notifyOnWarning');
         notifyOnSuccessEl.checked = await getSetting('notifyOnSuccess');
     } catch (err) {

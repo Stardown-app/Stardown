@@ -185,6 +185,15 @@ function addRules(t, subBrackets) {
             return '\n| ' + content.trim() + '\n';
         },
     });
+
+    t.addRule('table', {
+        filter: function (node) {
+            return node.nodeName === 'TABLE';
+        },
+        replacement: function (content) {
+            return '\n' + content + '\n';
+        },
+    });
 }
 
 /**

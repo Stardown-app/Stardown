@@ -163,7 +163,9 @@ async function getClickedElementId(clickedElement) {
  */
 async function handleIconSingleClick() {
     const selection = window.getSelection();
-    if (selection && selection.type !== 'None') {
+    if (selection && selection.type === 'Range') {
+        // only allow Range (and not Caret) selections or else every icon click will
+        // count as a selection click
         return await handleSelectionRightClick('', selection);
     } else {
         const linkMd1 = await md.createLink(document.title, location.href);

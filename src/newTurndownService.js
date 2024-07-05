@@ -174,24 +174,19 @@ function addRules(t, subBrackets) {
         replacement: function (content, node) {
             content = content.trim() + ' |\n';
 
+            const cells = node.childNodes;
+            if (!cells || cells.length === 0) {
+                return content;
+            }
+
             if (!isFirstBodyRow(node)) {
                 if (isOnlyRow(node)) {
-                    const cells = node.childNodes;
-                    if (!cells || cells.length === 0) {
-                        return content;
-                    }
-
                     for (let i = 0; i < cells.length; i++) {
                         content += '| --- ';
                     }
                     content += '|\n';
                 }
 
-                return content;
-            }
-
-            const cells = node.childNodes;
-            if (!cells || cells.length === 0) {
                 return content;
             }
 

@@ -179,22 +179,22 @@ function addRules(t, subBrackets) {
                 return content;
             }
 
-            if (!isFirstBodyRow(node)) {
-                if (isOnlyRow(node)) {
-                    for (let i = 0; i < cells.length; i++) {
-                        content += '| --- ';
-                    }
-                    content += '|\n';
+            if (isFirstBodyRow(node)) {
+                // insert a table divider before the first body row
+                content = '\n' + content;
+                for (let i = 0; i < cells.length; i++) {
+                    content = ' --- |' + content;
                 }
-
-                return content;
+                content = '\n| ' + content.trim() + '\n';
+            } else if (isOnlyRow(node)) {
+                // append a table divider after the row
+                for (let i = 0; i < cells.length; i++) {
+                    content += '| --- ';
+                }
+                content += '|\n';
             }
 
-            content = '\n' + content;
-            for (let i = 0; i < cells.length; i++) {
-                content = ' --- |' + content;
-            }
-            return '\n| ' + content.trim() + '\n';
+            return content;
         },
     });
 

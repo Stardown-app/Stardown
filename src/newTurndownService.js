@@ -202,7 +202,10 @@ function addRules(t, subBrackets) {
         filter: function (node) {
             return node.nodeName === 'TABLE';
         },
-        replacement: function (content) {
+        replacement: function (content, node) {
+            if (isHideButtonTable(node)) {
+                return '';
+            }
             return '\n' + content + '\n';
         },
     });
@@ -328,6 +331,33 @@ function isOnlyRow(tr) {
             console.error('Table md: unknown parent node:', parentNode.nodeName);
             return false;
     }
+}
+
+/**
+ * isHideButtonTable reports whether an HTML table contains nothing but a "hide" button.
+ * These tables are erroneously created by Turndown from some Wikipedia tables that have
+ * a "hide" button in their top-right corner.
+ * @param {*} node - the HTML element node.
+ * @returns {boolean}
+ */
+function isHideButtonTable(node) {
+    const trs = node.querySelectorAll('tr');
+    if (trs.length !== 1) {
+        return false;
+    }
+    const tds = trs[0].querySelectorAll('td');
+    if (tds.length !== 0) {
+        return false;
+    }
+    const ths = trs[0].querySelectorAll('th');
+    if (ths.length !== 1) {
+        return false;
+    }
+    const buttons = ths[0].querySelectorAll('button');
+    if (buttons.length !== 1) {
+        return false;
+    }
+    return buttons[0].textContent === 'hide';
 }
 
 /**

@@ -175,6 +175,18 @@ function addRules(t, subBrackets) {
             content = content.trim() + ' |\n';
 
             if (!isFirstBodyRow(node)) {
+                if (isOnlyRow(node)) {
+                    const cells = node.childNodes;
+                    if (!cells || cells.length === 0) {
+                        return content;
+                    }
+
+                    for (let i = 0; i < cells.length; i++) {
+                        content += '| --- ';
+                    }
+                    content += '|\n';
+                }
+
                 return content;
             }
 
@@ -260,6 +272,7 @@ function isFirstBodyRow(tr) {
             }
             return children[0] === tr; // the tr is the first tbody's first child?
         default:
+            console.error('Table md: unknown parent node:', parentNode.nodeName);
             return false;
     }
 }
@@ -275,6 +288,51 @@ function isFirstTbody(element) {
     }
     const prev = element.previousSibling;
     return !prev || prev.nodeName === 'THEAD';
+}
+
+/**
+ * isOnlyRow reports whether a given tr element is the only row in a table.
+ * @param {*} tr - the tr element.
+ * @returns {boolean}
+ */
+function isOnlyRow(tr) {
+    const parentNode = tr.parentNode;
+    const children = parentNode.childNodes;
+    if (children.length > 1) {
+        return false;
+    }
+
+    switch (parentNode.nodeName) {
+        case 'TABLE':
+            return true;
+        case 'TBODY':
+            const tbody = parentNode;
+            const tbodyParent = tbody.parentNode;
+            if (tbodyParent.nodeName !== 'TABLE') {
+                console.error(
+                    'Table md: tbody parent node is not a table, but a',
+                    tbodyParent.nodeName,
+                );
+                return false;
+            }
+
+            const tbodyChildren = tbodyParent.childNodes;
+            if (tbodyChildren.length === 1) {
+                return true;
+            }
+
+            let trCount = 0;
+            for (let i = 0; i < tbodyChildren.length; i++) {
+                if (tbodyChildren[i].nodeName === 'TR') {
+                    trCount++;
+                }
+            }
+
+            return trCount === 1;
+        default:
+            console.error('Table md: unknown parent node:', parentNode.nodeName);
+            return false;
+    }
 }
 
 /**

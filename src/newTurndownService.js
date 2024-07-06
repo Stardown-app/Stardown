@@ -179,22 +179,30 @@ function addRules(t, subBrackets) {
                 return content;
             }
 
-            if (isFirstBodyRow(node)) {
-                // insert a table divider before the first body row
-                content = '\n' + content;
-                for (let i = 0; i < cells.length; i++) {
-                    content = ' --- |' + content;
-                }
-                content = '\n| ' + content.trim() + '\n';
-            } else if (isOnlyRow(node)) {
-                // append a table divider after the row
-                for (let i = 0; i < cells.length; i++) {
-                    content += '| --- ';
-                }
-                content += '|\n';
+            switch (getRowType(node)) {
+                case RowType.onlyRow: // an onlyRow is a header row
+                    // append a table divider after the row
+                    for (let i = 0; i < cells.length; i++) {
+                        content += '| --- ';
+                    }
+                    return content + '|\n';
+                case RowType.headerRow:
+                    return content;
+                case RowType.firstBodyRow:
+                    // insert a table divider before the row
+                    content = '\n' + content;
+                    for (let i = 0; i < cells.length; i++) {
+                        content = ' --- |' + content;
+                    }
+                    return '\n| ' + content.trim() + '\n';
+                case RowType.bodyRow:
+                    return content;
+                case RowType.error:
+                    return content;
+                default:
+                    console.error(`tableRow replacement: unknown row type`);
+                    return content;
             }
-
-            return content;
         },
     });
 
@@ -241,95 +249,72 @@ function isInlineLink(node, options) {
 }
 
 /**
- * isFirstBodyRow reports whether a given tr element is the first row in the body of a
- * table. A tr is the first body row if it's the table's second child, or if it's the
- * first child of the table's first tbody, but if the table has tbody(s) but no thead,
- * then the first tbody's second child is considered the first body row.
- * @param {*} tr - the tr element.
- * @returns {boolean}
+ * RowType is an enum for the different types of rows.
  */
-function isFirstBodyRow(tr) {
-    const parentNode = tr.parentNode;
-    const children = parentNode.childNodes;
-    switch (parentNode.nodeName) {
-        case 'TABLE':
-            if (children.length === 1) {
-                return false;
-            }
-            return children[1] === tr; // the tr is the table's second child?
-        case 'TBODY':
-            const tbody = parentNode;
-            if (!isFirstTbody(tbody)) { // if the tbody isn't the first tbody
-                return false;
-            }
-            if (!tbody.previousSibling) { // if there is no thead
-                if (children.length === 1) {
-                    return false;
-                }
-                return children[1] === tr; // the tr is the first tbody's second child?
-            }
-            return children[0] === tr; // the tr is the first tbody's first child?
-        default:
-            console.error('Table md: unknown parent node:', parentNode.nodeName);
-            return false;
-    }
-}
+const RowType = {
+    error: 'error',
+    onlyRow: 'onlyRow', // an onlyRow is a header row
+    headerRow: 'headerRow',
+    firstBodyRow: 'firstBodyRow',
+    bodyRow: 'bodyRow',
+};
 
 /**
- * isFirstTBody reports whether an element is the first tbody element in a table.
- * @param {*} element - the element to check.
- * @returns {boolean}
- */
-function isFirstTbody(element) {
-    if (!element || element.nodeName !== 'TBODY') {
-        return false;
-    }
-    const prev = element.previousSibling;
-    return !prev || prev.nodeName === 'THEAD';
-}
-
-/**
- * isOnlyRow reports whether a given tr element is the only row in a table.
+ * getRowType determines the type of a given table row.
  * @param {*} tr - the tr element.
- * @returns {boolean}
+ * @returns {RowType}
  */
-function isOnlyRow(tr) {
-    const parentNode = tr.parentNode;
-    const children = parentNode.childNodes;
-    if (children.length > 1) {
-        return false;
-    }
-
-    switch (parentNode.nodeName) {
+function getRowType(tr) {
+    const parent = tr.parentNode;
+    const trs = parent.childNodes;
+    switch (parent.nodeName) {
         case 'TABLE':
-            return true;
+            if (trs.length === 1) {
+                return RowType.onlyRow;
+            } else if (trs[0] === tr) {
+                return RowType.headerRow;
+            } else if (trs[1] === tr) {
+                return RowType.firstBodyRow;
+            } else {
+                return RowType.bodyRow;
+            }
+        case 'THEAD':
+            const thead = parent;
+            const table1 = thead.parentNode;
+            if (table1.childNodes.length === 1 && trs.length === 1) {
+                return RowType.onlyRow;
+            } else {
+                return RowType.headerRow;
+            }
         case 'TBODY':
-            const tbody = parentNode;
-            const tbodyParent = tbody.parentNode;
-            if (tbodyParent.nodeName !== 'TABLE') {
-                console.error(
-                    'Table md: tbody parent node is not a table, but a',
-                    tbodyParent.nodeName,
-                );
-                return false;
+            const tbody = parent;
+            const table2 = tbody.parentNode;
+            if (table2.childNodes.length === 1 && trs.length === 1) {
+                return RowType.onlyRow;
             }
-
-            const tbodyChildren = tbodyParent.childNodes;
-            if (tbodyChildren.length === 1) {
-                return true;
-            }
-
-            let trCount = 0;
-            for (let i = 0; i < tbodyChildren.length; i++) {
-                if (tbodyChildren[i].nodeName === 'TR') {
-                    trCount++;
+            const prev = tbody.previousSibling;
+            if (!prev) {
+                if (trs[0] === tr) {
+                    return RowType.headerRow;
+                } else if (trs[1] === tr) {
+                    return RowType.firstBodyRow;
+                } else {
+                    return RowType.bodyRow;
                 }
             }
-
-            return trCount === 1;
+            if (prev.nodeName !== 'THEAD') {
+                // this tbody is not the table's first tbody
+                return RowType.bodyRow;
+            }
+            // this tbody is the table's first tbody
+            if (trs[0] === tr) {
+                return RowType.firstBodyRow;
+            } else {
+                return RowType.bodyRow;
+            }
         default:
-            console.error('Table md: unknown parent node:', parentNode.nodeName);
-            return false;
+            console.error('getRowType: unknown parent node:', parent.nodeName);
+            return RowType.error;
     }
 }
 

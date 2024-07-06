@@ -153,15 +153,21 @@ function addRules(t, subBrackets) {
         },
     });
 
-    // The following rules are for tables, and they apply to both source-formatted
-    // markdown and markdown in a block quote. Even though most or all markdown
-    // renderers don't render tables within block quotes, Stardown puts into block
-    // quotes not just the content of tables but also their markdown syntax because the
-    // output will (at least usually) not look good either way, keeping table syntax is
-    // more intuitive and easier for the user to edit into a table that's outside a
-    // block quote, and maybe some markdown renderers do allow tables to be in block
-    // quotes.
+    addTableRules(t);
+}
 
+/**
+ * addTableRules adds to a Turndown service instance Turndown rules for how to convert
+ * HTML tables to markdown. The rules apply to both source-formatted markdown and
+ * markdown in block quotes. Even though most or all markdown renderers don't render
+ * tables within block quotes, Stardown puts into block quotes not just the content of
+ * tables but also their markdown syntax because the output will (at least usually) not
+ * look good either way, keeping table syntax is more intuitive and easier for the user
+ * to edit into a table that's outside a block quote, and maybe some markdown renderers
+ * do allow tables to be in block quotes.
+ * @param {TurndownService} t - the Turndown service instance.
+ */
+function addTableRules(t) {
     t.addRule('tableCell', {
         filter: ['th', 'td'],
         replacement: function (content, cell) {

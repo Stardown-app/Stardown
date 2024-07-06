@@ -164,24 +164,24 @@ function addRules(t, subBrackets) {
 
     t.addRule('tableCell', {
         filter: ['th', 'td'],
-        replacement: function (content, node) {
+        replacement: function (content, cell) {
             return ' | ' + content.replaceAll('\n', ' ').replaceAll(/\s+/g, ' ');
         },
     });
 
     t.addRule('tableRow', {
         filter: 'tr',
-        replacement: function (content, node) {
-            switch (getRowType(node)) {
+        replacement: function (content, tr) {
+            switch (getRowType(tr)) {
                 case RowType.onlyRow: // an onlyRow is a header row
                     // append a table divider after the row
-                    for (let i = 0; i < node.childNodes.length; i++) {
+                    for (let i = 0; i < tr.childNodes.length; i++) {
                         content += '| --- ';
                     }
                     return content + '|\n';
                 case RowType.headerRow:
-                    const rowSize = node.childNodes.length;
-                    for (let i = rowSize; i < getMaxRowSize(node); i++) {
+                    const rowSize = tr.childNodes.length;
+                    for (let i = rowSize; i < getMaxRowSize(tr); i++) {
                         // add more cells to the header row
                         content += ' |';
                     }
@@ -189,7 +189,7 @@ function addRules(t, subBrackets) {
                 case RowType.firstBodyRow:
                     // insert a table divider before the first body row
                     let divider = '\n|';
-                    for (let i = 0; i < getMaxRowSize(node); i++) {
+                    for (let i = 0; i < getMaxRowSize(tr); i++) {
                         divider += ' --- |';
                     }
                     return divider + '\n' + content.trim() + ' |\n';
@@ -205,11 +205,11 @@ function addRules(t, subBrackets) {
     });
 
     t.addRule('table', {
-        filter: function (node) {
-            return node.nodeName === 'TABLE';
+        filter: function (table) {
+            return table.nodeName === 'TABLE';
         },
-        replacement: function (content, node) {
-            if (isHideButtonTable(node)) {
+        replacement: function (content, table) {
+            if (isHideButtonTable(table)) {
                 return '';
             }
             return '\n' + content + '\n';
@@ -362,11 +362,11 @@ function getMaxRowSize(tr) {
  * isHideButtonTable reports whether an HTML table contains nothing but a "hide" button.
  * These tables are erroneously created by Turndown from some Wikipedia tables that have
  * a "hide" button in their top-right corner.
- * @param {*} node - the HTML element node.
+ * @param {*} table - the HTML table element node.
  * @returns {boolean}
  */
-function isHideButtonTable(node) {
-    const trs = node.querySelectorAll('tr');
+function isHideButtonTable(table) {
+    const trs = table.querySelectorAll('tr');
     if (trs.length !== 1) {
         return false;
     }
@@ -432,17 +432,17 @@ function newConvertLinkToMarkdown(subBrackets) {
 /**
  * convertImageToMarkdown converts an HTML image to a markdown image.
  * @param {*} content - the page's content within the HTML image.
- * @param {*} node - the HTML element node.
+ * @param {*} img - the HTML img element node.
  * @returns {string}
  */
-function convertImageToMarkdown(content, node) {
-    let src = node.getAttribute('src') || '';
+function convertImageToMarkdown(content, img) {
+    let src = img.getAttribute('src') || '';
     if (!src) {
         return '';
     }
 
     // remove excess whitespace
-    let alt = cleanAttribute(node.getAttribute('alt') || '');
+    let alt = cleanAttribute(img.getAttribute('alt') || '');
 
     // make the URL absolute
     if (src.startsWith('//')) {
@@ -454,7 +454,7 @@ function convertImageToMarkdown(content, node) {
     }
 
     // remove excess whitespace
-    let title = cleanAttribute(node.getAttribute('title') || '');
+    let title = cleanAttribute(img.getAttribute('title') || '');
     let titlePart = title ? ' "' + title + '"' : '';
 
     return '![' + alt + '](' + src + titlePart + ')';

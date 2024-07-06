@@ -37,7 +37,7 @@ export async function createMd(title, url, selection) {
         case 'source with link':
             return await getSourceFormatMdWithLink(title, url, selection, selectedText) + '\n';
         case 'source':
-            return await getSourceFormatMd(selection, selectedText) + '\n';
+            return await getSourceFormatMd(selection, selectedText);
         case 'blockquote with link':
             const body = await getSourceFormatMd(selection, selectedText);
             return await md.createBlockquote(body, title, url) + '\n';

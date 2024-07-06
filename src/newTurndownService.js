@@ -16,6 +16,7 @@
 
 import { TurndownService } from './turndown.js';
 import { turndownPluginGfm } from './turndown-plugin-gfm.js';
+import { addTableRules } from './tables.js';
 
 /**
  * replaceBrackets replaces any square brackets in text with the character or escape
@@ -153,64 +154,7 @@ function addRules(t, subBrackets) {
         },
     });
 
-    // The following rules are for tables, and they apply to both source-formatted
-    // markdown and markdown in a block quote. Even though most or all markdown
-    // renderers don't render tables within block quotes, Stardown puts into block
-    // quotes not just the content of tables but also their markdown syntax because the
-    // output will (at least usually) not look good either way, keeping table syntax is
-    // more intuitive and easier for the user to edit into a table that's outside a
-    // block quote, and maybe some markdown renderers do allow tables to be in block
-    // quotes.
-
-    t.addRule('tableCell', {
-        filter: ['th', 'td'],
-        replacement: function (content, node) {
-            return ' | ' + content.replaceAll('\n', ' ').replaceAll(/\s+/g, ' ');
-        },
-    });
-
-    t.addRule('tableRow', {
-        filter: 'tr',
-        replacement: function (content, node) {
-            content = content.trim() + ' |\n';
-
-            if (!isFirstBodyRow(node)) {
-                if (isOnlyRow(node)) {
-                    const cells = node.childNodes;
-                    if (!cells || cells.length === 0) {
-                        return content;
-                    }
-
-                    for (let i = 0; i < cells.length; i++) {
-                        content += '| --- ';
-                    }
-                    content += '|\n';
-                }
-
-                return content;
-            }
-
-            const cells = node.childNodes;
-            if (!cells || cells.length === 0) {
-                return content;
-            }
-
-            content = '\n' + content;
-            for (let i = 0; i < cells.length; i++) {
-                content = ' --- |' + content;
-            }
-            return '\n| ' + content.trim() + '\n';
-        },
-    });
-
-    t.addRule('table', {
-        filter: function (node) {
-            return node.nodeName === 'TABLE';
-        },
-        replacement: function (content) {
-            return '\n' + content + '\n';
-        },
-    });
+    addTableRules(t);
 }
 
 /**
@@ -240,99 +184,6 @@ function isInlineLink(node, options) {
         node.nodeName === 'A' &&
         node.getAttribute('href')
     )
-}
-
-/**
- * isFirstBodyRow reports whether a given tr element is the first row in the body of a
- * table. A tr is the first body row if it's the table's second child, or if it's the
- * first child of the table's first tbody, but if the table has tbody(s) but no thead,
- * then the first tbody's second child is considered the first body row.
- * @param {*} tr - the tr element.
- * @returns {boolean}
- */
-function isFirstBodyRow(tr) {
-    const parentNode = tr.parentNode;
-    const children = parentNode.childNodes;
-    switch (parentNode.nodeName) {
-        case 'TABLE':
-            if (children.length === 1) {
-                return false;
-            }
-            return children[1] === tr; // the tr is the table's second child?
-        case 'TBODY':
-            const tbody = parentNode;
-            if (!isFirstTbody(tbody)) { // if the tbody isn't the first tbody
-                return false;
-            }
-            if (!tbody.previousSibling) { // if there is no thead
-                if (children.length === 1) {
-                    return false;
-                }
-                return children[1] === tr; // the tr is the first tbody's second child?
-            }
-            return children[0] === tr; // the tr is the first tbody's first child?
-        default:
-            console.error('Table md: unknown parent node:', parentNode.nodeName);
-            return false;
-    }
-}
-
-/**
- * isFirstTBody reports whether an element is the first tbody element in a table.
- * @param {*} element - the element to check.
- * @returns {boolean}
- */
-function isFirstTbody(element) {
-    if (!element || element.nodeName !== 'TBODY') {
-        return false;
-    }
-    const prev = element.previousSibling;
-    return !prev || prev.nodeName === 'THEAD';
-}
-
-/**
- * isOnlyRow reports whether a given tr element is the only row in a table.
- * @param {*} tr - the tr element.
- * @returns {boolean}
- */
-function isOnlyRow(tr) {
-    const parentNode = tr.parentNode;
-    const children = parentNode.childNodes;
-    if (children.length > 1) {
-        return false;
-    }
-
-    switch (parentNode.nodeName) {
-        case 'TABLE':
-            return true;
-        case 'TBODY':
-            const tbody = parentNode;
-            const tbodyParent = tbody.parentNode;
-            if (tbodyParent.nodeName !== 'TABLE') {
-                console.error(
-                    'Table md: tbody parent node is not a table, but a',
-                    tbodyParent.nodeName,
-                );
-                return false;
-            }
-
-            const tbodyChildren = tbodyParent.childNodes;
-            if (tbodyChildren.length === 1) {
-                return true;
-            }
-
-            let trCount = 0;
-            for (let i = 0; i < tbodyChildren.length; i++) {
-                if (tbodyChildren[i].nodeName === 'TR') {
-                    trCount++;
-                }
-            }
-
-            return trCount === 1;
-        default:
-            console.error('Table md: unknown parent node:', parentNode.nodeName);
-            return false;
-    }
 }
 
 /**
@@ -382,17 +233,17 @@ function newConvertLinkToMarkdown(subBrackets) {
 /**
  * convertImageToMarkdown converts an HTML image to a markdown image.
  * @param {*} content - the page's content within the HTML image.
- * @param {*} node - the HTML element node.
+ * @param {*} img - the HTML img element node.
  * @returns {string}
  */
-function convertImageToMarkdown(content, node) {
-    let src = node.getAttribute('src') || '';
+function convertImageToMarkdown(content, img) {
+    let src = img.getAttribute('src') || '';
     if (!src) {
         return '';
     }
 
     // remove excess whitespace
-    let alt = cleanAttribute(node.getAttribute('alt') || '');
+    let alt = cleanAttribute(img.getAttribute('alt') || '');
 
     // make the URL absolute
     if (src.startsWith('//')) {
@@ -404,7 +255,7 @@ function convertImageToMarkdown(content, node) {
     }
 
     // remove excess whitespace
-    let title = cleanAttribute(node.getAttribute('title') || '');
+    let title = cleanAttribute(img.getAttribute('title') || '');
     let titlePart = title ? ' "' + title + '"' : '';
 
     return '![' + alt + '](' + src + titlePart + ')';

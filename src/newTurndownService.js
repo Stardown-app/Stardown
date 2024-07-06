@@ -172,36 +172,34 @@ function addRules(t, subBrackets) {
     t.addRule('tableRow', {
         filter: 'tr',
         replacement: function (content, node) {
-            content = content.trim() + ' |\n';
-
-            const cells = node.childNodes;
-            if (!cells || cells.length === 0) {
-                return content;
-            }
-
             switch (getRowType(node)) {
                 case RowType.onlyRow: // an onlyRow is a header row
                     // append a table divider after the row
-                    for (let i = 0; i < cells.length; i++) {
+                    for (let i = 0; i < node.childNodes.length; i++) {
                         content += '| --- ';
                     }
                     return content + '|\n';
                 case RowType.headerRow:
-                    return content;
-                case RowType.firstBodyRow:
-                    // insert a table divider before the row
-                    content = '\n' + content;
-                    for (let i = 0; i < cells.length; i++) {
-                        content = ' --- |' + content;
+                    const rowSize = node.childNodes.length;
+                    for (let i = rowSize; i < getMaxRowSize(node); i++) {
+                        // add more cells to the header row
+                        content += ' |';
                     }
-                    return '\n| ' + content.trim() + '\n';
+                    return content.trim() + ' |\n';
+                case RowType.firstBodyRow:
+                    // insert a table divider before the first body row
+                    let divider = '\n|';
+                    for (let i = 0; i < getMaxRowSize(node); i++) {
+                        divider += ' --- |';
+                    }
+                    return divider + '\n' + content.trim() + ' |\n';
                 case RowType.bodyRow:
-                    return content;
+                    return content.trim() + ' |\n';
                 case RowType.error:
-                    return content;
+                    return content.trim() + ' |\n';
                 default:
                     console.error(`tableRow replacement: unknown row type`);
-                    return content;
+                    return content.trim() + ' |\n';
             }
         },
     });
@@ -315,6 +313,48 @@ function getRowType(tr) {
         default:
             console.error('getRowType: unknown parent node:', parent.nodeName);
             return RowType.error;
+    }
+}
+
+/**
+ * getMaxRowSize returns the number of cells in the row with the most cells. The given
+ * tr may or may not be that row; it only has to be one of the rows in the table.
+ * @param {*} tr - the tr element.
+ * @returns {number}
+ */
+function getMaxRowSize(tr) {
+    const parent = tr.parentNode;
+    let maxSize = 0;
+
+    switch (parent.nodeName) {
+        case 'TABLE':
+            const trs = parent.childNodes;
+            for (let i = 0; i < trs.length; i++) {
+                if (trs[i].length > maxSize) {
+                    maxSize = trs[i].length;
+                }
+            }
+            return maxSize;
+        case 'THEAD':
+        case 'TBODY':
+            const table = parent.parentNode;
+            for (let i = 0; i < table.childNodes.length; i++) {
+                const node = table.childNodes[i];
+                if (node.nodeName === 'TR' && node.childNodes.length > maxSize) {
+                    maxSize = node.childNodes.length;
+                } else {
+                    const trs = node.childNodes;
+                    for (let j = 0; j < trs.length; j++) {
+                        if (trs[j].childNodes.length > maxSize) {
+                            maxSize = trs[j].childNodes.length;
+                        }
+                    }
+                }
+            }
+            return maxSize;
+        default:
+            console.error(`getMaxRowSize: unknown parent.nodeName: ${parent.nodeName}`);
+            return tr.length;
     }
 }
 

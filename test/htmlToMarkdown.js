@@ -41,6 +41,14 @@ function runTests() {
 
 const tests = [
     {
+        testName: '0x0',
+        htmlInput: `
+            <table>
+            </table>
+        `,
+        mdExpected: ``,
+    },
+    {
         testName: '1x1',
         htmlInput: `
             <table>
@@ -55,6 +63,47 @@ const tests = [
 | a |
 | --- |
 `.trim(),
+    },
+    {
+        testName: '2x1',
+        htmlInput: `
+            <table>
+                <tr>
+                    <th>
+                        a
+                    </th>
+                    <th>
+                        b
+                    </th>
+                </tr>
+            </table>
+            `,
+        mdExpected: `
+| a | b |
+| --- | --- |
+`.trim()
+    },
+    {
+        testName: '1x2',
+        htmlInput: `
+            <table>
+                <tr>
+                    <th>
+                        a
+                    </th>
+                </tr>
+                <tr>
+                    <td>
+                        c
+                    </td>
+                </tr>
+            </table>
+            `,
+        mdExpected: `
+| a |
+| --- |
+| c |
+`.trim()
     },
     {
         testName: '2x2',
@@ -82,6 +131,568 @@ const tests = [
 | a | b |
 | --- | --- |
 | c | d |
+`.trim()
+    },
+    {
+        testName: '2x3',
+        htmlInput: `
+            <table>
+                <tr>
+                    <th>
+                        a
+                    </th>
+                    <th>
+                        b
+                    </th>
+                </tr>
+                <tr>
+                    <td>
+                        d
+                    </td>
+                    <td>
+                        e
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        g
+                    </td>
+                    <td>
+                        h
+                    </td>
+                </tr>
+            </table>
+            `,
+        mdExpected: `
+| a | b |
+| --- | --- |
+| d | e |
+| g | h |
+`.trim()
+    },
+    {
+        testName: '3x2',
+        htmlInput: `
+            <table>
+                <tr>
+                    <th>
+                        a
+                    </th>
+                    <th>
+                        b
+                    </th>
+                    <th>
+                        c
+                    </th>
+                </tr>
+                <tr>
+                    <td>
+                        d
+                    </td>
+                    <td>
+                        e
+                    </td>
+                    <td>
+                        f
+                    </td>
+                </tr>
+            </table>
+            `,
+        mdExpected: `
+| a | b | c |
+| --- | --- | --- |
+| d | e | f |
+`.trim()
+    },
+    {
+        testName: '3x3',
+        htmlInput: `
+            <table>
+                <tr>
+                    <th>
+                        a
+                    </th>
+                    <th>
+                        b
+                    </th>
+                    <th>
+                        c
+                    </th>
+                </tr>
+                <tr>
+                    <td>
+                        d
+                    </td>
+                    <td>
+                        e
+                    </td>
+                    <td>
+                        f
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        g
+                    </td>
+                    <td>
+                        h
+                    </td>
+                    <td>
+                        i
+                    </td>
+                </tr>
+            </table>
+            `,
+        mdExpected: `
+| a | b | c |
+| --- | --- | --- |
+| d | e | f |
+| g | h | i |
+`.trim()
+    },
+    {
+        testName: '3x3 -1 cell in the second body row',
+        htmlInput: `
+            <table>
+                <tr>
+                    <th>
+                        a
+                    </th>
+                    <th>
+                        b
+                    </th>
+                    <th>
+                        c
+                    </th>
+                </tr>
+                <tr>
+                    <td>
+                        d
+                    </td>
+                    <td>
+                        e
+                    </td>
+                    <td>
+                        f
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        g
+                    </td>
+                    <td>
+                        h
+                    </td>
+                </tr>
+            </table>
+            `,
+        mdExpected: `
+| a | b | c |
+| --- | --- | --- |
+| d | e | f |
+| g | h |
+`.trim()
+    },
+    {
+        testName: '3x3 -1 cell in the first body row',
+        htmlInput: `
+            <table>
+                <tr>
+                    <th>
+                        a
+                    </th>
+                    <th>
+                        b
+                    </th>
+                    <th>
+                        c
+                    </th>
+                </tr>
+                <tr>
+                    <td>
+                        d
+                    </td>
+                    <td>
+                        e
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        g
+                    </td>
+                    <td>
+                        h
+                    </td>
+                    <td>
+                        i
+                    </td>
+                </tr>
+            </table>
+            `,
+        mdExpected: `
+| a | b | c |
+| --- | --- | --- |
+| d | e |
+| g | h | i |
+`.trim()
+    },
+    {
+        testName: '3x3 -1 cell in the header row',
+        htmlInput: `
+            <table>
+                <tr>
+                    <th>
+                        a
+                    </th>
+                    <th>
+                        b
+                    </th>
+                </tr>
+                <tr>
+                    <td>
+                        d
+                    </td>
+                    <td>
+                        e
+                    </td>
+                    <td>
+                        f
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        g
+                    </td>
+                    <td>
+                        h
+                    </td>
+                    <td>
+                        i
+                    </td>
+                </tr>
+            </table>
+            `,
+        mdExpected: `
+| a | b | |
+| --- | --- | --- |
+| d | e | f |
+| g | h | i |
+`.trim()
+    },
+    {
+        testName: '3x3 -2 cells in the header row',
+        htmlInput: `
+            <table>
+                <tr>
+                    <th>
+                        a
+                    </th>
+                </tr>
+                <tr>
+                    <td>
+                        d
+                    </td>
+                    <td>
+                        e
+                    </td>
+                    <td>
+                        f
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        g
+                    </td>
+                    <td>
+                        h
+                    </td>
+                    <td>
+                        i
+                    </td>
+                </tr>
+            </table>
+            `,
+        mdExpected: `
+| a | | |
+| --- | --- | --- |
+| d | e | f |
+| g | h | i |
+`.trim()
+    },
+    {
+        testName: '3x1 with thead',
+        htmlInput: `
+            <table>
+                <thead>
+                    <tr>
+                        <th>
+                            a
+                        </th>
+                        <th>
+                            b
+                        </th>
+                        <th>
+                            c
+                        </th>
+                    </tr>
+                </thead>
+            </table>
+            `,
+        mdExpected: `
+| a | b | c |
+| --- | --- | --- |
+`.trim()
+    },
+    {
+        testName: '3x3 with one thead and one tbody',
+        htmlInput: `
+            <table>
+                <thead>
+                    <tr>
+                        <th>
+                            a
+                        </th>
+                        <th>
+                            b
+                        </th>
+                        <th>
+                            c
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>
+                            d
+                        </td>
+                        <td>
+                            e
+                        </td>
+                        <td>
+                            f
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            g
+                        </td>
+                        <td>
+                            h
+                        </td>
+                        <td>
+                            i
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            `,
+        mdExpected: `
+| a | b | c |
+| --- | --- | --- |
+| d | e | f |
+| g | h | i |
+`.trim()
+    },
+    {
+        testName: '3x3 with one thead and two tbodies',
+        htmlInput: `
+            <table>
+                <thead>
+                    <tr>
+                        <th>
+                            a
+                        </th>
+                        <th>
+                            b
+                        </th>
+                        <th>
+                            c
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>
+                            d
+                        </td>
+                        <td>
+                            e
+                        </td>
+                        <td>
+                            f
+                        </td>
+                    </tr>
+                </tbody>
+                <tbody>
+                    <tr>
+                        <td>
+                            g
+                        </td>
+                        <td>
+                            h
+                        </td>
+                        <td>
+                            i
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            `,
+        mdExpected: `
+| a | b | c |
+| --- | --- | --- |
+| d | e | f |
+| g | h | i |
+`.trim()
+    },
+    {
+        testName: '3x3 with thead, tbodies, and a th column',
+        htmlInput: `
+            <table>
+                <thead>
+                    <tr>
+                        <th>
+                            a
+                        </th>
+                        <th>
+                            b
+                        </th>
+                        <th>
+                            c
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <th>
+                            d
+                        </th>
+                        <td>
+                            e
+                        </td>
+                        <td>
+                            f
+                        </td>
+                    </tr>
+                </tbody>
+                <tbody>
+                    <tr>
+                        <th>
+                            g
+                        </th>
+                        <td>
+                            h
+                        </td>
+                        <td>
+                            i
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            `,
+        mdExpected: `
+| a | b | c |
+| --- | --- | --- |
+| d | e | f |
+| g | h | i |
+`.trim()
+    },
+    {
+        testName: '3x2 with one tbody, no thead',
+        htmlInput: `
+            <table>
+                <tbody>
+                    <tr>
+                        <th>
+                            a
+                        </th>
+                        <th>
+                            b
+                        </th>
+                        <th>
+                            c
+                        </th>
+                    </tr>
+                    <tr>
+                        <td>
+                            d
+                        </td>
+                        <td>
+                            e
+                        </td>
+                        <td>
+                            f
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            `,
+        mdExpected: `
+| a | b | c |
+| --- | --- | --- |
+| d | e | f |
+`.trim()
+    },
+    {
+        testName: '3x4 with two tbodies, no thead',
+        htmlInput: `
+            <table>
+                <tbody>
+                    <tr>
+                        <td>
+                            a
+                        </td>
+                        <td>
+                            b
+                        </td>
+                        <td>
+                            c
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            d
+                        </td>
+                        <td>
+                            e
+                        </td>
+                        <td>
+                            f
+                        </td>
+                    </tr>
+                <tbody>
+                </tbody>
+                    <tr>
+                        <td>
+                            g
+                        </td>
+                        <td>
+                            h
+                        </td>
+                        <td>
+                            i
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            j
+                        </td>
+                        <td>
+                            k
+                        </td>
+                        <td>
+                            l
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            `,
+        mdExpected: `
+| a | b | c |
+| --- | --- | --- |
+| d | e | f |
+| g | h | i |
+| j | k | l |
 `.trim()
     },
 ];

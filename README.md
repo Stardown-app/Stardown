@@ -105,6 +105,7 @@ Although Stardown can be used to copy an entire page's content as markdown all a
 Unlike the extensions linked above, Stardown:
 
 * requires only one click to create a markdown link for the current page
+* is good at creating markdown of tables
 * can create markdown links for specific parts of pages (using [text fragments](https://web.dev/articles/text-fragments) and/or HTML element IDs)
 * keeps almost all formatting when copying specific parts of pages
 * can create markdown of YouTube videos that renders well in GitHub

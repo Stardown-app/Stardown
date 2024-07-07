@@ -38,6 +38,7 @@ export function addTableRules(t) {
         replacement: function (content, tr) {
             switch (getRowType(tr)) {
                 case RowType.onlyRow: // an onlyRow is a header row
+                    content = content.trim() + ' |\n';
                     // append a table divider after the row
                     for (let i = 0; i < tr.childNodes.length; i++) {
                         content += '| --- ';

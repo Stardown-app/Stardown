@@ -41,6 +41,22 @@ function runTests() {
 
 const tests = [
     {
+        testName: '1x1',
+        htmlInput: `
+            <table>
+                <tr>
+                    <th>
+                        a
+                    </th>
+                </tr>
+            </table>
+        `,
+        mdExpected: `
+| a |
+| --- |
+`.trim(),
+    },
+    {
         testName: '2x2',
         htmlInput: `
             <table>

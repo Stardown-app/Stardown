@@ -196,8 +196,8 @@ function getMaxRowSize(tr) {
 
 /**
  * isHideButtonTable reports whether an HTML table contains nothing but a "hide" button.
- * These tables are erroneously created by Turndown from some Wikipedia tables that have
- * a "hide" button in their top-right corner.
+ * These tables are erroneously created from some Wikipedia tables that have a "hide"
+ * button in their top-right corner.
  * @param {*} table - the HTML table element node.
  * @returns {boolean}
  */

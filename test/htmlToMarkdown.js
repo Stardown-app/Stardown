@@ -24,36 +24,50 @@ const turndownService = newTurndownService(
     '-', 'underlined', 'source with link', true, true, escape,
 );
 
-test('simple 2x2 table', t => {
-    const html = `
-        <table>
-            <tr>
-                <th>
-                    a
-                </th>
-                <th>
-                    b
-                </th>
-            </tr>
-            <tr>
-                <td>
-                    c
-                </td>
-                <td>
-                    d
-                </td>
-            </tr>
-        </table>
-    `;
+function runTest(testName, htmlInput, mdExpected) {
+    test(testName, t => {
+        global.document = new JSDOM(htmlInput).window.document;
+        const mdActual = turndownService.turndown(htmlInput);
+        assert.equal(mdActual, mdExpected);
+    });
+}
 
-    global.document = new JSDOM(html).window.document;
+function runTests() {
+    for (let i = 0; i < tests.length; i++) {
+        const { testName, htmlInput, mdExpected } = tests[i];
+        runTest(testName, htmlInput, mdExpected);
+    }
+}
 
-    const got = turndownService.turndown(html);
-    const want = `
+const tests = [
+    {
+        testName: '2x2',
+        htmlInput: `
+            <table>
+                <tr>
+                    <th>
+                        a
+                    </th>
+                    <th>
+                        b
+                    </th>
+                </tr>
+                <tr>
+                    <td>
+                        c
+                    </td>
+                    <td>
+                        d
+                    </td>
+                </tr>
+            </table>
+            `,
+        mdExpected: `
 | a | b |
 | --- | --- |
 | c | d |
-`.trim();
+`.trim()
+    },
+];
 
-    assert.equal(want, got);
-});
+runTests();

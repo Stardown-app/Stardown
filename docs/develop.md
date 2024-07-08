@@ -87,9 +87,9 @@ When fully testing Stardown, use the descriptions in this section in each of the
 
 ### Features
 
-- [ ] **Clicking the icon or pressing Ctrl+Shift+U** copies a markdown link for the page, unless part of the page is selected in which case markdown of the selection is copied instead.
-- [ ] **Double-clicking the icon or pressing Ctrl+Shift+UU** copies a markdown unordered list of markdown links for all open tabs.
-- [ ] **Selecting tabs, then double-clicking the icon or pressing Ctrl+Shift+UU** copies a markdown unordered list of markdown links for all selected tabs.
+- [ ] **Clicking the icon or pressing Alt+C** copies a markdown link for the page, unless part of the page is selected in which case markdown of the selection is copied instead.
+- [ ] **Double-clicking the icon or pressing Alt+CC** copies a markdown unordered list of markdown links for all open tabs.
+- [ ] **Selecting tabs, then double-clicking the icon or pressing Alt+CC** copies a markdown unordered list of markdown links for all selected tabs.
 - [ ] **Right-clicking an empty part of a page** shows the "Copy markdown link to here" option.
 - [ ] **Right-clicking a website's unselected header** shows the "Copy markdown link to here" option.
 - [ ] **Right-clicking selected text** shows the "Copy markdown of selection" option.

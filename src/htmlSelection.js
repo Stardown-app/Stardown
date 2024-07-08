@@ -108,6 +108,25 @@ async function getSelectionHtml(selection) {
     let startRange = selection.getRangeAt(0).cloneRange();
     let startNode = startRange.startContainer;
 
+    selectParentHeader(startRange, startNode);
+    selectParentTable(startRange, startNode);
+
+    let container = document.createElement('div');
+    container.appendChild(startRange.cloneContents());
+    for (let i = 1; i < selection.rangeCount; i++) {
+        container.appendChild(selection.getRangeAt(i).cloneContents());
+    }
+
+    return container.innerHTML;
+}
+
+/**
+ * selectParentHeader expands a selection to include header elements that are the parent
+ * or grandparent of the start of the selection.
+ * @param {Range} startRange - a selection's index 0 range.
+ * @param {Node} startNode - a selection's index 0 range's start container.
+ */
+function selectParentHeader(startRange, startNode) {
     // While there is a parent node and either the parent node or its parent node is a
     // header tag...
     while (
@@ -119,17 +138,27 @@ async function getSelectionHtml(selection) {
         )
     ) {
         // ...expand the start of the selection to include the header tag. This is
-        // necessary because the selection may not include a header tag even if the user
+        // important because the selection may not include a header tag even if the user
         // selected text within it.
         startNode = startNode.parentNode;
         startRange.setStartBefore(startNode);
     }
+}
 
-    let container = document.createElement('div');
-    container.appendChild(startRange.cloneContents());
-    for (let i = 1; i < selection.rangeCount; i++) {
-        container.appendChild(selection.getRangeAt(i).cloneContents());
+/**
+ * selectParentTable expands a selection to include table elements that are the parent
+ * of the start of the selection.
+ * @param {Range} startRange - a selection's index 0 range.
+ * @param {Node} startNode - a selection's index 0 range's start container.
+ */
+function selectParentTable(startRange, startNode) {
+    const tags = ['TABLE', 'THEAD', 'TBODY', 'TR', 'TH', 'TD'];
+
+    // While there is a parent node and it's a table tag...
+    while (startNode.parentNode && tags.includes(startNode.parentNode.nodeName)) {
+        // ...expand the start of the selection to include the table tag. This makes
+        // tables easier to copy.
+        startNode = startNode.parentNode;
+        startRange.setStartBefore(startNode);
     }
-
-    return container.innerHTML;
 }

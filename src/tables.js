@@ -41,10 +41,10 @@ export function addTableRules(t) {
                 // If the cell contains something that can't render in a cell...
                 if (childName === 'TABLE' || childName.startsWith('H')) {
                     // ...just get its non-markdown text.
-                    return ' | ' + cell.textContent.trim().replaceAll(/\s+/g, ' ').replaceAll('|', '\\|');
+                    return ' | ' + formatCellContent(cell.textContent);
                 }
             }
-            return ' | ' + content.trim().replaceAll(/\s+/g, ' ').replaceAll('|', '\\|');
+            return ' | ' + formatCellContent(content);
         },
     });
 
@@ -87,6 +87,16 @@ export function addTableRules(t) {
             return '\n' + content + '\n';
         },
     });
+}
+
+/**
+ * formatCellContent prepares a table cell's content to be incorporated into a table
+ * row.
+ * @param {string} content - the table cell's content.
+ * @returns {string}
+ */
+function formatCellContent(content) {
+    return content.trim().replaceAll(/\s+/g, ' ').replaceAll('|', '\\|');
 }
 
 /**

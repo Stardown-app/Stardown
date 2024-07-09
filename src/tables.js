@@ -52,29 +52,21 @@ export function addTableRules(t) {
         filter: 'tr',
         replacement: function (content, tr) {
             switch (getRowType(tr)) {
-                case RowType.onlyRow: // an onlyRow is a header row
-                    content = content.trim() + ' |\n';
-                    // append a table divider after the row
-                    for (let i = 0; i < tr.childNodes.length; i++) {
-                        content += '| --- ';
-                    }
-                    return content + '|\n';
                 case RowType.headerRow:
+                    content = content.trim() + ' |';
                     const rowSize = tr.childNodes.length;
-                    for (let i = rowSize; i < getMaxRowSize(tr); i++) {
-                        // add more cells to the header row
+                    const maxRowSize = getMaxRowSize(tr);
+                    // add more cells to the header row if needed
+                    for (let i = rowSize; i < maxRowSize; i++) {
                         content += ' |';
                     }
-                    return content.trim() + ' |\n';
-                case RowType.firstBodyRow:
-                    // insert a table divider before the first body row
-                    let divider = '\n|';
-                    for (let i = 0; i < getMaxRowSize(tr); i++) {
-                        divider += ' --- |';
+                    // append a table divider
+                    content += '\n|';
+                    for (let i = 0; i < maxRowSize; i++) {
+                        content += ' --- |';
                     }
-                    return divider + '\n' + content.trim() + ' |\n';
+                    return content + '\n';
                 case RowType.bodyRow:
-                    return content.trim() + ' |\n';
                 case RowType.error:
                     return content.trim() + ' |\n';
                 default:
@@ -102,9 +94,7 @@ export function addTableRules(t) {
  */
 const RowType = {
     error: 'error',
-    onlyRow: 'onlyRow', // an onlyRow is a header row
     headerRow: 'headerRow',
-    firstBodyRow: 'firstBodyRow',
     bodyRow: 'bodyRow',
 };
 
@@ -118,52 +108,20 @@ function getRowType(tr) {
     const trs = parent.childNodes;
     switch (parent.nodeName) {
         case 'TABLE':
-            if (trs.length === 1) {
-                return RowType.onlyRow;
-            } else if (trs[0] === tr) {
-                return RowType.headerRow;
-            } else if (trs[1] === tr) {
-                return RowType.firstBodyRow;
-            } else {
-                return RowType.bodyRow;
-            }
         case 'THEAD':
-            const thead = parent;
-            const table1 = thead.parentNode;
-            if (table1.childNodes.length === 1 && trs.length === 1) {
-                return RowType.onlyRow;
-            } else if (trs[0] === tr) {
+            if (trs[0] === tr) {
                 return RowType.headerRow;
-            } else if (trs[1] === tr) {
-                return RowType.firstBodyRow;
             } else {
                 return RowType.bodyRow;
             }
         case 'TBODY':
             const tbody = parent;
-            const table2 = tbody.parentNode;
-            if (table2.childNodes.length === 1 && trs.length === 1) {
-                return RowType.onlyRow;
-            }
             const prev = tbody.previousSibling;
-            if (!prev || prev.nodeName === 'CAPTION') {
-                if (trs[0] === tr) {
-                    return RowType.headerRow;
-                } else if (trs[1] === tr) {
-                    return RowType.firstBodyRow;
-                } else {
-                    return RowType.bodyRow;
-                }
-            }
-            if (prev.nodeName !== 'THEAD') {
-                // this tbody is not the table's first tbody
+            if (prev && prev.nodeName !== 'CAPTION') {
                 return RowType.bodyRow;
             }
-            // this tbody is the table's first tbody
-            if (prev.childNodes.length > 1) {
-                return RowType.bodyRow;
-            } else if (trs[0] === tr) {
-                return RowType.firstBodyRow;
+            if (trs[0] === tr) {
+                return RowType.headerRow;
             } else {
                 return RowType.bodyRow;
             }

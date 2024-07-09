@@ -1030,6 +1030,37 @@ const tests = [
 | b |
 `.trim()
     },
+    {
+        testName: 'colspan',
+        htmlInput: `
+            <table>
+                <tr>
+                    <th colspan="2">
+                        a
+                    </th>
+                    <th>
+                        b
+                    </th>
+                </tr>
+                <tr>
+                    <td>
+                        c
+                    </td>
+                    <td>
+                        d
+                    </td>
+                    <td>
+                        e
+                    </td>
+                </tr>
+            </table>
+            `,
+        mdExpected: `
+| a | | b |
+| --- | --- | --- |
+| c | d | e |
+`.trim()
+    },
 ];
 
 runTests();

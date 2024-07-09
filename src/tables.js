@@ -55,7 +55,17 @@ export function addTableRules(t) {
                     return ' | ' + formatCellContent(cell.textContent);
                 }
             }
-            return ' | ' + formatCellContent(content);
+
+            content = ' | ' + formatCellContent(content);
+
+            // if the row spans multiple columns, add empty cells for the remaining
+            // columns
+            const colspan = cell.getAttribute('colspan') || 1;
+            for (let i = 1; i <= colspan - 1; i++) {
+                content += ' |'
+            }
+
+            return content;
         },
     });
 
@@ -65,7 +75,7 @@ export function addTableRules(t) {
             switch (getRowType(tr)) {
                 case RowType.headerRow:
                     content = content.trim() + ' |';
-                    const rowSize = tr.childNodes.length;
+                    const rowSize = getRowSize(tr);
                     const maxRowSize = getMaxRowSize(tr);
                     // add more cells to the header row if needed
                     for (let i = rowSize; i < maxRowSize; i++) {
@@ -121,7 +131,7 @@ const RowType = {
 
 /**
  * getRowType determines the type of a given table row.
- * @param {*} tr - the tr element.
+ * @param {Node} tr - the tr element.
  * @returns {RowType}
  */
 function getRowType(tr) {
@@ -155,55 +165,57 @@ function getRowType(tr) {
 }
 
 /**
- * getMaxRowSize returns the number of cells in the row with the most cells. The given
- * tr may or may not be that row; it only has to be one of the rows in the table.
- * @param {*} tr - the tr element.
+ * getRowSize gets the number of cells in a table row. Cells that span multiple columns
+ * are counted as multiple cells.
+ * @param {Node} tr - the tr element.
+ * @returns {number}
+ */
+function getRowSize(tr) {
+    let rowSize = tr.childNodes.length;
+    for (let i = 0; i < tr.childNodes.length; i++) {
+        const cell = tr.childNodes[i];
+        const colspan = cell.getAttribute('colspan') || 1;
+        rowSize += colspan - 1;
+    }
+    return rowSize;
+}
+
+/**
+ * getMaxRowSize returns the number of cells in the table's row with the most cells.
+ * Cells that span multiple columns are counted as multiple cells. The row with the most
+ * cells is not necessarily the row that is passed to this function; the given row can
+ * be any row in the table.
+ * @param {Node} tr - the tr element.
  * @returns {number}
  */
 function getMaxRowSize(tr) {
     const parent = tr.parentNode;
-    let maxSize = 0;
 
-    switch (parent.nodeName) {
-        case 'TABLE':
-            const trs = parent.childNodes;
-            for (let i = 0; i < trs.length; i++) {
-                const rowLen = trs[i].length;
-                if (rowLen > maxSize) {
-                    maxSize = rowLen;
-                }
-            }
-            return maxSize;
-        case 'THEAD':
-        case 'TBODY':
-        case 'TFOOT':
-            const table = parent.parentNode;
-            for (let i = 0; i < table.childNodes.length; i++) {
-                const node = table.childNodes[i];
-                if (node.nodeName === 'TR' && node.childNodes.length > maxSize) {
-                    maxSize = node.childNodes.length;
-                } else {
-                    const trs = node.childNodes;
-                    for (let j = 0; j < trs.length; j++) {
-                        const rowLen = trs[j].childNodes.length;
-                        if (rowLen > maxSize) {
-                            maxSize = rowLen;
-                        }
-                    }
-                }
-            }
-            return maxSize;
-        default:
-            console.error(`getMaxRowSize: unknown parent.nodeName: ${parent.nodeName}`);
-            return tr.length;
+    let table;
+    if (parent.nodeName === 'TABLE') {
+        table = parent;
+    } else {
+        table = parent.parentNode;
     }
+
+    const trs = table.querySelectorAll('tr');
+
+    let maxSize = 0;
+    for (let i = 0; i < trs.length; i++) {
+        const rowLen = getRowSize(trs[i]);
+        if (rowLen > maxSize) {
+            maxSize = rowLen;
+        }
+    }
+
+    return maxSize;
 }
 
 /**
  * isHideButtonTable reports whether an HTML table contains nothing but a "hide" button.
  * These tables are erroneously created from some Wikipedia tables that have a "hide"
  * button in their top-right corner.
- * @param {*} table - the HTML table element node.
+ * @param {Node} table - the HTML table element node.
  * @returns {boolean}
  */
 function isHideButtonTable(table) {

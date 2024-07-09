@@ -72,7 +72,10 @@ export function addTableRules(t) {
     t.addRule('tableRow', {
         filter: 'tr',
         replacement: function (content, tr) {
-            if (!isFirstRow(tr)) {
+            const table = getTable(tr);
+
+            if (!isFirstRow(tr, table)) {
+                // this row is a body row
                 return content.trim() + ' |\n';
             }
 
@@ -80,7 +83,7 @@ export function addTableRules(t) {
             content = content.trim() + ' |';
 
             const rowSize = getRowSize(tr);
-            const maxRowSize = getMaxRowSize(tr);
+            const maxRowSize = getMaxRowSize(table);
 
             // add more cells to the header row if needed
             for (let i = rowSize; i < maxRowSize; i++) {
@@ -94,7 +97,7 @@ export function addTableRules(t) {
             }
 
             return content + '\n';
-        }
+        },
     });
 
     t.addRule('table', {
@@ -121,20 +124,11 @@ function formatCellContent(content) {
 /**
  * isFirstRow reports whether a table row is the first row in its table.
  * @param {Node} tr - the tr element.
+ * @param {Node} table - the table element.
  * @returns {boolean}
  */
-function isFirstRow(tr) {
-    const parent = tr.parentNode;
-
-    let table;
-    if (parent.nodeName === 'TABLE') {
-        table = parent;
-    } else {
-        table = parent.parentNode;
-    }
-
+function isFirstRow(tr, table) {
     const trs = table.querySelectorAll('tr');
-
     return trs[0] === tr;
 }
 
@@ -156,22 +150,11 @@ function getRowSize(tr) {
 
 /**
  * getMaxRowSize returns the number of cells in the table's row with the most cells.
- * Cells that span multiple columns are counted as multiple cells. The row with the most
- * cells is not necessarily the row that is passed to this function; the given row can
- * be any row in the table.
- * @param {Node} tr - the tr element.
+ * Cells that span multiple columns are counted as multiple cells.
+ * @param {Node} table - the table element.
  * @returns {number}
  */
-function getMaxRowSize(tr) {
-    const parent = tr.parentNode;
-
-    let table;
-    if (parent.nodeName === 'TABLE') {
-        table = parent;
-    } else {
-        table = parent.parentNode;
-    }
-
+function getMaxRowSize(table) {
     const trs = table.querySelectorAll('tr');
 
     let maxSize = 0;
@@ -183,6 +166,20 @@ function getMaxRowSize(tr) {
     }
 
     return maxSize;
+}
+
+/**
+ * getTable gets the table element that contains the given table row.
+ * @param {Node} tr - the tr element.
+ * @returns {Node}
+ */
+function getTable(tr) {
+    const parent = tr.parentNode;
+    if (parent.nodeName === 'TABLE') {
+        return parent;
+    } else {
+        return parent.parentNode;
+    }
 }
 
 /**

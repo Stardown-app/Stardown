@@ -696,6 +696,38 @@ const tests = [
 `.trim()
     },
     {
+        testName: 'multiple rows in a thead',
+        htmlInput: `
+            <table>
+                <thead>
+                    <tr>
+                        <th>
+                            a
+                        </th>
+                    </tr>
+                    <tr>
+                        <th>
+                            b
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>
+                            c
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            `,
+        mdExpected: `
+| a |
+| --- |
+| b |
+| c |
+`.trim()
+    },
+    {
         testName: 'pipe symbols',
         htmlInput: `
             <table>

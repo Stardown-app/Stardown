@@ -117,8 +117,12 @@ function getRowType(tr) {
             const table1 = thead.parentNode;
             if (table1.childNodes.length === 1 && trs.length === 1) {
                 return RowType.onlyRow;
-            } else {
+            } else if (trs[0] === tr) {
                 return RowType.headerRow;
+            } else if (trs[1] === tr) {
+                return RowType.firstBodyRow;
+            } else {
+                return RowType.bodyRow;
             }
         case 'TBODY':
             const tbody = parent;
@@ -141,7 +145,9 @@ function getRowType(tr) {
                 return RowType.bodyRow;
             }
             // this tbody is the table's first tbody
-            if (trs[0] === tr) {
+            if (prev.childNodes.length > 1) {
+                return RowType.bodyRow;
+            } else if (trs[0] === tr) {
                 return RowType.firstBodyRow;
             } else {
                 return RowType.bodyRow;

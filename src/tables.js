@@ -29,7 +29,7 @@ export function addTableRules(t) {
     t.addRule('tableCell', {
         filter: ['th', 'td'],
         replacement: function (content, cell) {
-            return ' | ' + content.replaceAll(/\s+/g, ' ');
+            return ' | ' + content.replaceAll(/\s+/g, ' ').replaceAll('|', '\\|');
         },
     });
 

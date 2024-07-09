@@ -695,6 +695,28 @@ const tests = [
 | j | k | l |
 `.trim()
     },
+    {
+        testName: 'pipe symbols',
+        htmlInput: `
+            <table>
+                <tr>
+                    <th>
+                        a | b
+                    </th>
+                </tr>
+                <tr>
+                    <td>
+                        c | d
+                    </td>
+                </tr>
+            </table>
+            `,
+        mdExpected: `
+| a \\| b |
+| --- |
+| c \\| d |
+`.trim()
+    },
 ];
 
 runTests();

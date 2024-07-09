@@ -26,6 +26,13 @@
  * @param {TurndownService} t - the Turndown service instance.
  */
 export function addTableRules(t) {
+    t.addRule('caption', {
+        filter: 'caption',
+        replacement: function (content, caption) {
+            return '**' + content + '**\n\n';
+        },
+    });
+
     t.addRule('tableCell', {
         filter: ['th', 'td'],
         replacement: function (content, cell) {
@@ -139,7 +146,7 @@ function getRowType(tr) {
                 return RowType.onlyRow;
             }
             const prev = tbody.previousSibling;
-            if (!prev) {
+            if (!prev || prev.nodeName === 'CAPTION') {
                 if (trs[0] === tr) {
                     return RowType.headerRow;
                 } else if (trs[1] === tr) {

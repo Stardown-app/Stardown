@@ -889,6 +889,35 @@ const tests = [
 | cd |
 `.trim()
     },
+    {
+        testName: 'caption',
+        htmlInput: `
+            <table>
+                <caption>
+                    this is a caption
+                </caption>
+                <tbody>
+                    <tr>
+                        <th>
+                            a
+                        </th>
+                    </tr>
+                    <tr>
+                        <td>
+                            b
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            `,
+        mdExpected: `
+**this is a caption**
+
+| a |
+| --- |
+| b |
+`.trim()
+    },
 ];
 
 runTests();

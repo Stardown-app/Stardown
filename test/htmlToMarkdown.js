@@ -845,6 +845,50 @@ const tests = [
 | 1. e 2. f | - g - h |
 `.trim()
     },
+    {
+        testName: 'table of tables',
+        htmlInput: `
+            <table>
+                <tr>
+                    <td>
+                        <table>
+                            <tr>
+                                <td>
+                                    a
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    b
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <table>
+                            <tr>
+                                <td>
+                                    c
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    d
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+            </table>
+            `,
+        mdExpected: `
+| ab |
+| --- |
+| cd |
+`.trim()
+    },
 ];
 
 runTests();

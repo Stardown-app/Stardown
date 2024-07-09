@@ -29,6 +29,14 @@ export function addTableRules(t) {
     t.addRule('tableCell', {
         filter: ['th', 'td'],
         replacement: function (content, cell) {
+            for (let i = 0; i < cell.childNodes.length; i++) {
+                const childName = cell.childNodes[i].nodeName;
+                // If the cell contains something that can't render in a cell...
+                if (childName === 'TABLE' || childName.startsWith('H')) {
+                    // ...just get its non-markdown text.
+                    return ' | ' + cell.textContent.trim().replaceAll(/\s+/g, ' ').replaceAll('|', '\\|');
+                }
+            }
             return ' | ' + content.trim().replaceAll(/\s+/g, ' ').replaceAll('|', '\\|');
         },
     });

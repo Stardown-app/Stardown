@@ -728,6 +728,70 @@ const tests = [
 `.trim()
     },
     {
+        testName: 'one tbody and one tfoot, each with one row',
+        htmlInput: `
+            <table>
+                <tbody>
+                    <tr>
+                        <td>
+                            a
+                        </td>
+                    </tr>
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <td>
+                            b
+                        </td>
+                    </tr>
+                </tfoot>
+            </table>
+            `,
+        mdExpected: `
+| a |
+| --- |
+| b |
+`.trim()
+    },
+    {
+        testName: 'one tbody and one tfoot, each with two rows',
+        htmlInput: `
+            <table>
+                <tbody>
+                    <tr>
+                        <td>
+                            a
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            b
+                        </td>
+                    </tr>
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <td>
+                            c
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            d
+                        </td>
+                    </tr>
+                </tfoot>
+            </table>
+            `,
+        mdExpected: `
+| a |
+| --- |
+| b |
+| c |
+| d |
+`.trim()
+    },
+    {
         testName: 'pipe symbols',
         htmlInput: `
             <table>

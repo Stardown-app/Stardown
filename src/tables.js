@@ -115,6 +115,8 @@ function getRowType(tr) {
                 return RowType.bodyRow;
             }
         case 'TBODY':
+        case 'TFOOT':
+            // consider `tfoot`s to be `tbody`s since markdown doesn't differentiate
             const tbody = parent;
             const prev = tbody.previousSibling;
             if (prev && prev.nodeName !== 'CAPTION') {
@@ -145,13 +147,15 @@ function getMaxRowSize(tr) {
         case 'TABLE':
             const trs = parent.childNodes;
             for (let i = 0; i < trs.length; i++) {
-                if (trs[i].length > maxSize) {
-                    maxSize = trs[i].length;
+                const rowLen = trs[i].length;
+                if (rowLen > maxSize) {
+                    maxSize = rowLen;
                 }
             }
             return maxSize;
         case 'THEAD':
         case 'TBODY':
+        case 'TFOOT':
             const table = parent.parentNode;
             for (let i = 0; i < table.childNodes.length; i++) {
                 const node = table.childNodes[i];
@@ -160,8 +164,9 @@ function getMaxRowSize(tr) {
                 } else {
                     const trs = node.childNodes;
                     for (let j = 0; j < trs.length; j++) {
-                        if (trs[j].childNodes.length > maxSize) {
-                            maxSize = trs[j].childNodes.length;
+                        const rowLen = trs[j].childNodes.length;
+                        if (rowLen > maxSize) {
+                            maxSize = rowLen;
                         }
                     }
                 }

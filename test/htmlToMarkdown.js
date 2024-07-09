@@ -717,6 +717,28 @@ const tests = [
 | c \\| d |
 `.trim()
     },
+    {
+        testName: 'spaces around',
+        htmlInput: `
+            <table>
+                <tr>
+                    <th>
+                        <p>  a  </p>
+                    </th>
+                </tr>
+                <tr>
+                    <td>
+                        <p>  b  </p>
+                    </td>
+                </tr>
+            </table>
+            `,
+        mdExpected: `
+| a |
+| --- |
+| b |
+`.trim()
+    },
 ];
 
 runTests();

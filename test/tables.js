@@ -420,7 +420,7 @@ const tests = [
 `.trim()
     },
     {
-        testName: '3x1 with thead',
+        testName: 'thead',
         htmlInput: `
             <table>
                 <thead>
@@ -444,7 +444,7 @@ const tests = [
 `.trim()
     },
     {
-        testName: '3x3 with one thead and one tbody',
+        testName: 'one thead and one tbody',
         htmlInput: `
             <table>
                 <thead>
@@ -494,7 +494,7 @@ const tests = [
 `.trim()
     },
     {
-        testName: '3x3 with one thead and two tbodies',
+        testName: 'one thead and two tbodies',
         htmlInput: `
             <table>
                 <thead>
@@ -546,7 +546,7 @@ const tests = [
 `.trim()
     },
     {
-        testName: '3x3 with thead, tbodies, and a th column',
+        testName: 'thead, tbodies, and a th column',
         htmlInput: `
             <table>
                 <thead>
@@ -598,7 +598,7 @@ const tests = [
 `.trim()
     },
     {
-        testName: '3x2 with one tbody, no thead',
+        testName: 'one tbody, no thead',
         htmlInput: `
             <table>
                 <tbody>
@@ -634,7 +634,7 @@ const tests = [
 `.trim()
     },
     {
-        testName: '3x4 with two tbodies, no thead',
+        testName: 'two tbodies, no thead',
         htmlInput: `
             <table>
                 <tbody>

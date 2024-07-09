@@ -792,6 +792,54 @@ const tests = [
 `.trim()
     },
     {
+        testName: 'one thead with a tr, followed by one tr',
+        htmlInput: `
+            <table>
+                <thead>
+                    <tr>
+                        <th>
+                            a
+                        </th>
+                    </tr>
+                </thead>
+                <tr>
+                    <td>
+                        b
+                    </td>
+                </tr>
+            </table>
+            `,
+        mdExpected: `
+| a |
+| --- |
+| b |
+`.trim()
+    },
+    {
+        testName: 'one tr, followed by one tfoot',
+        htmlInput: `
+            <table>
+                <tr>
+                    <td>
+                        a
+                    </td>
+                </tr>
+                <tfoot>
+                    <tr>
+                        <th>
+                            b
+                        </th>
+                    </tr>
+                </tfoot>
+            </table>
+            `,
+        mdExpected: `
+| a |
+| --- |
+| b |
+`.trim()
+    },
+    {
         testName: 'pipe symbols',
         htmlInput: `
             <table>

@@ -72,35 +72,33 @@ export function addTableRules(t) {
     t.addRule('tableRow', {
         filter: 'tr',
         replacement: function (content, tr) {
-            switch (getRowType(tr)) {
-                case RowType.headerRow:
-                    content = content.trim() + ' |';
-                    const rowSize = getRowSize(tr);
-                    const maxRowSize = getMaxRowSize(tr);
-                    // add more cells to the header row if needed
-                    for (let i = rowSize; i < maxRowSize; i++) {
-                        content += ' |';
-                    }
-                    // append a table divider
-                    content += '\n|';
-                    for (let i = 0; i < maxRowSize; i++) {
-                        content += ' --- |';
-                    }
-                    return content + '\n';
-                case RowType.bodyRow:
-                case RowType.error:
-                    return content.trim() + ' |\n';
-                default:
-                    console.error(`tableRow replacement: unknown row type`);
-                    return content.trim() + ' |\n';
+            if (!isFirstRow(tr)) {
+                return content.trim() + ' |\n';
             }
-        },
+
+            // this row will be the header row
+            content = content.trim() + ' |';
+
+            const rowSize = getRowSize(tr);
+            const maxRowSize = getMaxRowSize(tr);
+
+            // add more cells to the header row if needed
+            for (let i = rowSize; i < maxRowSize; i++) {
+                content += ' |';
+            }
+
+            // append a table divider
+            content += '\n|';
+            for (let i = 0; i < maxRowSize; i++) {
+                content += ' --- |';
+            }
+
+            return content + '\n';
+        }
     });
 
     t.addRule('table', {
-        filter: function (table) {
-            return table.nodeName === 'TABLE';
-        },
+        filter: 'table',
         replacement: function (content, table) {
             if (isHideButtonTable(table)) {
                 return '';
@@ -121,47 +119,23 @@ function formatCellContent(content) {
 }
 
 /**
- * RowType is an enum for the different types of rows.
- */
-const RowType = {
-    error: 'error',
-    headerRow: 'headerRow',
-    bodyRow: 'bodyRow',
-};
-
-/**
- * getRowType determines the type of a given table row.
+ * isFirstRow reports whether a table row is the first row in its table.
  * @param {Node} tr - the tr element.
- * @returns {RowType}
+ * @returns {boolean}
  */
-function getRowType(tr) {
+function isFirstRow(tr) {
     const parent = tr.parentNode;
-    const trs = parent.childNodes;
-    switch (parent.nodeName) {
-        case 'TABLE':
-        case 'THEAD':
-            if (trs[0] === tr) {
-                return RowType.headerRow;
-            } else {
-                return RowType.bodyRow;
-            }
-        case 'TBODY':
-        case 'TFOOT':
-            // consider `tfoot`s to be `tbody`s since markdown doesn't differentiate
-            const tbody = parent;
-            const prev = tbody.previousSibling;
-            if (prev && prev.nodeName !== 'CAPTION') {
-                return RowType.bodyRow;
-            }
-            if (trs[0] === tr) {
-                return RowType.headerRow;
-            } else {
-                return RowType.bodyRow;
-            }
-        default:
-            console.error('getRowType: unknown parent node:', parent.nodeName);
-            return RowType.error;
+
+    let table;
+    if (parent.nodeName === 'TABLE') {
+        table = parent;
+    } else {
+        table = parent.parentNode;
     }
+
+    const trs = table.querySelectorAll('tr');
+
+    return trs[0] === tr;
 }
 
 /**

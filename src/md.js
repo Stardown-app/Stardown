@@ -96,8 +96,9 @@ export async function htmlToMarkdown(html) {
 
 /**
  * createLink creates a markdown link.
- * @param {string} title - the title of the link. Square brackets are replaced, escaped,
- * or unchanged depending on the settings. Some other markdown characters are escaped.
+ * @param {string|null} title - the title of the link. Square brackets are replaced,
+ * escaped, or unchanged depending on the settings. Some other markdown characters are
+ * escaped. If the given title is null, it is replaced with 'link'.
  * @param {string} url - the URL of the link. Parentheses are URL-encoded.
  * @param {string|null} subBrackets - the setting for what to substitute any square
  * brackets with. If not given, the setting is read from storage.
@@ -108,15 +109,19 @@ export async function createLink(title, url, subBrackets = null) {
         subBrackets = await getSetting('subBrackets');
     }
 
-    title = replaceBrackets(title, subBrackets);
-    title = title
-        .replaceAll('\\', '\\\\')
-        .replaceAll('#', '\\#')
-        .replaceAll('_', '\\_')
-        .replaceAll('*', '\\*')
-        .replaceAll('`', '\\`')
-        .replaceAll('>', '\\>')
-        .replaceAll(' ', '')
+    if (title === null) {
+        title = 'link';
+    } else {
+        title = replaceBrackets(title, subBrackets);
+        title = title
+            .replaceAll('\\', '\\\\')
+            .replaceAll('#', '\\#')
+            .replaceAll('_', '\\_')
+            .replaceAll('*', '\\*')
+            .replaceAll('`', '\\`')
+            .replaceAll('>', '\\>')
+            .replaceAll(' ', '')
+    }
 
     url = url.replaceAll('(', '%28').replaceAll(')', '%29');
 

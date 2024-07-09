@@ -739,6 +739,80 @@ const tests = [
 | b |
 `.trim()
     },
+    {
+        testName: 'paragraphs and breaks',
+        htmlInput: `
+                <table>
+                    <tr>
+                        <th>
+                            <p>a</p>
+                            <p>b</p>
+                        </th>
+                        <th>
+                            <p>c</p>
+                            <br>
+                            <p>d</p>
+                        </th>
+                    </tr>
+                    <tr>
+                        <td>
+                            <p>e</p>
+                            <br>
+                            <p>f</p>
+                        </td>
+                        <td>
+                            <p>g</p>
+                            <p>h</p>
+                        </td>
+                    </tr>
+                </table>
+                `,
+        mdExpected: `
+| a b | c d |
+| --- | --- |
+| e f | g h |
+`.trim()
+    },
+    {
+        testName: 'lists',
+        htmlInput: `
+                <table>
+                    <tr>
+                        <th>
+                            <ul>
+                                <li>a</li>
+                                <li>b</li>
+                            </ul>
+                        </th>
+                        <th>
+                            <ol>
+                                <li>c</li>
+                                <li>d</li>
+                            </ol>
+                        </th>
+                    </tr>
+                    <tr>
+                        <td>
+                            <ol>
+                                <li>e</li>
+                                <li>f</li>
+                            </ol>
+                        </td>
+                        <td>
+                            <ul>
+                                <li>g</li>
+                                <li>h</li>
+                            </ul>
+                        </td>
+                    </tr>
+                </table>
+                `,
+        mdExpected: `
+| - a - b | 1. c 2. d |
+| --- | --- |
+| 1. e 2. f | - g - h |
+`.trim()
+    },
 ];
 
 runTests();

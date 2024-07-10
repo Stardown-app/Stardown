@@ -958,6 +958,28 @@ const tests = [
 `.trim()
     },
     {
+        testName: 'h1 and h2 in rows',
+        htmlInput: `
+            <table>
+                <tr>
+                    <th>
+                        <h1>a</h1>
+                    </th>
+                </tr>
+                <tr>
+                    <td>
+                        <h2>b</h2>
+                    </td>
+                </tr>
+            </table>
+            `,
+        mdExpected: `
+| a |
+| --- |
+| b |
+`.trim()
+    },
+    {
         testName: 'table of tables',
         htmlInput: `
             <table>

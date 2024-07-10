@@ -14,6 +14,17 @@
    limitations under the License.
 */
 
+/*
+    HTML table definition:
+
+    In this order: optionally a caption element, followed by zero or more colgroup
+    elements, followed optionally by a thead element, followed by either zero or more
+    tbody elements or one or more tr elements, followed optionally by a tfoot element,
+    optionally intermixed with one or more script-supporting elements.
+
+    Source: [the HTML Standard](https://html.spec.whatwg.org/multipage/tables.html)
+*/
+
 /**
  * addTableRules adds to a Turndown service instance Turndown rules for how to convert
  * HTML tables to markdown. The rules apply to both source-formatted markdown and
@@ -26,52 +37,71 @@
  * @param {TurndownService} t - the Turndown service instance.
  */
 export function addTableRules(t) {
+    t.addRule('caption', {
+        filter: 'caption',
+        replacement: function (content, caption) {
+            return '**' + content + '**\n\n';
+        },
+    });
+
     t.addRule('tableCell', {
         filter: ['th', 'td'],
         replacement: function (content, cell) {
-            return ' | ' + content.replaceAll('\n', ' ').replaceAll(/\s+/g, ' ');
+            for (let i = 0; i < cell.childNodes.length; i++) {
+                const childName = cell.childNodes[i].nodeName;
+                // If the cell contains something that can't render in a cell...
+                if (childName === 'TABLE' || childName.startsWith('H')) {
+                    // ...just get its non-markdown text.
+                    return ' | ' + formatCellContent(cell.textContent);
+                }
+            }
+
+            content = ' | ' + formatCellContent(content);
+
+            // if the row spans multiple columns, add empty cells for the remaining
+            // columns
+            const colspan = cell.getAttribute('colspan') || 1;
+            for (let i = 1; i <= colspan - 1; i++) {
+                content += ' |'
+            }
+
+            return content;
         },
     });
 
     t.addRule('tableRow', {
         filter: 'tr',
         replacement: function (content, tr) {
-            switch (getRowType(tr)) {
-                case RowType.onlyRow: // an onlyRow is a header row
-                    // append a table divider after the row
-                    for (let i = 0; i < tr.childNodes.length; i++) {
-                        content += '| --- ';
-                    }
-                    return content + '|\n';
-                case RowType.headerRow:
-                    const rowSize = tr.childNodes.length;
-                    for (let i = rowSize; i < getMaxRowSize(tr); i++) {
-                        // add more cells to the header row
-                        content += ' |';
-                    }
-                    return content.trim() + ' |\n';
-                case RowType.firstBodyRow:
-                    // insert a table divider before the first body row
-                    let divider = '\n|';
-                    for (let i = 0; i < getMaxRowSize(tr); i++) {
-                        divider += ' --- |';
-                    }
-                    return divider + '\n' + content.trim() + ' |\n';
-                case RowType.bodyRow:
-                    return content.trim() + ' |\n';
-                case RowType.error:
-                    return content.trim() + ' |\n';
-                default:
-                    console.error(`tableRow replacement: unknown row type`);
-                    return content.trim() + ' |\n';
+            const table = getTable(tr);
+
+            if (!isFirstRow(tr, table)) {
+                // this row is a body row
+                return content.trim() + ' |\n';
             }
+
+            // this row will be the header row
+            content = content.trim() + ' |';
+
+            const rowSize = getRowSize(tr);
+            const maxRowSize = getMaxRowSize(table);
+
+            // add more cells to the header row if needed
+            for (let i = rowSize; i < maxRowSize; i++) {
+                content += ' |';
+            }
+
+            // append a table divider
+            content += '\n|';
+            for (let i = 0; i < maxRowSize; i++) {
+                content += ' --- |';
+            }
+
+            return content + '\n';
         },
     });
 
     t.addRule('table', {
-        filter: function (table) {
-            return table.nodeName === 'TABLE';
-        },
+        filter: 'table',
         replacement: function (content, table) {
             if (isHideButtonTable(table)) {
                 return '';
@@ -82,122 +112,81 @@ export function addTableRules(t) {
 }
 
 /**
- * RowType is an enum for the different types of rows.
+ * formatCellContent prepares a table cell's content to be incorporated into a table
+ * row.
+ * @param {string} content - the table cell's content.
+ * @returns {string}
  */
-const RowType = {
-    error: 'error',
-    onlyRow: 'onlyRow', // an onlyRow is a header row
-    headerRow: 'headerRow',
-    firstBodyRow: 'firstBodyRow',
-    bodyRow: 'bodyRow',
-};
-
-/**
- * getRowType determines the type of a given table row.
- * @param {*} tr - the tr element.
- * @returns {RowType}
- */
-function getRowType(tr) {
-    const parent = tr.parentNode;
-    const trs = parent.childNodes;
-    switch (parent.nodeName) {
-        case 'TABLE':
-            if (trs.length === 1) {
-                return RowType.onlyRow;
-            } else if (trs[0] === tr) {
-                return RowType.headerRow;
-            } else if (trs[1] === tr) {
-                return RowType.firstBodyRow;
-            } else {
-                return RowType.bodyRow;
-            }
-        case 'THEAD':
-            const thead = parent;
-            const table1 = thead.parentNode;
-            if (table1.childNodes.length === 1 && trs.length === 1) {
-                return RowType.onlyRow;
-            } else {
-                return RowType.headerRow;
-            }
-        case 'TBODY':
-            const tbody = parent;
-            const table2 = tbody.parentNode;
-            if (table2.childNodes.length === 1 && trs.length === 1) {
-                return RowType.onlyRow;
-            }
-            const prev = tbody.previousSibling;
-            if (!prev) {
-                if (trs[0] === tr) {
-                    return RowType.headerRow;
-                } else if (trs[1] === tr) {
-                    return RowType.firstBodyRow;
-                } else {
-                    return RowType.bodyRow;
-                }
-            }
-            if (prev.nodeName !== 'THEAD') {
-                // this tbody is not the table's first tbody
-                return RowType.bodyRow;
-            }
-            // this tbody is the table's first tbody
-            if (trs[0] === tr) {
-                return RowType.firstBodyRow;
-            } else {
-                return RowType.bodyRow;
-            }
-        default:
-            console.error('getRowType: unknown parent node:', parent.nodeName);
-            return RowType.error;
-    }
+function formatCellContent(content) {
+    return content.trim().replaceAll(/\s+/g, ' ').replaceAll('|', '\\|');
 }
 
 /**
- * getMaxRowSize returns the number of cells in the row with the most cells. The given
- * tr may or may not be that row; it only has to be one of the rows in the table.
- * @param {*} tr - the tr element.
+ * isFirstRow reports whether a table row is the first row in its table.
+ * @param {Node} tr - the tr element.
+ * @param {Node} table - the table element.
+ * @returns {boolean}
+ */
+function isFirstRow(tr, table) {
+    const trs = table.querySelectorAll('tr');
+    return trs[0] === tr;
+}
+
+/**
+ * getRowSize gets the number of cells in a table row. Cells that span multiple columns
+ * are counted as multiple cells.
+ * @param {Node} tr - the tr element.
  * @returns {number}
  */
-function getMaxRowSize(tr) {
-    const parent = tr.parentNode;
-    let maxSize = 0;
+function getRowSize(tr) {
+    let rowSize = tr.childNodes.length;
+    for (let i = 0; i < tr.childNodes.length; i++) {
+        const cell = tr.childNodes[i];
+        const colspan = cell.getAttribute('colspan') || 1;
+        rowSize += colspan - 1;
+    }
+    return rowSize;
+}
 
-    switch (parent.nodeName) {
-        case 'TABLE':
-            const trs = parent.childNodes;
-            for (let i = 0; i < trs.length; i++) {
-                if (trs[i].length > maxSize) {
-                    maxSize = trs[i].length;
-                }
-            }
-            return maxSize;
-        case 'THEAD':
-        case 'TBODY':
-            const table = parent.parentNode;
-            for (let i = 0; i < table.childNodes.length; i++) {
-                const node = table.childNodes[i];
-                if (node.nodeName === 'TR' && node.childNodes.length > maxSize) {
-                    maxSize = node.childNodes.length;
-                } else {
-                    const trs = node.childNodes;
-                    for (let j = 0; j < trs.length; j++) {
-                        if (trs[j].childNodes.length > maxSize) {
-                            maxSize = trs[j].childNodes.length;
-                        }
-                    }
-                }
-            }
-            return maxSize;
-        default:
-            console.error(`getMaxRowSize: unknown parent.nodeName: ${parent.nodeName}`);
-            return tr.length;
+/**
+ * getMaxRowSize returns the number of cells in the table's row with the most cells.
+ * Cells that span multiple columns are counted as multiple cells.
+ * @param {Node} table - the table element.
+ * @returns {number}
+ */
+function getMaxRowSize(table) {
+    const trs = table.querySelectorAll('tr');
+
+    let maxSize = 0;
+    for (let i = 0; i < trs.length; i++) {
+        const rowLen = getRowSize(trs[i]);
+        if (rowLen > maxSize) {
+            maxSize = rowLen;
+        }
+    }
+
+    return maxSize;
+}
+
+/**
+ * getTable gets the table element that contains the given table row.
+ * @param {Node} tr - the tr element.
+ * @returns {Node}
+ */
+function getTable(tr) {
+    const parent = tr.parentNode;
+    if (parent.nodeName === 'TABLE') {
+        return parent;
+    } else {
+        return parent.parentNode;
     }
 }
 
 /**
  * isHideButtonTable reports whether an HTML table contains nothing but a "hide" button.
- * These tables are erroneously created by Turndown from some Wikipedia tables that have
- * a "hide" button in their top-right corner.
- * @param {*} table - the HTML table element node.
+ * These tables are erroneously created from some Wikipedia tables that have a "hide"
+ * button in their top-right corner.
+ * @param {Node} table - the HTML table element node.
  * @returns {boolean}
  */
 function isHideButtonTable(table) {

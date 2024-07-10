@@ -39,8 +39,10 @@ export default [
                 targets: [
                     {
                         src: [
-                            // Copy everything from `src` to `chrome`.
+                            // Copy everything from `src` to `chrome` except the
+                            // config.js for testing.
                             'src/*',
+                            '!src/config.js',
                         ],
                         dest: 'chrome',
                     },

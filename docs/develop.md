@@ -43,6 +43,10 @@ To update Stardown after you make changes or you `git pull` changes:
 2. in Firefox, open `about:debugging#/runtime/this-firefox`
 3. click Stardown's reload button
 
+## Tests
+
+Run the tests with `npm run test`.
+
 ## Git workflow for collaboration
 
 Let's create feature branches with descriptive names and make pull requests as described in [Getting started with Git and GitHub](https://chriswheeler.dev/posts/getting-started-with-git-and-github/#git-workflows).
@@ -83,9 +87,9 @@ When fully testing Stardown, use the descriptions in this section in each of the
 
 ### Features
 
-- [ ] **Clicking the icon or pressing Ctrl+Shift+U** copies a markdown link for the page, unless part of the page is selected in which case markdown of the selection is copied instead.
-- [ ] **Double-clicking the icon or pressing Ctrl+Shift+UU** copies a markdown unordered list of markdown links for all open tabs.
-- [ ] **Selecting tabs, then double-clicking the icon or pressing Ctrl+Shift+UU** copies a markdown unordered list of markdown links for all selected tabs.
+- [ ] **Clicking the icon or pressing Alt+C** copies a markdown link for the page, unless part of the page is selected in which case markdown of the selection is copied instead.
+- [ ] **Double-clicking the icon or pressing Alt+CC** copies a markdown unordered list of markdown links for all open tabs.
+- [ ] **Selecting tabs, then double-clicking the icon or pressing Alt+CC** copies a markdown unordered list of markdown links for all selected tabs.
 - [ ] **Right-clicking an empty part of a page** shows the "Copy markdown link to here" option.
 - [ ] **Right-clicking a website's unselected header** shows the "Copy markdown link to here" option.
 - [ ] **Right-clicking selected text** shows the "Copy markdown of selection" option.
@@ -140,4 +144,12 @@ Stardown also tries to find HTML element IDs to put in links alongside text frag
 
 ## Turndown
 
-Stardown uses the amazing [Turndown](https://github.com/mixmark-io/turndown) and [turndown-plugin-gfm](https://github.com/mixmark-io/turndown-plugin-gfm), which were both created by Dom Christie, when copying source-formatted markdown of pages.
+Stardown uses the amazing [Turndown](https://github.com/mixmark-io/turndown), created by Dom Christie, when copying source-formatted markdown of pages.
+
+## Tables
+
+HTML tables have more features than markdown tables, but Stardown's custom code for converting tables from HTML to markdown should still always create valid markdown tables that are as similar to the HTML as possible.
+
+From my experience so far, it appears that markdown renderers require every markdown table to have one header row followed by one table divider, then zero or more body rows. The number of cells in the header row must be equal to that of the table divider and to that of whichever row has the most cells. Body rows may have varying numbers of cells.
+
+Sample markdown tables can be found in [./sampleTables.md](./sampleTables.md) for testing markdown renderers.

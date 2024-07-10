@@ -39,11 +39,13 @@ export default [
                 targets: [
                     {
                         src: [
-                            // Copy everything except the images. The copy call for the
-                            // images folder is below. It's separate because the
-                            // transform function can only run on files.
+                            // Copy everything except the images and the config.js for
+                            // testing. The copy call for the images folder is below.
+                            // It's separate because the transform function can only run
+                            // on files.
                             'src/*',
                             '!src/images',
+                            '!src/config.js',
                         ],
                         dest: 'firefox',
                         transform: (contents, filename) => {

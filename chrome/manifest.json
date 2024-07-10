@@ -52,8 +52,8 @@
     "commands": {
         "_execute_action": {
             "suggested_key": {
-                "default": "Ctrl+Shift+U",
-                "mac": "Command+Shift+U"
+                "default": "Alt+C",
+                "mac": "Alt+C"
             },
             "description": "Copy markdown links or selections"
         }

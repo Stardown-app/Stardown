@@ -2,7 +2,10 @@
   "name": "stardown",
   "version": "1.0.0",
   "description": "Copy the web as markdown.",
+  "type": "module",
   "scripts": {
+    "test": "node --test",
+
     "dev-firefox": "rollup --config rollup.config.firefox.mjs",
     "build-firefox": "npm install && npm run dev-firefox && npm run assert-clean && rm -r src && rm -r chrome",
     "update-firefox": "git restore . && git pull && npm run build-firefox",
@@ -14,6 +17,7 @@
     "assert-clean": "git update-index --refresh && git diff-index --quiet HEAD --"
   },
   "devDependencies": {
+    "jsdom": "^24.1.0",
     "rollup": "^4.18.0",
     "rollup-plugin-copy": "^3.5.0",
     "rollup-plugin-delete": "^2.0.0"

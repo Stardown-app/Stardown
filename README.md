@@ -18,10 +18,10 @@
 <p align="center"><img alt="demo gif" src="https://github.com/wheelercj/assets/blob/main/Stardown.gif"></p>
 
 * Click the extension's icon to copy a link for the current page.
+* Press `Alt+C` to copy a selection or a page's link.
 * Right-click part of a page to copy it as markdown. Select before right-clicking to copy multiple parts.
-* Double-click the extension's icon to copy links for all tabs.
+* Double-click the extension's icon or press `Alt+CC` to copy links for all tabs.
 * Select tabs before double-clicking the icon to copy links for only those tabs.
-* Press `Ctrl+Shift+U` (Mac: `Cmd+Shift+U`) to copy a page's link or selection.
 * Use [the options page](#settings) to customize these features.
 
 By default, the markdown created from a selection includes a link that navigates to the part of the page you selected, when possible. This is accomplished with [text fragments](https://web.dev/articles/text-fragments) and/or HTML element IDs. [Firefox does not support text fragments yet](https://bugzilla.mozilla.org/show_bug.cgi?id=1753933), but the Firefox version of Stardown allows you to create links with text fragments.
@@ -105,6 +105,7 @@ Although Stardown can be used to copy an entire page's content as markdown all a
 Unlike the extensions linked above, Stardown:
 
 * requires only one click to create a markdown link for the current page
+* is good at creating markdown of tables
 * can create markdown links for specific parts of pages (using [text fragments](https://web.dev/articles/text-fragments) and/or HTML element IDs)
 * keeps almost all formatting when copying specific parts of pages
 * can create markdown of YouTube videos that renders well in GitHub

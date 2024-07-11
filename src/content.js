@@ -18,6 +18,7 @@ import { browser, handleCopyRequest } from './config.js';
 import * as md from './md.js';
 import * as htmlSelection from './htmlSelection.js';
 import { createTextFragmentArg } from './createTextFragmentArg.js';
+import { getSetting } from './common.js';
 
 /**
  * A response object sent from a content script to a background script.
@@ -206,7 +207,8 @@ async function handleSelectionRightClick(htmlId, selection) {
     let url = await removeIdAndTextFragment(location.href);
 
     let arg = ''; // the text fragment argument
-    if (selection && selection.type === 'Range') {
+    const createTextFragment = await getSetting('createTextFragment');
+    if (createTextFragment && selection && selection.type === 'Range') {
         arg = createTextFragmentArg(selection);
     }
 

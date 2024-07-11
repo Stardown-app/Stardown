@@ -61,7 +61,7 @@ export function addTableRules(t) {
             // if the row spans multiple columns, add empty cells for the remaining
             // columns
             const colspan = cell.getAttribute('colspan') || 1;
-            for (let i = 1; i <= colspan - 1; i++) {
+            for (let i = 1; i < colspan; i++) {
                 content += ' |'
             }
 
@@ -159,9 +159,9 @@ function getMaxRowSize(table) {
 
     let maxSize = 0;
     for (let i = 0; i < trs.length; i++) {
-        const rowLen = getRowSize(trs[i]);
-        if (rowLen > maxSize) {
-            maxSize = rowLen;
+        const rowSize = getRowSize(trs[i]);
+        if (rowSize > maxSize) {
+            maxSize = rowSize;
         }
     }
 
@@ -186,7 +186,7 @@ function getTable(tr) {
  * isHideButtonTable reports whether an HTML table contains nothing but a "hide" button.
  * These tables are erroneously created from some Wikipedia tables that have a "hide"
  * button in their top-right corner.
- * @param {Node} table - the HTML table element node.
+ * @param {Node} table - the table element.
  * @returns {boolean}
  */
 function isHideButtonTable(table) {

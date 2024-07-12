@@ -18,6 +18,7 @@ import { browser } from './config.js';
 
 const defaultSettings = {
     youtubeMd: 'almost everywhere',
+    createTextFragment: true,
     omitNav: true,
     omitFooter: true,
     notifyOnWarning: false,

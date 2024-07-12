@@ -34,7 +34,7 @@ Want to just copy markdown links for pages without installing an extension? You 
 
 ## Privacy
 
-Stardown will never sell any data to anyone, and does not collect nor send any of your data anywhere besides putting markdown text into your clipboard.
+Stardown will never sell any data to anyone, and does not collect nor send any of your personal data anywhere besides putting markdown text into your clipboard.
 
 Stardown requires permission to display notifications so it can show you important error messages.
 

@@ -44,6 +44,13 @@ export function addTableRules(t) {
         },
     });
 
+    /*
+        When a table is being converted from HTML to markdown, the tableCell replacement
+        function is called for each cell in a row. Then the tableRow replacement
+        function runs for that row. Once all rows are converted, the table replacement
+        function runs.
+    */
+
     t.addRule('tableCell', {
         filter: ['th', 'td'],
         replacement: function (content, cell) {
@@ -58,7 +65,7 @@ export function addTableRules(t) {
 
             content = ' | ' + formatCellContent(content);
 
-            // if the row spans multiple columns, add empty cells for the remaining
+            // if the cell spans multiple columns, add empty cells for the remaining
             // columns
             const colspan = cell.getAttribute('colspan') || 1;
             for (let i = 1; i < colspan; i++) {

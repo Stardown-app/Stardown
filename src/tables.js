@@ -25,86 +25,40 @@
     Source: [the HTML Standard](https://html.spec.whatwg.org/multipage/tables.html)
 */
 
+import { TableConverter } from './tableConverter.js';
+import { TurndownService } from './turndown.js';
+
 /**
- * addTableRules adds to a Turndown service instance Turndown rules for how to convert
- * HTML tables to markdown. The rules apply to both source-formatted markdown and
- * markdown in block quotes. Even though most or all markdown renderers don't render
- * tables within block quotes, Stardown puts into block quotes not just the content of
- * tables but also their markdown syntax because the output will (at least usually) not
- * look good either way, keeping table syntax is more intuitive and easier for the user
- * to edit into a table that's outside a block quote, and maybe some markdown renderers
- * do allow tables to be in block quotes.
+ * addTableRules adds to a Turndown service instance Turndown rules for converting HTML
+ * tables to markdown. The rules apply to both source-formatted markdown and markdown in
+ * block quotes. Even though most or all markdown renderers don't render tables within
+ * block quotes, Stardown puts into block quotes not just the content of tables but also
+ * their markdown syntax because the output will (at least usually) not look good either
+ * way, keeping table syntax is more intuitive and easier for the user to edit into a
+ * table that's outside a block quote, and maybe some markdown renderers do allow tables
+ * to be in block quotes.
  * @param {TurndownService} t - the Turndown service instance.
  */
 export function addTableRules(t) {
-    t.addRule('caption', {
-        filter: 'caption',
-        replacement: function (content, caption) {
-            return '**' + content + '**\n\n';
-        },
-    });
-
     /*
-        When a table is being converted from HTML to markdown, the tableCell replacement
-        function is called for each cell in a row. Then the tableRow replacement
-        function runs for that row. Once all rows are converted, the table replacement
-        function runs.
+        Most of the table rules are not used because it's easier to convert complicated
+        tables to markdown by processing them as a whole rather than as individual
+        elements.
     */
+
+    t.addRule('tableCaption', {
+        filter: 'caption',
+        replacement: () => '',
+    });
 
     t.addRule('tableCell', {
         filter: ['th', 'td'],
-        replacement: function (content, cell) {
-            for (let i = 0; i < cell.childNodes.length; i++) {
-                const childName = cell.childNodes[i].nodeName;
-                // If the cell contains something that can't render in a cell...
-                if (childName === 'TABLE' || childName.startsWith('H')) {
-                    // ...just get its non-markdown text.
-                    return ' | ' + formatCellContent(cell.textContent);
-                }
-            }
-
-            content = ' | ' + formatCellContent(content);
-
-            // if the cell spans multiple columns, add empty cells for the remaining
-            // columns
-            const colspan = cell.getAttribute('colspan') || 1;
-            for (let i = 1; i < colspan; i++) {
-                content += ' |'
-            }
-
-            return content;
-        },
+        replacement: () => '',
     });
 
     t.addRule('tableRow', {
         filter: 'tr',
-        replacement: function (content, tr) {
-            const table = getTable(tr);
-
-            if (!isFirstRow(tr, table)) {
-                // this row is a body row
-                return content.trim() + ' |\n';
-            }
-
-            // this row will be the header row
-            content = content.trim() + ' |';
-
-            const rowSize = getRowSize(tr);
-            const maxRowSize = getMaxRowSize(table);
-
-            // add more cells to the header row if needed
-            for (let i = rowSize; i < maxRowSize; i++) {
-                content += ' |';
-            }
-
-            // append a table divider
-            content += '\n|';
-            for (let i = 0; i < maxRowSize; i++) {
-                content += ' --- |';
-            }
-
-            return content + '\n';
-        },
+        replacement: () => '',
     });
 
     t.addRule('table', {
@@ -113,80 +67,48 @@ export function addTableRules(t) {
             if (isHideButtonTable(table)) {
                 return '';
             }
-            return '\n' + content + '\n';
+
+            const tableConv = new TableConverter();
+
+            const trs = getTableTrs(table);
+
+            // for each row
+            for (let y = 0; y < trs.length; y++) {
+                const tr = trs[y];
+
+                // for each cell in the row
+                for (let x = 0; x < tr.children.length; x++) {
+                    const cell = tr.children[x];
+                    if (cell.nodeName !== 'TH' && cell.nodeName !== 'TD') {
+                        continue;
+                    }
+
+                    let cellContent;
+                    if (isUnconvertibleCell(cell)) {
+                        cellContent = cell.textContent;
+                    } else {
+                        cellContent = t.turndown(cell);
+                    }
+
+                    const colspan = Number(cell.getAttribute('colspan') || 1);
+                    const rowspan = Number(cell.getAttribute('rowspan') || 1);
+
+                    tableConv.addCell(cellContent, colspan, rowspan);
+                }
+
+                tableConv.addRow();
+            }
+
+            const md = tableConv.toMarkdown();
+
+            const caption = table.querySelector('caption');
+            if (caption) {
+                return '\n**' + caption.textContent + '**\n\n' + md + '\n';
+            } else {
+                return '\n' + md + '\n';
+            }
         },
     });
-}
-
-/**
- * formatCellContent prepares a table cell's content to be incorporated into a table
- * row.
- * @param {string} content - the table cell's content.
- * @returns {string}
- */
-function formatCellContent(content) {
-    return content.trim().replaceAll(/\s+/g, ' ').replaceAll('|', '\\|');
-}
-
-/**
- * isFirstRow reports whether a table row is the first row in its table.
- * @param {Node} tr - the tr element.
- * @param {Node} table - the table element.
- * @returns {boolean}
- */
-function isFirstRow(tr, table) {
-    const trs = table.querySelectorAll('tr');
-    return trs[0] === tr;
-}
-
-/**
- * getRowSize gets the number of cells in a table row. Cells that span multiple columns
- * are counted as multiple cells.
- * @param {Node} tr - the tr element.
- * @returns {number}
- */
-function getRowSize(tr) {
-    let rowSize = tr.childNodes.length;
-    for (let i = 0; i < tr.childNodes.length; i++) {
-        const cell = tr.childNodes[i];
-        const colspan = cell.getAttribute('colspan') || 1;
-        rowSize += colspan - 1;
-    }
-    return rowSize;
-}
-
-/**
- * getMaxRowSize returns the number of cells in the table's row with the most cells.
- * Cells that span multiple columns are counted as multiple cells.
- * @param {Node} table - the table element.
- * @returns {number}
- */
-function getMaxRowSize(table) {
-    const trs = table.querySelectorAll('tr');
-
-    let maxSize = 0;
-    for (let i = 0; i < trs.length; i++) {
-        const rowSize = getRowSize(trs[i]);
-        if (rowSize > maxSize) {
-            maxSize = rowSize;
-        }
-    }
-
-    return maxSize;
-}
-
-/**
- * getTable gets the table element that contains the given table row.
- * @param {Node} tr - the tr element.
- * @returns {Node}
- */
-function getTable(tr) {
-    const parent = tr.parentNode;
-    if (parent.nodeName === 'TABLE') {
-        return parent;
-    } else {
-        return parent.parentNode;
-    }
 }
 
 /**
@@ -214,4 +136,49 @@ function isHideButtonTable(table) {
         return false;
     }
     return buttons[0].textContent === 'hide';
+}
+
+/**
+ * getTableTrs gets the tr elements of an HTML table, but not any tr elements of any
+ * child tables.
+ * @param {Node} table - the table element.
+ * @returns {Node[]} the tr elements.
+ */
+function getTableTrs(table) {
+    const trs = [];
+    for (let i = 0; i < table.children.length; i++) {
+        const child = table.children[i];
+        if (child.nodeName === 'TR') {
+            trs.push(child);
+        } else if (
+            child.nodeName === 'TBODY' ||
+            child.nodeName === 'THEAD' ||
+            child.nodeName === 'TFOOT'
+        ) {
+            for (let j = 0; j < child.children.length; j++) {
+                const grandchild = child.children[j];
+                if (grandchild.nodeName === 'TR') {
+                    trs.push(grandchild);
+                }
+            }
+        }
+    }
+
+    return trs;
+}
+
+/**
+ * isUnconvertibleCell reports whether an HTML table cell contains HTML that can't be
+ * converted to markdown.
+ * @param {Node} cell - the cell element.
+ * @returns {boolean}
+ */
+function isUnconvertibleCell(cell) {
+    for (let i = 0; i < cell.childNodes.length; i++) {
+        const childName = cell.childNodes[i].nodeName;
+        if (childName === 'TABLE' || childName.startsWith('H')) {
+            return true;
+        }
+    }
+    return false;
 }

@@ -884,6 +884,34 @@ const tests = [
 `.trim()
     },
     {
+        testName: 'bold and emphasis',
+        htmlInput: `
+            <table>
+                <tr>
+                    <td>
+                        a
+                    </td>
+                    <td>
+                        <em>b</em>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <b>c</b>
+                    </td>
+                    <td>
+                        <b><em>d</em></b>
+                    </td>
+                </tr>
+            </table>
+            `,
+        mdExpected: `
+| a | *b* |
+| --- | --- |
+| **c** | ***d*** |
+`.trim()
+    },
+    {
         testName: 'paragraphs and breaks',
         htmlInput: `
                 <table>
@@ -1211,6 +1239,42 @@ const tests = [
 | --- | --- | --- |
 | d | e | e |
 | f | e | e |
+`.trim()
+    },
+    {
+        testName: 'colspan and rowspan in the same empty cell',
+        htmlInput: `
+            <table>
+                <tr>
+                    <td colspan="2" rowspan="2">
+                    </td>
+                    <td>
+                        a
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        b
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        c
+                    </td>
+                    <td>
+                        d
+                    </td>
+                    <td>
+                        e
+                    </td>
+                </tr>
+            </table>
+            `,
+        mdExpected: `
+|  |  | a |
+| --- | --- | --- |
+|  |  | b |
+| c | d | e |
 `.trim()
     },
 ];

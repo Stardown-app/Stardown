@@ -290,7 +290,7 @@ const tests = [
 | a | b | c |
 | --- | --- | --- |
 | d | e | f |
-| g | h |
+| g | h |  |
 `.trim()
     },
     {
@@ -332,7 +332,7 @@ const tests = [
         mdExpected: `
 | a | b | c |
 | --- | --- | --- |
-| d | e |
+| d | e |  |
 | g | h | i |
 `.trim()
     },
@@ -373,7 +373,7 @@ const tests = [
             </table>
             `,
         mdExpected: `
-| a | b | |
+| a | b |  |
 | --- | --- | --- |
 | d | e | f |
 | g | h | i |
@@ -413,7 +413,7 @@ const tests = [
             </table>
             `,
         mdExpected: `
-| a | | |
+| a |  |  |
 | --- | --- | --- |
 | d | e | f |
 | g | h | i |
@@ -884,6 +884,34 @@ const tests = [
 `.trim()
     },
     {
+        testName: 'bold and emphasis',
+        htmlInput: `
+            <table>
+                <tr>
+                    <td>
+                        a
+                    </td>
+                    <td>
+                        <em>b</em>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <b>c</b>
+                    </td>
+                    <td>
+                        <b><em>d</em></b>
+                    </td>
+                </tr>
+            </table>
+            `,
+        mdExpected: `
+| a | *b* |
+| --- | --- |
+| **c** | ***d*** |
+`.trim()
+    },
+    {
         testName: 'paragraphs and breaks',
         htmlInput: `
                 <table>
@@ -1078,8 +1106,174 @@ const tests = [
             </table>
             `,
         mdExpected: `
-| a | | b |
+| a | a | b |
 | --- | --- | --- |
+| c | d | e |
+`.trim()
+    },
+    {
+        testName: 'rowspan',
+        htmlInput: `
+            <table>
+                <tr>
+                    <th rowspan="2">
+                        a
+                    </th>
+                    <th>
+                        b
+                    </th>
+                </tr>
+                <tr>
+                    <td>
+                        c
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        d
+                    </td>
+                    <td>
+                        e
+                    </td>
+                </tr>
+            </table>
+            `,
+        mdExpected: `
+| a | b |
+| --- | --- |
+| a | c |
+| d | e |
+`.trim()
+    },
+    {
+        testName: 'parallel colspans',
+        htmlInput: `
+            <table>
+                <tr>
+                    <td colspan="2">
+                        a
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        b
+                    </td>
+                    <td>
+                        c
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="2">
+                        d
+                    </td>
+                </tr>
+            </table>
+            `,
+        mdExpected: `
+| a | a |
+| --- | --- |
+| b | c |
+| d | d |
+`.trim()
+    },
+    {
+        testName: 'parallel rowspans',
+        htmlInput: `
+            <table>
+                <tr>
+                    <td rowspan="2">
+                        a
+                    </td>
+                    <td>
+                        b
+                    </td>
+                    <td rowspan="2">
+                        c
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        d
+                    </td>
+                </tr>
+            </table>
+            `,
+        mdExpected: `
+| a | b | c |
+| --- | --- | --- |
+| a | d | c |
+`.trim()
+    },
+    {
+        testName: 'colspan and rowspan in the same cell',
+        htmlInput: `
+            <table>
+                <tr>
+                    <td>
+                        a
+                    </td>
+                    <td>
+                        b
+                    </td>
+                    <td>
+                        c
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        d
+                    </td>
+                    <td colspan="2" rowspan="2">
+                        e
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        f
+                    </td>
+                </tr>
+            </table>
+            `,
+        mdExpected: `
+| a | b | c |
+| --- | --- | --- |
+| d | e | e |
+| f | e | e |
+`.trim()
+    },
+    {
+        testName: 'colspan and rowspan in the same empty cell',
+        htmlInput: `
+            <table>
+                <tr>
+                    <td colspan="2" rowspan="2">
+                    </td>
+                    <td>
+                        a
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        b
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        c
+                    </td>
+                    <td>
+                        d
+                    </td>
+                    <td>
+                        e
+                    </td>
+                </tr>
+            </table>
+            `,
+        mdExpected: `
+|  |  | a |
+| --- | --- | --- |
+|  |  | b |
 | c | d | e |
 `.trim()
     },

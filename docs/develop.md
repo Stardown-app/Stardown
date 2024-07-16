@@ -72,7 +72,7 @@ The "background script" in Chromium is not exactly a background script, but a se
 
 ## What Stardown does
 
-When fully testing Stardown, use the descriptions in this section in each of the officially supported browsers to search for bugs.
+When fully manually testing Stardown, use the descriptions in this section in each of the officially supported browsers to search for bugs.
 
 ### Context types
 
@@ -102,6 +102,7 @@ When fully testing Stardown, use the descriptions in this section in each of the
 - [ ] **Right-clicking a link that is an image** might not show any context menu options due to browser limitations. If a context menu option appears, it should be "Copy markdown of image".
 - [ ] **Right-clicking a video** shows the "Copy markdown of video" option, but may require a second right-click for the correct context menu to appear because some videos (e.g. YouTube videos) have a special context menu.
 - [ ] **Right-clicking an audio player** shows the "Copy markdown of audio" option.
+- [ ] **Copying the contents of [this table](https://developer.mozilla.org/en-US/docs/Learn/HTML/Tables/Advanced#tables_for_visually_impaired_users)** should result in a similar-looking table with everything aligned correctly.
 - [ ] "Copy markdown link to here" copies a markdown link for the page with an HTML element ID from where the page was right-clicked, if one exists there.
 - [ ] "Copy markdown of selection", by default, copies markdown of the selected text (including all of the page's formatting that markdown supports), and a markdown link containing a text fragment and possibly an HTML element ID.
 - [ ] "Copy markdown of image" copies markdown of the image using the image's URL and any alt text.
@@ -150,6 +151,8 @@ Stardown uses the amazing [Turndown](https://github.com/mixmark-io/turndown), cr
 
 HTML tables have more features than markdown tables, but Stardown's custom code for converting tables from HTML to markdown should still always create valid markdown tables that are as similar to the HTML as possible.
 
-From my experience so far, it appears that markdown renderers require every markdown table to have one header row followed by one table divider, then zero or more body rows. The number of cells in the header row must be equal to that of the table divider and to that of whichever row has the most cells. Body rows may have varying numbers of cells.
+Some HTML tables have cells that span multiple rows and/or columns, such as [this one](https://developer.mozilla.org/en-US/docs/Learn/HTML/Tables/Advanced#tables_for_visually_impaired_users). Markdown tables don't allow that, so markdown tables must have extra cells to match the spans.
 
-Sample markdown tables can be found in [./sampleTables.md](./sampleTables.md) for testing markdown renderers.
+From my experience so far, markdown renderers tend to require every markdown table to have one header row followed by one table divider, then zero or more body rows. The number of cells in the header row must be equal to that of the table divider and to that of whichever row has the most cells. Body rows may have varying numbers of cells.
+
+Sample markdown tables for testing markdown renderers can be found in [./sampleTables.md](./sampleTables.md).

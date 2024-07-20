@@ -1,12 +1,12 @@
 # Stardown development
 
-I wrote some general extension development tips in [Making browser extensions](https://til.chriswheeler.dev/making-browser-extensions/).
+I wrote some general extension development tips in [Making browser extensions](https://chriswheeler.dev/posts/making-browser-extensions/). For more context about markdown itself, see [CommonMark: A Formal Specification For Markdown — Smashing Magazine](https://www.smashingmagazine.com/2020/12/commonmark-formal-specification-markdown/).
 
-## Priorities
+## Goals
 
-To keep Stardown easy to use, I would like to avoid having a popup and to have only one context menu option visible at a time. The options page can have many options as long as they are well organized and useful. Stardown's output to the clipboard should render well on at least Obsidian and GitHub, if not also other markdown renderers like VS Code and Discord.
+Stardown's main goal is to be so simple, fast, reliable, and flexible that people think of it as "it's like Ctrl+C but it keeps formatting". It should probably only ever have one keyboard shortcut, no popup, and show only one context menu option at a time. The options page can have many options as long as they are well organized and useful. Stardown's output should render well on at least Obsidian and GitHub, if not also other markdown renderers like Google Docs, VS Code, Discourse, GitLab, Stack Overflow, Joplin, Reddit, and Discord.
 
-I would like to keep Stardown relatively simple so that it's reliable, has few bugs that get fixed quickly, and is easy to maintain.
+I would also like to keep Stardown's code relatively simple so that it's reliable, has few bugs that get fixed quickly, and is easy to maintain.
 
 ## Installing Stardown from source for development
 

@@ -201,6 +201,7 @@ function newConvertLinkToMarkdown(subBrackets) {
      * @returns {string}
      */
     return function (content, node) {
+        content = content.trim();
         if (!content) { // if the link's title would be empty
             return ''; // don't create the link
         }
@@ -225,6 +226,8 @@ function newConvertLinkToMarkdown(subBrackets) {
                 href = location.href + href;
             }
         }
+
+        content = content.replaceAll('\n', ' ');
 
         return '[' + content + '](' + href + ')';
     };

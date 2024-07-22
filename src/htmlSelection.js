@@ -64,7 +64,9 @@ export async function createMd(title, url, selection) {
  */
 async function getSourceFormatMdWithLink(title, url, selection, selectedText) {
     const link = await md.createLink(title, url);
-    const alert = await md.createAlert('note', `from ${link}`);
+    const today = new Date();
+    const todayStr = today.getFullYear() + '/' + (today.getMonth() + 1) + '/' + today.getDate();
+    const alert = await md.createAlert('note', `from ${link} on ${todayStr}`);
     const html = await getSelectionHtml(selection);
     if (html === null) {
         return alert + '\n\n' + selectedText;

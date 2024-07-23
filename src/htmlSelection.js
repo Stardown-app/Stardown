@@ -110,8 +110,10 @@ async function getSelectionHtml(selection) {
     let startRange = selection.getRangeAt(0).cloneRange();
     let startNode = startRange.startContainer;
 
-    selectParentHeader(startRange, startNode);
-    selectParentTable(startRange, startNode);
+    startNode = selectAncestorHeader(startRange, startNode);
+    startNode = selectParentTable(startRange, startNode);
+    startNode = selectAncestorCode(startRange, startNode);
+    startNode = selectParentPre(startRange, startNode);
 
     let container = document.createElement('div');
     container.appendChild(startRange.cloneContents());
@@ -123,12 +125,13 @@ async function getSelectionHtml(selection) {
 }
 
 /**
- * selectParentHeader expands a selection to include header elements that are the parent
- * or grandparent of the start of the selection.
+ * selectAncestorHeader expands a selection to include header elements that are the
+ * parent or grandparent of the start of the selection.
  * @param {Range} startRange - a selection's index 0 range.
  * @param {Node} startNode - a selection's index 0 range's start container.
+ * @returns {Node} - the new start node.
  */
-function selectParentHeader(startRange, startNode) {
+function selectAncestorHeader(startRange, startNode) {
     // While there is a parent node and either the parent node or its parent node is a
     // header tag...
     while (
@@ -145,6 +148,8 @@ function selectParentHeader(startRange, startNode) {
         startNode = startNode.parentNode;
         startRange.setStartBefore(startNode);
     }
+
+    return startNode;
 }
 
 /**
@@ -152,6 +157,7 @@ function selectParentHeader(startRange, startNode) {
  * of the start of the selection.
  * @param {Range} startRange - a selection's index 0 range.
  * @param {Node} startNode - a selection's index 0 range's start container.
+ * @returns {Node} - the new start node.
  */
 function selectParentTable(startRange, startNode) {
     const tags = ['TABLE', 'THEAD', 'TBODY', 'TR', 'TH', 'TD'];
@@ -167,4 +173,57 @@ function selectParentTable(startRange, startNode) {
         startNode = startNode.parentNode;
         startRange.setStartBefore(startNode);
     }
+
+    return startNode;
+}
+
+/**
+ * selectAncestorCode expands a selection to include code elements that are the parent,
+ * grandparent, or great grandparent of the start of the selection.
+ * @param {Range} startRange - a selection's index 0 range.
+ * @param {Node} startNode - a selection's index 0 range's start container.
+ * @returns {Node} - the new start node.
+ */
+function selectAncestorCode(startRange, startNode) {
+    // If the parent, grandparent, or great grandparent node is a code tag, expand the
+    // start of the selection to include the code tag. This makes code blocks easier to
+    // copy.
+    const parent = startNode.parentNode;
+    if (parent) {
+        const grandparent = parent.parentNode;
+        if (grandparent) {
+            const greatGrandparent = grandparent.parentNode;
+            if (greatGrandparent && greatGrandparent.nodeName === 'CODE') {
+                startNode = greatGrandparent;
+                startRange.setStartBefore(startNode);
+            } else if (grandparent.nodeName === 'CODE') {
+                startNode = grandparent;
+                startRange.setStartBefore(startNode);
+            }
+        } else if (parent.nodeName === 'CODE') {
+            startNode = parent;
+            startRange.setStartBefore(startNode);
+        }
+    }
+
+    return startNode;
+}
+
+/**
+ * selectParentPre expands a selection to include pre elements that are the parent of
+ * the start of the selection.
+ * @param {Range} startRange - a selection's index 0 range.
+ * @param {Node} startNode - a selection's index 0 range's start container.
+ * @returns {Node} - the new start node.
+ */
+function selectParentPre(startRange, startNode) {
+    // If the parent is a pre tag, expand the start of the selection to include the pre
+    // tag. This makes preformatted text including code blocks easier to copy.
+    const parent = startNode.parentNode;
+    if (parent && parent.nodeName === 'PRE') {
+        startNode = parent;
+        startRange.setStartBefore(startNode);
+    }
+
+    return startNode;
 }

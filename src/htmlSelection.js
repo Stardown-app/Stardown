@@ -176,32 +176,28 @@ function selectParentTable(startRange, startNode) {
 }
 
 /**
- * selectAncestorCode expands a selection to include code elements that are the parent,
- * grandparent, or great grandparent of the start of the selection.
+ * selectAncestorCode expands a selection to include any code element that is an
+ * ancestor to the start of the selection as long as any tags between them are span
+ * tags.
  * @param {Range} startRange - a selection's index 0 range.
  * @param {Node} startNode - a selection's index 0 range's start container.
  * @returns {Node} - the new start node.
  */
 function selectAncestorCode(startRange, startNode) {
-    // If the parent, grandparent, or great grandparent node is a code tag, expand the
-    // start of the selection to include the code tag. This makes code blocks easier to
-    // copy.
-    const parent = startNode.parentNode;
-    if (parent) {
-        const grandparent = parent.parentNode;
-        if (grandparent) {
-            const greatGrandparent = grandparent.parentNode;
-            if (greatGrandparent && greatGrandparent.nodeName === 'CODE') {
-                startNode = greatGrandparent;
-                startRange.setStartBefore(startNode);
-            } else if (grandparent.nodeName === 'CODE') {
-                startNode = grandparent;
-                startRange.setStartBefore(startNode);
-            }
-        } else if (parent.nodeName === 'CODE') {
-            startNode = parent;
-            startRange.setStartBefore(startNode);
-        }
+    // If there are only span tags between the start node and an ancestor code tag,
+    // expand the start of the selection to include the code tag. This makes code blocks
+    // easier to copy.
+    let temp = startNode;
+    if (temp.parentNode && temp.parentNode.nodeName === 'SPAN') {
+        temp = temp.parentNode;
+    }
+    while (temp.nodeName === 'SPAN') {
+        temp = temp.parentNode;
+    }
+
+    if (temp.nodeName === 'CODE') {
+        startNode = temp;
+        startRange.setStartBefore(startNode);
     }
 
     return startNode;

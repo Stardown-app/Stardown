@@ -132,21 +132,19 @@ async function getSelectionHtml(selection) {
  * @returns {Node} - the new start node.
  */
 function selectAncestorHeader(startRange, startNode) {
-    // While there is a parent node and either the parent node or its parent node is a
-    // header tag...
-    while (
-        startNode.parentNode && (
-            startNode.parentNode.nodeName.startsWith('H') || (
-                startNode.parentNode.parentNode &&
-                startNode.parentNode.parentNode.nodeName.startsWith('H')
-            )
-        )
-    ) {
-        // ...expand the start of the selection to include the header tag. This is
-        // important because the selection may not include a header tag even if the user
-        // selected text within it.
-        startNode = startNode.parentNode;
-        startRange.setStartBefore(startNode);
+    // If the parent or grandparent is a header tag, expand the start of the selection
+    // to include the header tag. This is important because the selection may not
+    // include a header tag even if the user selected text within it.
+    const parent = startNode.parentNode;
+    if (parent) {
+        const grandparent = parent.parentNode;
+        if (grandparent && grandparent.nodeName.startsWith('H')) {
+            startNode = grandparent;
+            startRange.setStartBefore(startNode);
+        } else if (parent.nodeName.startsWith('H')) {
+            startNode = parent;
+            startRange.setStartBefore(startNode);
+        }
     }
 
     return startNode;

@@ -93,8 +93,9 @@ async function getSourceFormatMd(selection, selectedText) {
 }
 
 /**
- * getSelectionHtml gets a selection object and returns its HTML content. If no
- * selection exists, null is returned.
+ * getSelectionHtml takes a selection object and returns its HTML content. If no
+ * selection exists, null is returned. The selection may be expanded to include certain
+ * elements that are ancestors of the selection to make copying easier.
  * @param {Selection|null} - a selection object.
  * @returns {Promise<string|null>}
  */
@@ -107,31 +108,65 @@ async function getSelectionHtml(selection) {
         return null;
     }
 
-    let startRange = selection.getRangeAt(0).cloneRange();
-    let startNode = startRange.startContainer;
-
-    startNode = selectAncestorHeader(startRange, startNode);
-    startNode = selectParentTable(startRange, startNode);
-    startNode = selectAncestorCode(startRange, startNode);
-    startNode = selectParentPre(startRange, startNode);
-
     let container = document.createElement('div');
+
+    const startRange = getStartRange(selection);
     container.appendChild(startRange.cloneContents());
-    for (let i = 1; i < selection.rangeCount; i++) {
+    for (let i = 1; i < selection.rangeCount - 1; i++) {
         container.appendChild(selection.getRangeAt(i).cloneContents());
+    }
+    if (selection.rangeCount > 1) {
+        const endRange = getEndRange(selection);
+        container.appendChild(endRange.cloneContents());
     }
 
     return container.innerHTML;
 }
 
 /**
- * selectAncestorHeader expands a selection to include header elements that are the
+ * getStartRange gets the first range of a selection. The start of the selection may be
+ * expanded to include certain elements that are ancestors of the selection to make
+ * copying easier.
+ * @param {Selection} selection - a selection object.
+ * @returns {Range} - the first range of the selection.
+ */
+function getStartRange(selection) {
+    let startRange = selection.getRangeAt(0).cloneRange();
+    let startNode = startRange.startContainer;
+
+    startNode = startBeforeAncestorHeader(startRange, startNode);
+    startNode = startBeforeAncestorTable(startRange, startNode);
+    startNode = startBeforeAncestorCode(startRange, startNode);
+    startNode = startBeforeParentPre(startRange, startNode);
+
+    return startRange;
+}
+
+/**
+ * getEndRange gets the last range of a selection. The end of the selection may be
+ * expanded to include certain elements that are ancestors of the selection to make
+ * copying easier.
+ * @param {Selection} selection - a selection object.
+ * @returns {Range} - the last range of the selection.
+ */
+function getEndRange(selection) {
+    let endRange = selection.getRangeAt(selection.rangeCount - 1).cloneRange();
+    let endNode = endRange.endContainer;
+
+    endNode = endAfterAncestorCode(endRange, endNode);
+    endNode = endAfterParentPre(endRange, endNode);
+
+    return endRange;
+}
+
+/**
+ * startBeforeAncestorHeader expands a selection to include header elements that are the
  * parent or grandparent of the start of the selection.
  * @param {Range} startRange - a selection's index 0 range.
  * @param {Node} startNode - a selection's index 0 range's start container.
  * @returns {Node} - the new start node.
  */
-function selectAncestorHeader(startRange, startNode) {
+function startBeforeAncestorHeader(startRange, startNode) {
     // If the parent or grandparent is a header tag, expand the start of the selection
     // to include the header tag. This is important because the selection may not
     // include a header tag even if the user selected text within it.
@@ -151,13 +186,13 @@ function selectAncestorHeader(startRange, startNode) {
 }
 
 /**
- * selectParentTable expands a selection to include table elements that are the parent
- * of the start of the selection.
+ * startBeforeAncestorTable expands a selection to include table elements that are the
+ * parent of the start of the selection.
  * @param {Range} startRange - a selection's index 0 range.
  * @param {Node} startNode - a selection's index 0 range's start container.
  * @returns {Node} - the new start node.
  */
-function selectParentTable(startRange, startNode) {
+function startBeforeAncestorTable(startRange, startNode) {
     const tags = ['TABLE', 'THEAD', 'TBODY', 'TR', 'TH', 'TD'];
 
     // While there is a parent node and it's a table tag...
@@ -176,14 +211,14 @@ function selectParentTable(startRange, startNode) {
 }
 
 /**
- * selectAncestorCode expands a selection to include any code element that is an
+ * startBeforeAncestorCode expands a selection to include any code element that is an
  * ancestor to the start of the selection as long as any tags between them are span
  * tags.
  * @param {Range} startRange - a selection's index 0 range.
  * @param {Node} startNode - a selection's index 0 range's start container.
  * @returns {Node} - the new start node.
  */
-function selectAncestorCode(startRange, startNode) {
+function startBeforeAncestorCode(startRange, startNode) {
     // If there are only span tags between the start node and an ancestor code tag,
     // expand the start of the selection to include the code tag. This makes code blocks
     // easier to copy.
@@ -191,11 +226,11 @@ function selectAncestorCode(startRange, startNode) {
     if (temp.parentNode && temp.parentNode.nodeName === 'SPAN') {
         temp = temp.parentNode;
     }
-    while (temp.nodeName === 'SPAN') {
+    while (temp && temp.nodeName === 'SPAN') {
         temp = temp.parentNode;
     }
 
-    if (temp.nodeName === 'CODE') {
+    if (temp && temp.nodeName === 'CODE') {
         startNode = temp;
         startRange.setStartBefore(startNode);
     }
@@ -204,13 +239,13 @@ function selectAncestorCode(startRange, startNode) {
 }
 
 /**
- * selectParentPre expands a selection to include pre elements that are the parent of
- * the start of the selection.
+ * startBeforeParentPre expands a selection to include pre elements that are the parent
+ * of the start of the selection.
  * @param {Range} startRange - a selection's index 0 range.
  * @param {Node} startNode - a selection's index 0 range's start container.
  * @returns {Node} - the new start node.
  */
-function selectParentPre(startRange, startNode) {
+function startBeforeParentPre(startRange, startNode) {
     // If the parent is a pre tag, expand the start of the selection to include the pre
     // tag. This makes preformatted text including code blocks easier to copy.
     const parent = startNode.parentNode;
@@ -220,4 +255,50 @@ function selectParentPre(startRange, startNode) {
     }
 
     return startNode;
+}
+
+/**
+ * endAfterAncestorCode expands a selection to include any code element that is an
+ * ancestor to the end of the selection as long as any tags between them are span tags.
+ * @param {Range} endRange - a selection's last range.
+ * @param {Node} endNode - a selection's last range's end container.
+ * @returns {Node} - the new end node.
+ */
+function endAfterAncestorCode(endRange, endNode) {
+    // If there are only span tags between the end node and an ancestor code tag, expand
+    // the end of the selection to include the code tag. This makes code blocks easier
+    // to copy.
+    let temp = endNode;
+    if (temp.parentNode && temp.parentNode.nodeName === 'SPAN') {
+        temp = temp.parentNode;
+    }
+    while (temp && temp.nodeName === 'SPAN') {
+        temp = temp.parentNode;
+    }
+
+    if (temp && temp.nodeName === 'CODE') {
+        endNode = temp;
+        endRange.setEndAfter(endNode);
+    }
+
+    return endNode;
+}
+
+/**
+ * endAfterParentPre expands a selection to include pre elements that are the parent of
+ * the end of the selection.
+ * @param {Range} endRange - a selection's last range.
+ * @param {Node} endNode - a selection's last range's end container.
+ * @returns {Node} - the new end node.
+ */
+function endAfterParentPre(endRange, endNode) {
+    // If the parent is a pre tag, expand the end of the selection to include the pre
+    // tag. This makes preformatted text including code blocks easier to copy.
+    const parent = endNode.parentNode;
+    if (parent && parent.nodeName === 'PRE') {
+        endNode = parent;
+        endRange.setEndAfter(endNode);
+    }
+
+    return endNode;
 }

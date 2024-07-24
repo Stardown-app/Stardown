@@ -241,8 +241,11 @@ function newConvertLinkToMarkdown(subBrackets) {
  */
 function convertImageToMarkdown(content, img) {
     let src = img.getAttribute('src') || '';
-    if (!src) {
-        return '';
+    if (!src || src.startsWith('data:')) {
+        src = img.getAttribute('data-srcset') || '';
+        if (!src) {
+            return '';
+        }
     }
 
     // remove excess whitespace

@@ -206,9 +206,9 @@ function newConvertLinkToMarkdown(subBrackets) {
             return ''; // don't create the link
         }
 
-        // replace square brackets in the anchor element's content if and only if they
-        // aren't all for images
-        const mdImagesPattern = /^\s*(?:!\[[^\]]*\]\([^\)]*\)\s*)+\s*$/;
+        // replace square brackets in the anchor element's content if and only if none
+        // of them are for images
+        const mdImagesPattern = /^[^\[\]]*(?:!\[[^\]]*\]\([^\)]*\)\s*)+[^\[\]]*$/;
         if (!content.match(mdImagesPattern)) {
             content = replaceBrackets(content, subBrackets);
         }
@@ -241,8 +241,11 @@ function newConvertLinkToMarkdown(subBrackets) {
  */
 function convertImageToMarkdown(content, img) {
     let src = img.getAttribute('src') || '';
-    if (!src) {
-        return '';
+    if (!src || src.startsWith('data:')) {
+        src = img.getAttribute('data-srcset') || '';
+        if (!src) {
+            return '';
+        }
     }
 
     // remove excess whitespace

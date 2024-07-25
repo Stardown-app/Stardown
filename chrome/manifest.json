@@ -3,7 +3,7 @@
     "name": "Stardown",
     "description": "Copy the web as markdown.",
     "version": "1.0.0",
-    "homepage_url": "https://github.com/wheelercj/Stardown",
+    "homepage_url": "https://github.com/Stardown-app/Stardown",
     "permissions": [
         "activeTab",
         "clipboardWrite",

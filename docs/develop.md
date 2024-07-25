@@ -12,7 +12,7 @@ I would also like to keep Stardown's code relatively simple so that it's reliabl
 
 ### Chrome and Edge
 
-1. in a terminal, run `git clone https://github.com/wheelercj/Stardown.git && cd Stardown`
+1. in a terminal, run `git clone https://github.com/Stardown-app/Stardown.git && cd Stardown`
 2. then run `npm install && npm run dev-chrome`
 3. in your browser, open `chrome://extensions/`
 4. turn on developer mode
@@ -29,7 +29,7 @@ To update Stardown after you make changes or you `git pull` changes:
 
 ### Firefox
 
-1. in a terminal, run `git clone https://github.com/wheelercj/Stardown.git && cd Stardown`
+1. in a terminal, run `git clone https://github.com/Stardown-app/Stardown.git && cd Stardown`
 2. then run `npm install && npm run dev-firefox`
 3. in Firefox, open `about:debugging#/runtime/this-firefox`
 4. click "Load Temporary Add-on..."
@@ -132,7 +132,7 @@ When something goes wrong, Stardown should still respond well.
 - In Firefox, [Manifest V3 extensions with low privilege activeTab shows annoying blue dot for all websites](https://bugzilla.mozilla.org/show_bug.cgi?id=1851083). This is why I changed the Firefox version of Stardown from manifest v3 to v2.
 - Although Stardown no longer uses Firefox's manifest v3, [Firefox does not support service_worker in manifest v3](https://stackoverflow.com/questions/75043889/manifest-v3-background-scripts-service-worker-on-firefox).
 - Firefox [sometimes requires an add-on ID](https://extensionworkshop.com/documentation/develop/extensions-and-the-add-on-id/) in `browser_specific_settings` in manifest.json, but Chromium doesn't allow `browser_specific_settings`.
-- Based on testing I took notes on in [#11](https://github.com/wheelercj/Stardown/issues/11), it appears Firefox manifest v2 does not allow use of the `import` and `export` keywords, and Chrome manifest v3 does not allow their use in content scripts. That's why Stardown requires using a bundler.
+- Based on testing I took notes on in [#11](https://github.com/Stardown-app/Stardown/issues/11), it appears Firefox manifest v2 does not allow use of the `import` and `export` keywords, and Chrome manifest v3 does not allow their use in content scripts. That's why Stardown requires using a bundler.
 - Further differences are described in comments throughout Stardown's code.
 
 ## Text fragments

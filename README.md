@@ -72,11 +72,11 @@ Besides those possibilities, browsers have an occasionally reoccuring bug that m
 
 ### Something else is wrong
 
-If reinstalling Stardown doesn't fix it and [the issues page](https://github.com/wheelercj/Stardown/issues?q=is%3Aissue) doesn't have an issue for it yet, please make a new issue.
+If reinstalling Stardown doesn't fix it and [the issues page](https://github.com/Stardown-app/Stardown/issues?q=is%3Aissue) doesn't have an issue for it yet, please make a new issue.
 
 ## Feature requests
 
-You're welcome to [make a feature request](https://github.com/wheelercj/Stardown/issues/new?assignees=&labels=enhancement&projects=&template=feature_request.md&title=), and there may already be another browser extension that meets all of your needs. I am not affiliated with any of the below extensions and have not tried all of them; use them at your own risk.
+You're welcome to [make a feature request](https://github.com/Stardown-app/Stardown/issues/new?assignees=&labels=enhancement&projects=&template=feature_request.md&title=), and there may already be another browser extension that meets all of your needs. I am not affiliated with any of the below extensions and have not tried all of them; use them at your own risk.
 
 ### Download an entire page
 
@@ -114,7 +114,7 @@ Follow these steps to install Stardown using the source code. If you also want t
 
 ### Chrome and Edge
 
-1. in a terminal, run `git clone https://github.com/wheelercj/Stardown.git && cd Stardown`
+1. in a terminal, run `git clone https://github.com/Stardown-app/Stardown.git && cd Stardown`
 2. then run `npm run build-chrome`
 3. in your browser, open `chrome://extensions/`
 4. turn on developer mode
@@ -129,7 +129,7 @@ To get updates:
 
 ### Firefox
 
-1. in a terminal, run `git clone https://github.com/wheelercj/Stardown.git && cd Stardown`
+1. in a terminal, run `git clone https://github.com/Stardown-app/Stardown.git && cd Stardown`
 2. then `npm run build-firefox`
 3. in Firefox, open `about:debugging#/runtime/this-firefox`
 4. click "Load Temporary Add-on..."
@@ -143,6 +143,6 @@ To get updates:
 
 ## Development
 
-Contributions are welcome! Let me know (such as in [an issue](https://github.com/wheelercj/Stardown/issues) or [a discussion](https://github.com/wheelercj/Stardown/discussions)) what you have in mind ahead of time if you think there's a chance it won't be approved.
+Contributions are welcome! Let me know (such as in [an issue](https://github.com/Stardown-app/Stardown/issues) or [a discussion](https://github.com/Stardown-app/Stardown/discussions)) what you have in mind ahead of time if you think there's a chance it won't be approved.
 
 Also, please read [docs/develop.md](docs/develop.md).

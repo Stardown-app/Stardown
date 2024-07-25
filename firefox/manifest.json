@@ -3,7 +3,7 @@
     "name": "Stardown",
     "description": "Copy the web as markdown.",
     "version": "1.0.0",
-    "homepage_url": "https://github.com/wheelercj/Stardown",
+    "homepage_url": "https://github.com/Stardown-app/Stardown",
     "browser_specific_settings": {
         "gecko": {
             "id": "{ca5c6573-af57-4607-a075-337cdbfffde7}"

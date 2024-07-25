@@ -15,7 +15,7 @@
     to get updates early.
 </p>
 
-<p align="center"><img alt="demo gif" src="https://github.com/wheelercj/assets/blob/main/Stardown.gif"></p>
+<p align="center"><img alt="demo gif" src="https://github.com/Stardown-app/assets/blob/main/Stardown.gif"></p>
 
 * Click the extension's icon to copy a link for the current page.
 * Press `Alt+C` to copy a selection or a page's link.

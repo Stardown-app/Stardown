@@ -21,7 +21,7 @@ import { addTableRules } from './tables.js';
 /**
  * replaceBrackets replaces any square brackets in text with the character or escape
  * sequence chosen in settings.
- * @param {string} text - the text.
+ * @param {string} text - the text to replace brackets in.
  * @param {string} subBrackets - the setting for what to substitute any square brackets
  * with.
  * @returns {string}
@@ -34,6 +34,34 @@ export function replaceBrackets(text, subBrackets) {
     } else {
         return text;
     }
+}
+
+/**
+ * replaceNonImageBrackets replaces any square brackets in text that are not for
+ * markdown images with the character or escape sequence chosen in settings.
+ * @param {string} text - the text to replace non-image brackets in.
+ * @param {string} subBrackets - the setting for what to substitute any square brackets
+ * with.
+ * @returns {string}
+ */
+export function replaceNonImageBrackets(text, subBrackets) {
+    let newText = [];
+    for (let i = 0; i < text.length; i++) {
+        if (text[i] === '[' || text[i] === ']') {
+            newText.push(replaceBrackets(text[i], subBrackets));
+        } else if (text[i] === '!' && i + 1 < text.length && text[i + 1] === '[') {
+            let j = i + 2;
+            while (j < text.length && text[j] !== ']') {
+                j++;
+            }
+            newText.push(text.slice(i, j + 1));
+            i = j;
+        } else {
+            newText.push(text[i]);
+        }
+    }
+
+    return newText.join('');
 }
 
 /**
@@ -206,12 +234,7 @@ function newConvertLinkToMarkdown(subBrackets) {
             return ''; // don't create the link
         }
 
-        // replace square brackets in the anchor element's content if and only if none
-        // of them are for images
-        const mdImagesPattern = /^[^\[\]]*(?:!\[[^\]]*\]\([^\)]*\)\s*)+[^\[\]]*$/;
-        if (!content.match(mdImagesPattern)) {
-            content = replaceBrackets(content, subBrackets);
-        }
+        content = replaceNonImageBrackets(content, subBrackets);
 
         let href = node.getAttribute('href') || '';
         if (href) {

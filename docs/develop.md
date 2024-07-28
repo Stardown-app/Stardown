@@ -10,7 +10,7 @@ I would also like to keep Stardown's code relatively simple so that it's reliabl
 
 ## Installing Stardown from source for development
 
-See [./devInstallFromSource.md](./devInstallFromSource.md).
+See [./dev-install-from-source.md](./dev-install-from-source.md).
 
 ## Tests
 
@@ -124,4 +124,4 @@ Some HTML tables have cells that span multiple rows and/or columns, such as [thi
 
 From my experience so far, markdown renderers tend to require every markdown table to have one header row followed by one table divider, then zero or more body rows. The number of cells in the header row must be equal to that of the table divider and to that of whichever row has the most cells. Body rows may have varying numbers of cells.
 
-Sample markdown tables for testing markdown renderers can be found in [./sampleTables.md](./sampleTables.md).
+Sample markdown tables for testing markdown renderers can be found in [./sample-tables.md](./sample-tables.md).

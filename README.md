@@ -10,7 +10,7 @@
 </p>
 <p align="center">
     You can also
-    <a href="./docs/installFromSource.md">
+    <a href="./docs/install-from-source.md">
         install from the source code</a>
     to get updates early.
 </p>
@@ -60,11 +60,11 @@ See [./docs/troubleshooting.md](./docs/troubleshooting.md).
 
 ## Feature requests
 
-See [./docs/featureRequests.md](./docs/featureRequests.md).
+See [./docs/feature-requests.md](./docs/feature-requests.md).
 
 ## Install from source
 
-See [./docs/installFromSource.md](./docs/installFromSource.md).
+See [./docs/install-from-source.md](./docs/install-from-source.md).
 
 ## Development
 

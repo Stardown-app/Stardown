@@ -10,7 +10,7 @@ I would also like to keep Stardown's code relatively simple so that it's reliabl
 
 ## Installing Stardown from source for development
 
-See [./dev-install-from-source.md](./dev-install-from-source.md).
+See [./dev-install-from-source.md](./dev-install-from-source.md)
 
 ## Tests
 

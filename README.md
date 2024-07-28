@@ -56,18 +56,18 @@ To open Stardown's options page, right-click the extension's icon and choose:
 
 ## Troubleshooting
 
-See [./docs/troubleshooting.md](./docs/troubleshooting.md).
+See [./docs/troubleshooting.md](./docs/troubleshooting.md)
 
 ## Feature requests
 
-See [./docs/feature-requests.md](./docs/feature-requests.md).
+See [./docs/feature-requests.md](./docs/feature-requests.md)
 
 ## Install from source
 
-See [./docs/install-from-source.md](./docs/install-from-source.md).
+See [./docs/install-from-source.md](./docs/install-from-source.md)
 
 ## Development
 
 Contributions are welcome! Let me know (such as in [an issue](https://github.com/Stardown-app/Stardown/issues) or [a discussion](https://github.com/Stardown-app/Stardown/discussions)) what you have in mind ahead of time if you think there's a chance it won't be approved.
 
-Also, please read [./docs/develop.md](docs/develop.md).
+Also, please read [./docs/develop.md](docs/develop.md)

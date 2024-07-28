@@ -4,44 +4,13 @@ I wrote some general extension development tips in [Making browser extensions](h
 
 ## Goals
 
-Stardown's main goal is to be so simple, fast, reliable, and flexible that people think of it as "it's like Ctrl+C but it keeps formatting". It should probably only ever have one keyboard shortcut, no popup, and show only one context menu option at a time. The options page can have many options as long as they are well organized and useful. Stardown's output should render well on at least Obsidian and GitHub, if not also other markdown renderers like Google Docs, VS Code, Discourse, GitLab, Stack Overflow, Joplin, Reddit, and Discord.
+Stardown's main goal is to be so simple, fast, reliable, and flexible that people think of it as "it's like Ctrl+C but it keeps formatting". It should probably only ever have one keyboard shortcut, no popup, and show only one context menu option at a time. The options page can have many options as long as they are well organized and useful. Stardown's output should render well on at least Obsidian and GitHub, if not also other markdown renderers like [Google Docs](https://workspaceupdates.googleblog.com/2024/07/import-and-export-markdown-in-google-docs.html), [VS Code](https://code.visualstudio.com/docs/languages/markdown#_markdown-preview), Discourse, GitLab, Stack Overflow, Joplin, Reddit, and Discord.
 
 I would also like to keep Stardown's code relatively simple so that it's reliable, has few bugs that get fixed quickly, and is easy to maintain.
 
 ## Installing Stardown from source for development
 
-### Chrome and Edge
-
-1. in a terminal, run `git clone https://github.com/Stardown-app/Stardown.git && cd Stardown`
-2. then run `npm install && npm run dev-chrome`
-3. in your browser, open `chrome://extensions/`
-4. turn on developer mode
-5. click "Load unpacked"
-6. select Stardown's `chrome` folder
-
-In the `chrome` folder, don't make any changes unless they're to `config.js` or `manifest.json` because the other files get overwritten or deleted each time `npm run dev-chrome` runs.
-
-To update Stardown after you make changes or you `git pull` changes:
-
-1. run `npm run dev-chrome`
-2. in your browser, open `chrome://extensions/`
-3. click Stardown's reload button
-
-### Firefox
-
-1. in a terminal, run `git clone https://github.com/Stardown-app/Stardown.git && cd Stardown`
-2. then run `npm install && npm run dev-firefox`
-3. in Firefox, open `about:debugging#/runtime/this-firefox`
-4. click "Load Temporary Add-on..."
-5. select Stardown's `firefox/manifest.json` file
-
-In the `firefox` folder, don't make any changes unless they're to `config.js` or `manifest.json` because the other files get overwritten or deleted each time `npm run dev-firefox` runs.
-
-To update Stardown after you make changes or you `git pull` changes:
-
-1. run `npm run dev-firefox`
-2. in Firefox, open `about:debugging#/runtime/this-firefox`
-3. click Stardown's reload button
+See [./dev-install-from-source.md](./dev-install-from-source.md)
 
 ## Tests
 
@@ -155,4 +124,4 @@ Some HTML tables have cells that span multiple rows and/or columns, such as [thi
 
 From my experience so far, markdown renderers tend to require every markdown table to have one header row followed by one table divider, then zero or more body rows. The number of cells in the header row must be equal to that of the table divider and to that of whichever row has the most cells. Body rows may have varying numbers of cells.
 
-Sample markdown tables for testing markdown renderers can be found in [./sampleTables.md](./sampleTables.md).
+Sample markdown tables for testing markdown renderers can be found in [./sample-tables.md](./sample-tables.md).

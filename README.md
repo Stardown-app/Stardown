@@ -10,7 +10,7 @@
 </p>
 <p align="center">
     You can also
-    <a href="#install-from-source">
+    <a href="./docs/installFromSource.md">
         install from the source code</a>
     to get updates early.
 </p>
@@ -64,39 +64,10 @@ See [./docs/featureRequests.md](./docs/featureRequests.md).
 
 ## Install from source
 
-Follow these steps to install Stardown using the source code. If you also want to change Stardown's code, instead follow the directions in [Installing Stardown from source for development](./docs/develop.md#installing-stardown-from-source-for-development).
-
-### Chrome and Edge
-
-1. in a terminal, run `git clone https://github.com/Stardown-app/Stardown.git && cd Stardown`
-2. then run `npm run build-chrome`
-3. in your browser, open `chrome://extensions/`
-4. turn on developer mode
-5. click "Load unpacked"
-6. select Stardown's `chrome` folder
-
-To get updates:
-
-1. run `npm run update-chrome`
-2. in your browser, open `chrome://extensions/`
-3. click Stardown's reload button
-
-### Firefox
-
-1. in a terminal, run `git clone https://github.com/Stardown-app/Stardown.git && cd Stardown`
-2. then `npm run build-firefox`
-3. in Firefox, open `about:debugging#/runtime/this-firefox`
-4. click "Load Temporary Add-on..."
-5. select Stardown's `firefox/manifest.json` file
-
-To get updates:
-
-1. run `npm run update-firefox`
-2. in Firefox, open `about:debugging#/runtime/this-firefox`
-3. click Stardown's reload button
+See [./docs/installFromSource.md](./docs/installFromSource.md).
 
 ## Development
 
 Contributions are welcome! Let me know (such as in [an issue](https://github.com/Stardown-app/Stardown/issues) or [a discussion](https://github.com/Stardown-app/Stardown/discussions)) what you have in mind ahead of time if you think there's a chance it won't be approved.
 
-Also, please read [docs/develop.md](docs/develop.md).
+Also, please read [./docs/develop.md](docs/develop.md).

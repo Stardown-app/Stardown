@@ -16,7 +16,7 @@
 
 /**
  * A TableConverter is an object that assists with converting an HTML table to a
- * markdown table. A TableConverter instance should not be reused for multiple tables.
+ * markdown table. A TableConverter instance should not be used for multiple tables.
  */
 export class TableConverter {
     constructor() {
@@ -43,8 +43,6 @@ export class TableConverter {
      * @param {number} rowspan - the number of rows the HTML cell spans.
      */
     addCell(content, colspan = 1, rowspan = 1) {
-        content = this.formatCellContent(content);
-
         // while before the end of the row and not on a null cell
         while (this.X < this.table[this.Y].length && this.table[this.Y][this.X] !== null) {
             this.X++;
@@ -82,7 +80,7 @@ export class TableConverter {
      * toMarkdown returns the markdown representation of the table. If the addRow and
      * addCell methods were used correctly, the table should not contain any nulls when
      * this method is called.
-     * @returns {string} the markdown representation of the table.
+     * @returns {string} - the markdown representation of the table.
      */
     toMarkdown() {
         this.removeEmptyRows();
@@ -97,7 +95,8 @@ export class TableConverter {
 
             // for each cell
             for (let x = 0; x < row.length; x++) {
-                const cell = row[x];
+                let cell = row[x];
+                cell = this.formatCellContentMarkdown(cell);
                 markdown.push(` ${cell} |`);
             }
 
@@ -117,13 +116,13 @@ export class TableConverter {
     }
 
     /**
-     * formatCellContent prepares a table cell's content to be incorporated into a table
-     * row.
+     * formatCellContentMarkdown prepares a table cell's content to be incorporated into
+     * a markdown table row.
      * @private
      * @param {string} content - the table cell's content.
      * @returns {string}
      */
-    formatCellContent(content) {
+    formatCellContentMarkdown(content) {
         return content.trim().replaceAll(/\s+/g, ' ').replaceAll('|', '\\|');
     }
 

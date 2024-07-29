@@ -103,6 +103,8 @@ export function addTableRules(t, tableFormat) {
             let tableText;
             if (tableFormat === 'csv') {
                 tableText = tableConv.toCsv();
+            } else if (tableFormat === 'tsv') {
+                tableText = tableConv.toCsv('\t');
             } else {
                 tableText = tableConv.toMarkdown();
             }

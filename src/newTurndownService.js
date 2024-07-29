@@ -71,6 +71,7 @@ export function replaceNonImageBrackets(text, subBrackets) {
  * @param {string} subBrackets - the Stardown setting for what to substitute square
  * brackets with.
  * @param {string} selectionFormat - the Stardown setting for the selection format.
+ * @param {string} tableFormat - the Stardown setting for the table format.
  * @param {boolean} omitNav - the Stardown setting for whether to omit nav elements.
  * @param {boolean} omitFooter - the Stardown setting for whether to omit footer
  * elements.
@@ -79,7 +80,7 @@ export function replaceNonImageBrackets(text, subBrackets) {
  * @returns {TurndownService}
  */
 export function newTurndownService(
-    bulletPoint, subBrackets, selectionFormat, omitNav, omitFooter, turndownEscape,
+    bulletPoint, subBrackets, selectionFormat, tableFormat, omitNav, omitFooter, turndownEscape,
 ) {
     // https://github.com/mixmark-io/turndown
     const t = new TurndownService({
@@ -100,7 +101,7 @@ export function newTurndownService(
 
     t.use(turndownPluginGfm.gfm); // GitHub Flavored Markdown
 
-    addRules(t, subBrackets);
+    addRules(t, subBrackets, tableFormat);
     if (selectionFormat === 'blockquote with link') {
         addBlockquoteRules(t);
     }
@@ -152,9 +153,10 @@ function defaultReplacement(content, node) {
  * @param {TurndownService} t - the Turndown service instance.
  * @param {string} subBrackets - the Stardown setting for what to substitute square
  * brackets with.
+ * @param {string} tableFormat - the Stardown setting for the table format.
  * @returns {void}
  */
-function addRules(t, subBrackets) {
+function addRules(t, subBrackets, tableFormat) {
     // Each Turndown rule runs on each yet-unreplaced HTML element. If the element
     // matches the rule's filter, the rule's replacement function runs on it.
 
@@ -182,7 +184,7 @@ function addRules(t, subBrackets) {
         },
     });
 
-    addTableRules(t);
+    addTableRules(t, tableFormat);
 }
 
 /**

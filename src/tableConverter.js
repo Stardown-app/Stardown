@@ -16,7 +16,8 @@
 
 /**
  * A TableConverter is an object that assists with converting an HTML table to a
- * markdown table. A TableConverter instance should not be used for multiple tables.
+ * markdown or CSV table. A TableConverter instance should not be used for multiple
+ * tables.
  */
 export class TableConverter {
     constructor() {
@@ -96,7 +97,7 @@ export class TableConverter {
             // for each cell
             for (let x = 0; x < row.length; x++) {
                 let cell = row[x];
-                cell = this.formatCellContentMarkdown(cell);
+                cell = cell.trim().replaceAll(/\s+/g, ' ').replaceAll('|', '\\|');
                 markdown.push(` ${cell} |`);
             }
 
@@ -116,14 +117,61 @@ export class TableConverter {
     }
 
     /**
-     * formatCellContentMarkdown prepares a table cell's content to be incorporated into
-     * a markdown table row.
-     * @private
-     * @param {string} content - the table cell's content.
-     * @returns {string}
+     * toCsv returns the CSV representation of the table. If the addRow and addCell
+     * methods were used correctly, the table should not contain any nulls when this
+     * method is called.
+     * @param {string} delimiter - what to separate fields with.
+     * @param {string} encapsulator - what to encapsulate fields with.
+     * @param {string} escaper - what to escape the encapsulator within fields with.
+     * @param {string} lineTerminator - what to separate rows with.
+     * @param {boolean} trimFields - whether to trim surrounding whitespace characters
+     * from fields.
+     * @returns {string} - the CSV representation of the table.
      */
-    formatCellContentMarkdown(content) {
-        return content.trim().replaceAll(/\s+/g, ' ').replaceAll('|', '\\|');
+    toCsv(
+        delimiter = ',',
+        encapsulator = '"',
+        escaper = '"',
+        lineTerminator = '\n',
+        trimFields = false,
+    ) {
+        // [RFC 4180](https://datatracker.ietf.org/doc/html/rfc4180)
+        // [Comma-separated values - Wikipedia](https://en.wikipedia.org/wiki/Comma-separated_values#Basic_rules)
+        // [csv — Python documentation](https://docs.python.org/3/library/csv.html#dialects-and-formatting-parameters)
+
+        this.removeEmptyRows();
+        this.rectangularize();
+
+        let csv = [];
+
+        // for each row
+        for (let y = 0; y < this.table.length; y++) {
+            const row = this.table[y];
+            // for each cell
+            for (let x = 0; x < row.length; x++) {
+                let cell = row[x];
+                if (trimFields) {
+                    cell = cell.trim();
+                }
+                if (
+                    cell.includes(encapsulator) ||
+                    cell.includes(delimiter) ||
+                    cell.includes(lineTerminator)
+                ) {
+                    cell = cell.replaceAll(encapsulator, escaper + encapsulator);
+                    csv.push(encapsulator, cell, encapsulator);
+                } else {
+                    csv.push(cell);
+                }
+                if (x < row.length - 1) {
+                    csv.push(delimiter);
+                }
+            }
+
+            csv.push(lineTerminator);
+        }
+
+        return csv.join('');
     }
 
     /**

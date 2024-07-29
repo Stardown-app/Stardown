@@ -29,5 +29,5 @@ Although Stardown can be used to copy an entire page's content as markdown all a
 Unlike the extensions linked above, Stardown is:
 
 * **Easy to use.** Less clicking, less typing, no setup.
-* **Keeps almost all formatting**. Even complex tables are converted to markdown.
+* **Keeps almost all formatting**. Even complex tables are converted to markdown (or CSV).
 * **Creates [text fragments](https://web.dev/articles/text-fragments)** so you can link to specific parts of pages.

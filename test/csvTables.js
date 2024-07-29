@@ -21,21 +21,21 @@ import { newTurndownService } from '../src/newTurndownService.js';
 import { escape } from '../src/md.js';
 
 const turndownService = newTurndownService(
-    '-', 'underlined', 'source with link', true, true, escape,
+    '-', 'underlined', 'source with link', 'csv', true, true, escape,
 );
 
-function runTest(testName, htmlInput, mdExpected) {
+function runTest(testName, htmlInput, csvExpected) {
     test(testName, t => {
         global.document = new JSDOM(htmlInput).window.document;
-        const mdActual = turndownService.turndown(htmlInput);
-        assert.equal(mdActual, mdExpected);
+        const csvActual = turndownService.turndown(htmlInput);
+        assert.equal(csvActual, csvExpected);
     });
 }
 
 function runTests() {
     for (let i = 0; i < tests.length; i++) {
-        const { testName, htmlInput, mdExpected } = tests[i];
-        runTest(testName, htmlInput, mdExpected);
+        const { testName, htmlInput, csvExpected } = tests[i];
+        runTest(testName, htmlInput, csvExpected);
     }
 }
 
@@ -46,7 +46,7 @@ const tests = [
             <table>
             </table>
         `,
-        mdExpected: ``,
+        csvExpected: ``,
     },
     {
         testName: '1x1',
@@ -59,9 +59,8 @@ const tests = [
                 </tr>
             </table>
         `,
-        mdExpected: `
-| a |
-| --- |
+        csvExpected: `
+a
 `.trim(),
     },
     {
@@ -78,9 +77,8 @@ const tests = [
                 </tr>
             </table>
             `,
-        mdExpected: `
-| a | b |
-| --- | --- |
+        csvExpected: `
+a,b
 `.trim()
     },
     {
@@ -99,10 +97,9 @@ const tests = [
                 </tr>
             </table>
             `,
-        mdExpected: `
-| a |
-| --- |
-| c |
+        csvExpected: `
+a
+c
 `.trim()
     },
     {
@@ -127,10 +124,9 @@ const tests = [
                 </tr>
             </table>
             `,
-        mdExpected: `
-| a | b |
-| --- | --- |
-| c | d |
+        csvExpected: `
+a,b
+c,d
 `.trim()
     },
     {
@@ -163,11 +159,10 @@ const tests = [
                 </tr>
             </table>
             `,
-        mdExpected: `
-| a | b |
-| --- | --- |
-| d | e |
-| g | h |
+        csvExpected: `
+a,b
+d,e
+g,h
 `.trim()
     },
     {
@@ -198,10 +193,9 @@ const tests = [
                 </tr>
             </table>
             `,
-        mdExpected: `
-| a | b | c |
-| --- | --- | --- |
-| d | e | f |
+        csvExpected: `
+a,b,c
+d,e,f
 `.trim()
     },
     {
@@ -243,11 +237,10 @@ const tests = [
                 </tr>
             </table>
             `,
-        mdExpected: `
-| a | b | c |
-| --- | --- | --- |
-| d | e | f |
-| g | h | i |
+        csvExpected: `
+a,b,c
+d,e,f
+g,h,i
 `.trim()
     },
     {
@@ -286,11 +279,10 @@ const tests = [
                 </tr>
             </table>
             `,
-        mdExpected: `
-| a | b | c |
-| --- | --- | --- |
-| d | e | f |
-| g | h |  |
+        csvExpected: `
+a,b,c
+d,e,f
+g,h,
 `.trim()
     },
     {
@@ -329,11 +321,10 @@ const tests = [
                 </tr>
             </table>
             `,
-        mdExpected: `
-| a | b | c |
-| --- | --- | --- |
-| d | e |  |
-| g | h | i |
+        csvExpected: `
+a,b,c
+d,e,
+g,h,i
 `.trim()
     },
     {
@@ -372,11 +363,10 @@ const tests = [
                 </tr>
             </table>
             `,
-        mdExpected: `
-| a | b |  |
-| --- | --- | --- |
-| d | e | f |
-| g | h | i |
+        csvExpected: `
+a,b,
+d,e,f
+g,h,i
 `.trim()
     },
     {
@@ -412,11 +402,10 @@ const tests = [
                 </tr>
             </table>
             `,
-        mdExpected: `
-| a |  |  |
-| --- | --- | --- |
-| d | e | f |
-| g | h | i |
+        csvExpected: `
+a,,
+d,e,f
+g,h,i
 `.trim()
     },
     {
@@ -438,9 +427,8 @@ const tests = [
                 </thead>
             </table>
             `,
-        mdExpected: `
-| a | b | c |
-| --- | --- | --- |
+        csvExpected: `
+a,b,c
 `.trim()
     },
     {
@@ -486,11 +474,10 @@ const tests = [
                 </tbody>
             </table>
             `,
-        mdExpected: `
-| a | b | c |
-| --- | --- | --- |
-| d | e | f |
-| g | h | i |
+        csvExpected: `
+a,b,c
+d,e,f
+g,h,i
 `.trim()
     },
     {
@@ -538,11 +525,10 @@ const tests = [
                 </tbody>
             </table>
             `,
-        mdExpected: `
-| a | b | c |
-| --- | --- | --- |
-| d | e | f |
-| g | h | i |
+        csvExpected: `
+a,b,c
+d,e,f
+g,h,i
 `.trim()
     },
     {
@@ -590,11 +576,10 @@ const tests = [
                 </tbody>
             </table>
             `,
-        mdExpected: `
-| a | b | c |
-| --- | --- | --- |
-| d | e | f |
-| g | h | i |
+        csvExpected: `
+a,b,c
+d,e,f
+g,h,i
 `.trim()
     },
     {
@@ -627,10 +612,9 @@ const tests = [
                 </tbody>
             </table>
             `,
-        mdExpected: `
-| a | b | c |
-| --- | --- | --- |
-| d | e | f |
+        csvExpected: `
+a,b,c
+d,e,f
 `.trim()
     },
     {
@@ -687,12 +671,11 @@ const tests = [
                 </tbody>
             </table>
             `,
-        mdExpected: `
-| a | b | c |
-| --- | --- | --- |
-| d | e | f |
-| g | h | i |
-| j | k | l |
+        csvExpected: `
+a,b,c
+d,e,f
+g,h,i
+j,k,l
 `.trim()
     },
     {
@@ -720,11 +703,10 @@ const tests = [
                 </tbody>
             </table>
             `,
-        mdExpected: `
-| a |
-| --- |
-| b |
-| c |
+        csvExpected: `
+a
+b
+c
 `.trim()
     },
     {
@@ -747,10 +729,9 @@ const tests = [
                 </tfoot>
             </table>
             `,
-        mdExpected: `
-| a |
-| --- |
-| b |
+        csvExpected: `
+a
+b
 `.trim()
     },
     {
@@ -783,12 +764,11 @@ const tests = [
                 </tfoot>
             </table>
             `,
-        mdExpected: `
-| a |
-| --- |
-| b |
-| c |
-| d |
+        csvExpected: `
+a
+b
+c
+d
 `.trim()
     },
     {
@@ -809,10 +789,9 @@ const tests = [
                 </tr>
             </table>
             `,
-        mdExpected: `
-| a |
-| --- |
-| b |
+        csvExpected: `
+a
+b
 `.trim()
     },
     {
@@ -833,54 +812,9 @@ const tests = [
                 </tfoot>
             </table>
             `,
-        mdExpected: `
-| a |
-| --- |
-| b |
-`.trim()
-    },
-    {
-        testName: 'pipe symbols',
-        htmlInput: `
-            <table>
-                <tr>
-                    <th>
-                        a | b
-                    </th>
-                </tr>
-                <tr>
-                    <td>
-                        c | d
-                    </td>
-                </tr>
-            </table>
-            `,
-        mdExpected: `
-| a \\| b |
-| --- |
-| c \\| d |
-`.trim()
-    },
-    {
-        testName: 'spaces around',
-        htmlInput: `
-            <table>
-                <tr>
-                    <th>
-                        <p>  a  </p>
-                    </th>
-                </tr>
-                <tr>
-                    <td>
-                        <p>  b  </p>
-                    </td>
-                </tr>
-            </table>
-            `,
-        mdExpected: `
-| a |
-| --- |
-| b |
+        csvExpected: `
+a
+b
 `.trim()
     },
     {
@@ -905,10 +839,9 @@ const tests = [
                 </tr>
             </table>
             `,
-        mdExpected: `
-| a | *b* |
-| --- | --- |
-| **c** | ***d*** |
+        csvExpected: `
+a,*b*
+**c**,***d***
 `.trim()
     },
     {
@@ -939,50 +872,9 @@ const tests = [
                     </tr>
                 </table>
                 `,
-        mdExpected: `
-| a b | c d |
-| --- | --- |
-| e f | g h |
-`.trim()
-    },
-    {
-        testName: 'lists',
-        htmlInput: `
-                <table>
-                    <tr>
-                        <th>
-                            <ul>
-                                <li>a</li>
-                                <li>b</li>
-                            </ul>
-                        </th>
-                        <th>
-                            <ol>
-                                <li>c</li>
-                                <li>d</li>
-                            </ol>
-                        </th>
-                    </tr>
-                    <tr>
-                        <td>
-                            <ol>
-                                <li>e</li>
-                                <li>f</li>
-                            </ol>
-                        </td>
-                        <td>
-                            <ul>
-                                <li>g</li>
-                                <li>h</li>
-                            </ul>
-                        </td>
-                    </tr>
-                </table>
-                `,
-        mdExpected: `
-| - a - b | 1. c 2. d |
-| --- | --- |
-| 1. e 2. f | - g - h |
+        csvExpected: `
+"a\n\nb","c\n\n  \n\nd"
+"e\n\n  \n\nf","g\n\nh"
 `.trim()
     },
     {
@@ -1001,10 +893,9 @@ const tests = [
                 </tr>
             </table>
             `,
-        mdExpected: `
-| a |
-| --- |
-| b |
+        csvExpected: `
+a
+b
 `.trim()
     },
     {
@@ -1045,10 +936,9 @@ const tests = [
                 </tr>
             </table>
             `,
-        mdExpected: `
-| ab |
-| --- |
-| cd |
+        csvExpected: `
+ab
+cd
 `.trim()
     },
     {
@@ -1072,12 +962,9 @@ const tests = [
                 </tbody>
             </table>
             `,
-        mdExpected: `
-**this is a caption**
-
-| a |
-| --- |
-| b |
+        csvExpected: `
+a
+b
 `.trim()
     },
     {
@@ -1105,10 +992,9 @@ const tests = [
                 </tr>
             </table>
             `,
-        mdExpected: `
-| a | a | b |
-| --- | --- | --- |
-| c | d | e |
+        csvExpected: `
+a,a,b
+c,d,e
 `.trim()
     },
     {
@@ -1138,11 +1024,10 @@ const tests = [
                 </tr>
             </table>
             `,
-        mdExpected: `
-| a | b |
-| --- | --- |
-| a | c |
-| d | e |
+        csvExpected: `
+a,b
+a,c
+d,e
 `.trim()
     },
     {
@@ -1169,11 +1054,10 @@ const tests = [
                 </tr>
             </table>
             `,
-        mdExpected: `
-| a | a |
-| --- | --- |
-| b | c |
-| d | d |
+        csvExpected: `
+a,a
+b,c
+d,d
 `.trim()
     },
     {
@@ -1198,10 +1082,9 @@ const tests = [
                 </tr>
             </table>
             `,
-        mdExpected: `
-| a | b | c |
-| --- | --- | --- |
-| a | d | c |
+        csvExpected: `
+a,b,c
+a,d,c
 `.trim()
     },
     {
@@ -1234,11 +1117,10 @@ const tests = [
                 </tr>
             </table>
             `,
-        mdExpected: `
-| a | b | c |
-| --- | --- | --- |
-| d | e | e |
-| f | e | e |
+        csvExpected: `
+a,b,c
+d,e,e
+f,e,e
 `.trim()
     },
     {
@@ -1270,11 +1152,78 @@ const tests = [
                 </tr>
             </table>
             `,
-        mdExpected: `
-|  |  | a |
-| --- | --- | --- |
-|  |  | b |
-| c | d | e |
+        csvExpected: `
+,,a
+,,b
+c,d,e
+`.trim()
+    },
+    {
+        testName: 'encapsulated delimiters',
+        htmlInput: `
+            <table>
+                <tr>
+                    <th>
+                        a,b
+                    </th>
+                </tr>
+                <tr>
+                    <td>
+                        c,d
+                    </td>
+                </tr>
+            </table>
+            `,
+        csvExpected: `
+"a,b"
+"c,d"
+`.trim()
+    },
+    {
+        testName: 'encapsulated encapsulators',
+        htmlInput: `
+            <table>
+                <tr>
+                    <th>
+                        "a"
+                    </th>
+                </tr>
+                <tr>
+                    <td>
+                        They said "wow" twice.
+                    </td>
+                </tr>
+            </table>
+            `,
+        csvExpected: `
+"""a"""
+"They said ""wow"" twice."
+`.trim()
+    },
+    {
+        testName: 'encapsulated line terminators',
+        htmlInput: `
+            <table>
+                <tr>
+                    <th>
+                        <p>a</p>
+                        <p>b</p>
+                    </th>
+                </tr>
+                <tr>
+                    <td>
+                        <p>This</p>
+                        <p>has</p>
+                        <br>
+                        <p>four</p>
+                        <p>lines.</p>
+                    </td>
+                </tr>
+            </table>
+            `,
+        csvExpected: `
+"a\n\nb"
+"This\n\nhas\n\n  \n\nfour\n\nlines."
 `.trim()
     },
 ];

@@ -25,6 +25,7 @@ const defaultSettings = {
     notifyOnSuccess: false,
     subBrackets: 'underlined',
     selectionFormat: 'source with link',
+    tableFormat: 'markdown',
     bulletPoint: '-',
     doubleClickWindows: 'current',
     doubleClickInterval: 500,

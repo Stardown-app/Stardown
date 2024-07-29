@@ -30,20 +30,21 @@ import { TurndownService } from './turndown.js';
 
 /**
  * addTableRules adds to a Turndown service instance Turndown rules for converting HTML
- * tables to markdown. The rules apply to both source-formatted markdown and markdown in
- * block quotes. Even though most or all markdown renderers don't render tables within
- * block quotes, Stardown puts into block quotes not just the content of tables but also
- * their markdown syntax because the output will (at least usually) not look good either
- * way, keeping table syntax is more intuitive and easier for the user to edit into a
- * table that's outside a block quote, and maybe some markdown renderers do allow tables
- * to be in block quotes.
+ * tables to markdown or CSV. The rules apply to both source-formatted tables and tables
+ * in block quotes. Even though most or all markdown renderers don't render tables
+ * within block quotes, Stardown puts into block quotes not just the content of tables
+ * but also their markdown (or CSV) syntax because the output will at least usually not
+ * look good either way, keeping table syntax is more intuitive and easier for the user
+ * to edit into a table that's outside a block quote, and maybe some markdown renderers
+ * do allow tables to be in block quotes.
  * @param {TurndownService} t - the Turndown service instance.
+ * @param {string} tableFormat - the Stardown setting for the table format.
  */
-export function addTableRules(t) {
+export function addTableRules(t, tableFormat) {
     /*
         Most of the table rules are not used because it's easier to convert complicated
-        tables to markdown by processing them as a whole rather than as individual
-        elements.
+        tables to markdown or CSV by processing them as a whole rather than as
+        individual elements.
     */
 
     t.addRule('tableCaption', {
@@ -99,13 +100,22 @@ export function addTableRules(t) {
                 tableConv.addRow();
             }
 
-            const md = tableConv.toMarkdown();
-
-            const caption = table.querySelector('caption');
-            if (caption) {
-                return '\n**' + caption.textContent + '**\n\n' + md + '\n';
+            let tableText;
+            if (tableFormat === 'csv') {
+                tableText = tableConv.toCsv();
             } else {
-                return '\n' + md + '\n';
+                tableText = tableConv.toMarkdown();
+            }
+
+            let caption = '';
+            if (tableFormat === 'markdown') {
+                caption = table.querySelector('caption');
+            }
+
+            if (caption) {
+                return '\n**' + caption.textContent + '**\n\n' + tableText + '\n';
+            } else {
+                return '\n' + tableText + '\n';
             }
         },
     });
@@ -169,7 +179,7 @@ function getTableTrs(table) {
 
 /**
  * isUnconvertibleCell reports whether an HTML table cell contains HTML that can't be
- * converted to markdown.
+ * converted to markdown or CSV.
  * @param {Node} cell - the cell element.
  * @returns {boolean}
  */

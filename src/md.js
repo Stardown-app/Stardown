@@ -32,6 +32,7 @@ let turndownService = null;
 let currentBulletPoint = '-';
 let currentSubBrackets = 'underlined';
 let currentSelectionFormat = 'source with link';
+let currentTableFormat = 'markdown';
 let currentOmitNav = true;
 let currentOmitFooter = true;
 
@@ -64,6 +65,7 @@ export async function htmlToMarkdown(html) {
     const newBulletPoint = await getSetting('bulletPoint');
     const newSubBrackets = await getSetting('subBrackets');
     const newSelectionFormat = await getSetting('selectionFormat');
+    const newTableFormat = await getSetting('tableFormat');
     const newOmitNav = await getSetting('omitNav');
     const newOmitFooter = await getSetting('omitFooter');
 
@@ -72,12 +74,14 @@ export async function htmlToMarkdown(html) {
         newBulletPoint !== currentBulletPoint ||
         newSubBrackets !== currentSubBrackets ||
         newSelectionFormat !== currentSelectionFormat ||
+        newTableFormat !== currentTableFormat ||
         newOmitNav !== currentOmitNav ||
         newOmitFooter !== currentOmitFooter
     ) {
         currentBulletPoint = newBulletPoint;
         currentSubBrackets = newSubBrackets;
         currentSelectionFormat = newSelectionFormat;
+        currentTableFormat = newTableFormat;
         currentOmitNav = newOmitNav;
         currentOmitFooter = newOmitFooter;
 
@@ -85,6 +89,7 @@ export async function htmlToMarkdown(html) {
             currentBulletPoint,
             currentSubBrackets,
             currentSelectionFormat,
+            currentTableFormat,
             currentOmitNav,
             currentOmitFooter,
             escape,

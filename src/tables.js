@@ -69,6 +69,10 @@ export function addTableRules(t, tableFormat) {
                 return '';
             }
 
+            if (tableFormat === 'html') {
+                return '\n' + table.outerHTML + '\n';
+            }
+
             const tableConv = new TableConverter();
 
             const trs = getTableTrs(table);

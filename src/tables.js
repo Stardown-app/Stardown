@@ -69,6 +69,7 @@ export function addTableRules(t, tableFormat) {
                 return '';
             }
 
+            // TODO: change behavior based on whether only a table is selected
             if (tableFormat === 'html') {
                 return '\n' + table.outerHTML + '\n';
             }

@@ -32,7 +32,7 @@ let turndownService = null;
 let currentBulletPoint = '-';
 let currentSubBrackets = 'underlined';
 let currentSelectionFormat = 'source with link';
-let currentTableFormat = 'markdown';
+let currentTableFormat = 'tsv';
 let currentOmitNav = true;
 let currentOmitFooter = true;
 

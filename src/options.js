@@ -21,7 +21,6 @@ const form = document.querySelector('form');
 
 const youtubeMdEl = document.querySelector('#youtubeMd');
 const selectionFormatEl = document.querySelector('#selectionFormat');
-const tableFormatEl = document.querySelector('#tableFormat');
 const subBracketsEl = document.querySelector('#subBrackets');
 const bulletPointEl = document.querySelector('#bulletPoint');
 const doubleClickWindowsEl = document.querySelector('#doubleClickWindows');
@@ -37,7 +36,6 @@ const resetButton = document.querySelector('#reset');
 // set up setting autosaving
 initAutosave('youtubeMd', youtubeMdEl, 'value');
 initAutosave('selectionFormat', selectionFormatEl, 'value');
-initAutosave('tableFormat', tableFormatEl, 'value');
 initAutosave('subBrackets', subBracketsEl, 'value');
 initAutosave('bulletPoint', bulletPointEl, 'value');
 initAutosave('createTextFragment', createTextFragmentEl, 'checked');
@@ -77,7 +75,6 @@ async function loadSettings() {
     try {
         youtubeMdEl.value = await getSetting('youtubeMd');
         selectionFormatEl.value = await getSetting('selectionFormat');
-        tableFormatEl.value = await getSetting('tableFormat');
         subBracketsEl.value = await getSetting('subBrackets');
         bulletPointEl.value = await getSetting('bulletPoint');
         doubleClickWindowsEl.value = await getSetting('doubleClickWindows');

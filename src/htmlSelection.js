@@ -18,15 +18,15 @@ import { getSetting } from './common.js';
 import * as md from './md.js';
 
 /**
- * createMd creates markdown of the selected part of the page. The markdown format is
- * determined by the user's settings. If no text is selected, a link to the page is
- * created.
+ * createText creates markdown (or another text format) of the selected part of the
+ * page. The format is mostly determined by the user's settings. If no text is selected,
+ * a link to the page is created.
  * @param {string} title - the title of the page.
  * @param {string} url - the URL of the page.
  * @param {Selection|null} selection - a selection object.
  * @returns {Promise<string>}
  */
-export async function createMd(title, url, selection) {
+export async function createText(title, url, selection) {
     const selectedText = selection.toString().trim();
     if (!selectedText) {
         return await md.createLink(title, url);
@@ -35,11 +35,11 @@ export async function createMd(title, url, selection) {
     const selectionFormat = await getSetting('selectionFormat');
     switch (selectionFormat) {
         case 'source with link':
-            return await getSourceFormatMdWithLink(title, url, selection, selectedText) + '\n';
+            return await getSourceFormatTextWithLink(title, url, selection, selectedText) + '\n';
         case 'source':
-            return await getSourceFormatMd(selection, selectedText);
+            return await getSourceFormatText(selection, selectedText);
         case 'blockquote with link':
-            const body = await getSourceFormatMd(selection, selectedText);
+            const body = await getSourceFormatText(selection, selectedText);
             return await md.createBlockquote(body, title, url) + '\n';
         case 'link with selection as title':
             selectedText = selectedText.replaceAll('\r\n', ' ').replaceAll('\n', ' ');
@@ -53,53 +53,13 @@ export async function createMd(title, url, selection) {
 }
 
 /**
- * getSourceFormatMdWithLink gets markdown of the selected part of the document,
- * attempts to keep the source formatting, and adds a link to the page. The selected
- * text is used as a fallback if the source formatting cannot be obtained.
- * @param {string} title - the page's title.
- * @param {string} url - the page's URL.
- * @param {Selection|null} - a selection object.
- * @param {string} selectedText - the selected text.
- * @returns {Promise<string>}
- */
-async function getSourceFormatMdWithLink(title, url, selection, selectedText) {
-    const link = await md.createLink(title, url);
-    const today = new Date();
-    const todayStr = today.getFullYear() + '/' + (today.getMonth() + 1) + '/' + today.getDate();
-    const alert = await md.createAlert('note', `from ${link} on ${todayStr}`);
-    const html = await getSelectionHtml(selection);
-    if (html === null) {
-        return alert + '\n\n' + selectedText;
-    } else {
-        return alert + '\n\n' + await md.htmlToMarkdown(html);
-    }
-}
-
-/**
- * getSourceFormatMd gets markdown of the selected part of the document and attempts to
- * keep the source formatting. The selected text is used as a fallback if the source
- * formatting cannot be obtained.
- * @param {Selection|null} - a selection object.
- * @param {string} selectedText - the selected text.
- * @returns {Promise<string>}
- */
-async function getSourceFormatMd(selection, selectedText) {
-    const html = await getSelectionHtml(selection);
-    if (html === null) {
-        return selectedText;
-    } else {
-        return await md.htmlToMarkdown(html);
-    }
-}
-
-/**
  * getSelectionHtml takes a selection object and returns its HTML content. If no
  * selection exists, null is returned. The selection may be expanded to include certain
  * elements that are ancestors of the selection to make copying easier.
  * @param {Selection|null} - a selection object.
  * @returns {Promise<string|null>}
  */
-async function getSelectionHtml(selection) {
+export async function getSelectionHtml(selection) {
     if (selection === null || selection.type === 'None') {
         console.error('Failed to get a selection');
         return null;
@@ -121,6 +81,46 @@ async function getSelectionHtml(selection) {
     }
 
     return container.innerHTML;
+}
+
+/**
+ * getSourceFormatText gets markdown (or another text format) of the selected part of
+ * the document and attempts to keep the source formatting. The selected text is used as
+ * a fallback if the source formatting cannot be obtained.
+ * @param {Selection|null} - a selection object.
+ * @param {string} selectedText - the selected text.
+ * @returns {Promise<string>}
+ */
+export async function getSourceFormatText(selection, selectedText) {
+    const html = await getSelectionHtml(selection);
+    if (html === null) {
+        return selectedText;
+    } else {
+        return await md.htmlToPlaintext(html);
+    }
+}
+
+/**
+ * getSourceFormatTextWithLink gets markdown of the selected part of the document,
+ * attempts to keep the source formatting, and adds a link to the page. The selected
+ * text is used as a fallback if the source formatting cannot be obtained.
+ * @param {string} title - the page's title.
+ * @param {string} url - the page's URL.
+ * @param {Selection|null} - a selection object.
+ * @param {string} selectedText - the selected text.
+ * @returns {Promise<string>}
+ */
+async function getSourceFormatTextWithLink(title, url, selection, selectedText) {
+    const link = await md.createLink(title, url);
+    const today = new Date();
+    const todayStr = today.getFullYear() + '/' + (today.getMonth() + 1) + '/' + today.getDate();
+    const alert = await md.createAlert('note', `from ${link} on ${todayStr}`);
+    const html = await getSelectionHtml(selection);
+    if (html === null) {
+        return alert + '\n\n' + selectedText;
+    } else {
+        return alert + '\n\n' + await md.htmlToPlaintext(html);
+    }
 }
 
 /**

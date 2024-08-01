@@ -19,9 +19,12 @@ import assert from 'node:assert/strict'; // https://nodejs.org/api/assert.html#a
 import { JSDOM } from 'jsdom'; // https://www.npmjs.com/package/jsdom
 import { newTurndownService } from '../src/newTurndownService.js';
 import { escape } from '../src/md.js';
+import { tableConfig } from '../src/tables.js';
+
+tableConfig.format = 'markdown';
 
 const turndownService = newTurndownService(
-    '-', 'underlined', 'source with link', 'markdown', true, true, escape,
+    '-', 'underlined', 'source with link', true, true, escape,
 );
 
 function runTest(testName, htmlInput, mdExpected) {

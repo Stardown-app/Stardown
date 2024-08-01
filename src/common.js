@@ -25,7 +25,6 @@ const defaultSettings = {
     notifyOnSuccess: false,
     subBrackets: 'underlined',
     selectionFormat: 'source with link',
-    tableFormat: 'tsv',
     bulletPoint: '-',
     doubleClickWindows: 'current',
     doubleClickInterval: 500,

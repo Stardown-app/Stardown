@@ -19,6 +19,16 @@ import * as menu from './menu.js';
 export const browser = chrome;
 
 /**
+ * sleep pauses the execution of the current async function for a number of
+ * milliseconds.
+ * @param {number} ms - the number of milliseconds to sleep.
+ * @returns {Promise<void>}
+ */
+export async function sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+/**
  * createContextMenus creates the context menu options.
  * @returns {void}
  */
@@ -28,29 +38,50 @@ export function createContextMenus() {
 }
 
 /**
- * updateContextMenu changes which options are in the context menu based on the category
- * of HTML element the mouse is over. This only has an effect if the context menu is not
- * currently visible.
- * @param {string} category - the category of the element the mouse is over.
- * @returns {void}
+ * isTableSelected is a flag that indicates whether a table is currently selected.
+ * @type {boolean}
  */
-export function updateContextMenu(category) {
+let isTableSelected = false;
+
+/**
+ * updateContextMenu changes which options are in the context menu based on the category
+ * of HTML element the mouse is interacting with. This only has an effect if the context
+ * menu is not currently visible.
+ * @param {string} context - info about the element the mouse is interacting with.
+ * @returns {Promise<void>}
+ */
+export async function updateContextMenu(context) {
     // The `browser.contextMenus.update` method doesn't work well in Chromium because
     // when it's used to hide all but one context menu option, the one remaining would
     // appear under a "Stardown" parent menu option instead of being in the root of the
     // context menu.
-    browser.contextMenus.removeAll();
 
-    if (category === 'image') {
-        browser.contextMenus.create(menu.imageItem);
-    } else if (category === 'link') {
-        browser.contextMenus.create(menu.linkItem);
+    if (isTableSelected && context.selectionchange) {
+        isTableSelected = false;
     }
 
-    browser.contextMenus.create(menu.selectionItem);
-    browser.contextMenus.create(menu.pageItem);
-    browser.contextMenus.create(menu.videoItem);
-    browser.contextMenus.create(menu.audioItem);
+    if (!isTableSelected) {
+        browser.contextMenus.removeAll();
+
+        if (context.mouseup === 'table') {
+            isTableSelected = true;
+            browser.contextMenus.create(menu.markdownTableItem);
+            browser.contextMenus.create(menu.tsvTableItem);
+            browser.contextMenus.create(menu.csvTableItem);
+            browser.contextMenus.create(menu.htmlTableItem);
+        } else {
+            if (context.mouseover === 'image') {
+                browser.contextMenus.create(menu.imageItem);
+            } else if (context.mouseover === 'link') {
+                browser.contextMenus.create(menu.linkItem);
+            }
+
+            browser.contextMenus.create(menu.selectionItem);
+            browser.contextMenus.create(menu.pageItem);
+            browser.contextMenus.create(menu.videoItem);
+            browser.contextMenus.create(menu.audioItem);
+        }
+    }
 }
 
 /**

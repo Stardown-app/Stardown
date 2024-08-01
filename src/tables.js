@@ -29,6 +29,15 @@ import { TableConverter } from './tableConverter.js';
 import { TurndownService } from './turndown.js';
 
 /**
+ * tableConfig is the table conversion configuration.
+ * @type {object}
+ * @property {'markdown'|'csv'|'tsv'} format - the format to convert tables to.
+ */
+export let tableConfig = {
+    format: 'markdown',
+};
+
+/**
  * addTableRules adds to a Turndown service instance Turndown rules for converting HTML
  * tables to markdown or CSV. The rules apply to both source-formatted tables and tables
  * in block quotes. Even though most or all markdown renderers don't render tables
@@ -38,9 +47,8 @@ import { TurndownService } from './turndown.js';
  * to edit into a table that's outside a block quote, and maybe some markdown renderers
  * do allow tables to be in block quotes.
  * @param {TurndownService} t - the Turndown service instance.
- * @param {string} tableFormat - the Stardown setting for the table format.
  */
-export function addTableRules(t, tableFormat) {
+export function addTableRules(t) {
     /*
         Most of the table rules are not used because it's easier to convert complicated
         tables to markdown or CSV by processing them as a whole rather than as
@@ -67,11 +75,6 @@ export function addTableRules(t, tableFormat) {
         replacement: function (content, table) {
             if (isHideButtonTable(table)) {
                 return '';
-            }
-
-            // TODO: change behavior based on whether only a table is selected
-            if (tableFormat === 'html') {
-                return '\n' + table.outerHTML + '\n';
             }
 
             const tableConv = new TableConverter();
@@ -106,16 +109,18 @@ export function addTableRules(t, tableFormat) {
             }
 
             let tableText;
-            if (tableFormat === 'csv') {
+            if (tableConfig.format === 'csv') {
                 tableText = tableConv.toCsv();
-            } else if (tableFormat === 'tsv') {
+            } else if (tableConfig.format === 'tsv') {
+                console.log('tableConv.toCsv() with tab separator');
                 tableText = tableConv.toCsv('\t');
             } else {
+                console.log('tableConv.toMarkdown()');
                 tableText = tableConv.toMarkdown();
             }
 
             let caption = '';
-            if (tableFormat === 'markdown') {
+            if (tableConfig.format === 'markdown') {
                 caption = table.querySelector('caption');
             }
 

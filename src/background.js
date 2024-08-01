@@ -14,7 +14,7 @@
    limitations under the License.
 */
 
-import { browser, createContextMenus, updateContextMenu } from './config.js';
+import { browser, sleep, createContextMenus, updateContextMenu } from './config.js';
 import { getSetting } from './common.js';
 import { createTabLink } from './md.js';
 
@@ -55,11 +55,11 @@ browser.action.onClicked.addListener(async (tab) => {
 });
 
 browser.runtime.onMessage.addListener(async (message, sender, sendResponse) => {
-    if (message.mouseover) {
+    if (message.context) {
         // These context menu updates are done with messages from a content script
         // because the contextMenus.update method cannot update a context menu that is
-        // already open. The content script listens for mouseover events.
-        updateContextMenu(message.mouseover);
+        // already open. The content script listens for mouseover and mouseup events.
+        await updateContextMenu(message.context);
     } else if (message.doubleClickInterval) {
         doubleClickInterval = message.doubleClickInterval;
     } else if (message.warning) {
@@ -105,6 +105,32 @@ browser.contextMenus.onClicked.addListener(async (info, tab) => {
                 tab, { category: 'audioRightClick', srcUrl: info.srcUrl, pageUrl: info.pageUrl },
             );
             break;
+        case 'markdownTable':
+            console.log('markdownTableRightClick in background.js');
+            await handleInteraction(
+                tab, { category: 'markdownTableRightClick' }, { frameId: info.frameId },
+            );
+            break;
+        case 'tsvTable':
+            console.log('tsvTableRightClick in background.js');
+            const id = Math.random(); // why: https://github.com/Stardown-app/Stardown/issues/98
+            await handleInteraction(
+                tab, { category: 'tsvTableRightClick', id: id }, { frameId: info.frameId },
+            );
+            break;
+        case 'csvTable':
+            console.log('csvTableRightClick in background.js');
+            const id2 = Math.random(); // why: https://github.com/Stardown-app/Stardown/issues/98
+            await handleInteraction(
+                tab, { category: 'csvTableRightClick', id: id2 }, { frameId: info.frameId },
+            );
+            break;
+        case 'htmlTable':
+            console.log('htmlTableRightClick in background.js');
+            await handleInteraction(
+                tab, { category: 'htmlTableRightClick' }, { frameId: info.frameId },
+            );
+            break;
         default:
             console.error(`Unknown context menu item: ${info.menuItemId}`);
             throw new Error(`Unknown context menu item: ${info.menuItemId}`);
@@ -125,8 +151,12 @@ browser.contextMenus.onClicked.addListener(async (info, tab) => {
 async function handleInteraction(tab, message, options = {}) {
     let status, notifTitle, notifBody;
     try {
+        console.log('Sending message from background.js to content.js');
         const response = await browser.tabs.sendMessage(tab.id, message, options);
-        if (response === undefined) {
+        if (response === null) {
+            console.log('Response is null');
+            return;
+        } else if (response === undefined) {
             await showStatus(0, 'Error', 'No response received from the content script');
             return;
         }
@@ -255,14 +285,4 @@ async function brieflyShowX() {
     browser.action.setBadgeBackgroundColor({ color: 'red' });
     await sleep(1000); // 1 second
     browser.action.setBadgeText({ text: '' });
-}
-
-/**
- * sleep pauses the execution of the current async function for a number of
- * milliseconds.
- * @param {number} ms - the number of milliseconds to sleep.
- * @returns {Promise<void>}
- */
-async function sleep(ms) {
-    return new Promise(resolve => setTimeout(resolve, ms));
 }

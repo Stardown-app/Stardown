@@ -21,6 +21,7 @@
  */
 export class TableConverter {
     constructor() {
+        /** @type {(string|null)[][]} */
         this.table = [[]]; // a 2D array where each cell can be a string or null
         this.X = 0;
         this.Y = 0; // Y increases downwards
@@ -176,8 +177,8 @@ export class TableConverter {
 
     /**
      * toJson returns a JSON representation of the table. If the addRow and addCell
-     * methods were used correctly, the table should not contain any unquoted nulls when
-     * this method is called.
+     * methods were used correctly, the table should not contain any nulls when this
+     * method is called but may contain strings of the word "null".
      * @returns {string}
      */
     toJson() {
@@ -260,17 +261,21 @@ export class TableConverter {
 }
 
 /**
- * canBeJsonNumber reports whether a string contains either a valid JSON number or
- * something that can be converted into one.
+ * canBeJsonNumber reports whether a string's contents can be converted to a valid JSON
+ * number. If the string is already a valid JSON number, this function returns true.
  * @param {string} str
  * @returns {boolean}
  */
 export function canBeJsonNumber(str) {
-    return Boolean(str.match(/^[+-]?[0-9,]+\.?[0-9]*(?:[eE][+-]?[0-9]+)?$/));
+    if (!Boolean(str.match(/[0-9]/))) {
+        return false;
+    }
+    return Boolean(str.match(/^[+-]?[0-9,]*\.?[0-9]*(?:[eE][+-]?[0-9]+)?$/));
 }
 
 /**
- * toJsonNumber converts a string of a number to a valid JSON number.
+ * toJsonNumber converts a string of a number to a valid JSON number. If the number is
+ * already a valid JSON number, this function has no effect.
  * @param {string} numStr
  * @returns {string}
  */
@@ -287,7 +292,7 @@ export function toJsonNumber(numStr) {
 
 /**
  * fixLeadingZeros removes excess leading zeros and may add a zero before a decimal
- * point to make a number a valid JSON number.
+ * point or exponent to make a number a valid JSON number.
  * @param {string} numStr
  * @returns {string}
  */
@@ -296,10 +301,7 @@ export function fixLeadingZeros(numStr) {
         if (numStr[i] === '0') {
             continue;
         } else if (numStr[i] === '.' || numStr[i] === 'e' || numStr[i] === 'E') {
-            if (i === 0) {
-                return '0' + numStr;
-            }
-            return numStr.slice(i - 1);
+            return '0' + numStr.slice(i);
         }
         return numStr.slice(i);
     }

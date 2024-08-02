@@ -18,30 +18,38 @@ import test from 'node:test'; // https://nodejs.org/api/test.html
 import assert from 'node:assert/strict'; // https://nodejs.org/api/assert.html#assert
 import { canBeJsonNumber, toJsonNumber, fixLeadingZeros } from '../src/tableConverter.js';
 
-const jsonNumberTests = [
-    { input: "0.0", expected: "0.0" },
-    { input: "3", expected: "3" },
-    { input: "2.1", expected: "2.1" },
-    { input: "4.35", expected: "4.35" },
-    { input: "6.2000", expected: "6.2000" },
-    { input: "0.8", expected: "0.8" },
-    { input: "0.79", expected: "0.79" },
-    { input: "3.33333333333333", expected: "3.33333333333333" },
-    { input: "-5", expected: "-5" },
-    { input: "-6.3", expected: "-6.3" },
-    { input: "-0.23", expected: "-0.23" },
-    { input: "-3.01", expected: "-3.01" },
-    { input: "0e12", expected: "0e12" },
-    { input: "3e+8", expected: "3e+8" },
-    { input: "7e-7", expected: "7e-7" },
-    { input: "2E4", expected: "2E4" },
-    { input: "1E+9", expected: "1E+9" },
-    { input: "6E-5", expected: "6E-5" },
-    { input: "-2e3", expected: "-2e3" },
-    { input: "-4.7E2", expected: "-4.7E2" },
-    { input: "-0.222e+11", expected: "-0.222e+11" },
-    { input: "123.123e-5", expected: "123.123e-5" },
-    { input: "8.70E2", expected: "8.70E2" },
+const jsonNumbers = [
+    "0.0",
+    "3",
+    "2.1",
+    "4.35",
+    "6.2000",
+    "0.8",
+    "0.79",
+    "3.33333333333333",
+    "-5",
+    "-6.3",
+    "-0.23",
+    "-3.01",
+    "0e12",
+    "3e+8",
+    "7e-7",
+    "2E4",
+    "1E+9",
+    "6E-5",
+    "-2e3",
+    "-4.7E2",
+    "-0.222e+11",
+    "123.123e-5",
+    "8.70E2",
+];
+
+const notJsonNumbers = [
+    ".",
+    "1.2.3",
+    "hi",
+    "Infinity",
+    "NaN",
 ];
 
 const convertibleToJsonNumbersTests = [
@@ -52,18 +60,10 @@ const convertibleToJsonNumbersTests = [
     { input: "2.", expected: "2" },
 ];
 
-const unconvertibleToJsonNumbers = [
-    ".",
-    "1.2.3",
-    "hi",
-    "Infinity",
-    "NaN",
-];
-
 const leadingZeroTests = [
     { input: "01", expected: "1" },
-    { input: "01.1", expected: "1.1" },
     { input: "001", expected: "1" },
+    { input: "01.1", expected: "1.1" },
     { input: "0.2", expected: "0.2" },
     { input: "00.2", expected: "0.2" },
     { input: "-0.3", expected: "-0.3" },
@@ -71,36 +71,48 @@ const leadingZeroTests = [
 ];
 
 function testCanBeJsonNumber() {
-    for (let i = 0; i < jsonNumberTests.length; i++) {
-        const { input, expected } = jsonNumberTests[i];
+    for (let i = 0; i < jsonNumbers.length; i++) {
+        const input = jsonNumbers[i];
         test(`canBeJsonNumber(${input})`, t => {
             assert.equal(canBeJsonNumber(input), true);
+        });
+    }
+    for (let i = 0; i < notJsonNumbers.length; i++) {
+        const input = notJsonNumbers[i];
+        test(`canBeJsonNumber(${input})`, t => {
+            assert.equal(canBeJsonNumber(input), false);
         });
     }
     for (let i = 0; i < convertibleToJsonNumbersTests.length; i++) {
-        const { input, expected } = convertibleToJsonNumbersTests[i];
+        const { input } = convertibleToJsonNumbersTests[i];
         test(`canBeJsonNumber(${input})`, t => {
             assert.equal(canBeJsonNumber(input), true);
         });
     }
-    for (let i = 0; i < unconvertibleToJsonNumbers.length; i++) {
-        const input = unconvertibleToJsonNumbers[i];
+    for (let i = 0; i < leadingZeroTests.length; i++) {
+        const { input } = leadingZeroTests[i];
         test(`canBeJsonNumber(${input})`, t => {
-            assert.equal(canBeJsonNumber(input), false);
+            assert.equal(canBeJsonNumber(input), true);
         });
     }
 }
 testCanBeJsonNumber();
 
 function testToJsonNumber() {
-    for (let i = 0; i < jsonNumberTests.length; i++) {
-        const { input, expected } = jsonNumberTests[i];
+    for (let i = 0; i < jsonNumbers.length; i++) {
+        const input = jsonNumbers[i];
         test(`toJsonNumber(${input})`, t => {
-            assert.equal(toJsonNumber(input), expected);
+            assert.equal(toJsonNumber(input), input);
         });
     }
     for (let i = 0; i < convertibleToJsonNumbersTests.length; i++) {
         const { input, expected } = convertibleToJsonNumbersTests[i];
+        test(`toJsonNumber(${input})`, t => {
+            assert.equal(toJsonNumber(input), expected);
+        });
+    }
+    for (let i = 0; i < leadingZeroTests.length; i++) {
+        const { input, expected } = leadingZeroTests[i];
         test(`toJsonNumber(${input})`, t => {
             assert.equal(toJsonNumber(input), expected);
         });

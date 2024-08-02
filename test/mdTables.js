@@ -19,6 +19,9 @@ import assert from 'node:assert/strict'; // https://nodejs.org/api/assert.html#a
 import { JSDOM } from 'jsdom'; // https://www.npmjs.com/package/jsdom
 import { newTurndownService } from '../src/newTurndownService.js';
 import { escape } from '../src/md.js';
+import { tableConfig } from '../src/tables.js';
+
+tableConfig.format = 'markdown';
 
 const turndownService = newTurndownService(
     '-', 'underlined', 'source with link', true, true, escape,
@@ -840,50 +843,6 @@ const tests = [
 `.trim()
     },
     {
-        testName: 'pipe symbols',
-        htmlInput: `
-            <table>
-                <tr>
-                    <th>
-                        a | b
-                    </th>
-                </tr>
-                <tr>
-                    <td>
-                        c | d
-                    </td>
-                </tr>
-            </table>
-            `,
-        mdExpected: `
-| a \\| b |
-| --- |
-| c \\| d |
-`.trim()
-    },
-    {
-        testName: 'spaces around',
-        htmlInput: `
-            <table>
-                <tr>
-                    <th>
-                        <p>  a  </p>
-                    </th>
-                </tr>
-                <tr>
-                    <td>
-                        <p>  b  </p>
-                    </td>
-                </tr>
-            </table>
-            `,
-        mdExpected: `
-| a |
-| --- |
-| b |
-`.trim()
-    },
-    {
         testName: 'bold and emphasis',
         htmlInput: `
             <table>
@@ -943,46 +902,6 @@ const tests = [
 | a b | c d |
 | --- | --- |
 | e f | g h |
-`.trim()
-    },
-    {
-        testName: 'lists',
-        htmlInput: `
-                <table>
-                    <tr>
-                        <th>
-                            <ul>
-                                <li>a</li>
-                                <li>b</li>
-                            </ul>
-                        </th>
-                        <th>
-                            <ol>
-                                <li>c</li>
-                                <li>d</li>
-                            </ol>
-                        </th>
-                    </tr>
-                    <tr>
-                        <td>
-                            <ol>
-                                <li>e</li>
-                                <li>f</li>
-                            </ol>
-                        </td>
-                        <td>
-                            <ul>
-                                <li>g</li>
-                                <li>h</li>
-                            </ul>
-                        </td>
-                    </tr>
-                </table>
-                `,
-        mdExpected: `
-| - a - b | 1. c 2. d |
-| --- | --- |
-| 1. e 2. f | - g - h |
 `.trim()
     },
     {
@@ -1275,6 +1194,90 @@ const tests = [
 | --- | --- | --- |
 |  |  | b |
 | c | d | e |
+`.trim()
+    },
+    {
+        testName: 'spaces around',
+        htmlInput: `
+            <table>
+                <tr>
+                    <th>
+                        <p>  a  </p>
+                    </th>
+                </tr>
+                <tr>
+                    <td>
+                        <p>  b  </p>
+                    </td>
+                </tr>
+            </table>
+            `,
+        mdExpected: `
+| a |
+| --- |
+| b |
+`.trim()
+    },
+    {
+        testName: 'lists',
+        htmlInput: `
+                <table>
+                    <tr>
+                        <th>
+                            <ul>
+                                <li>a</li>
+                                <li>b</li>
+                            </ul>
+                        </th>
+                        <th>
+                            <ol>
+                                <li>c</li>
+                                <li>d</li>
+                            </ol>
+                        </th>
+                    </tr>
+                    <tr>
+                        <td>
+                            <ol>
+                                <li>e</li>
+                                <li>f</li>
+                            </ol>
+                        </td>
+                        <td>
+                            <ul>
+                                <li>g</li>
+                                <li>h</li>
+                            </ul>
+                        </td>
+                    </tr>
+                </table>
+                `,
+        mdExpected: `
+| - a - b | 1. c 2. d |
+| --- | --- |
+| 1. e 2. f | - g - h |
+`.trim()
+    },
+    {
+        testName: 'pipe symbols',
+        htmlInput: `
+            <table>
+                <tr>
+                    <th>
+                        a | b
+                    </th>
+                </tr>
+                <tr>
+                    <td>
+                        c | d
+                    </td>
+                </tr>
+            </table>
+            `,
+        mdExpected: `
+| a \\| b |
+| --- |
+| c \\| d |
 `.trim()
     },
 ];

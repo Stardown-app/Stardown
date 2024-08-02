@@ -19,14 +19,15 @@ import { TurndownService } from './turndown.js';
 import { newTurndownService, replaceBrackets } from './newTurndownService.js';
 
 /**
- * turndownService is a TurndownService instance used to convert HTML to markdown. Use
- * the exported htmlToMarkdown async function to convert HTML to markdown.
+ * turndownService is a TurndownService instance used to convert HTML to markdown (or
+ * another plaintext format). Use the exported htmlToPlaintext async function to convert
+ * HTML to markdown (or another plaintext format).
  * @type {TurndownService|null}
  */
 let turndownService = null;
 
 /**
- * The current* variables are used by the htmlToMarkdown function to detect changes to
+ * The current* variables are used by the htmlToPlaintext function to detect changes to
  * the settings to update the TurndownService instance when needed.
  */
 let currentBulletPoint = '-';
@@ -56,11 +57,11 @@ export function escape(text) {
 }
 
 /**
- * htmlToMarkdown converts HTML to markdown.
+ * htmlToPlaintext converts HTML to markdown (or another plaintext format).
  * @param {string|HTMLElement} html - the HTML to convert to markdown.
  * @returns {Promise<string>}
  */
-export async function htmlToMarkdown(html) {
+export async function htmlToPlaintext(html) {
     const newBulletPoint = await getSetting('bulletPoint');
     const newSubBrackets = await getSetting('subBrackets');
     const newSelectionFormat = await getSetting('selectionFormat');

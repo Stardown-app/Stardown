@@ -29,21 +29,31 @@ import { TableConverter } from './tableConverter.js';
 import { TurndownService } from './turndown.js';
 
 /**
+ * tableConfig is the table conversion configuration.
+ * @type {object}
+ * @property {'markdown'|'csv'|'tsv'|'json'} format - the format to convert tables to.
+ */
+export let tableConfig = {
+    format: 'markdown',
+};
+
+/**
  * addTableRules adds to a Turndown service instance Turndown rules for converting HTML
- * tables to markdown. The rules apply to both source-formatted markdown and markdown in
- * block quotes. Even though most or all markdown renderers don't render tables within
- * block quotes, Stardown puts into block quotes not just the content of tables but also
- * their markdown syntax because the output will (at least usually) not look good either
- * way, keeping table syntax is more intuitive and easier for the user to edit into a
- * table that's outside a block quote, and maybe some markdown renderers do allow tables
- * to be in block quotes.
+ * tables to markdown or another plaintext format. The rules apply to both
+ * source-formatted tables and tables in block quotes. Even though most or all markdown
+ * renderers don't render tables within block quotes, Stardown puts into block quotes
+ * not just the content of tables but also their markdown (or another plaintext format)
+ * syntax because the output will at least usually not look good either way, keeping
+ * table syntax is more intuitive and easier for the user to edit into a table that's
+ * outside a block quote, and maybe some markdown renderers do allow markdown tables to
+ * be in block quotes.
  * @param {TurndownService} t - the Turndown service instance.
  */
 export function addTableRules(t) {
     /*
         Most of the table rules are not used because it's easier to convert complicated
-        tables to markdown by processing them as a whole rather than as individual
-        elements.
+        tables to markdown or another plaintext format by processing them as a whole
+        rather than as individual elements.
     */
 
     t.addRule('tableCaption', {
@@ -99,13 +109,29 @@ export function addTableRules(t) {
                 tableConv.addRow();
             }
 
-            const md = tableConv.toMarkdown();
-
-            const caption = table.querySelector('caption');
-            if (caption) {
-                return '\n**' + caption.textContent + '**\n\n' + md + '\n';
+            let tableText;
+            if (tableConfig.format === 'csv') {
+                tableText = tableConv.toCsv();
+            } else if (tableConfig.format === 'tsv') {
+                console.log('tableConv.toCsv() with tab separator');
+                tableText = tableConv.toCsv('\t');
+            } else if (tableConfig.format === 'json') {
+                console.log('tableConv.toJson()');
+                tableText = tableConv.toJson();
             } else {
-                return '\n' + md + '\n';
+                console.log('tableConv.toMarkdown()');
+                tableText = tableConv.toMarkdown();
+            }
+
+            let caption = '';
+            if (tableConfig.format === 'markdown') {
+                caption = table.querySelector('caption');
+            }
+
+            if (caption) {
+                return '\n**' + caption.textContent + '**\n\n' + tableText + '\n';
+            } else {
+                return '\n' + tableText + '\n';
             }
         },
     });
@@ -169,7 +195,7 @@ function getTableTrs(table) {
 
 /**
  * isUnconvertibleCell reports whether an HTML table cell contains HTML that can't be
- * converted to markdown.
+ * converted to markdown (or another plaintext format).
  * @param {Node} cell - the cell element.
  * @returns {boolean}
  */

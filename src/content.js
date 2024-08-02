@@ -19,6 +19,7 @@ import * as md from './md.js';
 import * as htmlSelection from './htmlSelection.js';
 import { createTextFragmentArg } from './createTextFragmentArg.js';
 import { getSetting } from './common.js';
+import { tableConfig } from './tables.js';
 
 /**
  * A response object sent from a content script to a background script.
@@ -29,13 +30,26 @@ import { getSetting } from './common.js';
  * @property {string} notifBody - the body of the notification to show to the user.
  */
 
-// clickedElement is the element the user most recently right-clicked. It is assigned
-// values by the contextmenu event listener in setUpListeners.
+/**
+ * clickedElement is the element the user most recently right-clicked. It is assigned
+ * values by the contextmenu event listener in setUpListeners.
+ * @type {EventTarget|null}
+ */
 let clickedElement;
 
-// linkText is the text of the link the user most recently right-clicked. It is assigned
-// values by the contextmenu event listener in setUpListeners.
+/**
+ * linkText is the text of the link the user most recently right-clicked. It is assigned
+ * values by the contextmenu event listener in setUpListeners.
+ * @type {string|null}
+ */
 let linkText = null;
+
+/**
+ * tableSelection is the table the user most recently selected and right-clicked. It is
+ * assigned values by the mouseup event listener in setUpListeners.
+ * @type {Selection|null}
+ */
+let tableSelection = null;
 
 /**
  * setUpListeners sets up listeners.
@@ -52,12 +66,37 @@ function setUpListeners() {
         // contain the first of those that was detected.
         const s = window.getSelection();
         if (s && s.type === 'Range') {
-            browser.runtime.sendMessage({ mouseover: 'selection' });
+            browser.runtime.sendMessage({ context: { mouseover: 'selection' } });
         } else if (event.target.nodeName === 'IMG') {
-            browser.runtime.sendMessage({ mouseover: 'image' });
+            browser.runtime.sendMessage({ context: { mouseover: 'image' } });
         } else if (event.target.nodeName === 'A') {
-            browser.runtime.sendMessage({ mouseover: 'link' });
+            browser.runtime.sendMessage({ context: { mouseover: 'link' } });
         }
+    });
+
+    document.addEventListener('mouseup', async (event) => {
+        // This event listener detects when the user has selected a table and sends a
+        // message to the background script so it can load the correct context menu
+        // items.
+        const selection = window.getSelection();
+        if (!selection || selection.type !== 'Range') {
+            return;
+        }
+        const html = await htmlSelection.getSelectionHtml(selection);
+        const isTable = html.startsWith('<table');
+        if (isTable) {
+            tableSelection = selection;
+            browser.runtime.sendMessage({ context: { mouseup: 'table' } });
+        } else {
+            tableSelection = null;
+        }
+    });
+
+    document.addEventListener('selectionchange', async (event) => {
+        // This event listener detects when the user has deselected a table and sends a
+        // message to the background script so it can load the correct context menu
+        // items.
+        browser.runtime.sendMessage({ context: { selectionchange: 'selection' } });
     });
 
     document.addEventListener('contextmenu', (event) => {
@@ -80,6 +119,7 @@ function setUpListeners() {
         // In Chromium, this listener must be synchronous and must send a response
         // immediately. True must be sent if the actual response will be sent
         // asynchronously.
+        console.log('content.js received message');
 
         handleRequest(message).then((res) => {
             sendResponse(res);
@@ -104,12 +144,22 @@ window.onload = setUpListeners;
 setUpListeners();
 
 /**
+ * lastRequestId is the ID of the last request sent from background.js to content.js. It
+ * is used by certain request categories to prevent duplicate requests from being
+ * processed. This is necessary because Chromium sometimes duplicates requests for some
+ * reason, which can cause the wrong output configuration to be used if not handled
+ * carefully.
+ * @type {number|null}
+ */
+let lastRequestId = null;
+
+/**
  * handleRequest processes a message sent from the background script and returns a
  * response.
  * @param {object} message - the message object sent from the background script. Must
  * have a `category` property and may have other properties depending on the category.
  * @param {string} message.category - the category of the message.
- * @returns {Promise<ContentResponse>}
+ * @returns {Promise<ContentResponse|null>}
  */
 async function handleRequest(message) {
     switch (message.category) {
@@ -121,12 +171,12 @@ async function handleRequest(message) {
             const id1 = await getClickedElementId(clickedElement);
             return await handlePageRightClick(id1);
         case 'selectionRightClick':
-            const selection = window.getSelection();
+            const selection1 = window.getSelection();
             const id2 = await getClickedElementId(clickedElement);
-            return await handleSelectionRightClick(id2, selection);
+            return await handleSelectionRightClick(id2, selection1);
         case 'linkRightClick':
-            const linkMd2 = await md.createLink(linkText, message.linkUrl);
-            return await handleCopyRequest(linkMd2);
+            const linkMd = await md.createLink(linkText, message.linkUrl);
+            return await handleCopyRequest(linkMd);
         case 'imageRightClick':
             const imageMd = await md.createImage(message.srcUrl);
             return await handleCopyRequest(imageMd + '\n');
@@ -136,6 +186,48 @@ async function handleRequest(message) {
         case 'audioRightClick':
             const audioMd = await md.createAudio(message.srcUrl, message.pageUrl);
             return await handleCopyRequest(audioMd + '\n');
+        case 'markdownTableRightClick':
+            console.log('markdownTableRightClick in content.js');
+            const selection2 = window.getSelection();
+            const id3 = await getClickedElementId(clickedElement);
+            return await handleSelectionRightClick(id3, selection2);
+        case 'tsvTableRightClick':
+            if (message.id === lastRequestId) {
+                console.log('Ignoring duplicate request: tsvTableRightClick in content.js');
+                return null;
+            }
+            lastRequestId = message.id;
+            console.log('tsvTableRightClick in content.js');
+            tableConfig.format = 'tsv';
+            const tableTsv = await htmlSelection.getSourceFormatText(tableSelection, '');
+            tableConfig.format = 'markdown';
+            return await handleCopyRequest(tableTsv);
+        case 'csvTableRightClick':
+            if (message.id === lastRequestId) {
+                console.log('Ignoring duplicate request: csvTableRightClick in content.js');
+                return null;
+            }
+            lastRequestId = message.id;
+            console.log('csvTableRightClick in content.js');
+            tableConfig.format = 'csv';
+            const tableCsv = await htmlSelection.getSourceFormatText(tableSelection, '');
+            tableConfig.format = 'markdown';
+            return await handleCopyRequest(tableCsv);
+        case 'jsonTableRightClick':
+            if (message.id === lastRequestId) {
+                console.log('Ignoring duplicate request: jsonTableRightClick in content.js');
+                return null;
+            }
+            lastRequestId = message.id;
+            console.log('jsonTableRightClick in content.js');
+            tableConfig.format = 'json';
+            const tableJson = await htmlSelection.getSourceFormatText(tableSelection, '');
+            tableConfig.format = 'markdown';
+            return await handleCopyRequest(tableJson);
+        case 'htmlTableRightClick':
+            console.log('htmlTableRightClick in content.js');
+            const tableHtml = await htmlSelection.getSelectionHtml(tableSelection);
+            return await handleCopyRequest(tableHtml);
         default:
             console.error('Unknown message category:', message.category);
             throw new Error('Unknown message category:', message.category);
@@ -175,8 +267,8 @@ async function handleIconSingleClick() {
         // count as a selection click
         return await handleSelectionRightClick('', selection);
     } else {
-        const linkMd1 = await md.createLink(document.title, location.href);
-        return await handleCopyRequest(linkMd1);
+        const linkMd = await md.createLink(document.title, location.href);
+        return await handleCopyRequest(linkMd);
     }
 }
 
@@ -222,7 +314,7 @@ async function handleSelectionRightClick(htmlId, selection) {
         }
     }
 
-    const markdown = await htmlSelection.createMd(title, url, selection);
+    const markdown = await htmlSelection.createText(title, url, selection);
 
     return await handleCopyRequest(markdown);
 }

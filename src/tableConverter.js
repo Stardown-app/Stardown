@@ -15,8 +15,9 @@
 */
 
 /**
- * A TableConverter is an object that assists with converting an HTML table to a
- * markdown table. A TableConverter instance should not be reused for multiple tables.
+ * A TableConverter is an object that assists with converting an HTML table to markdown
+ * or another plaintext format. A TableConverter instance should not be used for
+ * multiple tables.
  */
 export class TableConverter {
     constructor() {
@@ -43,8 +44,6 @@ export class TableConverter {
      * @param {number} rowspan - the number of rows the HTML cell spans.
      */
     addCell(content, colspan = 1, rowspan = 1) {
-        content = this.formatCellContent(content);
-
         // while before the end of the row and not on a null cell
         while (this.X < this.table[this.Y].length && this.table[this.Y][this.X] !== null) {
             this.X++;
@@ -82,7 +81,7 @@ export class TableConverter {
      * toMarkdown returns the markdown representation of the table. If the addRow and
      * addCell methods were used correctly, the table should not contain any nulls when
      * this method is called.
-     * @returns {string} the markdown representation of the table.
+     * @returns {string} - the markdown representation of the table.
      */
     toMarkdown() {
         this.removeEmptyRows();
@@ -97,7 +96,8 @@ export class TableConverter {
 
             // for each cell
             for (let x = 0; x < row.length; x++) {
-                const cell = row[x];
+                let cell = row[x];
+                cell = cell.trim().replaceAll(/\s+/g, ' ').replaceAll('|', '\\|');
                 markdown.push(` ${cell} |`);
             }
 
@@ -117,14 +117,115 @@ export class TableConverter {
     }
 
     /**
-     * formatCellContent prepares a table cell's content to be incorporated into a table
-     * row.
-     * @private
-     * @param {string} content - the table cell's content.
+     * toCsv returns the CSV representation of the table. Fields are encapsulated
+     * minimally. If the addRow and addCell methods were used correctly, the table
+     * should not contain any nulls when this method is called.
+     * @param {string} delimiter - what to separate fields with.
+     * @param {string} encapsulator - what to encapsulate fields with.
+     * @param {string} escaper - what to escape the encapsulator within fields with.
+     * @param {string} lineTerminator - what to separate rows with.
+     * @param {boolean} trimFields - whether to trim surrounding whitespace characters
+     * from fields.
+     * @returns {string} - the CSV representation of the table.
+     */
+    toCsv(
+        delimiter = ',',
+        encapsulator = '"',
+        escaper = '"',
+        lineTerminator = '\n',
+        trimFields = false,
+    ) {
+        // [RFC 4180](https://datatracker.ietf.org/doc/html/rfc4180)
+        // [Comma-separated values - Wikipedia](https://en.wikipedia.org/wiki/Comma-separated_values#Basic_rules)
+        // [csv — Python documentation](https://docs.python.org/3/library/csv.html#dialects-and-formatting-parameters)
+
+        this.removeEmptyRows();
+        this.rectangularize();
+
+        let csv = [];
+
+        // for each row
+        for (let y = 0; y < this.table.length; y++) {
+            const row = this.table[y];
+            // for each cell
+            for (let x = 0; x < row.length; x++) {
+                let cell = row[x];
+                if (trimFields) {
+                    cell = cell.trim();
+                }
+                if (
+                    cell.includes(encapsulator) ||
+                    cell.includes(delimiter) ||
+                    cell.includes(lineTerminator)
+                ) {
+                    cell = cell.replaceAll(encapsulator, escaper + encapsulator);
+                    csv.push(encapsulator, cell, encapsulator);
+                } else {
+                    csv.push(cell);
+                }
+                if (x < row.length - 1) {
+                    csv.push(delimiter);
+                }
+            }
+
+            csv.push(lineTerminator);
+        }
+
+        return csv.join('');
+    }
+
+    /**
+     * toJson returns a JSON representation of the table. If the addRow and addCell
+     * methods were used correctly, the table should not contain any unquoted nulls when
+     * this method is called.
      * @returns {string}
      */
-    formatCellContent(content) {
-        return content.trim().replaceAll(/\s+/g, ' ').replaceAll('|', '\\|');
+    toJson() {
+        // [RFC 8259](https://www.rfc-editor.org/rfc/rfc8259)
+
+        this.removeEmptyRows();
+        // this.rectangularize(); // no need to rectangularize for JSON
+
+        let json = ['['];
+
+        // for each row
+        for (let y = 0; y < this.table.length; y++) {
+            const row = this.table[y];
+            json.push('[');
+
+            // for each cell
+            for (let x = 0; x < row.length; x++) {
+                let cell = row[x];
+                if (cell.startsWith('\\-')) { // because Turndown escapes leading minuses
+                    cell = cell.slice(1);
+                }
+
+                if (cell === '') {
+                    json.push('null');
+                } else if (['true', 'false', 'null'].includes(cell)) {
+                    json.push(cell);
+                } else if (canBeJsonNumber(cell)) {
+                    json.push(toJsonNumber(cell));
+                } else {
+                    // backslashes are escaped by Turndown
+                    cell = cell.replaceAll('"', '\\"');
+                    json.push('"' + cell + '"');
+                }
+
+                if (x < row.length - 1) {
+                    json.push(', ');
+                }
+            }
+
+            json.push(']');
+            if (y < this.table.length - 1) {
+                json.push(', ');
+            }
+        }
+
+        json.push(']');
+
+        return json.join('');
     }
 
     /**
@@ -155,5 +256,51 @@ export class TableConverter {
                 row.push('');
             }
         }
+    }
+}
+
+/**
+ * canBeJsonNumber reports whether a string contains either a valid JSON number or
+ * something that can be converted into one.
+ * @param {string} str
+ * @returns {boolean}
+ */
+export function canBeJsonNumber(str) {
+    return Boolean(str.match(/^[+-]?[0-9,]+\.?[0-9]*(?:[eE][+-]?[0-9]+)?$/));
+}
+
+/**
+ * toJsonNumber converts a string of a number to a valid JSON number.
+ * @param {string} numStr
+ * @returns {string}
+ */
+export function toJsonNumber(numStr) {
+    if (numStr[0] === '+') {
+        numStr = numStr.slice(1);
+    }
+    numStr = fixLeadingZeros(numStr.replaceAll(',', ''));
+    if (numStr[numStr.length - 1] === '.') {
+        numStr = numStr.slice(0, numStr.length - 1);
+    }
+    return numStr;
+}
+
+/**
+ * fixLeadingZeros removes excess leading zeros and may add a zero before a decimal
+ * point to make a number a valid JSON number.
+ * @param {string} numStr
+ * @returns {string}
+ */
+export function fixLeadingZeros(numStr) {
+    for (let i = 0; i < numStr.length; i++) {
+        if (numStr[i] === '0') {
+            continue;
+        } else if (numStr[i] === '.' || numStr[i] === 'e' || numStr[i] === 'E') {
+            if (i === 0) {
+                return '0' + numStr;
+            }
+            return numStr.slice(i - 1);
+        }
+        return numStr.slice(i);
     }
 }

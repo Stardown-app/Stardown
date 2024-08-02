@@ -4,7 +4,7 @@ I wrote some general extension development tips in [Making browser extensions](h
 
 ## Goals
 
-Stardown's main goal is to be so simple, fast, reliable, and flexible that people think of it as "it's like Ctrl+C but it keeps formatting". It should probably only ever have one keyboard shortcut, no popup, and show only one context menu option at a time. The options page can have many options as long as they are well organized and useful. Stardown's output should render well on at least Obsidian and GitHub, if not also other markdown renderers like [Google Docs](https://workspaceupdates.googleblog.com/2024/07/import-and-export-markdown-in-google-docs.html), [VS Code](https://code.visualstudio.com/docs/languages/markdown#_markdown-preview), Discourse, GitLab, Stack Overflow, Joplin, Reddit, and Discord.
+Stardown's main goal is to be so simple, fast, reliable, and flexible that people think of it as "it's like Ctrl+C but it keeps formatting". It should generally have only one keyboard shortcut, no popup, and usually show only one context menu option at a time. The options page can have many options as long as they are well organized and useful. Stardown's output should render well on at least Obsidian and GitHub, if not also other markdown renderers like [Google Docs](https://workspaceupdates.googleblog.com/2024/07/import-and-export-markdown-in-google-docs.html), [VS Code](https://code.visualstudio.com/docs/languages/markdown#_markdown-preview), Discourse, GitLab, Stack Overflow, Joplin, Reddit, and Discord.
 
 I would also like to keep Stardown's code relatively simple so that it's reliable, has few bugs that get fixed quickly, and is easy to maintain.
 
@@ -39,13 +39,15 @@ Here are the steps Stardown goes through with each user interaction (except on t
 
 The "background script" in Chromium is not exactly a background script, but a service worker, unlike in Firefox. This affects how the file name must be declared in the manifest and what variables and functions are available in certain places. For example, [Chromium's service workers don't allow access to the clipboard API](https://stackoverflow.com/questions/61862872/how-to-copy-web-notification-content-to-clipboard/61977696#61977696) unlike Firefox's background scripts. Stardown uses the clipboard API only in content scripts so that it can use the same code for both Chromium and Firefox. Safari supports both background scripts and service workers.
 
+The browser's context menu cannot be updated while it is visible, so Stardown's dynamic context menu options depend on information from events such as `mouseover` and `selectionchange`. These events are received from the browser in the content script and sent to the background script to update the context menu.
+
 ## What Stardown does
 
 When fully manually testing Stardown, use the descriptions in this section in each of the officially supported browsers to search for bugs.
 
 ### Context types
 
-- **selection**: anything that the user has selected by clicking and dragging with their mouse.
+- **selection**: anything that the user has selected by clicking and dragging with their mouse or using selection keyboard shortcuts.
 - **link**: any clickable link on a page. However, for a link that is also an image, Stardown should show only the image copy option.
 - **image**: types supported include png, jpg, svg, webp, gif, and base64-encoded. Types not supported include background images, `canvas` HTML elements, inline `svg` HTML elements, and sometimes images within `a` HTML elements for some reason.
 - **video**: a video rendered with the `video` HTML element, such as YouTube videos and mp4 files hosted by GitHub ([example on this page](https://github.com/wheelercj/zq)). This option doesn't appear for some video sites like [Vimeo](https://player.vimeo.com/video/55073825) probably because their `video` HTML element is buried under many other things, and [Asciinema](https://asciinema.org/) because they don't use the `video` HTML element.
@@ -53,6 +55,7 @@ When fully manually testing Stardown, use the descriptions in this section in ea
   - Markdown of GitHub mp4s is expected to render well only in GitHub.
   - If the user changes the setting "Optimize markdown of YouTube videos for __" to "GitHub", then the output should render well in at least GitHub, Obsidian, and VS Code.
 - **audio**: an audio player rendered with the `audio` HTML element. Some good examples are the first two audio players on [New Audio HTML Element: Master It Out Now With Our Code Example »](https://html.com/tags/audio/).
+- **table**: a table of data rendered with the `table` HTML element. Browsers do not offer a built-in context type for this, so Stardown has its own table detection code. Some examples of tables are at [Tables for visually impaired users](https://developer.mozilla.org/en-US/docs/Learn/HTML/Tables/Advanced#tables_for_visually_impaired_users) and [Extended Syntax | Markdown Guide](https://www.markdownguide.org/extended-syntax/#tables).
 
 ### Features
 
@@ -71,7 +74,7 @@ When fully manually testing Stardown, use the descriptions in this section in ea
 - [ ] **Right-clicking a link that is an image** might not show any context menu options due to browser limitations. If a context menu option appears, it should be "Copy markdown of image".
 - [ ] **Right-clicking a video** shows the "Copy markdown of video" option, but may require a second right-click for the correct context menu to appear because some videos (e.g. YouTube videos) have a special context menu.
 - [ ] **Right-clicking an audio player** shows the "Copy markdown of audio" option.
-- [ ] **Copying the contents of [this table](https://developer.mozilla.org/en-US/docs/Learn/HTML/Tables/Advanced#tables_for_visually_impaired_users)** should result in a similar-looking table with everything aligned correctly.
+- [ ] **Selecting the contents of a table and right-clicking the selection** shows several options: "Copy markdown of table", "Copy TSV of table", "Copy CSV of table", "Copy JSON of table", and "Copy HTML of table". Each option should result in a table with everything aligned correctly, leaving some cells empty and others duplicated as necessary.
 - [ ] "Copy markdown link to here" copies a markdown link for the page with an HTML element ID from where the page was right-clicked, if one exists there.
 - [ ] "Copy markdown of selection", by default, copies markdown of the selected text (including all of the page's formatting that markdown supports), and a markdown link containing a text fragment and possibly an HTML element ID.
 - [ ] "Copy markdown of image" copies markdown of the image using the image's URL and any alt text.
@@ -118,9 +121,9 @@ Stardown uses the amazing [Turndown](https://github.com/mixmark-io/turndown), cr
 
 ## Tables
 
-HTML tables have more features than markdown tables, but Stardown's custom code for converting tables from HTML to markdown should still always create valid markdown tables that are as similar to the HTML as possible.
+HTML tables have more features than markdown and other plaintext tables, but Stardown's custom code for converting tables from HTML to markdown or another plaintext format should still always create valid tables that are as similar to the HTML as possible.
 
-Some HTML tables have cells that span multiple rows and/or columns, such as [this one](https://developer.mozilla.org/en-US/docs/Learn/HTML/Tables/Advanced#tables_for_visually_impaired_users). Markdown tables don't allow that, so markdown tables must have extra cells to match the spans.
+Some HTML tables have cells that span multiple rows and/or columns, such as [this one](https://developer.mozilla.org/en-US/docs/Learn/HTML/Tables/Advanced#tables_for_visually_impaired_users). Markdown and other plaintext formats don't allow that, so they must have extra cells to match the spans.
 
 From my experience so far, markdown renderers tend to require every markdown table to have one header row followed by one table divider, then zero or more body rows. The number of cells in the header row must be equal to that of the table divider and to that of whichever row has the most cells. Body rows may have varying numbers of cells.
 

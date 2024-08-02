@@ -24,6 +24,11 @@
     SOFTWARE.
 */
 
+/*
+    This file has been customized for Stardown so that it can create TSV tables that
+    can start and/or end with tabs.
+*/
+
 export var TurndownService = (function () {
     'use strict';
 
@@ -935,7 +940,10 @@ export var TurndownService = (function () {
             }
         });
 
-        return output.replace(/^[\t\r\n]+/, '').replace(/[\t\r\n\s]+$/, '')
+        // customized so Stardown can create TSV tables that can start and/or end with
+        // tabs
+        return output.replace(/^[\r\n]+/, '').replace(/[\r\n]+$/, '') // for Stardown
+        // return output.replace(/^[\t\r\n]+/, '').replace(/[\t\r\n\s]+$/, '') // original
     }
 
     /**

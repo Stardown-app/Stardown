@@ -19,6 +19,16 @@ import * as menu from './menu.js';
 browser.action = browser.browserAction; // for manifest v2 compatibility
 
 /**
+ * sleep pauses the execution of the current async function for a number of
+ * milliseconds.
+ * @param {number} ms - the number of milliseconds to sleep.
+ * @returns {Promise<void>}
+ */
+export async function sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+/**
  * createContextMenus creates the context menu options.
  * @returns {void}
  */
@@ -30,18 +40,29 @@ export function createContextMenus() {
         browser.contextMenus.create(menu.imageItem);
         browser.contextMenus.create(menu.videoItem);
         browser.contextMenus.create(menu.audioItem);
+        browser.contextMenus.create(menu.markdownTableItem);
+        browser.contextMenus.create(menu.tsvTableItem);
+        browser.contextMenus.create(menu.csvTableItem);
+        browser.contextMenus.create(menu.jsonTableItem);
+        browser.contextMenus.create(menu.htmlTableItem);
+
+        browser.contextMenus.update('markdownTable', { visible: false });
+        browser.contextMenus.update('tsvTable', { visible: false });
+        browser.contextMenus.update('csvTable', { visible: false });
+        browser.contextMenus.update('jsonTable', { visible: false });
+        browser.contextMenus.update('htmlTable', { visible: false });
     });
 }
 
 /**
  * updateContextMenu changes which options are in the context menu based on the category
- * of HTML element the mouse is over. This only has an effect if the context menu is not
- * currently visible.
- * @param {string} category - the category of the element the mouse is over.
- * @returns {void}
+ * of HTML element the mouse is interacting with. This only has an effect if the context
+ * menu is not currently visible.
+ * @param {string} context - info about the element the mouse is interacting with.
+ * @returns {Promise<void>}
  */
-export function updateContextMenu(category) {
-    switch (category) {
+export async function updateContextMenu(context) {
+    switch (context.mouseover) {
         case 'selection':
             browser.contextMenus.update('link', { visible: false });
             browser.contextMenus.update('image', { visible: false });
@@ -54,9 +75,26 @@ export function updateContextMenu(category) {
             browser.contextMenus.update('link', { visible: true });
             browser.contextMenus.update('image', { visible: false });
             break;
-        default:
-            console.error('Invalid category', category);
-            throw new Error('Invalid category ' + category);
+    }
+
+    if (context.mouseup === 'table') {
+        await sleep(100); // wait for the context menu
+
+        browser.contextMenus.update('selection', { visible: false });
+
+        browser.contextMenus.update('markdownTable', { visible: true });
+        browser.contextMenus.update('tsvTable', { visible: true });
+        browser.contextMenus.update('csvTable', { visible: true });
+        browser.contextMenus.update('jsonTable', { visible: true });
+        browser.contextMenus.update('htmlTable', { visible: true });
+    } else if (context.selectionchange) {
+        browser.contextMenus.update('selection', { visible: true });
+
+        browser.contextMenus.update('markdownTable', { visible: false });
+        browser.contextMenus.update('tsvTable', { visible: false });
+        browser.contextMenus.update('csvTable', { visible: false });
+        browser.contextMenus.update('jsonTable', { visible: false });
+        browser.contextMenus.update('htmlTable', { visible: false });
     }
 }
 

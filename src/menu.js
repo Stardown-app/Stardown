@@ -49,3 +49,33 @@ export const audioItem = {
     title: 'Copy markdown of audio',
     contexts: ['audio'],
 };
+
+export const markdownTableItem = {
+    id: 'markdownTable',
+    title: 'Copy markdown of table',
+    contexts: ['selection'],
+};
+
+export const tsvTableItem = {
+    id: 'tsvTable',
+    title: 'Copy TSV of table',
+    contexts: ['selection'],
+};
+
+export const csvTableItem = {
+    id: 'csvTable',
+    title: 'Copy CSV of table',
+    contexts: ['selection'],
+};
+
+export const jsonTableItem = {
+    id: 'jsonTable',
+    title: 'Copy JSON of table',
+    contexts: ['selection'],
+};
+
+export const htmlTableItem = {
+    id: 'htmlTable',
+    title: 'Copy HTML of table',
+    contexts: ['selection'],
+};

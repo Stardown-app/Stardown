@@ -43,11 +43,13 @@ export function createContextMenus() {
         browser.contextMenus.create(menu.markdownTableItem);
         browser.contextMenus.create(menu.tsvTableItem);
         browser.contextMenus.create(menu.csvTableItem);
+        browser.contextMenus.create(menu.jsonTableItem);
         browser.contextMenus.create(menu.htmlTableItem);
 
         browser.contextMenus.update('markdownTable', { visible: false });
         browser.contextMenus.update('tsvTable', { visible: false });
         browser.contextMenus.update('csvTable', { visible: false });
+        browser.contextMenus.update('jsonTable', { visible: false });
         browser.contextMenus.update('htmlTable', { visible: false });
     });
 }
@@ -83,6 +85,7 @@ export async function updateContextMenu(context) {
         browser.contextMenus.update('markdownTable', { visible: true });
         browser.contextMenus.update('tsvTable', { visible: true });
         browser.contextMenus.update('csvTable', { visible: true });
+        browser.contextMenus.update('jsonTable', { visible: true });
         browser.contextMenus.update('htmlTable', { visible: true });
     } else if (context.selectionchange) {
         browser.contextMenus.update('selection', { visible: true });
@@ -90,6 +93,7 @@ export async function updateContextMenu(context) {
         browser.contextMenus.update('markdownTable', { visible: false });
         browser.contextMenus.update('tsvTable', { visible: false });
         browser.contextMenus.update('csvTable', { visible: false });
+        browser.contextMenus.update('jsonTable', { visible: false });
         browser.contextMenus.update('htmlTable', { visible: false });
     }
 }

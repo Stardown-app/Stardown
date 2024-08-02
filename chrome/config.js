@@ -68,6 +68,7 @@ export async function updateContextMenu(context) {
             browser.contextMenus.create(menu.markdownTableItem);
             browser.contextMenus.create(menu.tsvTableItem);
             browser.contextMenus.create(menu.csvTableItem);
+            browser.contextMenus.create(menu.jsonTableItem);
             browser.contextMenus.create(menu.htmlTableItem);
         } else {
             if (context.mouseover === 'image') {

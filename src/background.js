@@ -125,6 +125,13 @@ browser.contextMenus.onClicked.addListener(async (info, tab) => {
                 tab, { category: 'csvTableRightClick', id: id2 }, { frameId: info.frameId },
             );
             break;
+        case 'jsonTable':
+            console.log('jsonTableRightClick in background.js');
+            const id3 = Math.random(); // why: https://github.com/Stardown-app/Stardown/issues/98
+            await handleInteraction(
+                tab, { category: 'jsonTableRightClick', id: id3 }, { frameId: info.frameId },
+            );
+            break;
         case 'htmlTable':
             console.log('htmlTableRightClick in background.js');
             await handleInteraction(

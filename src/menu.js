@@ -68,6 +68,12 @@ export const csvTableItem = {
     contexts: ['selection'],
 };
 
+export const jsonTableItem = {
+    id: 'jsonTable',
+    title: 'Copy JSON of table',
+    contexts: ['selection'],
+};
+
 export const htmlTableItem = {
     id: 'htmlTable',
     title: 'Copy HTML of table',

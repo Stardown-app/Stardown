@@ -74,7 +74,7 @@ When fully manually testing Stardown, use the descriptions in this section in ea
 - [ ] **Right-clicking a link that is an image** might not show any context menu options due to browser limitations. If a context menu option appears, it should be "Copy markdown of image".
 - [ ] **Right-clicking a video** shows the "Copy markdown of video" option, but may require a second right-click for the correct context menu to appear because some videos (e.g. YouTube videos) have a special context menu.
 - [ ] **Right-clicking an audio player** shows the "Copy markdown of audio" option.
-- [ ] **Selecting the contents of a table and right-clicking the selection** shows four options: "Copy markdown of table", "Copy TSV of table", "Copy CSV of table", and "Copy HTML of table". Each option should result in a table with everything aligned correctly, leaving some cells empty and others duplicated.
+- [ ] **Selecting the contents of a table and right-clicking the selection** shows several options: "Copy markdown of table", "Copy TSV of table", "Copy CSV of table", "Copy JSON of table", and "Copy HTML of table". Each option should result in a table with everything aligned correctly, leaving some cells empty and others duplicated as necessary.
 - [ ] "Copy markdown link to here" copies a markdown link for the page with an HTML element ID from where the page was right-clicked, if one exists there.
 - [ ] "Copy markdown of selection", by default, copies markdown of the selected text (including all of the page's formatting that markdown supports), and a markdown link containing a text fragment and possibly an HTML element ID.
 - [ ] "Copy markdown of image" copies markdown of the image using the image's URL and any alt text.
@@ -121,9 +121,9 @@ Stardown uses the amazing [Turndown](https://github.com/mixmark-io/turndown), cr
 
 ## Tables
 
-HTML tables have more features than markdown and CSV tables, but Stardown's custom code for converting tables from HTML to markdown or CSV should still always create valid tables that are as similar to the HTML as possible.
+HTML tables have more features than markdown and other plaintext tables, but Stardown's custom code for converting tables from HTML to markdown or another plaintext format should still always create valid tables that are as similar to the HTML as possible.
 
-Some HTML tables have cells that span multiple rows and/or columns, such as [this one](https://developer.mozilla.org/en-US/docs/Learn/HTML/Tables/Advanced#tables_for_visually_impaired_users). Markdown and CSV tables don't allow that, so markdown and CSV tables must have extra cells to match the spans.
+Some HTML tables have cells that span multiple rows and/or columns, such as [this one](https://developer.mozilla.org/en-US/docs/Learn/HTML/Tables/Advanced#tables_for_visually_impaired_users). Markdown and other plaintext formats don't allow that, so they must have extra cells to match the spans.
 
 From my experience so far, markdown renderers tend to require every markdown table to have one header row followed by one table divider, then zero or more body rows. The number of cells in the header row must be equal to that of the table divider and to that of whichever row has the most cells. Body rows may have varying numbers of cells.
 

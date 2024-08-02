@@ -15,9 +15,9 @@
 */
 
 /**
- * A TableConverter is an object that assists with converting an HTML table to a
- * markdown or CSV table. A TableConverter instance should not be used for multiple
- * tables.
+ * A TableConverter is an object that assists with converting an HTML table to markdown
+ * or another plaintext format. A TableConverter instance should not be used for
+ * multiple tables.
  */
 export class TableConverter {
     constructor() {
@@ -117,9 +117,9 @@ export class TableConverter {
     }
 
     /**
-     * toCsv returns the CSV representation of the table. If the addRow and addCell
-     * methods were used correctly, the table should not contain any nulls when this
-     * method is called.
+     * toCsv returns the CSV representation of the table. Fields are encapsulated
+     * minimally. If the addRow and addCell methods were used correctly, the table
+     * should not contain any nulls when this method is called.
      * @param {string} delimiter - what to separate fields with.
      * @param {string} encapsulator - what to encapsulate fields with.
      * @param {string} escaper - what to escape the encapsulator within fields with.
@@ -175,6 +175,60 @@ export class TableConverter {
     }
 
     /**
+     * toJson returns a JSON representation of the table. If the addRow and addCell
+     * methods were used correctly, the table should not contain any unquoted nulls when
+     * this method is called.
+     * @returns {string}
+     */
+    toJson() {
+        // [RFC 8259](https://www.rfc-editor.org/rfc/rfc8259)
+
+        this.removeEmptyRows();
+        // this.rectangularize(); // no need to rectangularize for JSON
+
+        let json = ['['];
+
+        // for each row
+        for (let y = 0; y < this.table.length; y++) {
+            const row = this.table[y];
+            json.push('[');
+
+            // for each cell
+            for (let x = 0; x < row.length; x++) {
+                let cell = row[x];
+                if (cell.startsWith('\\-')) { // because Turndown escapes leading minuses
+                    cell = cell.slice(1);
+                }
+
+                if (cell === '') {
+                    json.push('null');
+                } else if (['true', 'false', 'null'].includes(cell)) {
+                    json.push(cell);
+                } else if (canBeJsonNumber(cell)) {
+                    json.push(toJsonNumber(cell));
+                } else {
+                    // backslashes are escaped by Turndown
+                    cell = cell.replaceAll('"', '\\"');
+                    json.push('"' + cell + '"');
+                }
+
+                if (x < row.length - 1) {
+                    json.push(', ');
+                }
+            }
+
+            json.push(']');
+            if (y < this.table.length - 1) {
+                json.push(', ');
+            }
+        }
+
+        json.push(']');
+
+        return json.join('');
+    }
+
+    /**
      * removeEmptyRows removes empty rows from the table.
      * @private
      */
@@ -202,5 +256,51 @@ export class TableConverter {
                 row.push('');
             }
         }
+    }
+}
+
+/**
+ * canBeJsonNumber reports whether a string contains either a valid JSON number or
+ * something that can be converted into one.
+ * @param {string} str
+ * @returns {boolean}
+ */
+export function canBeJsonNumber(str) {
+    return Boolean(str.match(/^[+-]?[0-9,]+\.?[0-9]*(?:[eE][+-]?[0-9]+)?$/));
+}
+
+/**
+ * toJsonNumber converts a string of a number to a valid JSON number.
+ * @param {string} numStr
+ * @returns {string}
+ */
+export function toJsonNumber(numStr) {
+    if (numStr[0] === '+') {
+        numStr = numStr.slice(1);
+    }
+    numStr = fixLeadingZeros(numStr.replaceAll(',', ''));
+    if (numStr[numStr.length - 1] === '.') {
+        numStr = numStr.slice(0, numStr.length - 1);
+    }
+    return numStr;
+}
+
+/**
+ * fixLeadingZeros removes excess leading zeros and may add a zero before a decimal
+ * point to make a number a valid JSON number.
+ * @param {string} numStr
+ * @returns {string}
+ */
+export function fixLeadingZeros(numStr) {
+    for (let i = 0; i < numStr.length; i++) {
+        if (numStr[i] === '0') {
+            continue;
+        } else if (numStr[i] === '.' || numStr[i] === 'e' || numStr[i] === 'E') {
+            if (i === 0) {
+                return '0' + numStr;
+            }
+            return numStr.slice(i - 1);
+        }
+        return numStr.slice(i);
     }
 }

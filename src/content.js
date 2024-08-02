@@ -213,6 +213,17 @@ async function handleRequest(message) {
             const tableCsv = await htmlSelection.getSourceFormatText(tableSelection, '');
             tableConfig.format = 'markdown';
             return await handleCopyRequest(tableCsv);
+        case 'jsonTableRightClick':
+            if (message.id === lastRequestId) {
+                console.log('Ignoring duplicate request: jsonTableRightClick in content.js');
+                return null;
+            }
+            lastRequestId = message.id;
+            console.log('jsonTableRightClick in content.js');
+            tableConfig.format = 'json';
+            const tableJson = await htmlSelection.getSourceFormatText(tableSelection, '');
+            tableConfig.format = 'markdown';
+            return await handleCopyRequest(tableJson);
         case 'htmlTableRightClick':
             console.log('htmlTableRightClick in content.js');
             const tableHtml = await htmlSelection.getSelectionHtml(tableSelection);

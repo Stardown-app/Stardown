@@ -83,7 +83,7 @@ function setUpListeners() {
             return;
         }
         const html = await htmlSelection.getSelectionHtml(selection);
-        const isTable = html.startsWith('<table>');
+        const isTable = html.startsWith('<table');
         if (isTable) {
             tableSelection = selection;
             browser.runtime.sendMessage({ context: { mouseup: 'table' } });

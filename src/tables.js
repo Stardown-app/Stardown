@@ -32,9 +32,12 @@ import { TurndownService } from './turndown.js';
  * tableConfig is the table conversion configuration.
  * @type {object}
  * @property {'markdown'|'csv'|'tsv'|'json'} format - the format to convert tables to.
+ * @property {string} emptyCellJson - the JSON representation of an empty cell in the
+ * JSON format. This is used only when format is 'json'.
  */
 export let tableConfig = {
     format: 'markdown',
+    emptyCellJson: 'null',
 };
 
 /**
@@ -111,13 +114,14 @@ export function addTableRules(t) {
 
             let tableText;
             if (tableConfig.format === 'csv') {
+                console.log('tableConv.toCsv()');
                 tableText = tableConv.toCsv();
             } else if (tableConfig.format === 'tsv') {
-                console.log('tableConv.toCsv() with tab separator');
+                console.log('tableConv.toCsv("\\t")');
                 tableText = tableConv.toCsv('\t');
             } else if (tableConfig.format === 'json') {
                 console.log('tableConv.toJson()');
-                tableText = tableConv.toJson();
+                tableText = tableConv.toJson(tableConfig.emptyCellJson);
             } else {
                 console.log('tableConv.toMarkdown()');
                 tableText = tableConv.toMarkdown();

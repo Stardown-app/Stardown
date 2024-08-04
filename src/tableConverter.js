@@ -179,9 +179,10 @@ export class TableConverter {
      * toJson returns a JSON representation of the table. If the addRow and addCell
      * methods were used correctly, the table should not contain any nulls when this
      * method is called but may contain strings of the word "null".
+     * @param {string} emptyCellJson - the JSON representation of an empty cell.
      * @returns {string}
      */
-    toJson() {
+    toJson(emptyCellJson = 'null') {
         // [RFC 8259](https://www.rfc-editor.org/rfc/rfc8259)
 
         this.removeEmptyRows();
@@ -192,7 +193,7 @@ export class TableConverter {
         // for each row
         for (let y = 0; y < this.table.length; y++) {
             const row = this.table[y];
-            json.push('[');
+            json.push('{');
 
             // for each cell
             for (let x = 0; x < row.length; x++) {
@@ -201,8 +202,15 @@ export class TableConverter {
                     cell = cell.slice(1);
                 }
 
-                if (cell === '') {
-                    json.push('null');
+                if (x === 0) {
+                    // backslashes are escaped by Turndown
+                    if (cell === '') {
+                        cell = emptyCellJson;
+                    }
+                    cell = cell.replaceAll('"', '\\"');
+                    json.push('"' + cell + '": [');
+                } else if (cell === '') {
+                    json.push(emptyCellJson);
                 } else if (['true', 'false', 'null'].includes(cell)) {
                     json.push(cell);
                 } else if (canBeJsonNumber(cell)) {
@@ -213,12 +221,12 @@ export class TableConverter {
                     json.push('"' + cell + '"');
                 }
 
-                if (x < row.length - 1) {
+                if (x > 0 && x < row.length - 1) {
                     json.push(', ');
                 }
             }
 
-            json.push(']');
+            json.push(']}');
             if (y < this.table.length - 1) {
                 json.push(', ');
             }

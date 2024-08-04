@@ -221,6 +221,7 @@ async function handleRequest(message) {
             lastRequestId = message.id;
             console.log('jsonTableRightClick in content.js');
             tableConfig.format = 'json';
+            tableConfig.emptyCellJson = await getSetting('emptyCellJson');
             const tableJson = await htmlSelection.getSourceFormatText(tableSelection, '');
             tableConfig.format = 'markdown';
             return await handleCopyRequest(tableJson);

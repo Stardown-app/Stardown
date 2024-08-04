@@ -22,6 +22,7 @@ import { escape } from '../src/md.js';
 import { tableConfig } from '../src/tables.js';
 
 tableConfig.format = 'json';
+tableConfig.emptyCellJson = 'null';
 
 const turndownService = newTurndownService(
     '-', 'underlined', 'source with link', true, true, escape,
@@ -63,7 +64,7 @@ const tests = [
             </table>
         `,
         jsonExpected: `
-[["a"]]
+[{"a": []}]
 `.trim(),
     },
     {
@@ -81,7 +82,7 @@ const tests = [
             </table>
             `,
         jsonExpected: `
-[["a", "b"]]
+[{"a": ["b"]}]
 `.trim()
     },
     {
@@ -101,7 +102,7 @@ const tests = [
             </table>
             `,
         jsonExpected: `
-[["a"], ["c"]]
+[{"a": []}, {"c": []}]
 `.trim()
     },
     {
@@ -127,7 +128,7 @@ const tests = [
             </table>
             `,
         jsonExpected: `
-[["a", "b"], ["c", "d"]]
+[{"a": ["b"]}, {"c": ["d"]}]
 `.trim()
     },
     {
@@ -161,7 +162,7 @@ const tests = [
             </table>
             `,
         jsonExpected: `
-[["a", "b"], ["d", "e"], ["g", "h"]]
+[{"a": ["b"]}, {"d": ["e"]}, {"g": ["h"]}]
 `.trim()
     },
     {
@@ -193,7 +194,7 @@ const tests = [
             </table>
             `,
         jsonExpected: `
-[["a", "b", "c"], ["d", "e", "f"]]
+[{"a": ["b", "c"]}, {"d": ["e", "f"]}]
 `.trim()
     },
     {
@@ -236,7 +237,7 @@ const tests = [
             </table>
             `,
         jsonExpected: `
-[["a", "b", "c"], ["d", "e", "f"], ["g", "h", "i"]]
+[{"a": ["b", "c"]}, {"d": ["e", "f"]}, {"g": ["h", "i"]}]
 `.trim()
     },
     {
@@ -276,7 +277,7 @@ const tests = [
             </table>
             `,
         jsonExpected: `
-[["a", "b", "c"], ["d", "e", "f"], ["g", "h"]]
+[{"a": ["b", "c"]}, {"d": ["e", "f"]}, {"g": ["h"]}]
 `.trim()
     },
     {
@@ -316,7 +317,7 @@ const tests = [
             </table>
             `,
         jsonExpected: `
-[["a", "b", "c"], ["d", "e"], ["g", "h", "i"]]
+[{"a": ["b", "c"]}, {"d": ["e"]}, {"g": ["h", "i"]}]
 `.trim()
     },
     {
@@ -356,7 +357,7 @@ const tests = [
             </table>
             `,
         jsonExpected: `
-[["a", "b"], ["d", "e", "f"], ["g", "h", "i"]]
+[{"a": ["b"]}, {"d": ["e", "f"]}, {"g": ["h", "i"]}]
 `.trim()
     },
     {
@@ -393,7 +394,7 @@ const tests = [
             </table>
             `,
         jsonExpected: `
-[["a"], ["d", "e", "f"], ["g", "h", "i"]]
+[{"a": []}, {"d": ["e", "f"]}, {"g": ["h", "i"]}]
 `.trim()
     },
     {
@@ -416,7 +417,7 @@ const tests = [
             </table>
             `,
         jsonExpected: `
-[["a", "b", "c"]]
+[{"a": ["b", "c"]}]
 `.trim()
     },
     {
@@ -463,7 +464,7 @@ const tests = [
             </table>
             `,
         jsonExpected: `
-[["a", "b", "c"], ["d", "e", "f"], ["g", "h", "i"]]
+[{"a": ["b", "c"]}, {"d": ["e", "f"]}, {"g": ["h", "i"]}]
 `.trim()
     },
     {
@@ -512,7 +513,7 @@ const tests = [
             </table>
             `,
         jsonExpected: `
-[["a", "b", "c"], ["d", "e", "f"], ["g", "h", "i"]]
+[{"a": ["b", "c"]}, {"d": ["e", "f"]}, {"g": ["h", "i"]}]
 `.trim()
     },
     {
@@ -561,7 +562,7 @@ const tests = [
             </table>
             `,
         jsonExpected: `
-[["a", "b", "c"], ["d", "e", "f"], ["g", "h", "i"]]
+[{"a": ["b", "c"]}, {"d": ["e", "f"]}, {"g": ["h", "i"]}]
 `.trim()
     },
     {
@@ -595,7 +596,7 @@ const tests = [
             </table>
             `,
         jsonExpected: `
-[["a", "b", "c"], ["d", "e", "f"]]
+[{"a": ["b", "c"]}, {"d": ["e", "f"]}]
 `.trim()
     },
     {
@@ -653,7 +654,7 @@ const tests = [
             </table>
             `,
         jsonExpected: `
-[["a", "b", "c"], ["d", "e", "f"], ["g", "h", "i"], ["j", "k", "l"]]
+[{"a": ["b", "c"]}, {"d": ["e", "f"]}, {"g": ["h", "i"]}, {"j": ["k", "l"]}]
 `.trim()
     },
     {
@@ -682,7 +683,7 @@ const tests = [
             </table>
             `,
         jsonExpected: `
-[["a"], ["b"], ["c"]]
+[{"a": []}, {"b": []}, {"c": []}]
 `.trim()
     },
     {
@@ -706,7 +707,7 @@ const tests = [
             </table>
             `,
         jsonExpected: `
-[["a"], ["b"]]
+[{"a": []}, {"b": []}]
 `.trim()
     },
     {
@@ -740,7 +741,7 @@ const tests = [
             </table>
             `,
         jsonExpected: `
-[["a"], ["b"], ["c"], ["d"]]
+[{"a": []}, {"b": []}, {"c": []}, {"d": []}]
 `.trim()
     },
     {
@@ -762,7 +763,7 @@ const tests = [
             </table>
             `,
         jsonExpected: `
-[["a"], ["b"]]
+[{"a": []}, {"b": []}]
 `.trim()
     },
     {
@@ -784,7 +785,7 @@ const tests = [
             </table>
             `,
         jsonExpected: `
-[["a"], ["b"]]
+[{"a": []}, {"b": []}]
 `.trim()
     },
     {
@@ -810,7 +811,7 @@ const tests = [
             </table>
             `,
         jsonExpected: `
-[["a", "*b*"], ["**c**", "***d***"]]
+[{"a": ["*b*"]}, {"**c**": ["***d***"]}]
 `.trim()
     },
     {
@@ -842,7 +843,7 @@ const tests = [
                 </table>
                 `,
         jsonExpected: `
-[["a\n\nb", "c\n\n  \n\nd"], ["e\n\n  \n\nf", "g\n\nh"]]
+[{"a\n\nb": ["c\n\n  \n\nd"]}, {"e\n\n  \n\nf": ["g\n\nh"]}]
 `.trim()
     },
     {
@@ -862,7 +863,7 @@ const tests = [
             </table>
             `,
         jsonExpected: `
-[["a"], ["b"]]
+[{"a": []}, {"b": []}]
 `.trim()
     },
     {
@@ -904,7 +905,7 @@ const tests = [
             </table>
             `,
         jsonExpected: `
-[["ab"], ["cd"]]
+[{"ab": []}, {"cd": []}]
 `.trim()
     },
     {
@@ -929,7 +930,7 @@ const tests = [
             </table>
             `,
         jsonExpected: `
-[["a"], ["b"]]
+[{"a": []}, {"b": []}]
 `.trim()
     },
     {
@@ -958,7 +959,7 @@ const tests = [
             </table>
             `,
         jsonExpected: `
-[["a", "a", "b"], ["c", "d", "e"]]
+[{"a": ["a", "b"]}, {"c": ["d", "e"]}]
 `.trim()
     },
     {
@@ -989,7 +990,7 @@ const tests = [
             </table>
             `,
         jsonExpected: `
-[["a", "b"], ["a", "c"], ["d", "e"]]
+[{"a": ["b"]}, {"a": ["c"]}, {"d": ["e"]}]
 `.trim()
     },
     {
@@ -1017,7 +1018,7 @@ const tests = [
             </table>
             `,
         jsonExpected: `
-[["a", "a"], ["b", "c"], ["d", "d"]]
+[{"a": ["a"]}, {"b": ["c"]}, {"d": ["d"]}]
 `.trim()
     },
     {
@@ -1043,7 +1044,7 @@ const tests = [
             </table>
             `,
         jsonExpected: `
-[["a", "b", "c"], ["a", "d", "c"]]
+[{"a": ["b", "c"]}, {"a": ["d", "c"]}]
 `.trim()
     },
     {
@@ -1077,7 +1078,7 @@ const tests = [
             </table>
             `,
         jsonExpected: `
-[["a", "b", "c"], ["d", "e", "e"], ["f", "e", "e"]]
+[{"a": ["b", "c"]}, {"d": ["e", "e"]}, {"f": ["e", "e"]}]
 `.trim()
     },
     {
@@ -1110,7 +1111,7 @@ const tests = [
             </table>
             `,
         jsonExpected: `
-[[null, null, "a"], [null, null, "b"], ["c", "d", "e"]]
+[{"null": [null, "a"]}, {"null": [null, "b"]}, {"c": ["d", "e"]}]
 `.trim()
     },
     {
@@ -1130,7 +1131,7 @@ const tests = [
             </table>
             `,
         jsonExpected: `
-[["a\\\\b"], ["c\\\\d"]]
+[{"a\\\\b": []}, {"c\\\\d": []}]
 `.trim()
     },
     {
@@ -1150,7 +1151,7 @@ const tests = [
             </table>
             `,
         jsonExpected: `
-[["\\"a\\""], ["They said \\"wow\\" twice."]]
+[{"\\"a\\"": []}, {"They said \\"wow\\" twice.": []}]
 `.trim()
     },
     {
@@ -1201,7 +1202,7 @@ const tests = [
             </table>
             `,
         jsonExpected: `
-[[true, false, null, null], ["hello", "True", "."], [5, -0.222e+11, 0.0, 8000, 4e-3]]
+[{"true": [false, null, null]}, {"hello": ["True", "."]}, {"5": [-0.222e+11, 0.0, 8000, 4e-3]}]
 `.trim()
     },
 ];

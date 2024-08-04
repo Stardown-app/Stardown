@@ -206,9 +206,20 @@ export class TableConverter {
                     // backslashes are escaped by Turndown
                     if (cell === '') {
                         cell = emptyCellJson;
+                        if (
+                            cell.length > 0 &&
+                            cell[0] === '"' &&
+                            cell[cell.length - 1] === '"'
+                        ) {
+                            json.push(cell + ': [');
+                        } else {
+                            cell = cell.replaceAll('"', '\\"');
+                            json.push('"' + cell + '": [');
+                        }
+                    } else {
+                        cell = cell.replaceAll('"', '\\"');
+                        json.push('"' + cell + '": [');
                     }
-                    cell = cell.replaceAll('"', '\\"');
-                    json.push('"' + cell + '": [');
                 } else if (cell === '') {
                     json.push(emptyCellJson);
                 } else if (['true', 'false', 'null'].includes(cell)) {

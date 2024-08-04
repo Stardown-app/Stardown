@@ -41,6 +41,36 @@ function runTests() {
         const { testName, htmlInput, jsonExpected } = tests[i];
         runTest(testName, htmlInput, jsonExpected);
     }
+
+    test('empty cells are set to "N/A"', t => {
+        const htmlInput = `
+            <table>
+                <tr>
+                    <td>
+                    </td>
+                    <td>
+                        a
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        b
+                    </td>
+                    <td>
+                    </td>
+                </tr>
+            </table>
+        `;
+        const jsonExpected = `
+[{"N/A": ["a"]}, {"b": ["N/A"]}]
+`.trim();
+
+        global.document = new JSDOM(htmlInput).window.document;
+        tableConfig.emptyCellJson = '"N/A"';
+        const jsonActual = turndownService.turndown(htmlInput);
+        tableConfig.emptyCellJson = 'null';
+        assert.equal(jsonActual, jsonExpected);
+    });
 }
 
 const tests = [

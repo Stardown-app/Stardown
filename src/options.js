@@ -100,10 +100,10 @@ async function loadSettings() {
  */
 async function resetSettings() {
     await browser.storage.sync.clear();
-    resetButton.value = 'Reset ✔';
+    resetButton.value = 'Reset all ✔';
     resetButton.style.backgroundColor = '#aadafa';
     setTimeout(() => {
-        resetButton.value = 'Reset';
+        resetButton.value = 'Reset all';
         resetButton.style.backgroundColor = '';
     }, 750);
 }

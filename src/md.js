@@ -106,6 +106,23 @@ export async function htmlToPlaintext(html) {
  * @returns {Promise<string>}
  */
 export async function createLink(title, url, subBrackets = null) {
+    title = await createLinkTitle(title, subBrackets);
+
+    url = url.replaceAll('(', '%28').replaceAll(')', '%29');
+
+    return `[${title}](${url})`;
+}
+
+/**
+ * createLinkTitle creates a markdown link title.
+ * @param {string|null} title - the title of the link. Square brackets are replaced,
+ * escaped, or unchanged depending on the settings. Some other markdown characters are
+ * escaped. If the given title is null, it is replaced with 'link'.
+ * @param {string|null} subBrackets - the setting for what to substitute any square
+ * brackets with. If not given, the setting is read from storage.
+ * @returns {Promise<string>}
+ */
+export async function createLinkTitle(title, subBrackets = null) {
     if (subBrackets === null) {
         subBrackets = await getSetting('subBrackets');
     }
@@ -124,9 +141,7 @@ export async function createLink(title, url, subBrackets = null) {
             .replaceAll(' ', '')
     }
 
-    url = url.replaceAll('(', '%28').replaceAll(')', '%29');
-
-    return `[${title}](${url})`;
+    return title;
 }
 
 /**

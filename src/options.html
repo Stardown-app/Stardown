@@ -64,10 +64,21 @@ as the options page. -->
       <select id="selectionFormat" name="selectionFormat">
         <option value="source with link">try to keep the same formatting and link to the source</option>
         <option value="source">try to keep the same formatting</option>
+        <option value="template">use a custom template</option>
         <option value="blockquote with link">create a block quote and link to the source</option>
         <option value="link with selection as title">create a link with the selected text as the title</option>
         <option value="link with page title as title">create a link with the page title as the link title</option>
       </select>
+      <br />
+      <br />
+      <label id="selectionTemplateLabel" for="selectionTemplate">Selection template:</label>
+      <textarea id="selectionTemplate" name="selectionTemplate" rows="5" cols="75">
+> [!note]
+> from [{{link.title}}]({{link.url}}) on {{date.YYYYMMDD}}
+
+{{selection}}
+</textarea>
+      <p id="selectionTemplateError" style="display: none"></p>
       <br />
       <br />
       <label for="emptyCellJson">Empty table cells are converted to

@@ -38,6 +38,8 @@ export async function createText(title, url, selection) {
             return await getSourceFormatTextWithLink(title, url, selection, selectedText) + '\n';
         case 'source':
             return await getSourceFormatText(selection, selectedText);
+        case 'template':
+            return await getTemplatedText(title, url, selection, selectedText);
         case 'blockquote with link':
             const body = await getSourceFormatText(selection, selectedText);
             return await md.createBlockquote(body, title, url) + '\n';
@@ -97,6 +99,36 @@ export async function getSourceFormatText(selection, selectedText) {
         return selectedText;
     } else {
         return await md.htmlToPlaintext(html);
+    }
+}
+
+export async function getTemplatedText(title, url, selection, selectedText) {
+    const template = await getSetting('selectionTemplate');
+
+    title = await md.createLinkTitle(title);
+    url = url.replaceAll('(', '%28').replaceAll(')', '%29');
+    const html = await getSelectionHtml(selection);
+    if (html === null) {
+        selection = selectedText;
+    } else {
+        selection = await md.htmlToPlaintext(html);
+    }
+    const today = new Date();
+    const YYYYMMDD = today.getFullYear() + '/' + (today.getMonth() + 1) + '/' + today.getDate();
+    const templateVars = {
+        link: { title, url },
+        date: { YYYYMMDD },
+        selection,
+    };
+
+    try {
+        return template.replaceAll(/{{([\w.]+)}}/g, (match, key) => {
+            return key.split('.').reduce((o, i) => o[i], templateVars);
+        });
+    } catch (err) {
+        // an error message should have been shown when the user changed the template
+        console.error(err);
+        throw err;
     }
 }
 

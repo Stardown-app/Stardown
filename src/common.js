@@ -25,6 +25,12 @@ const defaultSettings = {
     notifyOnSuccess: false,
     subBrackets: 'underlined',
     selectionFormat: 'source with link',
+    selectionTemplate: `
+> [!note]
+> from [{{link.title}}]({{link.url}}) on {{date.YYYYMMDD}}
+
+{{selection}}
+`.trim(),
     emptyCellJson: 'null',
     bulletPoint: '-',
     doubleClickWindows: 'current',

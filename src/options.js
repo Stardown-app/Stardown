@@ -21,6 +21,9 @@ const form = document.querySelector('form');
 
 const youtubeMdEl = document.querySelector('#youtubeMd');
 const selectionFormatEl = document.querySelector('#selectionFormat');
+const selectionTemplateEl = document.querySelector('#selectionTemplate');
+const selectionTemplateLabelEl = document.querySelector('#selectionTemplateLabel');
+const selectionTemplateErrorEl = document.querySelector('#selectionTemplateError');
 const emptyCellJsonEl = document.querySelector('#emptyCellJson');
 const subBracketsEl = document.querySelector('#subBrackets');
 const bulletPointEl = document.querySelector('#bulletPoint');
@@ -37,6 +40,7 @@ const resetButton = document.querySelector('#reset');
 // set up setting autosaving
 initAutosave('youtubeMd', youtubeMdEl, 'value');
 initAutosave('selectionFormat', selectionFormatEl, 'value');
+initAutosave('selectionTemplate', selectionTemplateEl, 'value');
 initAutosave('emptyCellJson', emptyCellJsonEl, 'value');
 initAutosave('subBrackets', subBracketsEl, 'value');
 initAutosave('bulletPoint', bulletPointEl, 'value');
@@ -77,6 +81,7 @@ async function loadSettings() {
     try {
         youtubeMdEl.value = await getSetting('youtubeMd');
         selectionFormatEl.value = await getSetting('selectionFormat');
+        selectionTemplateEl.value = await getSetting('selectionTemplate');
         emptyCellJsonEl.value = await getSetting('emptyCellJson');
         subBracketsEl.value = await getSetting('subBrackets');
         bulletPointEl.value = await getSetting('bulletPoint');
@@ -100,13 +105,84 @@ async function loadSettings() {
  */
 async function resetSettings() {
     await browser.storage.sync.clear();
-    resetButton.value = 'Reset ✔';
+
+    selectionTemplateEl.style.display = 'none';
+    selectionTemplateLabelEl.style.display = 'none';
+
+    resetButton.value = 'Reset all ✔';
     resetButton.style.backgroundColor = '#aadafa';
     setTimeout(() => {
-        resetButton.value = 'Reset';
+        resetButton.value = 'Reset all';
         resetButton.style.backgroundColor = '';
     }, 750);
 }
+
+/**
+ * validateTemplateVariables validates the selection template's variables. If any are
+ * invalid, an error message is displayed.
+ * @returns {Promise<void>}
+ */
+async function validateTemplateVariables() {
+    const title = 'page title';
+    const url = 'https://example.com';
+    const YYYYMMDD = '2024-01-01';
+    const selection = 'selected text';
+    const templateVars = {
+        link: { title, url },
+        date: { YYYYMMDD },
+        selection,
+    };
+
+    const matches = selectionTemplateEl.value.matchAll(/{{([^{}]+)}}/g);
+    if (!matches) {
+        return;
+    }
+
+    for (const match of matches) {
+        const [full, key] = match;
+        const tokens = key.split('.');
+
+        let value = templateVars;
+        for (const token of tokens) {
+            if (token.includes(' ')) {
+                value = undefined;
+                break;
+            }
+            value = value[token];
+            if (value === undefined) {
+                break;
+            }
+        }
+
+        if (value === undefined) {
+            selectionTemplateErrorEl.textContent = `Unknown variable "${key}"`;
+            selectionTemplateErrorEl.style.color = 'red';
+            selectionTemplateErrorEl.style.display = 'inline-block';
+            return;
+        }
+    }
+
+    selectionTemplateErrorEl.textContent = '';
+    selectionTemplateErrorEl.style.display = 'none';
+}
+
+selectionFormatEl.addEventListener('change', function () {
+    // hide or show the selection template setting based on the selection format
+    if (selectionFormatEl.value === 'template') {
+        selectionTemplateEl.style.display = 'block';
+        selectionTemplateLabelEl.style.display = 'block';
+    } else {
+        selectionTemplateEl.style.display = 'none';
+        selectionTemplateLabelEl.style.display = 'none';
+    }
+});
+new Promise(resolve => setTimeout(resolve, 50)).then(() => {
+    selectionFormatEl.dispatchEvent(new Event('change'));
+});
+
+selectionTemplateEl.addEventListener('input', async function () {
+    await validateTemplateVariables();
+});
 
 document.addEventListener('DOMContentLoaded', loadSettings);
 form.addEventListener('reset', resetSettings);

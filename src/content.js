@@ -224,7 +224,22 @@ async function handleRequest(message) {
             tableConfig.emptyCellJson = await getSetting('emptyCellJson');
             const tableJson = await htmlSelection.getSourceFormatText(tableSelection, '');
             tableConfig.format = 'markdown';
-            return await handleCopyRequest(tableJson);
+
+            const jsonDestination = await getSetting('jsonDestination');
+            if (jsonDestination === 'clipboard') {
+                console.log('Writing JSON to clipboard');
+                return await handleCopyRequest(tableJson);
+            } else {
+                // Tell the background what to download because apparently
+                // `browser.downloads` is always undefined in content scripts.
+                browser.runtime.sendMessage({
+                    downloadFile: {
+                        filename: 'table.json',
+                        json: tableJson,
+                    }
+                });
+                return null;
+            }
         case 'htmlTableRightClick':
             console.log('htmlTableRightClick in content.js');
             const tableHtml = await htmlSelection.getSelectionHtml(tableSelection);

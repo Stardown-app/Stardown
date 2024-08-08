@@ -81,6 +81,13 @@ as the options page. -->
       <p id="selectionTemplateError" style="display: none"></p>
       <br />
       <br />
+      <label for="jsonDestination">Save JSON output to</label>
+      <select id="jsonDestination" name="jsonDestination">
+        <option value="clipboard">the clipboard</option>
+        <option value="file">a file</option>
+      </select>
+      <br />
+      <br />
       <label for="emptyCellJson">Empty table cells are converted to
         <input id="emptyCellJson" name="emptyCellJson" type="text" placeholder="null" />
         in JSON

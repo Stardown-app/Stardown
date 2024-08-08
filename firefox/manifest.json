@@ -17,7 +17,8 @@
         "notifications"
     ],
     "optional_permissions": [
-        "tabs"
+        "tabs",
+        "downloads"
     ],
     "options_ui": {
         "page": "options.html"

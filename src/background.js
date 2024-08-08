@@ -22,8 +22,10 @@ createContextMenus();
 
 let lastClick = new Date(0);
 let doubleClickInterval = 500;
+let jsonDestination = 'clipboard';
 
 getSetting('doubleClickInterval').then(value => doubleClickInterval = value);
+getSetting('jsonDestination').then(value => jsonDestination = value);
 
 browser.action.onClicked.addListener(async (tab) => {
     const now = new Date();
@@ -62,6 +64,10 @@ browser.runtime.onMessage.addListener(async (message, sender, sendResponse) => {
         await updateContextMenu(message.context);
     } else if (message.doubleClickInterval) {
         doubleClickInterval = message.doubleClickInterval;
+    } else if (message.jsonDestination) {
+        jsonDestination = message.jsonDestination;
+    } else if (message.downloadFile) {
+        await downloadFile(message.downloadFile);
     } else if (message.warning) {
         console.warn(`Warning: ${message.warning}`);
         const notifyOnWarning = await getSetting('notifyOnWarning');
@@ -127,6 +133,22 @@ browser.contextMenus.onClicked.addListener(async (info, tab) => {
             break;
         case 'jsonTable':
             console.log('jsonTableRightClick in background.js');
+            if (jsonDestination === 'file') {
+                let havePerm;
+                try {
+                    // The permissions request must be the first async function call in
+                    // the event handler or it will throw an error.
+                    havePerm = await browser.permissions.request({ permissions: ['downloads'] });
+                } catch (err) {
+                    await showStatus(0, 'Error', err.message);
+                    return;
+                }
+                if (!havePerm) {
+                    await showStatus(0, 'Error', 'Unable to download JSON without permission');
+                    return;
+                }
+            }
+
             const id3 = Math.random(); // why: https://github.com/Stardown-app/Stardown/issues/98
             await handleInteraction(
                 tab, { category: 'jsonTableRightClick', id: id3 }, { frameId: info.frameId },
@@ -214,6 +236,35 @@ async function handleIconDoubleClick(activeTab) {
         await showStatus(0, notifTitle, notifBody);
     } else { // success
         await showStatus(tabs.length, notifTitle, notifBody);
+    }
+}
+
+/**
+ * downloadFile downloads a file to the user's computer. This must be in the background
+ * script because `browser.downloads` appears to always be undefined in content scripts.
+ * @param {object} fileObj - the object containing info about a file to download.
+ * @param {string} fileObj.filename - the name of the file to download.
+ * @param {string|undefined} fileObj.json - the content of the file to download if the
+ * file is JSON.
+ * @returns {Promise<void>}
+ */
+async function downloadFile(fileObj) {
+    if (fileObj.json) {
+        const json = fileObj.json;
+        const blob = new Blob([json], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const filename = fileObj.filename || 'file.json';
+        await browser.downloads.download({
+            url: url,
+            filename: filename,
+            saveAs: true,
+            conflictAction: 'uniquify',
+        }).then(
+            id => console.log('Download started with ID', id),
+            err => console.error('Download failed:', err),
+        );
+    } else {
+        console.error('No content to download');
     }
 }
 

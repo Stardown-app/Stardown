@@ -24,6 +24,7 @@ const selectionFormatEl = document.querySelector('#selectionFormat');
 const selectionTemplateEl = document.querySelector('#selectionTemplate');
 const selectionTemplateLabelEl = document.querySelector('#selectionTemplateLabel');
 const selectionTemplateErrorEl = document.querySelector('#selectionTemplateError');
+const jsonDestinationEl = document.querySelector('#jsonDestination');
 const emptyCellJsonEl = document.querySelector('#emptyCellJson');
 const subBracketsEl = document.querySelector('#subBrackets');
 const bulletPointEl = document.querySelector('#bulletPoint');
@@ -41,6 +42,12 @@ const resetButton = document.querySelector('#reset');
 initAutosave('youtubeMd', youtubeMdEl, 'value');
 initAutosave('selectionFormat', selectionFormatEl, 'value');
 initAutosave('selectionTemplate', selectionTemplateEl, 'value');
+initAutosave('jsonDestination', jsonDestinationEl, 'value', () => {
+    // send the updated jsonDestination to the background script
+    browser.runtime.sendMessage({
+        jsonDestination: jsonDestinationEl.value
+    });
+});
 initAutosave('emptyCellJson', emptyCellJsonEl, 'value');
 initAutosave('subBrackets', subBracketsEl, 'value');
 initAutosave('bulletPoint', bulletPointEl, 'value');
@@ -82,6 +89,7 @@ async function loadSettings() {
         youtubeMdEl.value = await getSetting('youtubeMd');
         selectionFormatEl.value = await getSetting('selectionFormat');
         selectionTemplateEl.value = await getSetting('selectionTemplate');
+        jsonDestinationEl.value = await getSetting('jsonDestination');
         emptyCellJsonEl.value = await getSetting('emptyCellJson');
         subBracketsEl.value = await getSetting('subBrackets');
         bulletPointEl.value = await getSetting('bulletPoint');

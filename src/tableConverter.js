@@ -185,6 +185,10 @@ export class TableConverter {
     toJson(emptyCellJson = 'null') {
         // [RFC 8259](https://www.rfc-editor.org/rfc/rfc8259)
 
+        if (emptyCellJson === '') {
+            emptyCellJson = 'null';
+        }
+
         this.removeEmptyRows();
         // this.rectangularize(); // no need to rectangularize for JSON
 

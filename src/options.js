@@ -90,7 +90,7 @@ async function loadSettings() {
         selectionFormatEl.value = await getSetting('selectionFormat');
         selectionTemplateEl.value = await getSetting('selectionTemplate');
         jsonDestinationEl.value = await getSetting('jsonDestination');
-        emptyCellJsonEl.value = await getSetting('emptyCellJson');
+        emptyCellJsonEl.value = await getSetting('emptyCellJson') || 'null';
         subBracketsEl.value = await getSetting('subBrackets');
         bulletPointEl.value = await getSetting('bulletPoint');
         doubleClickWindowsEl.value = await getSetting('doubleClickWindows');

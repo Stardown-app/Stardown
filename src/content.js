@@ -322,7 +322,7 @@ async function handleSelectionRightClick(htmlId, selection) {
  */
 async function handleJsonTableRightClick() {
     tableConfig.format = 'json';
-    tableConfig.emptyCellJson = await getSetting('emptyCellJson');
+    tableConfig.emptyCellJson = await getSetting('emptyCellJson') || 'null';
     const tableJson = await htmlSelection.getSourceFormatText(tableSelection, '');
     tableConfig.format = 'markdown';
 

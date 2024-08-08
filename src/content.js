@@ -220,11 +220,7 @@ async function handleRequest(message) {
             }
             lastRequestId = message.id;
             console.log('jsonTableRightClick in content.js');
-            tableConfig.format = 'json';
-            tableConfig.emptyCellJson = await getSetting('emptyCellJson');
-            const tableJson = await htmlSelection.getSourceFormatText(tableSelection, '');
-            tableConfig.format = 'markdown';
-            return await handleCopyRequest(tableJson);
+            return await handleJsonTableRightClick();
         case 'htmlTableRightClick':
             console.log('htmlTableRightClick in content.js');
             const tableHtml = await htmlSelection.getSelectionHtml(tableSelection);
@@ -318,6 +314,33 @@ async function handleSelectionRightClick(htmlId, selection) {
     const markdown = await htmlSelection.createText(title, url, selection);
 
     return await handleCopyRequest(markdown);
+}
+
+/**
+ * handleJsonTableRightClick handles a right-click on a table to copy it as JSON.
+ * @returns {Promise<ContentResponse|null>}
+ */
+async function handleJsonTableRightClick() {
+    tableConfig.format = 'json';
+    tableConfig.emptyCellJson = await getSetting('emptyCellJson') || 'null';
+    const tableJson = await htmlSelection.getSourceFormatText(tableSelection, '');
+    tableConfig.format = 'markdown';
+
+    const jsonDestination = await getSetting('jsonDestination');
+    if (jsonDestination === 'clipboard') {
+        console.log('Writing JSON to clipboard');
+        return await handleCopyRequest(tableJson);
+    } else {
+        // Tell the background what to download because apparently `browser.downloads`
+        // is always undefined in content scripts.
+        browser.runtime.sendMessage({
+            downloadFile: {
+                filename: 'table.json',
+                json: tableJson,
+            }
+        });
+        return null;
+    }
 }
 
 /**

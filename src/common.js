@@ -31,6 +31,7 @@ const defaultSettings = {
 
 {{selection}}
 `.trim(),
+    jsonDestination: 'clipboard',
     emptyCellJson: 'null',
     bulletPoint: '-',
     doubleClickWindows: 'current',

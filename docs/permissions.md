@@ -34,6 +34,10 @@ Settings are stored for customizing Stardown's features.
 
 This permission does NOT give access to existing browsing history and is only requested if and when you double-click the extension icon or double-press its keyboard shortcut to copy links for multiple tabs simultaneously. Chrome and Edge use the scary-sounding request message "Read your browsing history" because malicious extensions that can see the titles and URLs of all tabs could start manually gathering your browsing activity. Other Chrome and Edge extensions that request immediate and complete access to browsing history, unlike Stardown, use the request message "read and change your browsing history on all signed-in devices".
 
+### `downloads` ("Manage your downloads" or "Download files and read and modify the browser's download history")
+
+By default, Stardown's output goes to the clipboard. However, you can optionally save some outputs as files instead. The downloads permission is needed if you want Stardown to create new files.
+
 ## Developer documentation
 
 - [Permissions | Chrome for Developers](https://developer.chrome.com/docs/extensions/reference/permissions-list)

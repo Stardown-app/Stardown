@@ -122,8 +122,8 @@ export async function getTemplatedText(title, url, selection, selectedText) {
     };
 
     try {
-        return template.replaceAll(/{{([\w.]+)}}/g, (match, key) => {
-            return key.split('.').reduce((o, i) => o[i], templateVars);
+        return template.replaceAll(/{{([\w.]+)}}/g, (match, group) => {
+            return group.split('.').reduce((vars, token) => vars[token], templateVars);
         });
     } catch (err) {
         // an error message should have been shown when the user changed the template

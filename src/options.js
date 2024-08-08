@@ -147,8 +147,8 @@ async function validateTemplateVariables() {
     }
 
     for (const match of matches) {
-        const [full, key] = match;
-        const tokens = key.split('.');
+        const [full, group] = match;
+        const tokens = group.split('.');
 
         let value = templateVars;
         for (const token of tokens) {
@@ -163,7 +163,7 @@ async function validateTemplateVariables() {
         }
 
         if (value === undefined) {
-            selectionTemplateErrorEl.textContent = `Unknown variable "${key}"`;
+            selectionTemplateErrorEl.textContent = `Unknown variable "${group}"`;
             selectionTemplateErrorEl.style.color = 'red';
             selectionTemplateErrorEl.style.display = 'inline-block';
             return;

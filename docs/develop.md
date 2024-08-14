@@ -41,6 +41,8 @@ The "background script" in Chromium is not exactly a background script, but a se
 
 The browser's context menu cannot be updated while it is visible, so Stardown's dynamic context menu options depend on information from events such as `mouseover` and `selectionchange`. These events are received from the browser in the content script and sent to the background script to update the context menu.
 
+Stardown converts HTML to other formats using custom code explained in [../src/converters/README.md](../src/converters/README.md).
+
 ## What Stardown does
 
 When fully manually testing Stardown, use the descriptions in this section in each of the officially supported browsers to search for bugs.
@@ -55,7 +57,10 @@ When fully manually testing Stardown, use the descriptions in this section in ea
   - Markdown of GitHub mp4s is expected to render well only in GitHub.
   - If the user changes the setting "Optimize markdown of YouTube videos for __" to "GitHub", then the output should render well in at least GitHub, Obsidian, and VS Code.
 - **audio**: an audio player rendered with the `audio` HTML element. Some good examples are the first two audio players on [New Audio HTML Element: Master It Out Now With Our Code Example »](https://html.com/tags/audio/).
-- **table**: a table of data rendered with the `table` HTML element. Browsers do not offer a built-in context type for this, so Stardown has its own table detection code. Some examples of tables are at [Tables for visually impaired users](https://developer.mozilla.org/en-US/docs/Learn/HTML/Tables/Advanced#tables_for_visually_impaired_users) and [Extended Syntax | Markdown Guide](https://www.markdownguide.org/extended-syntax/#tables).
+- **table**: a table of data rendered with the `table` HTML element. Browsers do not offer a built-in context type for this, so Stardown has its own table detection code. Here are some examples of tables:
+  - [Tables for visually impaired users](https://developer.mozilla.org/en-US/docs/Learn/HTML/Tables/Advanced#tables_for_visually_impaired_users)
+  - [Extended Syntax | Markdown Guide](https://www.markdownguide.org/extended-syntax/#tables)
+  - [English modal auxiliary verbs - Wikipedia](https://en.wikipedia.org/wiki/English_modal_auxiliary_verbs#Modal_auxiliary_verbs_distinguished_grammatically)
 
 ### Features
 
@@ -114,10 +119,6 @@ Text fragments and how to generate them is explained in [this web.dev article](h
 Stardown's text fragment generation code, which was almost entirely written by Google, is in the files named `text-fragment-utils.js` and `fragment-generation-utils.js`. They probably should not be changed for anything except fixing bugs or updating to new versions of text fragments.
 
 Stardown also tries to find HTML element IDs to put in links alongside text fragments because if the website ever changes and makes the text fragment outdated, the browser will use the HTML element ID as a fallback.
-
-## Turndown
-
-Stardown uses the amazing [Turndown](https://github.com/mixmark-io/turndown), created by Dom Christie, when copying source-formatted markdown of pages.
 
 ## Tables
 

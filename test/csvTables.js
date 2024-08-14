@@ -17,20 +17,14 @@
 import test from 'node:test'; // https://nodejs.org/api/test.html
 import assert from 'node:assert/strict'; // https://nodejs.org/api/assert.html#assert
 import { JSDOM } from 'jsdom'; // https://www.npmjs.com/package/jsdom
-import { newTurndownService } from '../src/newTurndownService.js';
-import { escape } from '../src/md.js';
-import { tableConfig } from '../src/tables.js';
+import { htmlTableToCsv } from '../src/converters/csv.js';
 
-tableConfig.format = 'csv';
-
-const turndownService = newTurndownService(
-    '-', 'underlined', 'source with link', true, true, escape,
-);
+global.location = { href: 'https://example.com' };
 
 function runTest(testName, htmlInput, csvExpected) {
-    test(testName, t => {
+    test(testName, async t => {
         global.document = new JSDOM(htmlInput).window.document;
-        const csvActual = turndownService.turndown(htmlInput);
+        const csvActual = await htmlTableToCsv(htmlInput, ',');
         assert.equal(csvActual, csvExpected);
     });
 }
@@ -45,31 +39,25 @@ function runTests() {
 const tests = [
     {
         testName: '0x0',
-        htmlInput: `
-            <table>
-            </table>
-        `,
+        htmlInput: `<table>
+            </table>`,
         csvExpected: ``,
     },
     {
         testName: '1x1',
-        htmlInput: `
-            <table>
+        htmlInput: `<table>
                 <tr>
                     <th>
                         a
                     </th>
                 </tr>
-            </table>
-        `,
-        csvExpected: `
-a
-`.trim(),
+            </table>`,
+        csvExpected: `a
+`,
     },
     {
         testName: '2x1',
-        htmlInput: `
-            <table>
+        htmlInput: `<table>
                 <tr>
                     <th>
                         a
@@ -78,16 +66,13 @@ a
                         b
                     </th>
                 </tr>
-            </table>
-            `,
-        csvExpected: `
-a,b
-`.trim()
+            </table>`,
+        csvExpected: `a,b
+`
     },
     {
         testName: '1x2',
-        htmlInput: `
-            <table>
+        htmlInput: `<table>
                 <tr>
                     <th>
                         a
@@ -98,17 +83,14 @@ a,b
                         c
                     </td>
                 </tr>
-            </table>
-            `,
-        csvExpected: `
-a
+            </table>`,
+        csvExpected: `a
 c
-`.trim()
+`
     },
     {
         testName: '2x2',
-        htmlInput: `
-            <table>
+        htmlInput: `<table>
                 <tr>
                     <th>
                         a
@@ -125,17 +107,14 @@ c
                         d
                     </td>
                 </tr>
-            </table>
-            `,
-        csvExpected: `
-a,b
+            </table>`,
+        csvExpected: `a,b
 c,d
-`.trim()
+`
     },
     {
         testName: '2x3',
-        htmlInput: `
-            <table>
+        htmlInput: `<table>
                 <tr>
                     <th>
                         a
@@ -160,18 +139,15 @@ c,d
                         h
                     </td>
                 </tr>
-            </table>
-            `,
-        csvExpected: `
-a,b
+            </table>`,
+        csvExpected: `a,b
 d,e
 g,h
-`.trim()
+`
     },
     {
         testName: '3x2',
-        htmlInput: `
-            <table>
+        htmlInput: `<table>
                 <tr>
                     <th>
                         a
@@ -194,17 +170,14 @@ g,h
                         f
                     </td>
                 </tr>
-            </table>
-            `,
-        csvExpected: `
-a,b,c
+            </table>`,
+        csvExpected: `a,b,c
 d,e,f
-`.trim()
+`
     },
     {
         testName: '3x3',
-        htmlInput: `
-            <table>
+        htmlInput: `<table>
                 <tr>
                     <th>
                         a
@@ -238,18 +211,15 @@ d,e,f
                         i
                     </td>
                 </tr>
-            </table>
-            `,
-        csvExpected: `
-a,b,c
+            </table>`,
+        csvExpected: `a,b,c
 d,e,f
 g,h,i
-`.trim()
+`
     },
     {
         testName: '3x3 -1 cell in the second body row',
-        htmlInput: `
-            <table>
+        htmlInput: `<table>
                 <tr>
                     <th>
                         a
@@ -280,18 +250,15 @@ g,h,i
                         h
                     </td>
                 </tr>
-            </table>
-            `,
-        csvExpected: `
-a,b,c
+            </table>`,
+        csvExpected: `a,b,c
 d,e,f
 g,h,
-`.trim()
+`
     },
     {
         testName: '3x3 -1 cell in the first body row',
-        htmlInput: `
-            <table>
+        htmlInput: `<table>
                 <tr>
                     <th>
                         a
@@ -322,18 +289,15 @@ g,h,
                         i
                     </td>
                 </tr>
-            </table>
-            `,
-        csvExpected: `
-a,b,c
+            </table>`,
+        csvExpected: `a,b,c
 d,e,
 g,h,i
-`.trim()
+`
     },
     {
         testName: '3x3 -1 cell in the header row',
-        htmlInput: `
-            <table>
+        htmlInput: `<table>
                 <tr>
                     <th>
                         a
@@ -364,18 +328,15 @@ g,h,i
                         i
                     </td>
                 </tr>
-            </table>
-            `,
-        csvExpected: `
-a,b,
+            </table>`,
+        csvExpected: `a,b,
 d,e,f
 g,h,i
-`.trim()
+`
     },
     {
         testName: '3x3 -2 cells in the header row',
-        htmlInput: `
-            <table>
+        htmlInput: `<table>
                 <tr>
                     <th>
                         a
@@ -403,18 +364,15 @@ g,h,i
                         i
                     </td>
                 </tr>
-            </table>
-            `,
-        csvExpected: `
-a,,
+            </table>`,
+        csvExpected: `a,,
 d,e,f
 g,h,i
-`.trim()
+`
     },
     {
         testName: 'thead',
-        htmlInput: `
-            <table>
+        htmlInput: `<table>
                 <thead>
                     <tr>
                         <th>
@@ -428,16 +386,13 @@ g,h,i
                         </th>
                     </tr>
                 </thead>
-            </table>
-            `,
-        csvExpected: `
-a,b,c
-`.trim()
+            </table>`,
+        csvExpected: `a,b,c
+`
     },
     {
         testName: 'one thead and one tbody',
-        htmlInput: `
-            <table>
+        htmlInput: `<table>
                 <thead>
                     <tr>
                         <th>
@@ -475,18 +430,15 @@ a,b,c
                         </td>
                     </tr>
                 </tbody>
-            </table>
-            `,
-        csvExpected: `
-a,b,c
+            </table>`,
+        csvExpected: `a,b,c
 d,e,f
 g,h,i
-`.trim()
+`
     },
     {
         testName: 'one thead and two tbodies',
-        htmlInput: `
-            <table>
+        htmlInput: `<table>
                 <thead>
                     <tr>
                         <th>
@@ -526,18 +478,15 @@ g,h,i
                         </td>
                     </tr>
                 </tbody>
-            </table>
-            `,
-        csvExpected: `
-a,b,c
+            </table>`,
+        csvExpected: `a,b,c
 d,e,f
 g,h,i
-`.trim()
+`
     },
     {
         testName: 'thead, tbodies, and a th column',
-        htmlInput: `
-            <table>
+        htmlInput: `<table>
                 <thead>
                     <tr>
                         <th>
@@ -577,18 +526,15 @@ g,h,i
                         </td>
                     </tr>
                 </tbody>
-            </table>
-            `,
-        csvExpected: `
-a,b,c
+            </table>`,
+        csvExpected: `a,b,c
 d,e,f
 g,h,i
-`.trim()
+`
     },
     {
         testName: 'one tbody, no thead',
-        htmlInput: `
-            <table>
+        htmlInput: `<table>
                 <tbody>
                     <tr>
                         <th>
@@ -613,17 +559,14 @@ g,h,i
                         </td>
                     </tr>
                 </tbody>
-            </table>
-            `,
-        csvExpected: `
-a,b,c
+            </table>`,
+        csvExpected: `a,b,c
 d,e,f
-`.trim()
+`
     },
     {
         testName: 'two tbodies, no thead',
-        htmlInput: `
-            <table>
+        htmlInput: `<table>
                 <tbody>
                     <tr>
                         <td>
@@ -672,19 +615,16 @@ d,e,f
                         </td>
                     </tr>
                 </tbody>
-            </table>
-            `,
-        csvExpected: `
-a,b,c
+            </table>`,
+        csvExpected: `a,b,c
 d,e,f
 g,h,i
 j,k,l
-`.trim()
+`
     },
     {
         testName: 'multiple rows in a thead',
-        htmlInput: `
-            <table>
+        htmlInput: `<table>
                 <thead>
                     <tr>
                         <th>
@@ -704,18 +644,15 @@ j,k,l
                         </td>
                     </tr>
                 </tbody>
-            </table>
-            `,
-        csvExpected: `
-a
+            </table>`,
+        csvExpected: `a
 b
 c
-`.trim()
+`
     },
     {
         testName: 'one tbody and one tfoot, each with one row',
-        htmlInput: `
-            <table>
+        htmlInput: `<table>
                 <tbody>
                     <tr>
                         <td>
@@ -730,17 +667,14 @@ c
                         </td>
                     </tr>
                 </tfoot>
-            </table>
-            `,
-        csvExpected: `
-a
+            </table>`,
+        csvExpected: `a
 b
-`.trim()
+`
     },
     {
         testName: 'one tbody and one tfoot, each with two rows',
-        htmlInput: `
-            <table>
+        htmlInput: `<table>
                 <tbody>
                     <tr>
                         <td>
@@ -765,19 +699,16 @@ b
                         </td>
                     </tr>
                 </tfoot>
-            </table>
-            `,
-        csvExpected: `
-a
+            </table>`,
+        csvExpected: `a
 b
 c
 d
-`.trim()
+`
     },
     {
         testName: 'one thead with a tr, followed by one tr',
-        htmlInput: `
-            <table>
+        htmlInput: `<table>
                 <thead>
                     <tr>
                         <th>
@@ -790,17 +721,14 @@ d
                         b
                     </td>
                 </tr>
-            </table>
-            `,
-        csvExpected: `
-a
+            </table>`,
+        csvExpected: `a
 b
-`.trim()
+`
     },
     {
         testName: 'one tr, followed by one tfoot',
-        htmlInput: `
-            <table>
+        htmlInput: `<table>
                 <tr>
                     <td>
                         a
@@ -813,17 +741,14 @@ b
                         </th>
                     </tr>
                 </tfoot>
-            </table>
-            `,
-        csvExpected: `
-a
+            </table>`,
+        csvExpected: `a
 b
-`.trim()
+`
     },
     {
         testName: 'bold and emphasis',
-        htmlInput: `
-            <table>
+        htmlInput: `<table>
                 <tr>
                     <td>
                         a
@@ -840,17 +765,14 @@ b
                         <b><em>d</em></b>
                     </td>
                 </tr>
-            </table>
-            `,
-        csvExpected: `
-a,*b*
-**c**,***d***
-`.trim()
+            </table>`,
+        csvExpected: `a,b
+c,d
+`
     },
     {
         testName: 'paragraphs and breaks',
-        htmlInput: `
-                <table>
+        htmlInput: `<table>
                     <tr>
                         <th>
                             <p>a</p>
@@ -873,17 +795,14 @@ a,*b*
                             <p>h</p>
                         </td>
                     </tr>
-                </table>
-                `,
-        csvExpected: `
-"a\n\nb","c\n\n  \n\nd"
-"e\n\n  \n\nf","g\n\nh"
-`.trim()
+                </table>`,
+        csvExpected: `a b,c d
+e f,g h
+`
     },
     {
         testName: 'h1 and h2 in rows',
-        htmlInput: `
-            <table>
+        htmlInput: `<table>
                 <tr>
                     <th>
                         <h1>a</h1>
@@ -894,17 +813,14 @@ a,*b*
                         <h2>b</h2>
                     </td>
                 </tr>
-            </table>
-            `,
-        csvExpected: `
-a
+            </table>`,
+        csvExpected: `a
 b
-`.trim()
+`
     },
     {
         testName: 'table of tables',
-        htmlInput: `
-            <table>
+        htmlInput: `<table>
                 <tr>
                     <td>
                         <table>
@@ -937,17 +853,14 @@ b
                         </table>
                     </td>
                 </tr>
-            </table>
-            `,
-        csvExpected: `
-ab
-cd
-`.trim()
+            </table>`,
+        csvExpected: `a b
+c d
+`
     },
     {
         testName: 'caption',
-        htmlInput: `
-            <table>
+        htmlInput: `<table>
                 <caption>
                     this is a caption
                 </caption>
@@ -963,17 +876,14 @@ cd
                         </td>
                     </tr>
                 </tbody>
-            </table>
-            `,
-        csvExpected: `
-a
+            </table>`,
+        csvExpected: `a
 b
-`.trim()
+`
     },
     {
         testName: 'colspan',
-        htmlInput: `
-            <table>
+        htmlInput: `<table>
                 <tr>
                     <th colspan="2">
                         a
@@ -993,17 +903,14 @@ b
                         e
                     </td>
                 </tr>
-            </table>
-            `,
-        csvExpected: `
-a,a,b
+            </table>`,
+        csvExpected: `a,a,b
 c,d,e
-`.trim()
+`
     },
     {
         testName: 'rowspan',
-        htmlInput: `
-            <table>
+        htmlInput: `<table>
                 <tr>
                     <th rowspan="2">
                         a
@@ -1025,18 +932,15 @@ c,d,e
                         e
                     </td>
                 </tr>
-            </table>
-            `,
-        csvExpected: `
-a,b
+            </table>`,
+        csvExpected: `a,b
 a,c
 d,e
-`.trim()
+`
     },
     {
         testName: 'parallel colspans',
-        htmlInput: `
-            <table>
+        htmlInput: `<table>
                 <tr>
                     <td colspan="2">
                         a
@@ -1055,18 +959,15 @@ d,e
                         d
                     </td>
                 </tr>
-            </table>
-            `,
-        csvExpected: `
-a,a
+            </table>`,
+        csvExpected: `a,a
 b,c
 d,d
-`.trim()
+`
     },
     {
         testName: 'parallel rowspans',
-        htmlInput: `
-            <table>
+        htmlInput: `<table>
                 <tr>
                     <td rowspan="2">
                         a
@@ -1083,17 +984,14 @@ d,d
                         d
                     </td>
                 </tr>
-            </table>
-            `,
-        csvExpected: `
-a,b,c
+            </table>`,
+        csvExpected: `a,b,c
 a,d,c
-`.trim()
+`
     },
     {
         testName: 'colspan and rowspan in the same cell',
-        htmlInput: `
-            <table>
+        htmlInput: `<table>
                 <tr>
                     <td>
                         a
@@ -1118,18 +1016,15 @@ a,d,c
                         f
                     </td>
                 </tr>
-            </table>
-            `,
-        csvExpected: `
-a,b,c
+            </table>`,
+        csvExpected: `a,b,c
 d,e,e
 f,e,e
-`.trim()
+`
     },
     {
         testName: 'colspan and rowspan in the same empty cell',
-        htmlInput: `
-            <table>
+        htmlInput: `<table>
                 <tr>
                     <td colspan="2" rowspan="2">
                     </td>
@@ -1153,18 +1048,15 @@ f,e,e
                         e
                     </td>
                 </tr>
-            </table>
-            `,
-        csvExpected: `
-,,a
+            </table>`,
+        csvExpected: `,,a
 ,,b
 c,d,e
-`.trim()
+`
     },
     {
         testName: 'encapsulated delimiters',
-        htmlInput: `
-            <table>
+        htmlInput: `<table>
                 <tr>
                     <th>
                         a,b
@@ -1175,17 +1067,14 @@ c,d,e
                         c,d
                     </td>
                 </tr>
-            </table>
-            `,
-        csvExpected: `
-"a,b"
+            </table>`,
+        csvExpected: `"a,b"
 "c,d"
-`.trim()
+`
     },
     {
         testName: 'encapsulated encapsulators',
-        htmlInput: `
-            <table>
+        htmlInput: `<table>
                 <tr>
                     <th>
                         "a"
@@ -1196,17 +1085,14 @@ c,d,e
                         They said "wow" twice.
                     </td>
                 </tr>
-            </table>
-            `,
-        csvExpected: `
-"""a"""
+            </table>`,
+        csvExpected: `"""a"""
 "They said ""wow"" twice."
-`.trim()
+`
     },
     {
         testName: 'encapsulated line terminators',
-        htmlInput: `
-            <table>
+        htmlInput: `<table>
                 <tr>
                     <th>
                         <p>a</p>
@@ -1222,12 +1108,10 @@ c,d,e
                         <p>lines.</p>
                     </td>
                 </tr>
-            </table>
-            `,
-        csvExpected: `
-"a\n\nb"
-"This\n\nhas\n\n  \n\nfour\n\nlines."
-`.trim()
+            </table>`,
+        csvExpected: `a b
+This has four lines.
+`
     },
 ];
 

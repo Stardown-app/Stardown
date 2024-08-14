@@ -19,7 +19,9 @@ import * as md from './md.js';
 import * as htmlSelection from './htmlSelection.js';
 import { createTextFragmentArg } from './createTextFragmentArg.js';
 import { getSetting } from './common.js';
-import { tableConfig } from './tables.js';
+import { removeIdAndTextFragment } from './converters/urls.js';
+import { htmlTableToJson } from './converters/json.js';
+import { htmlTableToCsv } from './converters/csv.js';
 
 /**
  * A response object sent from a content script to a background script.
@@ -154,8 +156,7 @@ setUpListeners();
 let lastRequestId = null;
 
 /**
- * handleRequest processes a message sent from the background script and returns a
- * response.
+ * handleRequest processes a message from the background script and returns a response.
  * @param {object} message - the message object sent from the background script. Must
  * have a `category` property and may have other properties depending on the category.
  * @param {string} message.category - the category of the message.
@@ -188,9 +189,8 @@ async function handleRequest(message) {
             return await handleCopyRequest(audioMd + '\n');
         case 'markdownTableRightClick':
             console.log('markdownTableRightClick in content.js');
-            const selection2 = window.getSelection();
             const id3 = await getClickedElementId(clickedElement);
-            return await handleSelectionRightClick(id3, selection2);
+            return await handleSelectionRightClick(id3, tableSelection);
         case 'tsvTableRightClick':
             if (message.id === lastRequestId) {
                 console.log('Ignoring duplicate request: tsvTableRightClick in content.js');
@@ -198,10 +198,7 @@ async function handleRequest(message) {
             }
             lastRequestId = message.id;
             console.log('tsvTableRightClick in content.js');
-            tableConfig.format = 'tsv';
-            const tableTsv = await htmlSelection.getSourceFormatText(tableSelection, '');
-            tableConfig.format = 'markdown';
-            return await handleCopyRequest(tableTsv);
+            return await handleCsvTableRightClick(tableSelection, '\t');
         case 'csvTableRightClick':
             if (message.id === lastRequestId) {
                 console.log('Ignoring duplicate request: csvTableRightClick in content.js');
@@ -209,10 +206,7 @@ async function handleRequest(message) {
             }
             lastRequestId = message.id;
             console.log('csvTableRightClick in content.js');
-            tableConfig.format = 'csv';
-            const tableCsv = await htmlSelection.getSourceFormatText(tableSelection, '');
-            tableConfig.format = 'markdown';
-            return await handleCopyRequest(tableCsv);
+            return await handleCsvTableRightClick(tableSelection, ',');
         case 'jsonTableRightClick':
             if (message.id === lastRequestId) {
                 console.log('Ignoring duplicate request: jsonTableRightClick in content.js');
@@ -220,7 +214,7 @@ async function handleRequest(message) {
             }
             lastRequestId = message.id;
             console.log('jsonTableRightClick in content.js');
-            return await handleJsonTableRightClick();
+            return await handleJsonTableRightClick(tableSelection);
         case 'htmlTableRightClick':
             console.log('htmlTableRightClick in content.js');
             const tableHtml = await htmlSelection.getSelectionHtml(tableSelection);
@@ -293,7 +287,7 @@ async function handlePageRightClick(htmlId) {
  */
 async function handleSelectionRightClick(htmlId, selection) {
     let title = document.title;
-    let url = await removeIdAndTextFragment(location.href);
+    let url = removeIdAndTextFragment(location.href);
 
     let arg = ''; // the text fragment argument
     const createTextFragment = await getSetting('createTextFragment');
@@ -317,20 +311,41 @@ async function handleSelectionRightClick(htmlId, selection) {
 }
 
 /**
- * handleJsonTableRightClick handles a right-click on a table to copy it as JSON.
+ * handleCsvTableRightClick handles a right-click on a table to convert it to CSV and
+ * write it to the clipboard.
+ * @param {Selection} tableSelection
+ * @param {string} delimiter - what to separate fields with.
+ * @returns {Promise<ContentResponse>}
+ */
+async function handleCsvTableRightClick(tableSelection, delimiter = ',') {
+    let html = await htmlSelection.getSelectionHtml(tableSelection);
+    if (html === null) {
+        html = tableSelection.textContent;
+    }
+
+    const tableCsv = await htmlTableToCsv(html, delimiter);
+    return await handleCopyRequest(tableCsv);
+}
+
+/**
+ * handleJsonTableRightClick handles a right-click on a table to convert it to JSON and
+ * either write it to the clipboard or a file.
+ * @param {Selection} tableSelection
  * @returns {Promise<ContentResponse|null>}
  */
-async function handleJsonTableRightClick() {
-    tableConfig.format = 'json';
-    tableConfig.emptyCellJson = await getSetting('emptyCellJson') || 'null';
-    const tableJson = await htmlSelection.getSourceFormatText(tableSelection, '');
-    tableConfig.format = 'markdown';
+async function handleJsonTableRightClick(tableSelection) {
+    let html = await htmlSelection.getSelectionHtml(tableSelection);
+    if (html === null) {
+        html = tableSelection.textContent;
+    }
 
     const jsonDestination = await getSetting('jsonDestination');
     if (jsonDestination === 'clipboard') {
         console.log('Writing JSON to clipboard');
+        const tableJson = await htmlTableToJson(html);
         return await handleCopyRequest(tableJson);
     } else {
+        const tableJson = await htmlTableToJson(html);
         // Tell the background what to download because apparently `browser.downloads`
         // is always undefined in content scripts.
         browser.runtime.sendMessage({
@@ -341,26 +356,4 @@ async function handleJsonTableRightClick() {
         });
         return null;
     }
-}
-
-/**
- * removeIdAndTextFragment removes any HTML element ID and/or text fragment from a URL.
- * If the URL has neither, it is returned unchanged.
- * @param {string} url - the URL to remove any HTML element ID and/or text fragment
- * from.
- * @returns {Promise<string>}
- */
-async function removeIdAndTextFragment(url) {
-    // If the URL has an HTML element ID, any text fragment will also be in the `hash`
-    // attribute of its URL object. However, if the URL has a text fragment but no HTML
-    // element ID, the text fragment may be in the `pathname` attribute of its URL
-    // object along with part of the URL that should not be removed.
-    const urlObj = new URL(url);
-    urlObj.hash = ''; // remove HTML element ID and maybe text fragment
-    if (urlObj.pathname.includes(':~:text=')) {
-        urlObj.pathname = urlObj.pathname.split(':~:text=')[0];
-    }
-    url = urlObj.toString();
-
-    return url;
 }

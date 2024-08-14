@@ -17,20 +17,14 @@
 import test from 'node:test'; // https://nodejs.org/api/test.html
 import assert from 'node:assert/strict'; // https://nodejs.org/api/assert.html#assert
 import { JSDOM } from 'jsdom'; // https://www.npmjs.com/package/jsdom
-import { newTurndownService } from '../src/newTurndownService.js';
-import { escape } from '../src/md.js';
-import { tableConfig } from '../src/tables.js';
+import { htmlTableToCsv } from '../src/converters/csv.js';
 
-tableConfig.format = 'tsv';
-
-const turndownService = newTurndownService(
-    '-', 'underlined', 'source with link', true, true, escape,
-);
+global.location = { href: 'https://example.com' };
 
 function runTest(testName, htmlInput, csvExpected) {
-    test(testName, t => {
+    test(testName, async t => {
         global.document = new JSDOM(htmlInput).window.document;
-        const csvActual = turndownService.turndown(htmlInput);
+        const csvActual = await htmlTableToCsv(htmlInput, '\t');
         assert.equal(csvActual, csvExpected);
     });
 }
@@ -45,31 +39,25 @@ function runTests() {
 const tests = [
     {
         testName: '0x0',
-        htmlInput: `
-            <table>
-            </table>
-        `,
+        htmlInput: `<table>
+            </table>`,
         csvExpected: ``,
     },
     {
         testName: '1x1',
-        htmlInput: `
-            <table>
+        htmlInput: `<table>
                 <tr>
                     <th>
                         a
                     </th>
                 </tr>
-            </table>
-        `,
-        csvExpected: `
-a
-`.trim(),
+            </table>`,
+        csvExpected: `a
+`,
     },
     {
         testName: '2x1',
-        htmlInput: `
-            <table>
+        htmlInput: `<table>
                 <tr>
                     <th>
                         a
@@ -78,16 +66,13 @@ a
                         b
                     </th>
                 </tr>
-            </table>
-            `,
-        csvExpected: `
-a\tb
-`.trim()
+            </table>`,
+        csvExpected: `a\tb
+`
     },
     {
         testName: '1x2',
-        htmlInput: `
-            <table>
+        htmlInput: `<table>
                 <tr>
                     <th>
                         a
@@ -98,17 +83,14 @@ a\tb
                         c
                     </td>
                 </tr>
-            </table>
-            `,
-        csvExpected: `
-a
+            </table>`,
+        csvExpected: `a
 c
-`.trim()
+`
     },
     {
         testName: '2x2',
-        htmlInput: `
-            <table>
+        htmlInput: `<table>
                 <tr>
                     <th>
                         a
@@ -125,17 +107,14 @@ c
                         d
                     </td>
                 </tr>
-            </table>
-            `,
-        csvExpected: `
-a\tb
+            </table>`,
+        csvExpected: `a\tb
 c\td
-`.trim()
+`
     },
     {
         testName: 'caption',
-        htmlInput: `
-            <table>
+        htmlInput: `<table>
                 <caption>
                     this is a caption
                 </caption>
@@ -151,17 +130,14 @@ c\td
                         </td>
                     </tr>
                 </tbody>
-            </table>
-            `,
-        csvExpected: `
-a
+            </table>`,
+        csvExpected: `a
 b
-`.trim()
+`
     },
     {
         testName: 'colspan',
-        htmlInput: `
-            <table>
+        htmlInput: `<table>
                 <tr>
                     <th colspan="2">
                         a
@@ -181,17 +157,14 @@ b
                         e
                     </td>
                 </tr>
-            </table>
-            `,
-        csvExpected: `
-a\ta\tb
+            </table>`,
+        csvExpected: `a\ta\tb
 c\td\te
-`.trim()
+`
     },
     {
         testName: 'rowspan',
-        htmlInput: `
-            <table>
+        htmlInput: `<table>
                 <tr>
                     <th rowspan="2">
                         a
@@ -213,18 +186,15 @@ c\td\te
                         e
                     </td>
                 </tr>
-            </table>
-            `,
-        csvExpected: `
-a\tb
+            </table>`,
+        csvExpected: `a\tb
 a\tc
 d\te
-`.trim()
+`
     },
     {
         testName: 'parallel colspans',
-        htmlInput: `
-            <table>
+        htmlInput: `<table>
                 <tr>
                     <td colspan="2">
                         a
@@ -243,18 +213,15 @@ d\te
                         d
                     </td>
                 </tr>
-            </table>
-            `,
-        csvExpected: `
-a\ta
+            </table>`,
+        csvExpected: `a\ta
 b\tc
 d\td
-`.trim()
+`
     },
     {
         testName: 'parallel rowspans',
-        htmlInput: `
-            <table>
+        htmlInput: `<table>
                 <tr>
                     <td rowspan="2">
                         a
@@ -271,17 +238,14 @@ d\td
                         d
                     </td>
                 </tr>
-            </table>
-            `,
-        csvExpected: `
-a\tb\tc
+            </table>`,
+        csvExpected: `a\tb\tc
 a\td\tc
-`.trim()
+`
     },
     {
         testName: 'colspan and rowspan in the same cell',
-        htmlInput: `
-            <table>
+        htmlInput: `<table>
                 <tr>
                     <td>
                         a
@@ -306,18 +270,15 @@ a\td\tc
                         f
                     </td>
                 </tr>
-            </table>
-            `,
-        csvExpected: `
-a\tb\tc
+            </table>`,
+        csvExpected: `a\tb\tc
 d\te\te
 f\te\te
-`.trim()
+`
     },
     {
         testName: 'colspan and rowspan in the same leading empty cell',
-        htmlInput: `
-            <table>
+        htmlInput: `<table>
                 <tr>
                     <td colspan="2" rowspan="2">
                     </td>
@@ -341,16 +302,15 @@ f\te\te
                         e
                     </td>
                 </tr>
-            </table>
-            `,
+            </table>`,
         csvExpected: `\t\ta
 \t\tb
-c\td\te` // no trim
+c\td\te
+`
     },
     {
         testName: 'colspan and rowspan in the same middle empty cell',
-        htmlInput: `
-            <table>
+        htmlInput: `<table>
                 <tr>
                     <td>
                         a
@@ -374,11 +334,11 @@ c\td\te` // no trim
                         e
                     </td>
                 </tr>
-            </table>
-            `,
+            </table>`,
         csvExpected: `a\tb\tc
 d\t\t
-e\t\t` // no trim
+e\t\t
+`
     },
 ];
 

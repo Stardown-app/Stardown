@@ -16,6 +16,7 @@
 
 import { getSetting } from './common.js';
 import * as md from './md.js';
+import { htmlToMd, encodeUrl } from './converters/md.js';
 
 /**
  * createText creates markdown (or another text format) of the selected part of the
@@ -97,21 +98,20 @@ export async function getSourceFormatText(selection, selectedText) {
     const html = await getSelectionHtml(selection);
     if (html === null) {
         return selectedText;
-    } else {
-        return await md.htmlToPlaintext(html);
     }
+    return await htmlToMd(html);
 }
 
 export async function getTemplatedText(title, url, selection, selectedText) {
     const template = await getSetting('selectionTemplate');
 
     title = await md.createLinkTitle(title);
-    url = url.replaceAll('(', '%28').replaceAll(')', '%29');
+    url = encodeUrl(url);
     const html = await getSelectionHtml(selection);
     if (html === null) {
         selection = selectedText;
     } else {
-        selection = await md.htmlToPlaintext(html);
+        selection = await htmlToMd(html);
     }
     const today = new Date();
     const YYYYMMDD = today.getFullYear() + '/' + (today.getMonth() + 1) + '/' + today.getDate();
@@ -150,9 +150,11 @@ async function getSourceFormatTextWithLink(title, url, selection, selectedText) 
     const html = await getSelectionHtml(selection);
     if (html === null) {
         return alert + '\n\n' + selectedText;
-    } else {
-        return alert + '\n\n' + await md.htmlToPlaintext(html);
     }
+
+    const text = await htmlToMd(html);
+
+    return alert + '\n\n' + text;
 }
 
 /**

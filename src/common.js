@@ -47,13 +47,12 @@ const defaultSettings = {
 export async function getSetting(name) {
     let obj;
     try {
-        obj = await browser.storage.sync.get(name);
+        obj = await browser.storage?.sync.get(name);
     } catch (err) {
         console.error(err);
         return defaultSettings[name];
     }
     if (obj === undefined) {
-        console.error(`Tried to get undefined setting "${name}"`);
         return defaultSettings[name];
     }
 

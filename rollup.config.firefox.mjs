@@ -27,6 +27,37 @@ import del from 'rollup-plugin-delete'; // https://www.npmjs.com/package/rollup-
 // Each time this runs, any existing files with the same names as those copied are
 // overwritten.
 
+/**
+ * transform changes a js file to make it compatible with Firefox.
+ * @param {Buffer} contents - a file's contents.
+ * @param {string} filename - a file's name.
+ * @returns {any}
+ */
+function transform(contents, filename) {
+    if (!filename.endsWith('.js')) {
+        return contents;
+    }
+
+    return contents
+        .toString()
+        .replace(
+            // Remove all `browser` imports because
+            // firefox/config.js doesn't define `browser`
+            // because Firefox already has a global
+            // `browser` variable.
+            /(import \{.*?)browser,?(.*?\} from ['"])/,
+            '$1$2',
+        ).replace(
+            // Comment out `window.onload = setUpListeners`
+            // because although Chrome needs it, in Firefox
+            // it causes a "Clipboard write is not allowed"
+            // error on some sites despite not preventing
+            // clipboard writes.
+            /window\.onload = setUpListeners/,
+            '// window.onload = setUpListeners',
+        );
+}
+
 export default [
     {
         input: 'firefox/background.js',
@@ -36,56 +67,33 @@ export default [
         },
         plugins: [
             copy({
+                // Copy all files and folders to the firefox folder except the test
+                // config.js. There are multiple targets because the tranform function
+                // cannot run on folders.
                 targets: [
                     {
+                        // copy the images folder
+                        src: ['src/images'],
+                        dest: 'firefox',
+                    },
+                    {
+                        // copy js files in the converters folder
+                        src: ['src/converters/*'],
+                        dest: 'firefox/converters',
+                        transform: transform,
+                    },
+                    {
                         src: [
-                            // Copy everything except the images and the config.js for
-                            // testing. The copy call for the images folder is below.
-                            // It's separate because the transform function can only run
-                            // on files.
-                            'src/*',
-                            '!src/images',
+                            // copy js files that are directly in the src folder
+                            'src/*.js',
                             '!src/config.js',
                         ],
                         dest: 'firefox',
-                        transform: (contents, filename) => {
-                            if (filename.endsWith('.js')) {
-                                return contents.toString()
-                                    .replace(
-                                        // Remove all `browser` imports because
-                                        // firefox/config.js doesn't define `browser`
-                                        // because Firefox already has a global
-                                        // `browser` variable.
-                                        /(import \{.*?)browser,?(.*?\} from ['"])/,
-                                        '$1$2',
-                                    ).replace(
-                                        // Comment out `window.onload = setUpListeners`
-                                        // because although Chrome needs it, in Firefox
-                                        // it causes a "Clipboard write is not allowed"
-                                        // error on some sites despite not preventing
-                                        // clipboard writes.
-                                        /window\.onload = setUpListeners/,
-                                        '// window.onload = setUpListeners',
-                                    );
-                            }
-                            return contents;
-                        },
+                        transform: transform,
                     },
                 ],
                 hook: 'buildStart', // Run the copy before the build starts.
             }),
-            copy({
-                targets: [
-                    {
-                        src: [
-                            // Copy the images folder.
-                            'src/images',
-                        ],
-                        dest: 'firefox',
-                    }
-                ],
-                hook: 'buildStart', // Run the copy before the build starts.
-            })
         ]
     },
     {

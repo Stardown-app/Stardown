@@ -15,85 +15,7 @@
 */
 
 import { getSetting } from './common.js';
-import { TurndownService } from './turndown.js';
-import { newTurndownService, replaceBrackets } from './newTurndownService.js';
-
-/**
- * turndownService is a TurndownService instance used to convert HTML to markdown (or
- * another plaintext format). Use the exported htmlToPlaintext async function to convert
- * HTML to markdown (or another plaintext format).
- * @type {TurndownService|null}
- */
-let turndownService = null;
-
-/**
- * The current* variables are used by the htmlToPlaintext function to detect changes to
- * the settings to update the TurndownService instance when needed.
- */
-let currentBulletPoint = '-';
-let currentSubBrackets = 'underlined';
-let currentSelectionFormat = 'source with link';
-let currentOmitNav = true;
-let currentOmitFooter = true;
-
-/**
- * escape escapes many markdown patterns, but not square brackets.
- * @param {string} text - the text to escape markdown characters in.
- * @returns {string}
- */
-export function escape(text) {
-    return text
-        .replaceAll('\\', '\\\\')
-        .replaceAll('#', '\\#')
-        .replaceAll('_', '\\_')
-        .replaceAll('*', '\\*')
-        .replaceAll('`', '\\`')
-        .replaceAll(/^>/g, '\\>')
-        .replaceAll(/^-/g, '\\-')
-        .replaceAll(/^\+ /g, '\\+ ')
-        .replaceAll(/^(=+)/g, '\\$1')
-        .replaceAll(/^~~~/g, '\\~~~')
-        .replaceAll(/^(\d+)\. /g, '$1\\. ')
-}
-
-/**
- * htmlToPlaintext converts HTML to markdown (or another plaintext format).
- * @param {string|HTMLElement} html - the HTML to convert to markdown.
- * @returns {Promise<string>}
- */
-export async function htmlToPlaintext(html) {
-    const newBulletPoint = await getSetting('bulletPoint');
-    const newSubBrackets = await getSetting('subBrackets');
-    const newSelectionFormat = await getSetting('selectionFormat');
-    const newOmitNav = await getSetting('omitNav');
-    const newOmitFooter = await getSetting('omitFooter');
-
-    if (
-        !turndownService ||
-        newBulletPoint !== currentBulletPoint ||
-        newSubBrackets !== currentSubBrackets ||
-        newSelectionFormat !== currentSelectionFormat ||
-        newOmitNav !== currentOmitNav ||
-        newOmitFooter !== currentOmitFooter
-    ) {
-        currentBulletPoint = newBulletPoint;
-        currentSubBrackets = newSubBrackets;
-        currentSelectionFormat = newSelectionFormat;
-        currentOmitNav = newOmitNav;
-        currentOmitFooter = newOmitFooter;
-
-        turndownService = newTurndownService(
-            currentBulletPoint,
-            currentSubBrackets,
-            currentSelectionFormat,
-            currentOmitNav,
-            currentOmitFooter,
-            escape,
-        );
-    }
-
-    return turndownService.turndown(html);
-}
+import { encodeUrl, newEscape } from './converters/md.js';
 
 /**
  * createLink creates a markdown link.
@@ -108,7 +30,7 @@ export async function htmlToPlaintext(html) {
 export async function createLink(title, url, subBrackets = null) {
     title = await createLinkTitle(title, subBrackets);
 
-    url = url.replaceAll('(', '%28').replaceAll(')', '%29');
+    url = encodeUrl(url);
 
     return `[${title}](${url})`;
 }
@@ -130,15 +52,8 @@ export async function createLinkTitle(title, subBrackets = null) {
     if (title === null) {
         title = 'link';
     } else {
-        title = replaceBrackets(title, subBrackets);
-        title = title
-            .replaceAll('\\', '\\\\')
-            .replaceAll('#', '\\#')
-            .replaceAll('_', '\\_')
-            .replaceAll('*', '\\*')
-            .replaceAll('`', '\\`')
-            .replaceAll('>', '\\>')
-            .replaceAll(' ', '')
+        const escape = newEscape(subBrackets);
+        title = escape(title);
     }
 
     return title;

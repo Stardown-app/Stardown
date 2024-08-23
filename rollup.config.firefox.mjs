@@ -41,18 +41,14 @@ function transform(contents, filename) {
     return contents
         .toString()
         .replace(
-            // Remove all `browser` imports because
-            // firefox/config.js doesn't define `browser`
-            // because Firefox already has a global
-            // `browser` variable.
+            // Remove all `browser` imports because firefox/config.js doesn't define
+            // `browser` because Firefox already has a global `browser` variable.
             /(import \{.*?)browser,?(.*?\} from ['"])/,
             '$1$2',
         ).replace(
-            // Comment out `window.onload = setUpListeners`
-            // because although Chrome needs it, in Firefox
-            // it causes a "Clipboard write is not allowed"
-            // error on some sites despite not preventing
-            // clipboard writes.
+            // Comment out `window.onload = setUpListeners` because although Chrome
+            // needs it, in Firefox it causes a "Clipboard write is not allowed" error
+            // on some sites despite not preventing clipboard writes.
             /window\.onload = setUpListeners/,
             '// window.onload = setUpListeners',
         );

@@ -35,6 +35,7 @@ export async function htmlToMd(html) {
         omitNav: await getSetting('omitNav'),
         omitFooter: await getSetting('omitFooter'),
         youtubeMd: await getSetting('youtubeMd'),
+        indent: '',
     };
 
     /** @type {function(string): string} */
@@ -176,7 +177,7 @@ const elementConverters = new Map([
     ['DT', convertDt],
     ['FIGCAPTION', convertBlockElement],
     ['FIGURE', convertBlockElement],
-    ['HR', (ctx, el) => '---\n\n'],
+    ['HR', (ctx, el) => '* * *\n\n'],
     ['LI', (ctx, el) => ''],
     ['MENU', convertUl],
     ['OL', convertOl],
@@ -321,7 +322,16 @@ function convertChildNodes(ctx, node) {
  * @returns {string}
  */
 function convertBlockElement(ctx, el) {
-    return convertNodes(ctx, el.childNodes).trim().replaceAll(/\n\s+/g, '\n') + '\n\n';
+    const newCtx = { ...ctx, dontTrimText: true };
+
+    /** @type {string[]} */
+    const result = [];
+    result.push(convertNodes(newCtx, el.childNodes).trim().replaceAll(/\n\s+/g, '\n'));
+    if (!ctx.inList) {
+        result.push('\n\n');
+    }
+
+    return result.join('');
 }
 
 /**
@@ -331,11 +341,11 @@ function convertBlockElement(ctx, el) {
  */
 function convertNodes(ctx, nodes) {
     /** @type {string[]} */
-    const results = [];
+    const result = [];
     for (let i = 0; i < nodes.length; i++) {
-        results.push(convertNode(ctx, nodes[i]));
+        result.push(convertNode(ctx, nodes[i]));
     }
-    return results.join('');
+    return result.join('');
 }
 
 /**
@@ -383,7 +393,11 @@ function convertElement(ctx, el) {
  */
 function convertText(ctx, node) {
     if (node.textContent) {
-        return ctx.escape(node.textContent).trim().replaceAll(/\s+/g, ' ');
+        let content = ctx.escape(node.textContent);
+        if (!ctx.dontTrimText) {
+            content = content.trim();
+        }
+        return content.replaceAll(/\s+/g, ' ');
     }
     return '';
 }
@@ -485,8 +499,23 @@ function convertNav(ctx, el) {
  * @returns {string}
  */
 function convertBlockquote(ctx, el) {
-    let result = convertNodes(ctx, el.childNodes);
-    return '> ' + result.replaceAll('\n', '\n> ') + '\n\n';
+    const newCtx = { ...ctx, dontTrimText: true };
+
+    /** @type {string[]} */
+    const result = [];
+    if (ctx.inList) {
+        result.push('\n' + ctx.indent + '\n' + ctx.indent);
+    }
+    result.push('> ');
+    result.push(convertNodes(newCtx, el.childNodes).trim().replaceAll('\n', '\n>'));
+    result.push('\n');
+    if (ctx.inList) {
+        result.push(ctx.indent);
+    } else {
+        result.push('\n');
+    }
+
+    return result.join('');
 }
 
 /**
@@ -524,6 +553,11 @@ function convertDt(ctx, el) {
 function convertOl(ctx, el) {
     /** @type {string[]} */
     const result = [];
+    if (ctx.inList) {
+        result.push('\n');
+    }
+
+    const newCtx = { ...ctx, indent: ctx.indent + '    ', inList: true };
 
     let liNum = Number(el.getAttribute('start') || 1);
     const reversed = Boolean(el.getAttribute('reversed'));
@@ -531,31 +565,26 @@ function convertOl(ctx, el) {
     const children = el.childNodes;
     for (let i = 0; i < children.length; i++) {
         const child = children[i];
-        if (child.nodeName === 'LI') {
-            const indent = ctx.indent || 0;
-            for (let j = 0; j < indent; j++) {
-                result.push(' ');
-            }
-            result.push(String(liNum) + '. ');
-            if (reversed) {
-                liNum--;
-            } else {
-                liNum++;
-            }
-            result.push(convertNodes(ctx, child.childNodes).replaceAll('\n', ' '));
-            result.push('\n');
-        } else if (child.nodeName === 'OL') {
-            const indent = ctx.indent || 0;
-            const newCtx = { ...ctx, indent: indent + 4 };
-            result.push(convertOl(newCtx, child));
-        } else if (child.nodeName === 'UL') {
-            const indent = ctx.indent || 0;
-            const newCtx = { ...ctx, indent: indent + 4 };
-            result.push(convertUl(newCtx, child));
+        if (child.nodeType === TEXT_NODE) {
+            continue;
+        }
+
+        result.push(ctx.indent + String(liNum) + '. ');
+        result.push(convertNodes(newCtx, child.childNodes).replace(/\n$/, ''));
+        result.push('\n');
+
+        if (reversed) {
+            liNum--;
+        } else {
+            liNum++;
         }
     }
 
-    return result.join('') + '\n';
+    if (!ctx.inList) {
+        result.push('\n');
+    }
+
+    return result.join('');
 }
 
 /**
@@ -566,30 +595,29 @@ function convertOl(ctx, el) {
 function convertUl(ctx, el) {
     /** @type {string[]} */
     const result = [];
+    if (ctx.inList) {
+        result.push('\n');
+    }
+
+    const newCtx = { ...ctx, indent: ctx.indent + '    ', inList: true };
 
     const children = el.childNodes;
     for (let i = 0; i < children.length; i++) {
         const child = children[i];
-        if (child.nodeName === 'LI') {
-            const indent = ctx.indent || 0;
-            for (let j = 0; j < indent; j++) {
-                result.push(' ');
-            }
-            result.push(ctx.bulletPoint + ' ');
-            result.push(convertNodes(ctx, child.childNodes).replaceAll('\n', ' '));
-            result.push('\n');
-        } else if (child.nodeName === 'OL') {
-            const indent = ctx.indent || 0;
-            const newCtx = { ...ctx, indent: indent + 4 };
-            result.push(convertOl(newCtx, child));
-        } else if (child.nodeName === 'UL') {
-            const indent = ctx.indent || 0;
-            const newCtx = { ...ctx, indent: indent + 4 };
-            result.push(convertUl(newCtx, child));
+        if (child.nodeType === TEXT_NODE) {
+            continue;
         }
+
+        result.push(ctx.indent + ctx.bulletPoint + ' ');
+        result.push(convertNodes(newCtx, child.childNodes).replace(/\n$/, ''));
+        result.push('\n');
     }
 
-    return result.join('') + '\n';
+    if (!ctx.inList) {
+        result.push('\n');
+    }
+
+    return result.join('');
 }
 
 /**
@@ -603,13 +631,17 @@ function convertPre(ctx, el) {
         return '';
     }
 
-    if (child.nodeName === 'SAMP') {
-        return convertSamp(ctx, child);
-    } else if (child.nodeName === 'KBD') {
-        return convertKbd(ctx, child);
+    if (child.nodeName === 'SAMP' || child.nodeName === 'KBD') {
+        return convertCode(ctx, child);
     } else if (child.nodeName === 'CODE') {
         /** @type {string[]} */
-        const result = ['```'];
+        const result = [];
+
+        if (ctx.inList) {
+            result.push('\n' + ctx.indent + '\n' + ctx.indent);
+        }
+
+        result.push('```');
 
         if (child.textContent.includes('```')) {
             result.push('`');
@@ -625,17 +657,21 @@ function convertPre(ctx, el) {
         }
         result.push(language + '\n');
 
-        const code = child.textContent || '';
-        result.push(code + '\n```');
+        let code = child.textContent || '';
+        code = code.replaceAll('\n', '\n' + ctx.indent);
+        result.push(ctx.indent + code + '\n' + ctx.indent + '```\n' + ctx.indent);
 
         if (child.textContent.includes('```')) {
             result.push('`');
         }
 
-        return result.join('') + '\n\n';
+        if (!ctx.inList) {
+            result.push('\n');
+        }
+
+        return result.join('');
     } else {
         let text = el.textContent || '';
-        text = text.replaceAll('\n', ' ');
         if (text.includes('```')) {
             return '````\n' + text + '\n````\n\n';
         } else {
@@ -784,7 +820,17 @@ function convertImg(ctx, el) {
     src = absolutize(src, ctx.locationHref);
     src = encodeUrl(src);
 
-    return '![' + alt + '](' + src + ')';
+    /** @type {string[]} */
+    const result = [];
+    if (ctx.inList) {
+        result.push('\n' + ctx.indent + '\n' + ctx.indent);
+    }
+    result.push('![' + alt + '](' + src + ')');
+    if (ctx.inList) {
+        result.push('\n');
+    }
+
+    return result.join('');
 }
 
 /**
@@ -919,17 +965,6 @@ function convertTable(ctx, el) {
         return convertText(ctx, el);
     }
     const newCtx = { ...ctx, inTable: true };
-
-    /*
-        HTML table definition:
-
-        In this order: optionally a caption element, followed by zero or more colgroup
-        elements, followed optionally by a thead element, followed by either zero or
-        more tbody elements or one or more tr elements, followed optionally by a tfoot
-        element, optionally intermixed with one or more script-supporting elements.
-
-        Source: [the HTML Standard](https://html.spec.whatwg.org/multipage/tables.html)
-    */
 
     /** @type {string[]} */
     let result = [];

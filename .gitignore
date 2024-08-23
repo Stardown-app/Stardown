@@ -10,3 +10,5 @@ firefox/*
 chrome/*
 !chrome/manifest.json
 !chrome/config.js
+
+*.diff.html

@@ -16,6 +16,8 @@ See [./dev-install-from-source.md](./dev-install-from-source.md)
 
 Run the tests with `npm run test`.
 
+There's also a markdown converter test you can run with `npm run md-diff` (requires [nodemon](https://www.npmjs.com/package/nodemon); `npm install -g nodemon`) which creates a file named `md.diff.html` that displays the difference between the markdown converter's actual output and its expected output. Any text with a green background is expected but not present in the actual output, and any text with a red background is unexpected but present in the actual output ("add what's green and remove what's red"). Any incorrect newline character is visualized as a downward right arrow (⤵). You may want to use VS Code's [Live Server](https://marketplace.visualstudio.com/items?itemName=ritwickdey.LiveServer) extension to automatically reload the output HTML file when nodemon changes it.
+
 ## Git workflow for collaboration
 
 Let's create feature branches with descriptive names and make pull requests as described in [Getting started with Git and GitHub](https://chriswheeler.dev/posts/getting-started-with-git-and-github/#git-workflows).

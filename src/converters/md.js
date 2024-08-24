@@ -17,6 +17,7 @@
 import { getSetting } from '../common.js';
 import * as tables from './tables.js';
 import { absolutize } from './urls.js';
+import { removeHiddenElements } from './html.js';
 
 /**
  * htmlToMd converts HTML to pure markdown without any HTML.
@@ -26,6 +27,7 @@ import { absolutize } from './urls.js';
 export async function htmlToMd(html) {
     /** @type {DocumentFragment} */
     const frag = document.createRange().createContextualFragment(html);
+    removeHiddenElements(frag, document);
 
     const ctx = {
         locationHref: location.href,

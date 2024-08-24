@@ -30,24 +30,23 @@ export async function htmlTableToJson(html, emptyCellJson) {
     const frag = document.createRange().createContextualFragment(html);
     const table = frag.firstChild;
 
-    emptyCellJson = emptyCellJson || await getSetting('emptyCellJson') || 'null';
+    const ctx = {
+        document: document,
+        emptyCellJson: emptyCellJson || await getSetting('emptyCellJson') || 'null',
+    };
 
-    return convertTable(table, emptyCellJson);
+    return convertTable(ctx, table);
 }
 
 /**
  * convertTable converts an HTML table to JSON.
- * @param {Element} table - the table element.
- * @param {string} emptyCellJson - the JSON representation of an empty cell.
+ * @param {object} ctx
+ * @param {Element} table
  * @returns {string}
  */
-function convertTable(table, emptyCellJson = 'null') {
-    if (emptyCellJson === '') {
-        emptyCellJson = 'null';
-    }
-
+function convertTable(ctx, table) {
     /** @type {Element[][]} */
-    let table2d = tables.to2dArray(table);
+    let table2d = tables.to2dArray(table, ctx.document);
     table2d = tables.removeEmptyRows(table2d);
 
     /** @type {string[]} */
@@ -74,13 +73,13 @@ function convertTable(table, emptyCellJson = 'null') {
             if (x === 0) { // if this is the first column
                 if (cellStr.length === 0) { // if the cell is empty
                     if ( // if the empty cell JSON is already wrapped with quotes
-                        emptyCellJson.length > 0 &&
-                        emptyCellJson[0] === '"' &&
-                        emptyCellJson[emptyCellJson.length - 1] === '"'
+                        ctx.emptyCellJson.length > 0 &&
+                        ctx.emptyCellJson[0] === '"' &&
+                        ctx.emptyCellJson[ctx.emptyCellJson.length - 1] === '"'
                     ) {
-                        json.push(emptyCellJson + ': [');
+                        json.push(ctx.emptyCellJson + ': [');
                     } else { // if the empty cell JSON is not already wrapped with quotes
-                        cellStr = emptyCellJson.replaceAll('"', '\\"');
+                        cellStr = ctx.emptyCellJson.replaceAll('"', '\\"');
                         json.push('"' + cellStr + '": [');
                     }
                 } else { // if the cell is not empty
@@ -88,7 +87,7 @@ function convertTable(table, emptyCellJson = 'null') {
                     json.push('"' + cellStr + '": [');
                 }
             } else if (cellStr.length === 0) {
-                json.push(emptyCellJson);
+                json.push(ctx.emptyCellJson);
             } else if (['true', 'false', 'null'].includes(cellStr)) {
                 json.push(cellStr);
             } else if (canBeJsonNumber(cellStr)) {

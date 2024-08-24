@@ -17,10 +17,11 @@
  * and/or `<td>`s). It may contain empty rows and some rows may have more cells than
  * others.
  * @param {Element} table
+ * @param {Document} doc
  * @returns {Element[][]}
  */
-export function to2dArray(table) {
-    const tableConv = new TableConverter();
+export function to2dArray(table, doc) {
+    const tableConv = new TableConverter(doc);
 
     const trs = getTableTrs(table);
 
@@ -87,11 +88,15 @@ export function rectangularize(table, doc) {
  * array. A TableConverter instance should not be used for multiple tables.
  */
 class TableConverter {
-    constructor() {
+    /**
+     * @param {Document} doc
+     */
+    constructor(doc) {
         /** @type {(Element|null)[][]} */
         this.table = [[]];
         this.X = 0;
         this.Y = 0; // Y increases downwards
+        this.doc = doc;
     }
 
     /**
@@ -106,7 +111,8 @@ class TableConverter {
     /**
      * addCell adds a cell to the end of the TableConverter instance's current last row.
      * If the HTML cell spans multiple rows and/or columns, multiple TableConverter
-     * cells are added to match the HTML span(s).
+     * cells are added to match the HTML span(s). Spanning cells have duplicate content
+     * unless the content includes any images or videos.
      * @param {Element} cell - a `<th>` or `<td>` element.
      * @param {number} colspan - the number of columns the HTML cell spans.
      * @param {number} rowspan - the number of rows the HTML cell spans.
@@ -116,6 +122,12 @@ class TableConverter {
         while (this.X < this.table[this.Y].length && this.table[this.Y][this.X] !== null) {
             this.X++;
         }
+
+        const hasMedia = Boolean(
+            cell.querySelector('img') ||
+            cell.querySelector('svg') ||
+            cell.querySelector('video')
+        );
 
         // for each row and column the cell spans
         for (let y = this.Y; y < this.Y + rowspan; y++) {
@@ -135,9 +147,17 @@ class TableConverter {
             for (let x = this.X; x < this.X + colspan; x++) {
                 // assign the cell
                 if (x === row.length) {
-                    row.push(cell);
+                    if (hasMedia && x > this.X) {
+                        row.push(this.doc.createElement('td'));
+                    } else {
+                        row.push(cell);
+                    }
                 } else {
-                    row[x] = cell;
+                    if (hasMedia && x > this.X) {
+                        row[x] = this.doc.createElement('td');
+                    } else {
+                        row[x] = cell;
+                    }
                 }
             }
         }

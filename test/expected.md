@@ -131,6 +131,10 @@ Click **[here](https://pairdrop.net/)** to send something to another device in y
 | --- | --- |
 | three | four |
 
+| ![Melon slice](melon-slice.jpg) |  |
+| --- | --- |
+| hi | hi |
+
 ~~This is stricken through.~~
 
 ==This is highlighted.==

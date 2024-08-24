@@ -50,7 +50,7 @@ export async function htmlTableToCsv(html, delimiter = ',') {
  */
 function convertTable(ctx, table) {
     /** @type {Element[][]} */
-    let table2d = tables.to2dArray(table);
+    let table2d = tables.to2dArray(table, ctx.document);
     table2d = tables.removeEmptyRows(table2d);
     table2d = tables.rectangularize(table2d, ctx.document);
 

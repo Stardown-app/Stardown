@@ -977,7 +977,7 @@ function convertTable(ctx, el) {
     }
 
     /** @type {Element[][]} */
-    let table2d = tables.to2dArray(el);
+    let table2d = tables.to2dArray(el, ctx.document);
     table2d = tables.removeEmptyRows(table2d);
     table2d = tables.rectangularize(table2d, ctx.document);
 

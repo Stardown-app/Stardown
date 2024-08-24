@@ -472,12 +472,14 @@ function newConvertHN(n) {
             return convertText(ctx, el);
         }
 
+        const newCtx = { ...ctx, dontTrimText: true };
+
         /** @type {string[]} */
         const result = [];
         for (let i = 0; i < n; i++) {
             result.push('#');
         }
-        result.push(' ' + convertNodes(ctx, el.childNodes).replaceAll('\n', ' '));
+        result.push(' ' + convertNodes(newCtx, el.childNodes).replaceAll('\n', ' '));
 
         return result.join('') + '\n\n';
     }
@@ -526,7 +528,8 @@ function convertBlockquote(ctx, el) {
  * @returns {string}
  */
 function convertDd(ctx, el) {
-    return ': ' + convertNodes(ctx, el.childNodes).replaceAll('\n', ' ') + '\n';
+    const newCtx = { ...ctx, dontTrimText: true };
+    return ': ' + convertNodes(newCtx, el.childNodes).replaceAll('\n', ' ') + '\n';
 }
 
 /**
@@ -535,7 +538,8 @@ function convertDd(ctx, el) {
  * @returns {string}
  */
 function convertDl(ctx, el) {
-    return convertNodes(ctx, el.childNodes) + '\n';
+    const newCtx = { ...ctx, dontTrimText: true };
+    return convertNodes(newCtx, el.childNodes) + '\n';
 }
 
 /**
@@ -544,7 +548,8 @@ function convertDl(ctx, el) {
  * @returns {string}
  */
 function convertDt(ctx, el) {
-    return convertNodes(ctx, el.childNodes).replaceAll('\n', ' ') + '\n';
+    const newCtx = { ...ctx, dontTrimText: true };
+    return convertNodes(newCtx, el.childNodes).replaceAll('\n', ' ') + '\n';
 }
 
 /**
@@ -559,7 +564,9 @@ function convertOl(ctx, el) {
         result.push('\n');
     }
 
-    const newCtx = { ...ctx, indent: ctx.indent + '    ', inList: true };
+    const newCtx = {
+        ...ctx, indent: ctx.indent + '    ', inList: true, dontTrimText: true,
+    };
 
     let liNum = Number(el.getAttribute('start') || 1);
     const reversed = Boolean(el.getAttribute('reversed'));
@@ -572,8 +579,16 @@ function convertOl(ctx, el) {
         }
 
         result.push(ctx.indent + String(liNum) + '. ');
-        result.push(convertNodes(newCtx, child.childNodes).replace(/\n$/, ''));
-        result.push('\n');
+        result.push(
+            convertNodes(newCtx, child.childNodes)
+                .replace(/^ /, '')
+                .replace(/ \n/, '\n')
+                .replace(/\n$/, '')
+                .replace(/ $/, '')
+        );
+        if (!ctx.inList || i < children.length - 2) {
+            result.push('\n');
+        }
 
         if (reversed) {
             liNum--;
@@ -601,7 +616,9 @@ function convertUl(ctx, el) {
         result.push('\n');
     }
 
-    const newCtx = { ...ctx, indent: ctx.indent + '    ', inList: true };
+    const newCtx = {
+        ...ctx, indent: ctx.indent + '    ', inList: true, dontTrimText: true,
+    };
 
     const children = el.childNodes;
     for (let i = 0; i < children.length; i++) {
@@ -611,8 +628,16 @@ function convertUl(ctx, el) {
         }
 
         result.push(ctx.indent + ctx.bulletPoint + ' ');
-        result.push(convertNodes(newCtx, child.childNodes).replace(/\n$/, ''));
-        result.push('\n');
+        result.push(
+            convertNodes(newCtx, child.childNodes)
+                .replace(/^ /, '')
+                .replace(/ \n/, '\n')
+                .replace(/\n$/, '')
+                .replace(/ $/, '')
+        );
+        if (!ctx.inList || i < children.length - 2) {
+            result.push('\n');
+        }
     }
 
     if (!ctx.inList) {
@@ -661,14 +686,15 @@ function convertPre(ctx, el) {
 
         let code = child.textContent || '';
         code = code.replaceAll('\n', '\n' + ctx.indent);
-        result.push(ctx.indent + code + '\n' + ctx.indent + '```\n' + ctx.indent);
+        result.push(ctx.indent + code + '\n' + ctx.indent + '```\n');
 
         if (child.textContent.includes('```')) {
             result.push('`');
         }
-
-        if (!ctx.inList) {
-            result.push('\n');
+        if (ctx.inList) {
+            result.push(ctx.indent);
+        } else {
+            result.push(ctx.indent + '\n');
         }
 
         return result.join('');
@@ -829,7 +855,7 @@ function convertImg(ctx, el) {
     }
     result.push('![' + alt + '](' + src + ')');
     if (ctx.inList) {
-        result.push('\n');
+        result.push('\n' + ctx.indent);
     }
 
     return result.join('');

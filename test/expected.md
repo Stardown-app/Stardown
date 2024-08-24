@@ -116,6 +116,8 @@ func main() {
 4. Item 4 with image
     
     ![Orange slice](orange-slice.jpg)
+    
+5. List item with **bold**, *italic*, and [a link](https://puter.com/app/code).
 
 * * *
 

@@ -33,6 +33,8 @@ emphasizedLetters*Within*String
 
 boldAndEmphasizedLetters***Within***String
 
+*Emphasis* in citation.
+
 > To make all your unknowns known, you must make all your knowns unknown. — Unknown
 
 > When a measure becomes a target, it ceases to be a good measure. — Goodhart's Law
@@ -81,11 +83,11 @@ func main() {
 2. litigation
 3. west
 
-1. manual
-2. queen
+4. manual
+5. queen
     1. related
     2. transition
-3. skin
+6. skin
     - egg
     - log
 
@@ -116,7 +118,7 @@ func main() {
 4. Item 4 with image
     
     ![Orange slice](orange-slice.jpg)
-    
+
 5. List item with **bold**, *italic*, and [a link](https://puter.com/app/code).
 
 * * *

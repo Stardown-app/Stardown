@@ -83,11 +83,11 @@ func main() {
 2. litigation
 3. west
 
-4. manual
-5. queen
+1. manual
+2. queen
     1. related
     2. transition
-6. skin
+3. skin
     - egg
     - log
 
@@ -118,7 +118,7 @@ func main() {
 4. Item 4 with image
     
     ![Orange slice](orange-slice.jpg)
-
+    
 5. List item with **bold**, *italic*, and [a link](https://puter.com/app/code).
 
 * * *
@@ -138,6 +138,9 @@ Click **[here](https://pairdrop.net/)** to send something to another device in y
 | ![Melon slice](melon-slice.jpg) |  |
 | --- | --- |
 | hi | hi |
+
+| **Bold**, *emphasis*, and [link](https://gchq.github.io/CyberChef/). |
+| --- |
 
 ~~This is stricken through.~~
 

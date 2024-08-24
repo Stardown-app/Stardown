@@ -992,7 +992,7 @@ function convertTable(ctx, el) {
     if (ctx.inTable) {
         return convertText(ctx, el);
     }
-    const newCtx = { ...ctx, inTable: true };
+    const newCtx = { ...ctx, inTable: true, dontTrimText: true };
 
     /** @type {string[]} */
     let result = [];
@@ -1014,8 +1014,9 @@ function convertTable(ctx, el) {
 
         // for each cell
         for (let x = 0; x < row.length; x++) {
-            let cellStr = convertNodes(newCtx, row[x].childNodes);
-            cellStr = cellStr.trim().replaceAll(/\s+/g, ' ').replaceAll('|', '\\|');
+            const cell = row[x]; // a `<th>` or `<td>` element
+            const cellStr = convertNodes(newCtx, cell.childNodes)
+                .trim().replaceAll(/\s+/g, ' ').replaceAll('|', '\\|');
             result.push(` ${cellStr} |`);
         }
 

@@ -22,13 +22,11 @@ import * as tables from './tables.js';
 
 /**
  * htmlTableToCsv converts an HTML table to CSV.
- * @param {string} html
+ * @param {DocumentFragment} frag
  * @param {string} delimiter - what to separate fields with.
  * @returns {Promise<string>}
  */
-export async function htmlTableToCsv(html, delimiter = ',') {
-    /** @type {DocumentFragment} */
-    const frag = document.createRange().createContextualFragment(html);
+export async function htmlTableToCsv(frag, delimiter = ',') {
     const table = frag.firstChild;
 
     const ctx = {

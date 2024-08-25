@@ -24,7 +24,7 @@ global.location = { href: 'https://example.com' };
 function runTest(testName, htmlInput, csvExpected) {
     test(testName, async t => {
         global.document = new JSDOM(htmlInput).window.document;
-        const csvActual = await htmlTableToCsv(htmlInput, ',');
+        const csvActual = await htmlTableToCsv(global.document.body, ',');
         assert.equal(csvActual, csvExpected);
     });
 }

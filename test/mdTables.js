@@ -24,7 +24,7 @@ global.location = { href: 'https://example.com' };
 function runTest(testName, htmlInput, mdExpected) {
     test(testName, async t => {
         global.document = new JSDOM(htmlInput).window.document;
-        const mdActual = await htmlToMd(htmlInput);
+        const mdActual = await htmlToMd(global.document.body);
         assert.equal(mdActual, mdExpected);
     });
 }

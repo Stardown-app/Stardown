@@ -24,7 +24,7 @@ global.location = { href: 'https://example.com' };
 function runTest(testName, htmlInput, jsonExpected) {
     test(testName, async t => {
         global.document = new JSDOM(htmlInput).window.document;
-        const jsonActual = await htmlTableToJson(htmlInput);
+        const jsonActual = await htmlTableToJson(global.document.body);
         assert.equal(jsonActual, jsonExpected);
     });
 }
@@ -55,7 +55,7 @@ function runTests() {
         const jsonExpected = `[{"N/A": ["a"]}, {"b": ["N/A"]}]`;
 
         global.document = new JSDOM(htmlInput).window.document;
-        const jsonActual = await htmlTableToJson(htmlInput, '"N/A"');
+        const jsonActual = await htmlTableToJson(global.document.body, '"N/A"');
         assert.equal(jsonActual, jsonExpected);
     });
 }

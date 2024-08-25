@@ -10,7 +10,8 @@ To convert HTML to markdown:
 import { htmlToMd } from './converters/md.js';
 
 const html = '<div>...</div>';
-const markdown = await htmlToMd(html);
+const frag = document.createRange().createContextualFragment(html);
+const markdown = await htmlToMd(frag);
 console.log(markdown);
 ```
 
@@ -20,7 +21,8 @@ HTML tables can be converted to a variety of formats besides markdown, such as C
 import { htmlTableToCsv } from './converters/csv.js';
 
 const html '<table>...</table>';
-const csv = await htmlTableToCsv(html, ',');
+const frag = document.createRange().createContextualFragment(html);
+const csv = await htmlTableToCsv(frag, ',');
 console.log(csv);
 ```
 

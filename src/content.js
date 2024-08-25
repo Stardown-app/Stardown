@@ -84,8 +84,10 @@ function setUpListeners() {
         if (!selection || selection.type !== 'Range') {
             return;
         }
-        const html = await htmlSelection.getSelectionHtml(selection);
-        const isTable = html.startsWith('<table');
+
+        /** @type {DocumentFragment} */
+        const frag = await htmlSelection.getSelectionFragment(selection);
+        const isTable = frag?.firstChild?.nodeName === 'TABLE';
         if (isTable) {
             tableSelection = selection;
             browser.runtime.sendMessage({ context: { mouseup: 'table' } });
@@ -217,8 +219,12 @@ async function handleRequest(message) {
             return await handleJsonTableRightClick(tableSelection);
         case 'htmlTableRightClick':
             console.log('htmlTableRightClick in content.js');
-            const tableHtml = await htmlSelection.getSelectionHtml(tableSelection);
-            return await handleCopyRequest(tableHtml);
+            /** @type {DocumentFragment} */
+            const tableFrag = await htmlSelection.getSelectionFragment(tableSelection);
+            if (tableFrag === null) {
+                return null;
+            }
+            return await handleCopyRequest(tableFrag.firstChild.outerHTML);
         default:
             console.error('Unknown message category:', message.category);
             throw new Error('Unknown message category:', message.category);
@@ -318,13 +324,17 @@ async function handleSelectionRightClick(htmlId, selection) {
  * @returns {Promise<ContentResponse>}
  */
 async function handleCsvTableRightClick(tableSelection, delimiter = ',') {
-    let html = await htmlSelection.getSelectionHtml(tableSelection);
-    if (html === null) {
-        html = tableSelection.textContent;
+    /** @type {DocumentFragment} */
+    let frag = await htmlSelection.getSelectionFragment(tableSelection);
+
+    let text = '';
+    if (frag === null) {
+        text = tableSelection.textContent;
+    } else {
+        text = await htmlTableToCsv(frag, delimiter);
     }
 
-    const tableCsv = await htmlTableToCsv(html, delimiter);
-    return await handleCopyRequest(tableCsv);
+    return await handleCopyRequest(text);
 }
 
 /**
@@ -334,18 +344,19 @@ async function handleCsvTableRightClick(tableSelection, delimiter = ',') {
  * @returns {Promise<ContentResponse|null>}
  */
 async function handleJsonTableRightClick(tableSelection) {
-    let html = await htmlSelection.getSelectionHtml(tableSelection);
-    if (html === null) {
-        html = tableSelection.textContent;
+    /** @type {DocumentFragment} */
+    let frag = await htmlSelection.getSelectionFragment(tableSelection);
+    if (frag === null) {
+        return await handleCopyRequest(tableSelection.textContent);
     }
 
     const jsonDestination = await getSetting('jsonDestination');
     if (jsonDestination === 'clipboard') {
         console.log('Writing JSON to clipboard');
-        const tableJson = await htmlTableToJson(html);
+        const tableJson = await htmlTableToJson(frag);
         return await handleCopyRequest(tableJson);
     } else {
-        const tableJson = await htmlTableToJson(html);
+        const tableJson = await htmlTableToJson(frag);
         // Tell the background what to download because apparently `browser.downloads`
         // is always undefined in content scripts.
         browser.runtime.sendMessage({

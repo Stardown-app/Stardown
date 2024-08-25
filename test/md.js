@@ -26,7 +26,7 @@ async function runTest() {
     const mdExpected = await fs.readFile('./test/expected.md', { encoding: 'utf8' });
 
     global.document = new JSDOM(htmlInput).window.document;
-    const mdActual = await htmlToMd(htmlInput);
+    const mdActual = await htmlToMd(global.document.body);
 
     const diff = diffChars(mdActual, mdExpected);
 

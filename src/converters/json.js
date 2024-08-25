@@ -21,13 +21,11 @@ import * as tables from './tables.js';
 
 /**
  * htmlTableToJson converts an HTML table to JSON.
- * @param {string} html
+ * @param {DocumentFragment} frag
  * @param {string|undefined} emptyCellJson - the JSON representation of an empty cell.
  * @returns {Promise<string>}
  */
-export async function htmlTableToJson(html, emptyCellJson) {
-    /** @type {DocumentFragment} */
-    const frag = document.createRange().createContextualFragment(html);
+export async function htmlTableToJson(frag, emptyCellJson) {
     const table = frag.firstChild;
 
     const ctx = {

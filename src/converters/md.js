@@ -20,13 +20,11 @@ import { absolutize } from './urls.js';
 import { removeHiddenElements } from './html.js';
 
 /**
- * htmlToMd converts HTML to pure markdown without any HTML.
- * @param {string} html
+ * htmlToMd converts an HTML fragment to pure markdown without any HTML.
+ * @param {DocumentFragment} frag
  * @returns {Promise<string>}
  */
-export async function htmlToMd(html) {
-    /** @type {DocumentFragment} */
-    const frag = document.createRange().createContextualFragment(html);
+export async function htmlToMd(frag) {
     removeHiddenElements(frag, document);
 
     const ctx = {

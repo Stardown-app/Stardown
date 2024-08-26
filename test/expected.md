@@ -79,6 +79,12 @@ func main() {
 <h1>Section title</h1>
 ```
 
+python3
+
+```python3
+print("hello world")
+```
+
 1. reference
 2. litigation
 3. west
@@ -145,4 +151,3 @@ Click **[here](https://pairdrop.net/)** to send something to another device in y
 ~~This is stricken through.~~
 
 ==This is highlighted.==
-

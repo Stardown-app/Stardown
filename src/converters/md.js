@@ -41,7 +41,7 @@ export async function htmlToMd(frag) {
     /** @type {function(string): string} */
     ctx.escape = newEscape(ctx.subBrackets);
 
-    return convertNodes(ctx, frag.childNodes);
+    return convertNodes(ctx, frag.childNodes).trim().replaceAll(/\n{3,}/g, '\n\n') + '\n';
 }
 
 /**
@@ -177,7 +177,7 @@ const elementConverters = new Map([
     ['DT', convertDt],
     ['FIGCAPTION', convertBlockElement],
     ['FIGURE', convertBlockElement],
-    ['HR', (ctx, el) => '* * *\n\n'],
+    ['HR', (ctx, el) => '\n\n* * *\n\n'],
     ['LI', (ctx, el) => ''],
     ['MENU', convertUl],
     ['OL', convertOl],
@@ -325,7 +325,7 @@ function convertBlockElement(ctx, el) {
     const newCtx = { ...ctx, dontTrimText: true };
 
     /** @type {string[]} */
-    const result = [];
+    const result = ['\n\n'];
     result.push(convertNodes(newCtx, el.childNodes).trim().replaceAll(/\n\s+/g, '\n'));
     if (!ctx.inList) {
         result.push('\n\n');
@@ -473,7 +473,7 @@ function newConvertHN(n) {
         const newCtx = { ...ctx, dontTrimText: true };
 
         /** @type {string[]} */
-        const result = [];
+        const result = ['\n\n'];
         for (let i = 0; i < n; i++) {
             result.push('#');
         }
@@ -504,12 +504,14 @@ function convertBlockquote(ctx, el) {
     const newCtx = { ...ctx, dontTrimText: true };
 
     /** @type {string[]} */
-    const result = [];
+    const result = ['\n\n'];
     if (ctx.inList) {
         result.push('\n' + ctx.indent + '\n' + ctx.indent);
     }
     result.push('> ');
-    result.push(convertNodes(newCtx, el.childNodes).trim().replaceAll('\n', '\n>'));
+    result.push(
+        convertNodes(newCtx, el.childNodes).trim().replaceAll('\n', '\n>').replaceAll('> \n>\n>', '> ')
+    );
     result.push('\n');
     if (ctx.inList) {
         result.push(ctx.indent);
@@ -537,7 +539,7 @@ function convertDd(ctx, el) {
  */
 function convertDl(ctx, el) {
     const newCtx = { ...ctx, dontTrimText: true };
-    return convertNodes(newCtx, el.childNodes) + '\n';
+    return '\n\n' + convertNodes(newCtx, el.childNodes) + '\n\n';
 }
 
 /**
@@ -557,8 +559,8 @@ function convertDt(ctx, el) {
  */
 function convertOl(ctx, el) {
     /** @type {string[]} */
-    const result = [];
-    if (ctx.inList) {
+    const result = ['\n'];
+    if (!ctx.inList) {
         result.push('\n');
     }
 
@@ -580,7 +582,8 @@ function convertOl(ctx, el) {
         result.push(
             convertNodes(newCtx, child.childNodes)
                 .replace(/^ /, '')
-                .replace(/ \n/, '\n')
+                .replace(/^\n+/, '')
+                .replace(/ \n+/, '\n')
                 .replace(/\n$/, '')
                 .replace(/ $/, '')
         );
@@ -609,8 +612,8 @@ function convertOl(ctx, el) {
  */
 function convertUl(ctx, el) {
     /** @type {string[]} */
-    const result = [];
-    if (ctx.inList) {
+    const result = ['\n'];
+    if (!ctx.inList) {
         result.push('\n');
     }
 
@@ -629,7 +632,8 @@ function convertUl(ctx, el) {
         result.push(
             convertNodes(newCtx, child.childNodes)
                 .replace(/^ /, '')
-                .replace(/ \n/, '\n')
+                .replace(/^\n+/, '')
+                .replace(/ \n+/, '\n')
                 .replace(/\n$/, '')
                 .replace(/ $/, '')
         );
@@ -660,7 +664,7 @@ function convertPre(ctx, el) {
         return convertCode(ctx, child);
     } else if (child.nodeName === 'CODE') {
         /** @type {string[]} */
-        const result = [];
+        const result = ['\n\n'];
 
         if (ctx.inList) {
             result.push('\n' + ctx.indent + '\n' + ctx.indent);
@@ -993,7 +997,7 @@ function convertTable(ctx, el) {
     const newCtx = { ...ctx, inTable: true, dontTrimText: true };
 
     /** @type {string[]} */
-    let result = [];
+    let result = ['\n\n'];
 
     const caption = el.querySelector('caption');
     if (caption) {

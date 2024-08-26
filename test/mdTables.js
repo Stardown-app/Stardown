@@ -55,7 +55,6 @@ const tests = [
             </table>`,
         mdExpected: `| a |
 | --- |
-
 `,
     },
     {
@@ -72,7 +71,6 @@ const tests = [
             </table>`,
         mdExpected: `| a | b |
 | --- | --- |
-
 `
     },
     {
@@ -92,7 +90,6 @@ const tests = [
         mdExpected: `| a |
 | --- |
 | c |
-
 `
     },
     {
@@ -118,7 +115,6 @@ const tests = [
         mdExpected: `| a | b |
 | --- | --- |
 | c | d |
-
 `
     },
     {
@@ -153,7 +149,6 @@ const tests = [
 | --- | --- |
 | d | e |
 | g | h |
-
 `
     },
     {
@@ -185,7 +180,6 @@ const tests = [
         mdExpected: `| a | b | c |
 | --- | --- | --- |
 | d | e | f |
-
 `
     },
     {
@@ -229,7 +223,6 @@ const tests = [
 | --- | --- | --- |
 | d | e | f |
 | g | h | i |
-
 `
     },
     {
@@ -270,7 +263,6 @@ const tests = [
 | --- | --- | --- |
 | d | e | f |
 | g | h |  |
-
 `
     },
     {
@@ -311,7 +303,6 @@ const tests = [
 | --- | --- | --- |
 | d | e |  |
 | g | h | i |
-
 `
     },
     {
@@ -352,7 +343,6 @@ const tests = [
 | --- | --- | --- |
 | d | e | f |
 | g | h | i |
-
 `
     },
     {
@@ -390,7 +380,6 @@ const tests = [
 | --- | --- | --- |
 | d | e | f |
 | g | h | i |
-
 `
     },
     {
@@ -412,7 +401,6 @@ const tests = [
             </table>`,
         mdExpected: `| a | b | c |
 | --- | --- | --- |
-
 `
     },
     {
@@ -460,7 +448,6 @@ const tests = [
 | --- | --- | --- |
 | d | e | f |
 | g | h | i |
-
 `
     },
     {
@@ -510,7 +497,6 @@ const tests = [
 | --- | --- | --- |
 | d | e | f |
 | g | h | i |
-
 `
     },
     {
@@ -560,7 +546,6 @@ const tests = [
 | --- | --- | --- |
 | d | e | f |
 | g | h | i |
-
 `
     },
     {
@@ -594,7 +579,6 @@ const tests = [
         mdExpected: `| a | b | c |
 | --- | --- | --- |
 | d | e | f |
-
 `
     },
     {
@@ -654,7 +638,6 @@ const tests = [
 | d | e | f |
 | g | h | i |
 | j | k | l |
-
 `
     },
     {
@@ -684,7 +667,6 @@ const tests = [
 | --- |
 | b |
 | c |
-
 `
     },
     {
@@ -708,7 +690,6 @@ const tests = [
         mdExpected: `| a |
 | --- |
 | b |
-
 `
     },
     {
@@ -744,7 +725,6 @@ const tests = [
 | b |
 | c |
 | d |
-
 `
     },
     {
@@ -766,7 +746,6 @@ const tests = [
         mdExpected: `| a |
 | --- |
 | b |
-
 `
     },
     {
@@ -788,7 +767,6 @@ const tests = [
         mdExpected: `| a |
 | --- |
 | b |
-
 `
     },
     {
@@ -814,7 +792,6 @@ const tests = [
         mdExpected: `| a | *b* |
 | --- | --- |
 | **c** | ***d*** |
-
 `
     },
     {
@@ -846,7 +823,6 @@ const tests = [
         mdExpected: `| a b | c d |
 | --- | --- |
 | e f | g h |
-
 `
     },
     {
@@ -866,7 +842,6 @@ const tests = [
         mdExpected: `| a |
 | --- |
 | b |
-
 `
     },
     {
@@ -908,7 +883,6 @@ const tests = [
         mdExpected: `| a b |
 | --- |
 | c d |
-
 `
     },
     {
@@ -935,7 +909,6 @@ const tests = [
 | a |
 | --- |
 | b |
-
 `
     },
     {
@@ -964,7 +937,6 @@ const tests = [
         mdExpected: `| a | a | b |
 | --- | --- | --- |
 | c | d | e |
-
 `
     },
     {
@@ -996,7 +968,6 @@ const tests = [
 | --- | --- |
 | a | c |
 | d | e |
-
 `
     },
     {
@@ -1025,7 +996,6 @@ const tests = [
 | --- | --- |
 | b | c |
 | d | d |
-
 `
     },
     {
@@ -1051,7 +1021,6 @@ const tests = [
         mdExpected: `| a | b | c |
 | --- | --- | --- |
 | a | d | c |
-
 `
     },
     {
@@ -1086,7 +1055,6 @@ const tests = [
 | --- | --- | --- |
 | d | e | e |
 | f | e | e |
-
 `
     },
     {
@@ -1120,7 +1088,6 @@ const tests = [
 | --- | --- | --- |
 |  |  | b |
 | c | d | e |
-
 `
     },
     {
@@ -1140,7 +1107,6 @@ const tests = [
         mdExpected: `| a |
 | --- |
 | b |
-
 `
     },
     {
@@ -1178,7 +1144,6 @@ const tests = [
         mdExpected: `| - a - b | 1. c 2. d |
 | --- | --- |
 | 1. e 2. f | - g - h |
-
 `
     },
     {
@@ -1198,7 +1163,6 @@ const tests = [
         mdExpected: `| a \\| b |
 | --- |
 | c \\| d |
-
 `
     },
 ];

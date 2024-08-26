@@ -115,23 +115,29 @@ print("hello world")
     1. miscarriage
     2. trunk
 
-1. Ordered list item 1
-2. Item 2 with block quote
+1. Ordered list item
+2. List item with block quote
     
     > Premature optimization is the root of all evil. — Donald Knuth
     
-3. Item 3 with code block
+3. List item with Python code block
     
     ```python
     while True:
         print(exec(input(">>> ")))
     ```
     
-4. Item 4 with image
+4. List item with code block without language
+    
+    ```
+    over there
+    ```
+    
+5. List item with image
     
     ![Orange slice](orange-slice.jpg)
     
-5. List item with **bold**, *italic*, and [a link](https://puter.com/app/code).
+6. List item with **bold**, *italic*, and [a link](https://puter.com/app/code).
 
 * * *
 

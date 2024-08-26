@@ -34,3 +34,24 @@ export function removeHiddenElements(node, doc) {
         currentNode = iterator.nextNode();
     }
 }
+
+/**
+ * isInlineText reports whether the given nodes are only text nodes and inline text
+ * elements.
+ * @param {Node[]|NodeList|HTMLCollection} nodes
+ * @returns {boolean}
+ */
+export function isInlineText(nodes) {
+    let i = 0;
+    const TEXT_NODE = 3;
+    while (nodes[i]?.nodeType === TEXT_NODE) {
+        i++;
+    }
+
+    const inlineTextElems = [
+        'EM', 'STRONG', 'B', 'I', 'A', 'LABEL', 'CODE', 'S', 'INS', 'DEL', 'MARK',
+        'SUB', 'SUP', 'TIME', 'Q', 'BIG', 'SMALL', 'CITE', 'DFN', 'VAR', 'SAMP', 'KBD',
+    ];
+
+    return nodes[i] && inlineTextElems.includes(nodes[i].nodeName);
+}

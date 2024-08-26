@@ -17,7 +17,7 @@
 import { getSetting } from '../common.js';
 import * as tables from './tables.js';
 import { absolutize } from './urls.js';
-import { removeHiddenElements } from './html.js';
+import { removeHiddenElements, isInlineText } from './html.js';
 
 /**
  * htmlToMd converts an HTML fragment to pure markdown without any HTML.
@@ -40,6 +40,10 @@ export async function htmlToMd(frag) {
 
     /** @type {function(string): string} */
     ctx.escape = newEscape(ctx.subBrackets);
+
+    if (isInlineText(frag.childNodes)) {
+        ctx.dontTrimText = true;
+    }
 
     return convertNodes(ctx, frag.childNodes).trim().replaceAll(/\n{3,}/g, '\n\n') + '\n';
 }

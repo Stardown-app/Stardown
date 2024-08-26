@@ -47,15 +47,24 @@ async function runTest() {
         </style>
     `);
     result.push('<body><pre>');
+
+    // add in the top right the numbers of characters that are unexpected and missing
+    result.push(`<div style="position: fixed; top: 0; right: 0; width: 25%; background-color: #f0f0f0; display: inline; font-size: 20px"><div style="color: red; display: inline"><div id="unexpectedCount" style="display: inline"></div> unexpected</div>   <div style="color: green; display: inline"><div id="missingCount" style="display: inline"></div> missing</div></div>`);
+
+    let unexpectedCount = 0;
+    let missingCount = 0;
+
     diff.forEach(part => {
         if (!part || !part.value) {
             return;
         }
 
         if (part.added) {
+            missingCount += part.value.length;
             const value = part.value.replaceAll('\n', '⤵\n');
             result.push('<span class="expected">' + value + '</span>');
         } else if (part.removed) {
+            unexpectedCount += part.value.length;
             const value = part.value.replaceAll('\n', '⤵\n');
             result.push('<span class="actual">' + value + '</span>');
         } else {
@@ -63,6 +72,13 @@ async function runTest() {
         }
     });
     result.push('</pre></body>');
+
+    result.push(`
+        <script>
+            document.getElementById('unexpectedCount').innerText = ${unexpectedCount};
+            document.getElementById('missingCount').innerText = ${missingCount};
+        </script>
+    `);
 
     await fs.writeFile('./test/md.diff.html', result.join(''));
 }

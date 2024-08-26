@@ -674,9 +674,14 @@ function convertPre(ctx, el) {
             result.push('\n' + ctx.indent + '\n' + ctx.indent);
         }
 
-        result.push('```');
+        let backtickCount = 3;
+        const text = child.textContent || '';
+        const match = text.match(/(`{3,})/);
+        if (match) {
+            backtickCount = match[1].length + 1;
+        }
 
-        if (child.textContent.includes('```')) {
+        for (let i = 0; i < backtickCount; i++) {
             result.push('`');
         }
 
@@ -692,11 +697,12 @@ function convertPre(ctx, el) {
 
         let code = child.textContent || '';
         code = code.replaceAll('\n', '\n' + ctx.indent);
-        result.push(ctx.indent + code + '\n' + ctx.indent + '```\n');
+        result.push(ctx.indent + code + '\n' + ctx.indent);
 
-        if (child.textContent.includes('```')) {
+        for (let i = 0; i < backtickCount; i++) {
             result.push('`');
         }
+        result.push('\n');
         if (ctx.inList) {
             result.push(ctx.indent);
         } else {
@@ -705,12 +711,28 @@ function convertPre(ctx, el) {
 
         return result.join('');
     } else {
-        let text = el.textContent || '';
-        if (text.includes('```')) {
-            return '````\n' + text + '\n````\n\n';
-        } else {
-            return '```\n' + text + '\n```\n\n';
+        const result = ['\n\n'];
+
+        let backtickCount = 3;
+        const text = child.textContent || '';
+        const match = text.match(/(`{3,})/);
+        if (match) {
+            backtickCount = match[1].length + 1;
         }
+
+        for (let i = 0; i < backtickCount; i++) {
+            result.push('`');
+        }
+
+        result.push('\n', text, '\n');
+
+        for (let i = 0; i < backtickCount; i++) {
+            result.push('`');
+        }
+
+        result.push('\n\n');
+
+        return result.join('');
     }
 }
 
@@ -725,12 +747,24 @@ function convertCode(ctx, el) {
         return '';
     }
     text = text.replaceAll('\n', ' ');
-    if (text.includes('``')) {
-        return '```' + text + '```';
-    } else if (text.includes('`')) {
-        return '``' + text + '``';
+
+    const result = [];
+
+    let backtickCount = 1;
+    const match = text.match(/(`+)/);
+    if (match) {
+        backtickCount = match[1].length + 1;
     }
-    return '`' + text + '`';
+
+    for (let i = 0; i < backtickCount; i++) {
+        result.push('`');
+    }
+    result.push(text);
+    for (let i = 0; i < backtickCount; i++) {
+        result.push('`');
+    }
+
+    return result.join('');
 }
 
 /**

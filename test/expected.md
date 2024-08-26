@@ -55,6 +55,8 @@ Press `Alt+C` to copy.
 
 ``Code elements can contain `backticks`.``
 
+`````and even ````tons of backticks````.`````
+
 ```
   .
  ...
@@ -66,6 +68,10 @@ Press `Alt+C` to copy.
 ```
 This text is in a code block.
 ```
+
+```````
+Code blocks can also contain ``````many`````` backticks.
+```````
 
 ```go
 import "fmt"

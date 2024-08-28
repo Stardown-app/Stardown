@@ -16,7 +16,12 @@
 
 import test from 'node:test'; // https://nodejs.org/api/test.html
 import assert from 'node:assert/strict'; // https://nodejs.org/api/assert.html#assert
+import { JSDOM } from 'jsdom'; // https://www.npmjs.com/package/jsdom
 import { diffMd } from './diffMd.js';
+import { htmlToMd } from '../src/converters/md.js';
+import * as md from '../src/md.js';
+
+global.location = { href: 'https://example.com' };
 
 test('diffMd', async () => {
     const wrongCharCount = await diffMd();
@@ -27,4 +32,21 @@ test('diffMd', async () => {
 There are differences between the actual and expected markdown.
 Run \`npm run md-diff\` and open md.diff.html to see the differences.`
     );
+});
+
+test('md.createBlockquote', async () => {
+    const input = 'This is a test.';
+    const expected = `> This is a test.
+> 
+> — [Example](https://example.com)
+`;
+
+    const title = 'Example';
+    const url = global.location.href;
+
+    global.document = new JSDOM(input).window.document;
+    const markdown = await htmlToMd(global.document.body);
+    const actual = await md.createBlockquote(markdown, title, url) + '\n';
+
+    assert.equal(actual, expected);
 });

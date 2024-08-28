@@ -86,7 +86,7 @@ export async function createAlert(type, text) {
  * @returns {Promise<string>}
  */
 export async function createBlockquote(body, title, url) {
-    body = body.replaceAll('\n', '\n> ');
+    body = body.trim().replaceAll('\n', '\n> ');
     const link = await createLink(title, url);
     return `> ${body}\n> \n> — ${link}`;
 }

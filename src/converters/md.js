@@ -431,7 +431,7 @@ function convertDocumentFragment(ctx, node) {
  */
 function convertHtml(ctx, el) {
     const newCtx = { ...ctx }; // prevent mutations of the original context
-    return convertNodes(newCtx, node.childNodes);
+    return convertNodes(newCtx, el.childNodes);
 }
 
 /**

@@ -363,10 +363,8 @@ function convertNode(ctx, node) {
     if (convert === undefined) {
         if (node.childNodes) {
             return convertNodes(ctx, node.childNodes);
-        } else if (node.textContent) {
-            return convertText(ctx, node);
         }
-        return '';
+        return convertText(ctx, node);
     }
     return convert(ctx, node);
 }
@@ -382,10 +380,8 @@ function convertElement(ctx, el) {
     if (convert === undefined) {
         if (el.childNodes) {
             return convertNodes(ctx, el.childNodes);
-        } else if (el.textContent) {
-            return convertText(ctx, el);
         }
-        return '';
+        return convertText(ctx, el);
     }
     return convert(ctx, el);
 }

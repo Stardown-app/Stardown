@@ -153,7 +153,7 @@ const elementConverters = new Map([
     ['TITLE', (ctx, node) => ''],
 
     // sectioning root elements
-    ['BODY', convertBlockElement],
+    ['BODY', convertChildNodes],
 
     // content sectioning elements
     ['ADDRESS', convertBlockElement],

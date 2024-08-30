@@ -655,81 +655,69 @@ function convertUl(ctx, el) {
  * @returns {string}
  */
 function convertPre(ctx, el) {
-    const child = el.firstChild;
-    if (!child) {
+    if (el.childNodes.length === 0) {
         return '';
     }
 
-    if (child.nodeName === 'SAMP' || child.nodeName === 'KBD') {
-        return convertCode(ctx, child);
-    } else if (child.nodeName === 'CODE') {
-        /** @type {string[]} */
-        const result = ['\n\n'];
-
-        if (ctx.inList) {
-            result.push('\n' + ctx.indent + '\n' + ctx.indent);
+    let text = '';
+    let language = '';
+    if (el.childNodes.length > 1) {
+        const result = [];
+        for (let i = 0; i < el.childNodes.length; i++) {
+            const child = el.childNodes[i];
+            result.push(child.textContent?.replaceAll('\n\n', ' ') || '');
+        }
+        text = result.join('');
+    } else { // if there is only one child
+        /** @type {Node} */
+        const child = el.firstChild;
+        if (child.nodeName === 'SAMP' || child.nodeName === 'KBD') {
+            return convertCode(ctx, child);
         }
 
-        let backtickCount = 3;
-        const text = child.textContent || '';
-        const match = text.match(/(`{3,})/);
-        if (match) {
-            backtickCount = match[1].length + 1;
+        text = child.textContent || '';
+
+        if (child.getAttribute) { // if the child is not a text node
+            const class_ = child.getAttribute('class') || '';
+            const languageMatch = class_.match(/language-(\S+)/);
+            if (languageMatch) {
+                language = languageMatch[1];
+            }
         }
-
-        for (let i = 0; i < backtickCount; i++) {
-            result.push('`');
-        }
-
-        // assign the code block a language if there is one
-        let language = '';
-        /** @type {string} */
-        const class_ = child.getAttribute('class') || '';
-        const languageMatch = class_.match(/language-(\S+)/);
-        if (languageMatch && languageMatch.length > 0) {
-            language = languageMatch[1];
-        }
-        result.push(language + '\n');
-
-        let code = child.textContent || '';
-        code = code.replaceAll('\n', '\n' + ctx.indent);
-        result.push(ctx.indent + code + '\n' + ctx.indent);
-
-        for (let i = 0; i < backtickCount; i++) {
-            result.push('`');
-        }
-        result.push('\n');
-        if (ctx.inList) {
-            result.push(ctx.indent);
-        } else {
-            result.push(ctx.indent + '\n');
-        }
-
-        return result.join('');
-    } else {
-        const result = ['\n\n'];
-
-        let backtickCount = 3;
-        const text = child.textContent || '';
-        const match = text.match(/(`{3,})/);
-        if (match) {
-            backtickCount = match[1].length + 1;
-        }
-
-        for (let i = 0; i < backtickCount; i++) {
-            result.push('`');
-        }
-
-        result.push('\n', text, '\n');
-
-        for (let i = 0; i < backtickCount; i++) {
-            result.push('`');
-        }
-
-        result.push('\n\n');
-
-        return result.join('');
     }
+
+    const result = ['\n\n'];
+
+    if (ctx.inList) {
+        result.push('\n' + ctx.indent + '\n' + ctx.indent);
+    }
+
+    let backtickCount = 3;
+    const match = text.match(/(`{3,})/);
+    if (match) {
+        backtickCount = match[1].length + 1;
+    }
+
+    for (let i = 0; i < backtickCount; i++) {
+        result.push('`');
+    }
+
+    result.push(language + '\n');
+
+    text = text.replaceAll('\n', '\n' + ctx.indent);
+    result.push(ctx.indent + text + '\n' + ctx.indent);
+
+    for (let i = 0; i < backtickCount; i++) {
+        result.push('`');
+    }
+    result.push('\n');
+    if (ctx.inList) {
+        result.push(ctx.indent);
+    } else {
+        result.push(ctx.indent + '\n');
+    }
+
+    return result.join('');
 }
 
 /**

@@ -91,6 +91,19 @@ python3
 print("hello world")
 ```
 
+```
+public class A : B
+{
+    public override void C(D e, F[] g){}
+}
+```
+
+```
+var h = new I();
+ 
+h.J(true, false, k);
+```
+
 1. reference
 2. litigation
 3. west

@@ -78,6 +78,7 @@ const ctx = {
     omitNav: await getSetting('omitNav'),
     omitFooter: await getSetting('omitFooter'),
     youtubeMd: await getSetting('youtubeMd'),
+    indent: '',
 };
 ```
 

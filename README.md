@@ -49,14 +49,12 @@ For why Stardown requests the permissions that it does, see [./docs/permissions.
 To open Stardown's options page, right-click the extension's icon and choose:
 
 * Firefox: "Manange extension" and then "Options"
-* Chrome: "Options"
-* Edge: "Extension options"
+* Chrome, Edge, Arc, Brave, Vivaldi, or Opera: "Options" or "Extension options"
 
 ### How to change the keyboard shortcut
 
 * [Firefox](https://support.mozilla.org/en-US/kb/manage-extension-shortcuts-firefox)
-* Chrome: `chrome://extensions/shortcuts`
-* Edge: `edge://extensions/shortcuts`
+* Chrome, Edge, Arc, Brave, Vivaldi, or Opera: `chrome://extensions/shortcuts`
 
 ## Troubleshooting
 

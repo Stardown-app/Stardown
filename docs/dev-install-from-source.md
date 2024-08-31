@@ -1,6 +1,6 @@
 # Installing Stardown from source for development
 
-## Chrome and Edge
+## Chrome, Edge, Arc, Brave, Vivaldi, Opera
 
 1. in a terminal, run `git clone https://github.com/Stardown-app/Stardown.git && cd Stardown`
 2. then run `npm install && npm run dev-chrome`

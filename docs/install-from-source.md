@@ -2,7 +2,7 @@
 
 Follow these steps to install Stardown using the source code. If you also want to change Stardown's code, instead follow the directions in [Installing Stardown from source for development](./dev-install-from-source.md).
 
-## Chrome and Edge
+## Chrome, Edge, Arc, Brave, Vivaldi, Opera
 
 1. in a terminal, run `git clone https://github.com/Stardown-app/Stardown.git && cd Stardown`
 2. then run `npm run build-chrome`

@@ -74,11 +74,11 @@ Also, please read [./docs/develop.md](docs/develop.md)
 
 ## Feature requests and alternatives
 
-You're welcome to [make a feature request](https://github.com/Stardown-app/Stardown/issues/new?assignees=&labels=enhancement&projects=&template=feature_request.md&title=), and there may already be other software that meets all of your needs. I am not affiliated with any of the below extensions and have not tried all of them; use them at your own risk.
+You're welcome to [make a feature request](https://github.com/Stardown-app/Stardown/issues/new?assignees=&labels=enhancement&projects=&template=feature_request.md&title=), and there may already be other software that meets all of your needs. I am not affiliated with any of the alternatives below and have not tried all of them; use them at your own risk.
 
 ### Download an entire web page
 
-* [MarkDownload](https://github.com/deathau/markdownload) was developed by an Obsidian community moderator. While Stardown is great for copying *parts* of web pages as markdown, MarkDownload is better for entire pages, especially if you want to download directly into Obsidian. I use both Stardown and MarkDownload.
+* [MarkDownload](https://github.com/deathau/markdownload) was developed by an Obsidian community moderator. While Stardown is great for copying *parts* of web pages as markdown, MarkDownload is better for downloading entire pages, especially if you want to download directly into Obsidian. I use both Stardown and MarkDownload.
 * [Obsidian Web Clipper Bookmarklet](https://gist.github.com/kepano/90c05f162c37cf730abb8ff027987ca3) is a bookmarklet for saving web pages directly to Obsidian.
 * [Slurp](https://github.com/inhumantsar/slurp) is an Obsidian community plugin and bookmarklet for saving web pages directly to Obsidian.
 * [Omnivore](https://omnivore.app/) doesn't save pages as markdown but can export them as markdown.
@@ -110,7 +110,7 @@ You're welcome to [make a feature request](https://github.com/Stardown-app/Stard
 
 Unlike the alternatives listed above, Stardown is:
 
-* **Simple.** Less clicking, less typing, no setup.
-* **Converts more formatting**. Even most complex tables can be converted to markdown or other markup languages.
+* **Flexible**. Integrates well with many workflows. Just copy part of a web page and paste anywhere.
+* **Converts more formatting**. Stardown can convert almost any table to markdown or another markup language, and can create markdown of videos that renders well in GitHub.
 * **Creates [text fragments](https://web.dev/articles/text-fragments)** so you can link to specific parts of pages.
-* **Infinitely customizable**. Any software developer can [install from source](./dev-install-from-source.md) and [edit or create a markup converter](../src/converters/README.md) such as [the HTML to markdown converter](../src/converters/md.js). For all but the most simple customization, Stardown's converters are easier to customize, extend, and integrate than all other widely used markup converters.
+* **Extensible**. Stardown's custom code for converting between markup languages is designed to be extended for more markdown flavors and other markup languages.

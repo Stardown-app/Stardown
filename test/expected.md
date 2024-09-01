@@ -35,8 +35,6 @@ emphasizedLetters*Within*String
 
 boldAndEmphasizedLetters***Within***String
 
-<a/>
-
 *Emphasis* in citation.
 
 > To make all your unknowns known, you must make all your knowns unknown. — Unknown

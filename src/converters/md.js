@@ -189,7 +189,7 @@ const elementConverters = new Map([
     ['LI', (ctx, el) => ''],
     ['MENU', convertUl],
     ['OL', convertOl],
-    ['P', convertBlockElement],
+    ['P', convertP],
     ['PRE', convertPre],
     ['UL', convertUl],
 
@@ -396,14 +396,19 @@ function convertElement(ctx, el) {
  * @returns {string}
  */
 function convertText(ctx, node) {
-    if (node.textContent) {
-        let content = ctx.escape(node.textContent);
-        if (!ctx.dontTrimText) {
-            content = content.trim();
-        }
-        return content.replaceAll(/\s+/g, ' ');
+    if (!node.textContent) {
+        return '';
     }
-    return '';
+
+    let content = ctx.escape(node.textContent);
+    if (!ctx.dontTrimText) {
+        content = content.trim();
+    }
+    if (!ctx.dontMinimizeWhitespace) {
+        content = content.replaceAll(/\s+/g, ' ');
+    }
+
+    return content;
 }
 
 /**
@@ -652,6 +657,25 @@ function convertUl(ctx, el) {
 
     return result.join('');
 }
+
+/**
+ * @param {object} ctx
+ * @param {Element} el
+ * @returns {string}
+ */
+function convertP(ctx, el) {
+    const newCtx = { ...ctx, dontTrimText: true, dontMinimizeWhitespace: true };
+
+    /** @type {string[]} */
+    const result = ['\n\n'];
+    result.push(convertNodes(newCtx, el.childNodes).trim().replaceAll(/\n\s+/g, '\n'));
+    if (!ctx.inList) {
+        result.push('\n\n');
+    }
+
+    return result.join('');
+}
+
 
 /**
  * @param {object} ctx

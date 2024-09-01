@@ -14,12 +14,14 @@ paragraph
 
 another paragraph
 
-Multi-line paragraph.
+Multi-line
+paragraph.
 
 Paragraph with 
 line break.
 
-**bold** *emphasis*
+**bold**
+*emphasis*
 
 ***both bold and emphasis***
 

@@ -266,7 +266,7 @@ const elementConverters = new Map([
     ['DATALIST', convertChildNodes],
     ['FIELDSET', convertBlockElement],
     ['FORM', convertBlockElement],
-    ['INPUT', (ctx, el) => ''],
+    ['INPUT', convertInput],
     ['LABEL', convertChildNodes],
     ['LEGEND', convertB],
     ['METER', convertChildNodes],
@@ -1057,4 +1057,32 @@ function convertTable(ctx, el) {
     }
 
     return result.join('') + '\n';
+}
+
+/**
+ * @param {object} ctx
+ * @param {Element} el
+ * @returns {string}
+ */
+function convertInput(ctx, el) {
+    const type = el.getAttribute('type');
+    if (type !== 'checkbox') {
+        return '';
+    }
+
+    const checked = el.getAttribute('checked') !== null;
+
+    /** @type {string[]} */
+    const result = [];
+
+    if (!ctx.inList) {
+        result.push('- ');
+    }
+    if (checked) {
+        result.push('[x] ');
+    } else {
+        result.push('[ ] ');
+    }
+
+    return result.join('');
 }

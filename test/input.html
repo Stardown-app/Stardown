@@ -39,6 +39,9 @@
     <strong>Bold</strong> and <em>emphasis</em> in a block quote.
   </blockquote>
   <p><img alt="Grapefruit slice" src="grapefruit-slice.jpg"></p>
+  <p><input type="checkbox">Checkbox on its own</p>
+  <p><input type="checkbox" checked>Checked checkbox on its own</p>
+  <p><input id="confirm" type="checkbox"><label for="confirm">Checkbox with label</label></p>
   <p>Press <code>Alt+C</code> to copy.</p>
   <p><code>Code elements can contain `backticks`.</code></p>
   <p><code>and even ````tons of backticks````.</code></p>
@@ -107,6 +110,13 @@ func main() {
         <li>trunk</li>
       </ol>
     </li>
+    <li><input type="checkbox">unchecked</li>
+    <li>
+      <input type="checkbox" checked>checked
+      <ul>
+        <li><input type="checkbox">indented</li>
+      </ul>
+    </li>
   </ul>
   <ol>
     <li>Ordered list item</li>
@@ -130,6 +140,13 @@ func main() {
       <img alt="Orange slice" src="orange-slice.jpg">
     </li>
     <li>List item with <strong>bold</strong>, <em>italic</em>, and <a href="https://puter.com/app/code">a link</a>.</li>
+    <li><input type="checkbox">List item with unchecked checkbox</li>
+    <li>
+      <input type="checkbox" checked>List item with checked checkbox
+      <ol>
+        <li><input type="checkbox">Indented list item with checkbox</li>
+      </ol>
+    </li>
   </ol>
   <hr>
   <p>It's possible to open a <a href="https://en.wikipedia.org/wiki/Special:Random">random Wikipedia page</a>.</p>

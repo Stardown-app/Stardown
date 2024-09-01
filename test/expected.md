@@ -51,6 +51,12 @@ boldAndEmphasizedLetters***Within***String
 
 ![Grapefruit slice](grapefruit-slice.jpg)
 
+- [ ] Checkbox on its own
+
+- [x] Checked checkbox on its own
+
+- [ ] Checkbox with label
+
 Press `Alt+C` to copy.
 
 ``Code elements can contain `backticks`.``
@@ -127,6 +133,9 @@ h.J(true, false, k);
 - borrow
     1. miscarriage
     2. trunk
+- [ ] unchecked
+- [x] checked
+    - [ ] indented
 
 1. Ordered list item
 2. List item with block quote
@@ -151,6 +160,9 @@ h.J(true, false, k);
     ![Orange slice](orange-slice.jpg)
     
 6. List item with **bold**, *italic*, and [a link](https://puter.com/app/code).
+7. [ ] List item with unchecked checkbox
+8. [x] List item with checked checkbox
+    1. [ ] Indented list item with checkbox
 
 * * *
 

@@ -33,6 +33,8 @@ emphasizedLetters*Within*String
 
 boldAndEmphasizedLetters***Within***String
 
+<a/>
+
 *Emphasis* in citation.
 
 > To make all your unknowns known, you must make all your knowns unknown. — Unknown
@@ -108,6 +110,13 @@ public class A : B
 var h = new I();
  
 h.J(true, false, k);
+```
+
+```
+<a/>
+    *hi*
+    
+    - one
 ```
 
 1. reference

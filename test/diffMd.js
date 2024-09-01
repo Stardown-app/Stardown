@@ -71,16 +71,21 @@ export async function diffMd() {
             return;
         }
 
+        let value = part.value
+            .replaceAll('<', '&lt;')
+            .replaceAll('>', '&gt;')
+            .replaceAll(' ', '&nbsp;')
+
         if (part.added) {
             missingCount += part.value.length;
-            const value = part.value.replaceAll('\n', '⤵\n');
+            value = value.replaceAll('\n', '⤵\n');
             result.push('<span class="missing">' + value + '</span>');
         } else if (part.removed) {
             unexpectedCount += part.value.length;
-            const value = part.value.replaceAll('\n', '⤵\n');
+            value = value.replaceAll('\n', '⤵\n');
             result.push('<span class="unexpected">' + value + '</span>');
         } else {
-            result.push('<span>' + part.value + '</span>');
+            result.push('<span>' + value + '</span>');
         }
     });
     result.push('</pre></body>');

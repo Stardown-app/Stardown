@@ -19,8 +19,12 @@ import * as tables from './tables.js';
 import { absolutize } from './urls.js';
 import { removeHiddenElements, isInlineText } from './html.js';
 
+// [CommonMark Spec](https://spec.commonmark.org/)
+// [commonmark.js demo](https://spec.commonmark.org/dingus/)
+
 /**
- * htmlToMd converts an HTML fragment to pure markdown without any HTML.
+ * htmlToMd converts an HTML fragment to pure markdown without any HTML. This function
+ * otherwise supports a superset of the CommonMark specification.
  * @param {DocumentFragment} frag
  * @returns {Promise<string>}
  */

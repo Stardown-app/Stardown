@@ -149,26 +149,26 @@ h.J(true, false, k);
 
 1. Ordered list item
 2. List item with block quote
-    
+
     > Premature optimization is the root of all evil. — Donald Knuth
-    
+
 3. List item with Python code block
-    
+
     ```python
     while True:
         print(exec(input(">>> ")))
     ```
-    
+
 4. List item with code block without language
-    
+
     ```
     over there
     ```
-    
+
 5. List item with image
-    
+
     ![Orange slice](orange-slice.jpg)
-    
+
 6. List item with **bold**, *italic*, and [a link](https://puter.com/app/code).
 7. [ ] List item with unchecked checkbox
 8. [x] List item with checked checkbox

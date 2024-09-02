@@ -515,16 +515,14 @@ function convertBlockquote(ctx, el) {
     /** @type {string[]} */
     const result = ['\n\n'];
     if (ctx.inList) {
-        result.push('\n' + ctx.indent + '\n' + ctx.indent);
+        result.push('\n\n' + ctx.indent);
     }
     result.push('> ');
     result.push(
         convertNodes(newCtx, el.childNodes).trim().replaceAll('\n', '\n>').replaceAll('> \n>\n>', '> ')
     );
     result.push('\n');
-    if (ctx.inList) {
-        result.push(ctx.indent);
-    } else {
+    if (!ctx.inList) {
         result.push('\n');
     }
 
@@ -592,8 +590,7 @@ function convertOl(ctx, el) {
             convertNodes(newCtx, child.childNodes)
                 .replace(/^ /, '')
                 .replace(/^\n+/, '')
-                .replace(/ \n+/, '\n')
-                .replace(/\n$/, '')
+                .replace(/ \n/, '\n')
                 .replace(/ $/, '')
         );
         if (!ctx.inList || i < children.length - 2) {
@@ -642,8 +639,7 @@ function convertUl(ctx, el) {
             convertNodes(newCtx, child.childNodes)
                 .replace(/^ /, '')
                 .replace(/^\n+/, '')
-                .replace(/ \n+/, '\n')
-                .replace(/\n$/, '')
+                .replace(/ \n/, '\n')
                 .replace(/ $/, '')
         );
         if (!ctx.inList || i < children.length - 2) {
@@ -717,7 +713,7 @@ function convertPre(ctx, el) {
     const result = ['\n\n'];
 
     if (ctx.inList) {
-        result.push('\n' + ctx.indent + '\n' + ctx.indent);
+        result.push('\n\n' + ctx.indent);
     }
 
     let backtickCount = 3;
@@ -739,10 +735,8 @@ function convertPre(ctx, el) {
         result.push('`');
     }
     result.push('\n');
-    if (ctx.inList) {
-        result.push(ctx.indent);
-    } else {
-        result.push(ctx.indent + '\n');
+    if (!ctx.inList) {
+        result.push('\n');
     }
 
     return result.join('');
@@ -903,11 +897,11 @@ function convertImg(ctx, el) {
     /** @type {string[]} */
     const result = [];
     if (ctx.inList) {
-        result.push('\n' + ctx.indent + '\n' + ctx.indent);
+        result.push('\n\n' + ctx.indent);
     }
     result.push('![' + alt + '](' + src + ')');
     if (ctx.inList) {
-        result.push('\n' + ctx.indent);
+        result.push('\n');
     }
 
     return result.join('');

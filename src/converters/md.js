@@ -896,12 +896,18 @@ function convertImg(ctx, el) {
     src = absolutize(src, ctx.locationHref);
     src = encodeUrl(src);
 
+    const title = ctx.escape(el.getAttribute('title') || '').replaceAll('"', '\\"');
+
     /** @type {string[]} */
     const result = [];
     if (ctx.inList) {
         result.push('\n\n' + ctx.indent);
     }
-    result.push('![' + alt + '](' + src + ')');
+    result.push('![' + alt + '](' + src);
+    if (title) {
+        result.push(' "' + title + '"');
+    }
+    result.push(')');
     if (ctx.inList) {
         result.push('\n');
     }

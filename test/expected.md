@@ -29,6 +29,10 @@ line break.
 
 ***both bold and emphasis***
 
+**nested bold elements**
+
+*nested emphasis elements*
+
 *Entirely emphasized but **only partly bold**.*
 
 boldLetters**Within**String

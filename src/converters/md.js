@@ -799,7 +799,12 @@ function convertA(ctx, el) {
  * @returns {string}
  */
 function convertB(ctx, el) {
-    const text = convertNodes(ctx, el.childNodes);
+    if (ctx.inB) {
+        return convertNodes(ctx, el.childNodes);
+    }
+    const newCtx = { ...ctx, inB: true };
+
+    const text = convertNodes(newCtx, el.childNodes);
     return '**' + text.trim().replaceAll('\n', ' ') + '**';
 }
 
@@ -809,7 +814,12 @@ function convertB(ctx, el) {
  * @returns {string}
  */
 function convertEm(ctx, el) {
-    const text = convertNodes(ctx, el.childNodes);
+    if (ctx.inEm) {
+        return convertNodes(ctx, el.childNodes);
+    }
+    const newCtx = { ...ctx, inEm: true };
+
+    const text = convertNodes(newCtx, el.childNodes);
     return '*' + text.trim().replaceAll('\n', ' ') + '*';
 }
 

@@ -10,6 +10,8 @@
 
 ###### Header level 6
 
+# another header
+
 paragraph
 
 another paragraph

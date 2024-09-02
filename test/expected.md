@@ -53,6 +53,8 @@ boldAndEmphasizedLetters***Within***String
 
 > **Bold** and *emphasis* in a block quote.
 
+[Edna](https://edna.arslexis.io/#scratch "tooltip")
+
 ![Grapefruit slice](grapefruit-slice.jpg)
 
 - [ ] Checkbox on its own

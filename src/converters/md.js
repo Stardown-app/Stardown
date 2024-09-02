@@ -786,9 +786,14 @@ function convertA(ctx, el) {
     href = absolutize(href, ctx.locationHref);
     href = encodeUrl(href);
 
-    const title = convertNodes(ctx, el.childNodes).replaceAll('\n', ' ');
+    const text = convertNodes(ctx, el.childNodes).replaceAll('\n', ' ');
 
-    return '[' + title + '](' + href + ')';
+    const title = ctx.escape(el.getAttribute('title') || '').replaceAll('"', '\\"');
+
+    if (title) {
+        return '[' + text + '](' + href + ' "' + title + '")';
+    }
+    return '[' + text + '](' + href + ')';
 }
 
 /**

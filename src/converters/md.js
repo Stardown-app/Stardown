@@ -246,7 +246,7 @@ const elementConverters = new Map([
 
     // scripting elements
     ['CANVAS', convertBlockElement],
-    ['NOSCRIPT', convertBlockElement],
+    ['NOSCRIPT', (ctx, el) => ''],
     ['SCRIPT', (ctx, el) => ''],
 
     // demarcating edits elements

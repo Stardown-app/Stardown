@@ -146,6 +146,7 @@ h.J(true, false, k);
 - [ ] unchecked
 - [x] checked
     - [ ] indented
+- # header in list
 
 1. Ordered list item
 2. List item with block quote
@@ -173,6 +174,7 @@ h.J(true, false, k);
 7. [ ] List item with unchecked checkbox
 8. [x] List item with checked checkbox
     1. [ ] Indented list item with checkbox
+9. ## header in ordered list
 
 * * *
 

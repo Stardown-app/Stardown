@@ -794,6 +794,8 @@ function convertA(ctx, el) {
     const text = convertNodes(ctx, el.childNodes).replaceAll('\n', ' ');
     if (!text) {
         return '';
+    } else if (!href) {
+        return text;
     }
 
     const title = ctx.escape(el.getAttribute('title') || '').replaceAll('"', '\\"');

@@ -59,6 +59,8 @@ boldAndEmphasizedLetters***Within***String
 
 [Edna](https://edna.arslexis.io/#scratch "tooltip")
 
+anchor with no href
+
 ![Grapefruit slice](grapefruit-slice.jpg)
 
 - [ ] Checkbox on its own

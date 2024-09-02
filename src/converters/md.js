@@ -839,8 +839,21 @@ function convertMark(ctx, el) {
  * @returns {string}
  */
 function convertQ(ctx, el) {
-    const text = convertNodes(ctx, el.childNodes);
-    return '*"' + text.trim().replaceAll('\n', ' ') + '"*';
+    if (ctx.inEm) {
+        const text = convertNodes(ctx, el.childNodes)
+            .trim()
+            .replaceAll('\n', ' ')
+            .replaceAll('"', '\\"')
+        return '"' + text + '"';
+    }
+    const newCtx = { ...ctx, inEm: true };
+
+    const text = convertNodes(newCtx, el.childNodes)
+        .trim()
+        .replaceAll('\n', ' ')
+        .replaceAll('"', '\\"')
+
+    return '*"' + text + '"*';
 }
 
 /**
@@ -849,8 +862,17 @@ function convertQ(ctx, el) {
  * @returns {string}
  */
 function convertS(ctx, el) {
-    const text = convertNodes(ctx, el.childNodes);
-    return '~~' + text.trim().replaceAll('\n', ' ').replaceAll('~', '\\~') + '~~';
+    if (ctx.inS) {
+        return convertNodes(ctx, el.childNodes);
+    }
+    const newCtx = { ...ctx, inS: true };
+
+    const text = convertNodes(newCtx, el.childNodes)
+        .trim()
+        .replaceAll('\n', ' ')
+        .replaceAll('~', '\\~')
+
+    return '~~' + text + '~~';
 }
 
 /**
@@ -859,8 +881,27 @@ function convertS(ctx, el) {
  * @returns {string}
  */
 function convertVar(ctx, el) {
-    const text = convertNodes(ctx, el.childNodes);
-    return '***' + text.trim().replaceAll('\n', ' ') + '***';
+    /** @type {string[]} */
+    const result = [];
+
+    if (!ctx.inEm) {
+        result.push('*');
+    }
+    if (!ctx.inB) {
+        result.push('**');
+    }
+
+    const newCtx = { ...ctx, inEm: true, inB: true };
+    result.push(convertNodes(newCtx, el.childNodes).trim().replaceAll('\n', ' '));
+
+    if (!ctx.inB) {
+        result.push('**');
+    }
+    if (!ctx.inEm) {
+        result.push('*');
+    }
+
+    return result.join('');
 }
 
 /**

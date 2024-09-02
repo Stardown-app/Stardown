@@ -581,7 +581,11 @@ function convertOl(ctx, el) {
     const children = el.childNodes;
     for (let i = 0; i < children.length; i++) {
         const child = children[i];
-        if (child.nodeType === TEXT_NODE) {
+        if (
+            child.nodeType === TEXT_NODE ||
+            child.childNodes.length === 0 ||
+            child.textContent?.match(/^\s+$/)
+        ) {
             continue;
         }
 
@@ -630,7 +634,11 @@ function convertUl(ctx, el) {
     const children = el.childNodes;
     for (let i = 0; i < children.length; i++) {
         const child = children[i];
-        if (child.nodeType === TEXT_NODE) {
+        if (
+            child.nodeType === TEXT_NODE ||
+            child.childNodes.length === 0 ||
+            child.textContent?.match(/^\s+$/)
+        ) {
             continue;
         }
 

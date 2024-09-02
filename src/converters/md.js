@@ -792,6 +792,9 @@ function convertA(ctx, el) {
     href = encodeUrl(href);
 
     const text = convertNodes(ctx, el.childNodes).replaceAll('\n', ' ');
+    if (!text) {
+        return '';
+    }
 
     const title = ctx.escape(el.getAttribute('title') || '').replaceAll('"', '\\"');
 

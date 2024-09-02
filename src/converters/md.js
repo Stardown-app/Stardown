@@ -294,10 +294,10 @@ const elementConverters = new Map([
     ['TEMPLATE', (ctx, el) => ''],
 
     // deprecated elements
-    ['ACRONYM', (ctx, el) => ''],
-    ['BIG', (ctx, el) => ''],
-    ['CENTER', (ctx, el) => ''],
-    ['CONTENT', (ctx, el) => ''],
+    ['ACRONYM', convertChildNodes],
+    ['BIG', convertChildNodes],
+    ['CENTER', convertChildNodes],
+    ['CONTENT', convertChildNodes],
     ['DIR', (ctx, el) => ''],
     ['FONT', (ctx, el) => ''],
     ['FRAME', (ctx, el) => ''],
@@ -313,7 +313,7 @@ const elementConverters = new Map([
     ['RB', (ctx, el) => ''],
     ['RTC', (ctx, el) => ''],
     ['SHADOW', (ctx, el) => ''],
-    ['STRIKE', (ctx, el) => ''],
+    ['STRIKE', convertS],
     ['TT', (ctx, el) => ''],
     ['XMP', (ctx, el) => ''],
 ]);

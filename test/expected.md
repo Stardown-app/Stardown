@@ -124,6 +124,10 @@ h.J(true, false, k);
 3. litigation
 4. west
 
+- deteriorate
+- salivation
+- familiar
+
 1. manual
 2. queen
     1. related
@@ -131,10 +135,6 @@ h.J(true, false, k);
 3. skin
     - egg
     - log
-
-- deteriorate
-- salivation
-- familiar
 
 - add
 - system

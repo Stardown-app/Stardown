@@ -779,10 +779,7 @@ function convertCode(ctx, el) {
  * @returns {string}
  */
 function convertA(ctx, el) {
-    let href = el.getAttribute('href');
-    if (!href) {
-        return '';
-    }
+    let href = el.getAttribute('href') || '';
     href = absolutize(href, ctx.locationHref);
     href = encodeUrl(href);
 

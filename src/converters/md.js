@@ -1150,6 +1150,10 @@ function convertInput(ctx, el) {
     if (type !== 'checkbox') {
         return '';
     }
+    const ariaHasPopup = el.getAttribute('aria-haspopup');
+    if (ariaHasPopup) {
+        return '';
+    }
 
     const checked = el.getAttribute('checked') !== null;
 

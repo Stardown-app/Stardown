@@ -257,16 +257,16 @@ const elementConverters = new Map([
     ['INS', convertChildNodes],
 
     // table content elements
-    ['CAPTION', (ctx, el) => ''],
+    ['CAPTION', convertChildNodes],
     ['COL', (ctx, el) => ''],
     ['COLGROUP', (ctx, el) => ''],
     ['TABLE', convertTable],
-    ['TBODY', (ctx, el) => ''],
-    ['TD', (ctx, el) => ''],
-    ['TFOOT', (ctx, el) => ''],
-    ['TH', (ctx, el) => ''],
-    ['THEAD', (ctx, el) => ''],
-    ['TR', (ctx, el) => ''],
+    ['TBODY', convertChildNodes],
+    ['TD', convertChildNodes],
+    ['TFOOT', convertChildNodes],
+    ['TH', convertChildNodes],
+    ['THEAD', convertChildNodes],
+    ['TR', convertChildNodes],
 
     // form elements
     ['BUTTON', convertChildNodes],
@@ -1114,6 +1114,10 @@ function convertTable(ctx, el) {
         return convertText(ctx, el);
     }
     const newCtx = { ...ctx, inTable: true, dontTrimText: true };
+
+    if (el.getAttribute('role') === 'presentation') {
+        return convertNodes(newCtx, el.childNodes);
+    }
 
     /** @type {string[]} */
     let result = ['\n\n'];

@@ -24,7 +24,10 @@ import { removeHiddenElements, isInlineText } from './html.js';
 
 /**
  * htmlToMd converts an HTML fragment to pure markdown without any HTML. This function
- * otherwise supports a superset of the CommonMark specification.
+ * otherwise supports a superset of the CommonMark specification. In rare cases, the
+ * output may contain HTML because some sites put sample HTML in code blocks created
+ * without <pre> or <code> elements, such as
+ * https://www.w3schools.com/html/html_iframe.asp
  * @param {DocumentFragment} frag
  * @returns {Promise<string>}
  */

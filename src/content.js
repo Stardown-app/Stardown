@@ -276,7 +276,7 @@ async function handleIconSingleClick() {
  */
 async function handlePageRightClick(htmlId) {
     let title = document.title;
-    let url = location.href;
+    let url = removeIdAndTextFragment(location.href);
     if (htmlId) {
         url += '#' + htmlId;
     }

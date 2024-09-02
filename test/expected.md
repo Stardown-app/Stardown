@@ -149,6 +149,24 @@ h.J(true, false, k);
 - [ ] unchecked
 - [x] checked
     - [ ] indented
+- quote
+
+    > In general, problems are much easier to solve when you have them, than when you try to guess what they will be. — BurningFrog
+
+- code block
+
+    ```cpp
+    #include <iostream>
+    
+    int main() {
+        std::cout << "hello world";
+    }
+    ```
+
+- image
+
+    ![Lime slice](lime-slice.jpg)
+
 - # header in list
 
 1. Ordered list item

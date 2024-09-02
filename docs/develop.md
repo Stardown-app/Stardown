@@ -49,6 +49,25 @@ Stardown converts HTML to other formats using custom code explained in [../src/c
 
 When fully manually testing Stardown, use the descriptions in this section in each of the officially supported browsers to search for bugs.
 
+### Sample web pages
+
+Here are a bunch of web pages with interesting features for testing.
+
+- [tiny table](https://www.markdownguide.org/extended-syntax/#tables)
+- [small table](https://developer.mozilla.org/en-US/docs/Learn/HTML/Tables/Advanced#tables_for_visually_impaired_users)
+- [complex table](https://en.wikipedia.org/wiki/English_modal_auxiliary_verbs#Modal_auxiliary_verbs_distinguished_grammatically)
+- [table with link images](https://en.wikipedia.org/wiki/1926_World_Table_Tennis_Championships)
+- [tables with spanned images](https://en.wikipedia.org/wiki/Toshimi_Kitazawa)
+- [massive table](https://www.worldometers.info/world-population/population-by-country/)
+- [references](https://en.wikipedia.org/wiki/Shanti_Kumar_Morarjee)
+- [code blocks that use `<pre>` but not `<code>`](https://www.cnblogs.com/unity2018/p/8492463.html)
+- [code blocks with inline element headers](https://developer.mozilla.org/en-US/docs/Learn/HTML/Tables/Advanced#the_scope_attribute)
+- [MS doc code blocks](https://devblogs.microsoft.com/dotnet/csharp-13-explore-preview-features/)
+- [block quote](https://markdownguide.offshoot.io/basic-syntax/#blockquotes-1)
+- [image](https://betterexplained.com/articles/math-empathy/#post-6251:~:text=Math%20Empathy%20Checklist,different%20mental%20checklist.)
+- [iframe](https://www.w3schools.com/html/html_iframe.asp)
+- [YouTube video](https://www.youtube.com/watch?v=jfKfPfyJRdk)
+
 ### Context types
 
 - **selection**: anything that the user has selected by clicking and dragging with their mouse or using selection keyboard shortcuts.

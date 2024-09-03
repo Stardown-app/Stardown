@@ -794,7 +794,7 @@ function convertA(ctx, el) {
     href = absolutize(href, ctx.locationHref);
     href = encodeUrl(href);
 
-    const text = convertNodes(ctx, el.childNodes).replaceAll('\n', ' ');
+    const text = convertNodes(ctx, el.childNodes).trim().replaceAll('\n', ' ');
     if (!text) {
         return '';
     } else if (!href) {

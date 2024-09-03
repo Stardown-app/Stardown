@@ -337,7 +337,7 @@ function convertBlockElement(ctx, el) {
 
     /** @type {string[]} */
     const result = ['\n\n'];
-    result.push(convertNodes(newCtx, el.childNodes).trim().replaceAll(/\n\s+/g, '\n'));
+    result.push(convertNodes(newCtx, el.childNodes).trim().replaceAll(/\n\s*\n\s*/g, '\n\n'));
     if (!ctx.inList) {
         result.push('\n\n');
     }

@@ -105,11 +105,3 @@ Similarly, `ctx` can be used to help with list indentation:
 ```js
 const newCtx = { ...ctx, indent: ctx.indent + '    ' };
 ```
-
-### Tables
-
-HTML table definition:
-
-> In this order: optionally a caption element, followed by zero or more colgroup elements, followed optionally by a thead element, followed by either zero or more tbody elements or one or more tr elements, followed optionally by a tfoot element, optionally intermixed with one or more script-supporting elements.
-
-Source: [the HTML Standard](https://html.spec.whatwg.org/multipage/tables.html)

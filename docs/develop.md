@@ -150,3 +150,9 @@ Some HTML tables have cells that span multiple rows and/or columns, such as [thi
 From my experience so far, markdown renderers tend to require every markdown table to have one header row followed by one table divider, then zero or more body rows. The number of cells in the header row must be equal to that of the table divider and to that of whichever row has the most cells. Body rows may have varying numbers of cells.
 
 Sample markdown tables for testing markdown renderers can be found in [./sample-tables.md](./sample-tables.md).
+
+**HTML table definition**
+
+> In this order: optionally a caption element, followed by zero or more colgroup elements, followed optionally by a thead element, followed by either zero or more tbody elements or one or more tr elements, followed optionally by a tfoot element, optionally intermixed with one or more script-supporting elements.
+> 
+> — [the HTML Standard](https://html.spec.whatwg.org/multipage/tables.html)

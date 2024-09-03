@@ -34,7 +34,7 @@ Stardown-converters' markdown converter uses two map data structures to determin
 /** @type {Map<string, function(object, Element): string>} */
 const elementConverters = new Map([
     ['BR', (ctx, el) => '\n'],
-    ['HR', (ctx, el) => '---\n\n'],
+    ['HR', (ctx, el) => '\n\n* * *\n\n'],
     ['A', convertA],
     ['EM', convertEm],
     ['IMG', convertImg],

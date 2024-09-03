@@ -15,6 +15,7 @@
 */
 
 import { browser } from './config.js';
+import { encodeUrl } from './converters/md.js';
 
 /**
  * createTextFragmentArg creates for a markdown link a text fragment argument (the part
@@ -69,26 +70,27 @@ export function createTextFragmentArg(selection) {
 
     let arg = '';
     if (fragment.prefix) {
-        arg += urlEncode(fragment.prefix) + '-,';
+        arg += encodeFragmentComponent(fragment.prefix) + '-,';
     }
-    arg += urlEncode(fragment.textStart);
+    arg += encodeFragmentComponent(fragment.textStart);
     if (fragment.textEnd) {
-        arg += ',' + urlEncode(fragment.textEnd);
+        arg += ',' + encodeFragmentComponent(fragment.textEnd);
     }
     if (fragment.suffix) {
-        arg += ',-' + urlEncode(fragment.suffix);
+        arg += ',-' + encodeFragmentComponent(fragment.suffix);
     }
-    arg = arg.replaceAll('(', '%28').replaceAll(')', '%29'); // for markdown links
+
+    arg = encodeUrl(arg);
 
     return arg;
 }
 
 /**
- * urlEncode URL-encodes a string, but also replaces '-' with '%2D' because the text
- * fragment generator appears to not handle '-' correctly.
+ * encodeFragmentComponent URL-encodes a string, but also replaces '-' with '%2D'
+ * because the text fragment generator appears to not handle '-' correctly.
  * @param {string} text - the text to encode.
  * @returns {string}
  */
-function urlEncode(text) {
+function encodeFragmentComponent(text) {
     return encodeURIComponent(text).replaceAll('-', '%2D');
 }

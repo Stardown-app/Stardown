@@ -17,21 +17,14 @@
 import test from 'node:test'; // https://nodejs.org/api/test.html
 import assert from 'node:assert/strict'; // https://nodejs.org/api/assert.html#assert
 import { JSDOM } from 'jsdom'; // https://www.npmjs.com/package/jsdom
-import { newTurndownService } from '../src/newTurndownService.js';
-import { escape } from '../src/md.js';
-import { tableConfig } from '../src/tables.js';
+import { htmlTableToJson } from '../src/converters/json.js';
 
-tableConfig.format = 'json';
-tableConfig.emptyCellJson = 'null';
-
-const turndownService = newTurndownService(
-    '-', 'underlined', 'source with link', true, true, escape,
-);
+global.location = { href: 'https://example.com' };
 
 function runTest(testName, htmlInput, jsonExpected) {
-    test(testName, t => {
+    test(testName, async t => {
         global.document = new JSDOM(htmlInput).window.document;
-        const jsonActual = turndownService.turndown(htmlInput);
+        const jsonActual = await htmlTableToJson(global.document.body);
         assert.equal(jsonActual, jsonExpected);
     });
 }
@@ -42,9 +35,8 @@ function runTests() {
         runTest(testName, htmlInput, jsonExpected);
     }
 
-    test('empty cells are set to "N/A"', t => {
-        const htmlInput = `
-            <table>
+    test('empty cells are set to "N/A"', async t => {
+        const htmlInput = `<table>
                 <tr>
                     <td>
                     </td>
@@ -59,16 +51,11 @@ function runTests() {
                     <td>
                     </td>
                 </tr>
-            </table>
-        `;
-        const jsonExpected = `
-[{"N/A": ["a"]}, {"b": ["N/A"]}]
-`.trim();
+            </table>`;
+        const jsonExpected = `[{"N/A": ["a"]}, {"b": ["N/A"]}]`;
 
         global.document = new JSDOM(htmlInput).window.document;
-        tableConfig.emptyCellJson = '"N/A"';
-        const jsonActual = turndownService.turndown(htmlInput);
-        tableConfig.emptyCellJson = 'null';
+        const jsonActual = await htmlTableToJson(global.document.body, '"N/A"');
         assert.equal(jsonActual, jsonExpected);
     });
 }
@@ -76,31 +63,24 @@ function runTests() {
 const tests = [
     {
         testName: '0x0',
-        htmlInput: `
-            <table>
-            </table>
-        `,
+        htmlInput: `<table>
+            </table>`,
         jsonExpected: `[]`,
     },
     {
         testName: '1x1',
-        htmlInput: `
-            <table>
+        htmlInput: `<table>
                 <tr>
                     <th>
                         a
                     </th>
                 </tr>
-            </table>
-        `,
-        jsonExpected: `
-[{"a": []}]
-`.trim(),
+            </table>`,
+        jsonExpected: `[{"a": []}]`,
     },
     {
         testName: '2x1',
-        htmlInput: `
-            <table>
+        htmlInput: `<table>
                 <tr>
                     <th>
                         a
@@ -109,16 +89,12 @@ const tests = [
                         b
                     </th>
                 </tr>
-            </table>
-            `,
-        jsonExpected: `
-[{"a": ["b"]}]
-`.trim()
+            </table>`,
+        jsonExpected: `[{"a": ["b"]}]`,
     },
     {
         testName: '1x2',
-        htmlInput: `
-            <table>
+        htmlInput: `<table>
                 <tr>
                     <th>
                         a
@@ -129,16 +105,12 @@ const tests = [
                         c
                     </td>
                 </tr>
-            </table>
-            `,
-        jsonExpected: `
-[{"a": []}, {"c": []}]
-`.trim()
+            </table>`,
+        jsonExpected: `[{"a": []}, {"c": []}]`,
     },
     {
         testName: '2x2',
-        htmlInput: `
-            <table>
+        htmlInput: `<table>
                 <tr>
                     <th>
                         a
@@ -155,16 +127,12 @@ const tests = [
                         d
                     </td>
                 </tr>
-            </table>
-            `,
-        jsonExpected: `
-[{"a": ["b"]}, {"c": ["d"]}]
-`.trim()
+            </table>`,
+        jsonExpected: `[{"a": ["b"]}, {"c": ["d"]}]`,
     },
     {
         testName: '2x3',
-        htmlInput: `
-            <table>
+        htmlInput: `<table>
                 <tr>
                     <th>
                         a
@@ -189,16 +157,12 @@ const tests = [
                         h
                     </td>
                 </tr>
-            </table>
-            `,
-        jsonExpected: `
-[{"a": ["b"]}, {"d": ["e"]}, {"g": ["h"]}]
-`.trim()
+            </table>`,
+        jsonExpected: `[{"a": ["b"]}, {"d": ["e"]}, {"g": ["h"]}]`,
     },
     {
         testName: '3x2',
-        htmlInput: `
-            <table>
+        htmlInput: `<table>
                 <tr>
                     <th>
                         a
@@ -221,16 +185,12 @@ const tests = [
                         f
                     </td>
                 </tr>
-            </table>
-            `,
-        jsonExpected: `
-[{"a": ["b", "c"]}, {"d": ["e", "f"]}]
-`.trim()
+            </table>`,
+        jsonExpected: `[{"a": ["b", "c"]}, {"d": ["e", "f"]}]`,
     },
     {
         testName: '3x3',
-        htmlInput: `
-            <table>
+        htmlInput: `<table>
                 <tr>
                     <th>
                         a
@@ -264,16 +224,12 @@ const tests = [
                         i
                     </td>
                 </tr>
-            </table>
-            `,
-        jsonExpected: `
-[{"a": ["b", "c"]}, {"d": ["e", "f"]}, {"g": ["h", "i"]}]
-`.trim()
+            </table>`,
+        jsonExpected: `[{"a": ["b", "c"]}, {"d": ["e", "f"]}, {"g": ["h", "i"]}]`,
     },
     {
         testName: '3x3 -1 cell in the second body row',
-        htmlInput: `
-            <table>
+        htmlInput: `<table>
                 <tr>
                     <th>
                         a
@@ -304,16 +260,12 @@ const tests = [
                         h
                     </td>
                 </tr>
-            </table>
-            `,
-        jsonExpected: `
-[{"a": ["b", "c"]}, {"d": ["e", "f"]}, {"g": ["h"]}]
-`.trim()
+            </table>`,
+        jsonExpected: `[{"a": ["b", "c"]}, {"d": ["e", "f"]}, {"g": ["h"]}]`,
     },
     {
         testName: '3x3 -1 cell in the first body row',
-        htmlInput: `
-            <table>
+        htmlInput: `<table>
                 <tr>
                     <th>
                         a
@@ -344,16 +296,12 @@ const tests = [
                         i
                     </td>
                 </tr>
-            </table>
-            `,
-        jsonExpected: `
-[{"a": ["b", "c"]}, {"d": ["e"]}, {"g": ["h", "i"]}]
-`.trim()
+            </table>`,
+        jsonExpected: `[{"a": ["b", "c"]}, {"d": ["e"]}, {"g": ["h", "i"]}]`,
     },
     {
         testName: '3x3 -1 cell in the header row',
-        htmlInput: `
-            <table>
+        htmlInput: `<table>
                 <tr>
                     <th>
                         a
@@ -384,16 +332,12 @@ const tests = [
                         i
                     </td>
                 </tr>
-            </table>
-            `,
-        jsonExpected: `
-[{"a": ["b"]}, {"d": ["e", "f"]}, {"g": ["h", "i"]}]
-`.trim()
+            </table>`,
+        jsonExpected: `[{"a": ["b"]}, {"d": ["e", "f"]}, {"g": ["h", "i"]}]`,
     },
     {
         testName: '3x3 -2 cells in the header row',
-        htmlInput: `
-            <table>
+        htmlInput: `<table>
                 <tr>
                     <th>
                         a
@@ -421,16 +365,12 @@ const tests = [
                         i
                     </td>
                 </tr>
-            </table>
-            `,
-        jsonExpected: `
-[{"a": []}, {"d": ["e", "f"]}, {"g": ["h", "i"]}]
-`.trim()
+            </table>`,
+        jsonExpected: `[{"a": []}, {"d": ["e", "f"]}, {"g": ["h", "i"]}]`,
     },
     {
         testName: 'thead',
-        htmlInput: `
-            <table>
+        htmlInput: `<table>
                 <thead>
                     <tr>
                         <th>
@@ -444,16 +384,12 @@ const tests = [
                         </th>
                     </tr>
                 </thead>
-            </table>
-            `,
-        jsonExpected: `
-[{"a": ["b", "c"]}]
-`.trim()
+            </table>`,
+        jsonExpected: `[{"a": ["b", "c"]}]`,
     },
     {
         testName: 'one thead and one tbody',
-        htmlInput: `
-            <table>
+        htmlInput: `<table>
                 <thead>
                     <tr>
                         <th>
@@ -491,16 +427,12 @@ const tests = [
                         </td>
                     </tr>
                 </tbody>
-            </table>
-            `,
-        jsonExpected: `
-[{"a": ["b", "c"]}, {"d": ["e", "f"]}, {"g": ["h", "i"]}]
-`.trim()
+            </table>`,
+        jsonExpected: `[{"a": ["b", "c"]}, {"d": ["e", "f"]}, {"g": ["h", "i"]}]`,
     },
     {
         testName: 'one thead and two tbodies',
-        htmlInput: `
-            <table>
+        htmlInput: `<table>
                 <thead>
                     <tr>
                         <th>
@@ -540,16 +472,12 @@ const tests = [
                         </td>
                     </tr>
                 </tbody>
-            </table>
-            `,
-        jsonExpected: `
-[{"a": ["b", "c"]}, {"d": ["e", "f"]}, {"g": ["h", "i"]}]
-`.trim()
+            </table>`,
+        jsonExpected: `[{"a": ["b", "c"]}, {"d": ["e", "f"]}, {"g": ["h", "i"]}]`,
     },
     {
         testName: 'thead, tbodies, and a th column',
-        htmlInput: `
-            <table>
+        htmlInput: `<table>
                 <thead>
                     <tr>
                         <th>
@@ -589,16 +517,12 @@ const tests = [
                         </td>
                     </tr>
                 </tbody>
-            </table>
-            `,
-        jsonExpected: `
-[{"a": ["b", "c"]}, {"d": ["e", "f"]}, {"g": ["h", "i"]}]
-`.trim()
+            </table>`,
+        jsonExpected: `[{"a": ["b", "c"]}, {"d": ["e", "f"]}, {"g": ["h", "i"]}]`,
     },
     {
         testName: 'one tbody, no thead',
-        htmlInput: `
-            <table>
+        htmlInput: `<table>
                 <tbody>
                     <tr>
                         <th>
@@ -623,16 +547,12 @@ const tests = [
                         </td>
                     </tr>
                 </tbody>
-            </table>
-            `,
-        jsonExpected: `
-[{"a": ["b", "c"]}, {"d": ["e", "f"]}]
-`.trim()
+            </table>`,
+        jsonExpected: `[{"a": ["b", "c"]}, {"d": ["e", "f"]}]`,
     },
     {
         testName: 'two tbodies, no thead',
-        htmlInput: `
-            <table>
+        htmlInput: `<table>
                 <tbody>
                     <tr>
                         <td>
@@ -681,16 +601,12 @@ const tests = [
                         </td>
                     </tr>
                 </tbody>
-            </table>
-            `,
-        jsonExpected: `
-[{"a": ["b", "c"]}, {"d": ["e", "f"]}, {"g": ["h", "i"]}, {"j": ["k", "l"]}]
-`.trim()
+            </table>`,
+        jsonExpected: `[{"a": ["b", "c"]}, {"d": ["e", "f"]}, {"g": ["h", "i"]}, {"j": ["k", "l"]}]`,
     },
     {
         testName: 'multiple rows in a thead',
-        htmlInput: `
-            <table>
+        htmlInput: `<table>
                 <thead>
                     <tr>
                         <th>
@@ -710,16 +626,12 @@ const tests = [
                         </td>
                     </tr>
                 </tbody>
-            </table>
-            `,
-        jsonExpected: `
-[{"a": []}, {"b": []}, {"c": []}]
-`.trim()
+            </table>`,
+        jsonExpected: `[{"a": []}, {"b": []}, {"c": []}]`,
     },
     {
         testName: 'one tbody and one tfoot, each with one row',
-        htmlInput: `
-            <table>
+        htmlInput: `<table>
                 <tbody>
                     <tr>
                         <td>
@@ -734,16 +646,12 @@ const tests = [
                         </td>
                     </tr>
                 </tfoot>
-            </table>
-            `,
-        jsonExpected: `
-[{"a": []}, {"b": []}]
-`.trim()
+            </table>`,
+        jsonExpected: `[{"a": []}, {"b": []}]`,
     },
     {
         testName: 'one tbody and one tfoot, each with two rows',
-        htmlInput: `
-            <table>
+        htmlInput: `<table>
                 <tbody>
                     <tr>
                         <td>
@@ -768,16 +676,12 @@ const tests = [
                         </td>
                     </tr>
                 </tfoot>
-            </table>
-            `,
-        jsonExpected: `
-[{"a": []}, {"b": []}, {"c": []}, {"d": []}]
-`.trim()
+            </table>`,
+        jsonExpected: `[{"a": []}, {"b": []}, {"c": []}, {"d": []}]`,
     },
     {
         testName: 'one thead with a tr, followed by one tr',
-        htmlInput: `
-            <table>
+        htmlInput: `<table>
                 <thead>
                     <tr>
                         <th>
@@ -790,16 +694,12 @@ const tests = [
                         b
                     </td>
                 </tr>
-            </table>
-            `,
-        jsonExpected: `
-[{"a": []}, {"b": []}]
-`.trim()
+            </table>`,
+        jsonExpected: `[{"a": []}, {"b": []}]`,
     },
     {
         testName: 'one tr, followed by one tfoot',
-        htmlInput: `
-            <table>
+        htmlInput: `<table>
                 <tr>
                     <td>
                         a
@@ -812,42 +712,12 @@ const tests = [
                         </th>
                     </tr>
                 </tfoot>
-            </table>
-            `,
-        jsonExpected: `
-[{"a": []}, {"b": []}]
-`.trim()
-    },
-    {
-        testName: 'bold and emphasis',
-        htmlInput: `
-            <table>
-                <tr>
-                    <td>
-                        a
-                    </td>
-                    <td>
-                        <em>b</em>
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        <b>c</b>
-                    </td>
-                    <td>
-                        <b><em>d</em></b>
-                    </td>
-                </tr>
-            </table>
-            `,
-        jsonExpected: `
-[{"a": ["*b*"]}, {"**c**": ["***d***"]}]
-`.trim()
+            </table>`,
+        jsonExpected: `[{"a": []}, {"b": []}]`,
     },
     {
         testName: 'paragraphs and breaks',
-        htmlInput: `
-                <table>
+        htmlInput: `<table>
                     <tr>
                         <th>
                             <p>a</p>
@@ -870,16 +740,12 @@ const tests = [
                             <p>h</p>
                         </td>
                     </tr>
-                </table>
-                `,
-        jsonExpected: `
-[{"a\n\nb": ["c\n\n  \n\nd"]}, {"e\n\n  \n\nf": ["g\n\nh"]}]
-`.trim()
+                </table>`,
+        jsonExpected: `[{"a b": ["c d"]}, {"e f": ["g h"]}]`,
     },
     {
         testName: 'h1 and h2 in rows',
-        htmlInput: `
-            <table>
+        htmlInput: `<table>
                 <tr>
                     <th>
                         <h1>a</h1>
@@ -890,16 +756,12 @@ const tests = [
                         <h2>b</h2>
                     </td>
                 </tr>
-            </table>
-            `,
-        jsonExpected: `
-[{"a": []}, {"b": []}]
-`.trim()
+            </table>`,
+        jsonExpected: `[{"a": []}, {"b": []}]`,
     },
     {
         testName: 'table of tables',
-        htmlInput: `
-            <table>
+        htmlInput: `<table>
                 <tr>
                     <td>
                         <table>
@@ -932,16 +794,12 @@ const tests = [
                         </table>
                     </td>
                 </tr>
-            </table>
-            `,
-        jsonExpected: `
-[{"ab": []}, {"cd": []}]
-`.trim()
+            </table>`,
+        jsonExpected: `[{"a b": []}, {"c d": []}]`,
     },
     {
         testName: 'caption',
-        htmlInput: `
-            <table>
+        htmlInput: `<table>
                 <caption>
                     this is a caption
                 </caption>
@@ -957,16 +815,12 @@ const tests = [
                         </td>
                     </tr>
                 </tbody>
-            </table>
-            `,
-        jsonExpected: `
-[{"a": []}, {"b": []}]
-`.trim()
+            </table>`,
+        jsonExpected: `[{"a": []}, {"b": []}]`,
     },
     {
         testName: 'colspan',
-        htmlInput: `
-            <table>
+        htmlInput: `<table>
                 <tr>
                     <th colspan="2">
                         a
@@ -986,16 +840,12 @@ const tests = [
                         e
                     </td>
                 </tr>
-            </table>
-            `,
-        jsonExpected: `
-[{"a": ["a", "b"]}, {"c": ["d", "e"]}]
-`.trim()
+            </table>`,
+        jsonExpected: `[{"a": ["a", "b"]}, {"c": ["d", "e"]}]`,
     },
     {
         testName: 'rowspan',
-        htmlInput: `
-            <table>
+        htmlInput: `<table>
                 <tr>
                     <th rowspan="2">
                         a
@@ -1017,16 +867,12 @@ const tests = [
                         e
                     </td>
                 </tr>
-            </table>
-            `,
-        jsonExpected: `
-[{"a": ["b"]}, {"a": ["c"]}, {"d": ["e"]}]
-`.trim()
+            </table>`,
+        jsonExpected: `[{"a": ["b"]}, {"a": ["c"]}, {"d": ["e"]}]`,
     },
     {
         testName: 'parallel colspans',
-        htmlInput: `
-            <table>
+        htmlInput: `<table>
                 <tr>
                     <td colspan="2">
                         a
@@ -1045,16 +891,12 @@ const tests = [
                         d
                     </td>
                 </tr>
-            </table>
-            `,
-        jsonExpected: `
-[{"a": ["a"]}, {"b": ["c"]}, {"d": ["d"]}]
-`.trim()
+            </table>`,
+        jsonExpected: `[{"a": ["a"]}, {"b": ["c"]}, {"d": ["d"]}]`,
     },
     {
         testName: 'parallel rowspans',
-        htmlInput: `
-            <table>
+        htmlInput: `<table>
                 <tr>
                     <td rowspan="2">
                         a
@@ -1071,16 +913,12 @@ const tests = [
                         d
                     </td>
                 </tr>
-            </table>
-            `,
-        jsonExpected: `
-[{"a": ["b", "c"]}, {"a": ["d", "c"]}]
-`.trim()
+            </table>`,
+        jsonExpected: `[{"a": ["b", "c"]}, {"a": ["d", "c"]}]`,
     },
     {
         testName: 'colspan and rowspan in the same cell',
-        htmlInput: `
-            <table>
+        htmlInput: `<table>
                 <tr>
                     <td>
                         a
@@ -1105,16 +943,12 @@ const tests = [
                         f
                     </td>
                 </tr>
-            </table>
-            `,
-        jsonExpected: `
-[{"a": ["b", "c"]}, {"d": ["e", "e"]}, {"f": ["e", "e"]}]
-`.trim()
+            </table>`,
+        jsonExpected: `[{"a": ["b", "c"]}, {"d": ["e", "e"]}, {"f": ["e", "e"]}]`,
     },
     {
         testName: 'colspan and rowspan in the same empty cell',
-        htmlInput: `
-            <table>
+        htmlInput: `<table>
                 <tr>
                     <td colspan="2" rowspan="2">
                     </td>
@@ -1138,36 +972,34 @@ const tests = [
                         e
                     </td>
                 </tr>
-            </table>
-            `,
-        jsonExpected: `
-[{"null": [null, "a"]}, {"null": [null, "b"]}, {"c": ["d", "e"]}]
-`.trim()
+            </table>`,
+        jsonExpected: `[{"null": [null, "a"]}, {"null": [null, "b"]}, {"c": ["d", "e"]}]`,
     },
     {
         testName: 'backslashes',
-        htmlInput: `
-            <table>
+        htmlInput: `<table>
                 <tr>
                     <th>
                         a\\b
                     </th>
+                    <th>
+                        c\\d
+                    </th>
                 </tr>
                 <tr>
                     <td>
-                        c\\d
+                        e\\f
+                    </td>
+                    <td>
+                        g\\h
                     </td>
                 </tr>
-            </table>
-            `,
-        jsonExpected: `
-[{"a\\\\b": []}, {"c\\\\d": []}]
-`.trim()
+            </table>`,
+        jsonExpected: `[{"a\\\\b": ["c\\\\d"]}, {"e\\\\f": ["g\\\\h"]}]`,
     },
     {
         testName: 'encapsulated double quotes',
-        htmlInput: `
-            <table>
+        htmlInput: `<table>
                 <tr>
                     <th>
                         "a"
@@ -1178,16 +1010,12 @@ const tests = [
                         They said "wow" twice.
                     </td>
                 </tr>
-            </table>
-            `,
-        jsonExpected: `
-[{"\\"a\\"": []}, {"They said \\"wow\\" twice.": []}]
-`.trim()
+            </table>`,
+        jsonExpected: `[{"\\"a\\"": []}, {"They said \\"wow\\" twice.": []}]`,
     },
     {
         testName: 'several JSON types',
-        htmlInput: `
-            <table>
+        htmlInput: `<table>
                 <tr>
                     <td>
                         true
@@ -1229,11 +1057,8 @@ const tests = [
                         4e-3
                     </td>
                 </tr>
-            </table>
-            `,
-        jsonExpected: `
-[{"true": [false, null, null]}, {"hello": ["True", "."]}, {"5": [-0.222e+11, 0.0, 8000, 4e-3]}]
-`.trim()
+            </table>`,
+        jsonExpected: `[{"true": [false, null, null]}, {"hello": ["True", "."]}, {"5": [-0.222e+11, 0.0, 8000, 4e-3]}]`,
     },
 ];
 

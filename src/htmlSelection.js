@@ -16,6 +16,7 @@
 
 import { getSetting } from './common.js';
 import * as md from './md.js';
+import { htmlToMd, encodeUrl } from './converters/md.js';
 
 /**
  * createText creates markdown (or another text format) of the selected part of the
@@ -55,13 +56,14 @@ export async function createText(title, url, selection) {
 }
 
 /**
- * getSelectionHtml takes a selection object and returns its HTML content. If no
- * selection exists, null is returned. The selection may be expanded to include certain
- * elements that are ancestors of the selection to make copying easier.
- * @param {Selection|null} - a selection object.
- * @returns {Promise<string|null>}
+ * getSelectionFragment takes a selection object and returns its HTML content as a
+ * document fragment. If no selection exists, null is returned. The selection may be
+ * expanded to include certain elements that are ancestors of the selection to make
+ * copying easier.
+ * @param {Selection} selection
+ * @returns {Promise<DocumentFragment|null>}
  */
-export async function getSelectionHtml(selection) {
+export async function getSelectionFragment(selection) {
     if (selection === null || selection.type === 'None') {
         console.error('Failed to get a selection');
         return null;
@@ -70,19 +72,20 @@ export async function getSelectionHtml(selection) {
         return null;
     }
 
-    let container = document.createElement('div');
+    /** @type {DocumentFragment} */
+    const frag = document.createDocumentFragment();
 
     const startRange = getStartRange(selection);
-    container.appendChild(startRange.cloneContents());
+    frag.appendChild(startRange.cloneContents());
     for (let i = 1; i < selection.rangeCount - 1; i++) {
-        container.appendChild(selection.getRangeAt(i).cloneContents());
+        frag.appendChild(selection.getRangeAt(i).cloneContents());
     }
     if (selection.rangeCount > 1) {
         const endRange = getEndRange(selection);
-        container.appendChild(endRange.cloneContents());
+        frag.appendChild(endRange.cloneContents());
     }
 
-    return container.innerHTML;
+    return frag;
 }
 
 /**
@@ -94,31 +97,33 @@ export async function getSelectionHtml(selection) {
  * @returns {Promise<string>}
  */
 export async function getSourceFormatText(selection, selectedText) {
-    const html = await getSelectionHtml(selection);
-    if (html === null) {
+    /** @type {DocumentFragment} */
+    const frag = await getSelectionFragment(selection);
+    if (frag === null) {
         return selectedText;
-    } else {
-        return await md.htmlToPlaintext(html);
     }
+    return await htmlToMd(frag);
 }
 
 export async function getTemplatedText(title, url, selection, selectedText) {
     const template = await getSetting('selectionTemplate');
 
     title = await md.createLinkTitle(title);
-    url = url.replaceAll('(', '%28').replaceAll(')', '%29');
-    const html = await getSelectionHtml(selection);
-    if (html === null) {
-        selection = selectedText;
+    url = encodeUrl(url);
+
+    /** @type {DocumentFragment} */
+    const frag = await getSelectionFragment(selection);
+    if (frag === null) {
+        text = selectedText;
     } else {
-        selection = await md.htmlToPlaintext(html);
+        text = await htmlToMd(frag);
     }
     const today = new Date();
     const YYYYMMDD = today.getFullYear() + '/' + (today.getMonth() + 1) + '/' + today.getDate();
     const templateVars = {
         link: { title, url },
         date: { YYYYMMDD },
-        selection,
+        text,
     };
 
     try {
@@ -147,12 +152,16 @@ async function getSourceFormatTextWithLink(title, url, selection, selectedText) 
     const today = new Date();
     const todayStr = today.getFullYear() + '/' + (today.getMonth() + 1) + '/' + today.getDate();
     const alert = await md.createAlert('note', `from ${link} on ${todayStr}`);
-    const html = await getSelectionHtml(selection);
-    if (html === null) {
+
+    /** @type {DocumentFragment} */
+    const frag = await getSelectionFragment(selection);
+    if (frag === null) {
         return alert + '\n\n' + selectedText;
-    } else {
-        return alert + '\n\n' + await md.htmlToPlaintext(html);
     }
+
+    const text = await htmlToMd(frag);
+
+    return alert + '\n\n' + text;
 }
 
 /**

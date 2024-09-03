@@ -17,20 +17,14 @@
 import test from 'node:test'; // https://nodejs.org/api/test.html
 import assert from 'node:assert/strict'; // https://nodejs.org/api/assert.html#assert
 import { JSDOM } from 'jsdom'; // https://www.npmjs.com/package/jsdom
-import { newTurndownService } from '../src/newTurndownService.js';
-import { escape } from '../src/md.js';
-import { tableConfig } from '../src/tables.js';
+import { htmlToMd } from '../src/converters/md.js';
 
-tableConfig.format = 'markdown';
-
-const turndownService = newTurndownService(
-    '-', 'underlined', 'source with link', true, true, escape,
-);
+global.location = { href: 'https://example.com' };
 
 function runTest(testName, htmlInput, mdExpected) {
-    test(testName, t => {
+    test(testName, async t => {
         global.document = new JSDOM(htmlInput).window.document;
-        const mdActual = turndownService.turndown(htmlInput);
+        const mdActual = await htmlToMd(global.document.body);
         assert.equal(mdActual, mdExpected);
     });
 }
@@ -45,32 +39,27 @@ function runTests() {
 const tests = [
     {
         testName: '0x0',
-        htmlInput: `
-            <table>
-            </table>
-        `,
-        mdExpected: ``,
+        htmlInput: `<table>
+            </table>`,
+        mdExpected: `
+`,
     },
     {
         testName: '1x1',
-        htmlInput: `
-            <table>
+        htmlInput: `<table>
                 <tr>
                     <th>
                         a
                     </th>
                 </tr>
-            </table>
-        `,
-        mdExpected: `
-| a |
+            </table>`,
+        mdExpected: `| a |
 | --- |
-`.trim(),
+`,
     },
     {
         testName: '2x1',
-        htmlInput: `
-            <table>
+        htmlInput: `<table>
                 <tr>
                     <th>
                         a
@@ -79,17 +68,14 @@ const tests = [
                         b
                     </th>
                 </tr>
-            </table>
-            `,
-        mdExpected: `
-| a | b |
+            </table>`,
+        mdExpected: `| a | b |
 | --- | --- |
-`.trim()
+`
     },
     {
         testName: '1x2',
-        htmlInput: `
-            <table>
+        htmlInput: `<table>
                 <tr>
                     <th>
                         a
@@ -100,18 +86,15 @@ const tests = [
                         c
                     </td>
                 </tr>
-            </table>
-            `,
-        mdExpected: `
-| a |
+            </table>`,
+        mdExpected: `| a |
 | --- |
 | c |
-`.trim()
+`
     },
     {
         testName: '2x2',
-        htmlInput: `
-            <table>
+        htmlInput: `<table>
                 <tr>
                     <th>
                         a
@@ -128,18 +111,15 @@ const tests = [
                         d
                     </td>
                 </tr>
-            </table>
-            `,
-        mdExpected: `
-| a | b |
+            </table>`,
+        mdExpected: `| a | b |
 | --- | --- |
 | c | d |
-`.trim()
+`
     },
     {
         testName: '2x3',
-        htmlInput: `
-            <table>
+        htmlInput: `<table>
                 <tr>
                     <th>
                         a
@@ -164,19 +144,16 @@ const tests = [
                         h
                     </td>
                 </tr>
-            </table>
-            `,
-        mdExpected: `
-| a | b |
+            </table>`,
+        mdExpected: `| a | b |
 | --- | --- |
 | d | e |
 | g | h |
-`.trim()
+`
     },
     {
         testName: '3x2',
-        htmlInput: `
-            <table>
+        htmlInput: `<table>
                 <tr>
                     <th>
                         a
@@ -199,18 +176,15 @@ const tests = [
                         f
                     </td>
                 </tr>
-            </table>
-            `,
-        mdExpected: `
-| a | b | c |
+            </table>`,
+        mdExpected: `| a | b | c |
 | --- | --- | --- |
 | d | e | f |
-`.trim()
+`
     },
     {
         testName: '3x3',
-        htmlInput: `
-            <table>
+        htmlInput: `<table>
                 <tr>
                     <th>
                         a
@@ -244,19 +218,16 @@ const tests = [
                         i
                     </td>
                 </tr>
-            </table>
-            `,
-        mdExpected: `
-| a | b | c |
+            </table>`,
+        mdExpected: `| a | b | c |
 | --- | --- | --- |
 | d | e | f |
 | g | h | i |
-`.trim()
+`
     },
     {
         testName: '3x3 -1 cell in the second body row',
-        htmlInput: `
-            <table>
+        htmlInput: `<table>
                 <tr>
                     <th>
                         a
@@ -287,19 +258,16 @@ const tests = [
                         h
                     </td>
                 </tr>
-            </table>
-            `,
-        mdExpected: `
-| a | b | c |
+            </table>`,
+        mdExpected: `| a | b | c |
 | --- | --- | --- |
 | d | e | f |
 | g | h |  |
-`.trim()
+`
     },
     {
         testName: '3x3 -1 cell in the first body row',
-        htmlInput: `
-            <table>
+        htmlInput: `<table>
                 <tr>
                     <th>
                         a
@@ -330,19 +298,16 @@ const tests = [
                         i
                     </td>
                 </tr>
-            </table>
-            `,
-        mdExpected: `
-| a | b | c |
+            </table>`,
+        mdExpected: `| a | b | c |
 | --- | --- | --- |
 | d | e |  |
 | g | h | i |
-`.trim()
+`
     },
     {
         testName: '3x3 -1 cell in the header row',
-        htmlInput: `
-            <table>
+        htmlInput: `<table>
                 <tr>
                     <th>
                         a
@@ -373,19 +338,16 @@ const tests = [
                         i
                     </td>
                 </tr>
-            </table>
-            `,
-        mdExpected: `
-| a | b |  |
+            </table>`,
+        mdExpected: `| a | b |  |
 | --- | --- | --- |
 | d | e | f |
 | g | h | i |
-`.trim()
+`
     },
     {
         testName: '3x3 -2 cells in the header row',
-        htmlInput: `
-            <table>
+        htmlInput: `<table>
                 <tr>
                     <th>
                         a
@@ -413,19 +375,16 @@ const tests = [
                         i
                     </td>
                 </tr>
-            </table>
-            `,
-        mdExpected: `
-| a |  |  |
+            </table>`,
+        mdExpected: `| a |  |  |
 | --- | --- | --- |
 | d | e | f |
 | g | h | i |
-`.trim()
+`
     },
     {
         testName: 'thead',
-        htmlInput: `
-            <table>
+        htmlInput: `<table>
                 <thead>
                     <tr>
                         <th>
@@ -439,17 +398,14 @@ const tests = [
                         </th>
                     </tr>
                 </thead>
-            </table>
-            `,
-        mdExpected: `
-| a | b | c |
+            </table>`,
+        mdExpected: `| a | b | c |
 | --- | --- | --- |
-`.trim()
+`
     },
     {
         testName: 'one thead and one tbody',
-        htmlInput: `
-            <table>
+        htmlInput: `<table>
                 <thead>
                     <tr>
                         <th>
@@ -487,19 +443,16 @@ const tests = [
                         </td>
                     </tr>
                 </tbody>
-            </table>
-            `,
-        mdExpected: `
-| a | b | c |
+            </table>`,
+        mdExpected: `| a | b | c |
 | --- | --- | --- |
 | d | e | f |
 | g | h | i |
-`.trim()
+`
     },
     {
         testName: 'one thead and two tbodies',
-        htmlInput: `
-            <table>
+        htmlInput: `<table>
                 <thead>
                     <tr>
                         <th>
@@ -539,19 +492,16 @@ const tests = [
                         </td>
                     </tr>
                 </tbody>
-            </table>
-            `,
-        mdExpected: `
-| a | b | c |
+            </table>`,
+        mdExpected: `| a | b | c |
 | --- | --- | --- |
 | d | e | f |
 | g | h | i |
-`.trim()
+`
     },
     {
         testName: 'thead, tbodies, and a th column',
-        htmlInput: `
-            <table>
+        htmlInput: `<table>
                 <thead>
                     <tr>
                         <th>
@@ -591,19 +541,16 @@ const tests = [
                         </td>
                     </tr>
                 </tbody>
-            </table>
-            `,
-        mdExpected: `
-| a | b | c |
+            </table>`,
+        mdExpected: `| a | b | c |
 | --- | --- | --- |
 | d | e | f |
 | g | h | i |
-`.trim()
+`
     },
     {
         testName: 'one tbody, no thead',
-        htmlInput: `
-            <table>
+        htmlInput: `<table>
                 <tbody>
                     <tr>
                         <th>
@@ -628,18 +575,15 @@ const tests = [
                         </td>
                     </tr>
                 </tbody>
-            </table>
-            `,
-        mdExpected: `
-| a | b | c |
+            </table>`,
+        mdExpected: `| a | b | c |
 | --- | --- | --- |
 | d | e | f |
-`.trim()
+`
     },
     {
         testName: 'two tbodies, no thead',
-        htmlInput: `
-            <table>
+        htmlInput: `<table>
                 <tbody>
                     <tr>
                         <td>
@@ -688,20 +632,17 @@ const tests = [
                         </td>
                     </tr>
                 </tbody>
-            </table>
-            `,
-        mdExpected: `
-| a | b | c |
+            </table>`,
+        mdExpected: `| a | b | c |
 | --- | --- | --- |
 | d | e | f |
 | g | h | i |
 | j | k | l |
-`.trim()
+`
     },
     {
         testName: 'multiple rows in a thead',
-        htmlInput: `
-            <table>
+        htmlInput: `<table>
                 <thead>
                     <tr>
                         <th>
@@ -721,19 +662,16 @@ const tests = [
                         </td>
                     </tr>
                 </tbody>
-            </table>
-            `,
-        mdExpected: `
-| a |
+            </table>`,
+        mdExpected: `| a |
 | --- |
 | b |
 | c |
-`.trim()
+`
     },
     {
         testName: 'one tbody and one tfoot, each with one row',
-        htmlInput: `
-            <table>
+        htmlInput: `<table>
                 <tbody>
                     <tr>
                         <td>
@@ -748,18 +686,15 @@ const tests = [
                         </td>
                     </tr>
                 </tfoot>
-            </table>
-            `,
-        mdExpected: `
-| a |
+            </table>`,
+        mdExpected: `| a |
 | --- |
 | b |
-`.trim()
+`
     },
     {
         testName: 'one tbody and one tfoot, each with two rows',
-        htmlInput: `
-            <table>
+        htmlInput: `<table>
                 <tbody>
                     <tr>
                         <td>
@@ -784,20 +719,17 @@ const tests = [
                         </td>
                     </tr>
                 </tfoot>
-            </table>
-            `,
-        mdExpected: `
-| a |
+            </table>`,
+        mdExpected: `| a |
 | --- |
 | b |
 | c |
 | d |
-`.trim()
+`
     },
     {
         testName: 'one thead with a tr, followed by one tr',
-        htmlInput: `
-            <table>
+        htmlInput: `<table>
                 <thead>
                     <tr>
                         <th>
@@ -810,18 +742,15 @@ const tests = [
                         b
                     </td>
                 </tr>
-            </table>
-            `,
-        mdExpected: `
-| a |
+            </table>`,
+        mdExpected: `| a |
 | --- |
 | b |
-`.trim()
+`
     },
     {
         testName: 'one tr, followed by one tfoot',
-        htmlInput: `
-            <table>
+        htmlInput: `<table>
                 <tr>
                     <td>
                         a
@@ -834,18 +763,15 @@ const tests = [
                         </th>
                     </tr>
                 </tfoot>
-            </table>
-            `,
-        mdExpected: `
-| a |
+            </table>`,
+        mdExpected: `| a |
 | --- |
 | b |
-`.trim()
+`
     },
     {
         testName: 'bold and emphasis',
-        htmlInput: `
-            <table>
+        htmlInput: `<table>
                 <tr>
                     <td>
                         a
@@ -862,18 +788,15 @@ const tests = [
                         <b><em>d</em></b>
                     </td>
                 </tr>
-            </table>
-            `,
-        mdExpected: `
-| a | *b* |
+            </table>`,
+        mdExpected: `| a | *b* |
 | --- | --- |
 | **c** | ***d*** |
-`.trim()
+`
     },
     {
         testName: 'paragraphs and breaks',
-        htmlInput: `
-                <table>
+        htmlInput: `<table>
                     <tr>
                         <th>
                             <p>a</p>
@@ -896,18 +819,15 @@ const tests = [
                             <p>h</p>
                         </td>
                     </tr>
-                </table>
-                `,
-        mdExpected: `
-| a b | c d |
+                </table>`,
+        mdExpected: `| a b | c d |
 | --- | --- |
 | e f | g h |
-`.trim()
+`
     },
     {
         testName: 'h1 and h2 in rows',
-        htmlInput: `
-            <table>
+        htmlInput: `<table>
                 <tr>
                     <th>
                         <h1>a</h1>
@@ -918,18 +838,15 @@ const tests = [
                         <h2>b</h2>
                     </td>
                 </tr>
-            </table>
-            `,
-        mdExpected: `
-| a |
+            </table>`,
+        mdExpected: `| a |
 | --- |
 | b |
-`.trim()
+`
     },
     {
         testName: 'table of tables',
-        htmlInput: `
-            <table>
+        htmlInput: `<table>
                 <tr>
                     <td>
                         <table>
@@ -962,18 +879,15 @@ const tests = [
                         </table>
                     </td>
                 </tr>
-            </table>
-            `,
-        mdExpected: `
-| ab |
+            </table>`,
+        mdExpected: `| a b |
 | --- |
-| cd |
-`.trim()
+| c d |
+`
     },
     {
         testName: 'caption',
-        htmlInput: `
-            <table>
+        htmlInput: `<table>
                 <caption>
                     this is a caption
                 </caption>
@@ -989,20 +903,17 @@ const tests = [
                         </td>
                     </tr>
                 </tbody>
-            </table>
-            `,
-        mdExpected: `
-**this is a caption**
+            </table>`,
+        mdExpected: `**this is a caption**
 
 | a |
 | --- |
 | b |
-`.trim()
+`
     },
     {
         testName: 'colspan',
-        htmlInput: `
-            <table>
+        htmlInput: `<table>
                 <tr>
                     <th colspan="2">
                         a
@@ -1022,18 +933,15 @@ const tests = [
                         e
                     </td>
                 </tr>
-            </table>
-            `,
-        mdExpected: `
-| a | a | b |
+            </table>`,
+        mdExpected: `| a | a | b |
 | --- | --- | --- |
 | c | d | e |
-`.trim()
+`
     },
     {
         testName: 'rowspan',
-        htmlInput: `
-            <table>
+        htmlInput: `<table>
                 <tr>
                     <th rowspan="2">
                         a
@@ -1055,19 +963,16 @@ const tests = [
                         e
                     </td>
                 </tr>
-            </table>
-            `,
-        mdExpected: `
-| a | b |
+            </table>`,
+        mdExpected: `| a | b |
 | --- | --- |
 | a | c |
 | d | e |
-`.trim()
+`
     },
     {
         testName: 'parallel colspans',
-        htmlInput: `
-            <table>
+        htmlInput: `<table>
                 <tr>
                     <td colspan="2">
                         a
@@ -1086,19 +991,16 @@ const tests = [
                         d
                     </td>
                 </tr>
-            </table>
-            `,
-        mdExpected: `
-| a | a |
+            </table>`,
+        mdExpected: `| a | a |
 | --- | --- |
 | b | c |
 | d | d |
-`.trim()
+`
     },
     {
         testName: 'parallel rowspans',
-        htmlInput: `
-            <table>
+        htmlInput: `<table>
                 <tr>
                     <td rowspan="2">
                         a
@@ -1115,18 +1017,15 @@ const tests = [
                         d
                     </td>
                 </tr>
-            </table>
-            `,
-        mdExpected: `
-| a | b | c |
+            </table>`,
+        mdExpected: `| a | b | c |
 | --- | --- | --- |
 | a | d | c |
-`.trim()
+`
     },
     {
         testName: 'colspan and rowspan in the same cell',
-        htmlInput: `
-            <table>
+        htmlInput: `<table>
                 <tr>
                     <td>
                         a
@@ -1151,19 +1050,16 @@ const tests = [
                         f
                     </td>
                 </tr>
-            </table>
-            `,
-        mdExpected: `
-| a | b | c |
+            </table>`,
+        mdExpected: `| a | b | c |
 | --- | --- | --- |
 | d | e | e |
 | f | e | e |
-`.trim()
+`
     },
     {
         testName: 'colspan and rowspan in the same empty cell',
-        htmlInput: `
-            <table>
+        htmlInput: `<table>
                 <tr>
                     <td colspan="2" rowspan="2">
                     </td>
@@ -1187,19 +1083,16 @@ const tests = [
                         e
                     </td>
                 </tr>
-            </table>
-            `,
-        mdExpected: `
-|  |  | a |
+            </table>`,
+        mdExpected: `|  |  | a |
 | --- | --- | --- |
 |  |  | b |
 | c | d | e |
-`.trim()
+`
     },
     {
         testName: 'spaces around',
-        htmlInput: `
-            <table>
+        htmlInput: `<table>
                 <tr>
                     <th>
                         <p>  a  </p>
@@ -1210,18 +1103,15 @@ const tests = [
                         <p>  b  </p>
                     </td>
                 </tr>
-            </table>
-            `,
-        mdExpected: `
-| a |
+            </table>`,
+        mdExpected: `| a |
 | --- |
 | b |
-`.trim()
+`
     },
     {
         testName: 'lists',
-        htmlInput: `
-                <table>
+        htmlInput: `<table>
                     <tr>
                         <th>
                             <ul>
@@ -1250,18 +1140,15 @@ const tests = [
                             </ul>
                         </td>
                     </tr>
-                </table>
-                `,
-        mdExpected: `
-| - a - b | 1. c 2. d |
+                </table>`,
+        mdExpected: `| - a - b | 1. c 2. d |
 | --- | --- |
 | 1. e 2. f | - g - h |
-`.trim()
+`
     },
     {
         testName: 'pipe symbols',
-        htmlInput: `
-            <table>
+        htmlInput: `<table>
                 <tr>
                     <th>
                         a | b
@@ -1272,13 +1159,11 @@ const tests = [
                         c | d
                     </td>
                 </tr>
-            </table>
-            `,
-        mdExpected: `
-| a \\| b |
+            </table>`,
+        mdExpected: `| a \\| b |
 | --- |
 | c \\| d |
-`.trim()
+`
     },
 ];
 

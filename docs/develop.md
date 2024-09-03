@@ -4,7 +4,7 @@ I wrote some general extension development tips in [Making browser extensions](h
 
 ## Goals
 
-Stardown's main goal is to be so simple, fast, reliable, and flexible that people think of it as "it's like Ctrl+C but it keeps formatting". It should generally have only one keyboard shortcut, no popup, and usually show only one context menu option at a time. The options page can have many options as long as they are well organized and useful. Stardown's output should render well on at least Obsidian and GitHub, if not also other markdown renderers like [Google Docs](https://workspaceupdates.googleblog.com/2024/07/import-and-export-markdown-in-google-docs.html), [VS Code](https://code.visualstudio.com/docs/languages/markdown#_markdown-preview), Discourse, GitLab, Stack Overflow, Joplin, Reddit, and Discord.
+Stardown's main goal is to be so simple, fast, reliable, and flexible that people think of it as "it's like Ctrl+C but it keeps formatting". It should generally have only one keyboard shortcut, no popup, and as few context menu options at a time as reasonable. The options page can have many options as long as they are well organized, useful, and not so important that many users will be constantly changing them. Stardown's output should render well in at least Obsidian and GitHub, if not also other markdown renderers and converters like [Pandoc](https://boisgera.github.io/pandoc/markdown/), [Google Docs](https://workspaceupdates.googleblog.com/2024/07/import-and-export-markdown-in-google-docs.html), [VS Code](https://code.visualstudio.com/docs/languages/markdown#_markdown-preview), [Overleaf](https://www.overleaf.com/learn/how-to/Writing_Markdown_in_LaTeX_Documents), [Mattermost](https://docs.mattermost.com/collaborate/format-messages.html), Discourse, GitLab, Stack Overflow, Joplin, Reddit, and Discord.
 
 I would also like to keep Stardown's code relatively simple so that it's reliable, has few bugs that get fixed quickly, and is easy to maintain.
 
@@ -15,6 +15,8 @@ See [./dev-install-from-source.md](./dev-install-from-source.md)
 ## Tests
 
 Run the tests with `npm run test`.
+
+If a certain test fails, its error message will tell you to run `npm run md-diff` (requires [nodemon](https://www.npmjs.com/package/nodemon); `npm install -g nodemon`) and open a file named `md.diff.html` that displays the differences between the markdown converter's actual output and its expected output. Any text with a green background is missing from the actual output, and any text with a red background is unexpected. You may want to use VS Code's [Live Server](https://marketplace.visualstudio.com/items?itemName=ritwickdey.LiveServer) extension to automatically reload `md.diff.html` when nodemon changes it. Note that VS Code sometimes makes automatic changes to markdown files while they're being edited that could mess up `expected.md`, such as changing table column widths or ordered list numbers. If you edit `expected.md` in VS Code, please fix any changes VS Code automatically makes before committing. The line endings in `expected.md` should be LF, not CRLF.
 
 ## Git workflow for collaboration
 
@@ -41,9 +43,30 @@ The "background script" in Chromium is not exactly a background script, but a se
 
 The browser's context menu cannot be updated while it is visible, so Stardown's dynamic context menu options depend on information from events such as `mouseover` and `selectionchange`. These events are received from the browser in the content script and sent to the background script to update the context menu.
 
+Stardown converts HTML to other formats using custom code explained in [../src/converters/README.md](../src/converters/README.md).
+
 ## What Stardown does
 
 When fully manually testing Stardown, use the descriptions in this section in each of the officially supported browsers to search for bugs.
+
+### Sample web pages
+
+Here are a bunch of web pages with interesting features for testing.
+
+- [tiny table](https://www.markdownguide.org/extended-syntax/#tables)
+- [small table](https://developer.mozilla.org/en-US/docs/Learn/HTML/Tables/Advanced#tables_for_visually_impaired_users)
+- [complex table](https://en.wikipedia.org/wiki/English_modal_auxiliary_verbs#Modal_auxiliary_verbs_distinguished_grammatically)
+- [table with link images](https://en.wikipedia.org/wiki/1926_World_Table_Tennis_Championships)
+- [tables with spanned images](https://en.wikipedia.org/wiki/Toshimi_Kitazawa)
+- [massive table](https://www.worldometers.info/world-population/population-by-country/)
+- [references](https://en.wikipedia.org/wiki/Shanti_Kumar_Morarjee)
+- [code blocks that use `<pre>` but not `<code>`](https://www.cnblogs.com/unity2018/p/8492463.html)
+- [code blocks with inline element headers](https://developer.mozilla.org/en-US/docs/Learn/HTML/Tables/Advanced#the_scope_attribute)
+- [MS doc code blocks](https://devblogs.microsoft.com/dotnet/csharp-13-explore-preview-features/)
+- [block quote](https://markdownguide.offshoot.io/basic-syntax/#blockquotes-1)
+- [image](https://betterexplained.com/articles/math-empathy/#post-6251:~:text=Math%20Empathy%20Checklist,different%20mental%20checklist.)
+- [iframe](https://www.w3schools.com/html/html_iframe.asp)
+- [YouTube video](https://www.youtube.com/watch?v=jfKfPfyJRdk)
 
 ### Context types
 
@@ -55,7 +78,10 @@ When fully manually testing Stardown, use the descriptions in this section in ea
   - Markdown of GitHub mp4s is expected to render well only in GitHub.
   - If the user changes the setting "Optimize markdown of YouTube videos for __" to "GitHub", then the output should render well in at least GitHub, Obsidian, and VS Code.
 - **audio**: an audio player rendered with the `audio` HTML element. Some good examples are the first two audio players on [New Audio HTML Element: Master It Out Now With Our Code Example »](https://html.com/tags/audio/).
-- **table**: a table of data rendered with the `table` HTML element. Browsers do not offer a built-in context type for this, so Stardown has its own table detection code. Some examples of tables are at [Tables for visually impaired users](https://developer.mozilla.org/en-US/docs/Learn/HTML/Tables/Advanced#tables_for_visually_impaired_users) and [Extended Syntax | Markdown Guide](https://www.markdownguide.org/extended-syntax/#tables).
+- **table**: a table of data rendered with the `table` HTML element. Browsers do not offer a built-in context type for this, so Stardown has its own table detection code. Here are some examples of tables:
+  - [Tables for visually impaired users](https://developer.mozilla.org/en-US/docs/Learn/HTML/Tables/Advanced#tables_for_visually_impaired_users)
+  - [Extended Syntax | Markdown Guide](https://www.markdownguide.org/extended-syntax/#tables)
+  - [English modal auxiliary verbs - Wikipedia](https://en.wikipedia.org/wiki/English_modal_auxiliary_verbs#Modal_auxiliary_verbs_distinguished_grammatically)
 
 ### Features
 
@@ -115,10 +141,6 @@ Stardown's text fragment generation code, which was almost entirely written by G
 
 Stardown also tries to find HTML element IDs to put in links alongside text fragments because if the website ever changes and makes the text fragment outdated, the browser will use the HTML element ID as a fallback.
 
-## Turndown
-
-Stardown uses the amazing [Turndown](https://github.com/mixmark-io/turndown), created by Dom Christie, when copying source-formatted markdown of pages.
-
 ## Tables
 
 HTML tables have more features than markdown and other plaintext tables, but Stardown's custom code for converting tables from HTML to markdown or another plaintext format should still always create valid tables that are as similar to the HTML as possible.
@@ -128,3 +150,9 @@ Some HTML tables have cells that span multiple rows and/or columns, such as [thi
 From my experience so far, markdown renderers tend to require every markdown table to have one header row followed by one table divider, then zero or more body rows. The number of cells in the header row must be equal to that of the table divider and to that of whichever row has the most cells. Body rows may have varying numbers of cells.
 
 Sample markdown tables for testing markdown renderers can be found in [./sample-tables.md](./sample-tables.md).
+
+**HTML table definition**
+
+> In this order: optionally a caption element, followed by zero or more colgroup elements, followed optionally by a thead element, followed by either zero or more tbody elements or one or more tr elements, followed optionally by a tfoot element, optionally intermixed with one or more script-supporting elements.
+> 
+> — [the HTML Standard](https://html.spec.whatwg.org/multipage/tables.html)

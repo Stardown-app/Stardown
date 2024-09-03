@@ -88,7 +88,7 @@ export async function diffMd() {
                 .replaceAll('\n', '\\n\n')
                 .replaceAll('\t', '\\t\t')
                 .replaceAll('\r', '\\r\r')
-        result.push('<span class="unexpected">' + value + '</span>');
+            result.push('<span class="unexpected">' + value + '</span>');
         } else {
             result.push('<span>' + value + '</span>');
         }

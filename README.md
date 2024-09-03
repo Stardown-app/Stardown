@@ -56,7 +56,7 @@ To open Stardown's options page, right-click the extension's icon and choose:
 * [Firefox](https://support.mozilla.org/en-US/kb/manage-extension-shortcuts-firefox)
 * Chrome, Edge, Arc, Brave, Vivaldi, or Opera: `chrome://extensions/shortcuts`
 
-## Troubleshooting
+## Troubleshooting and reporting bugs
 
 See [./docs/troubleshooting.md](./docs/troubleshooting.md)
 

@@ -77,12 +77,18 @@ export async function diffMd() {
 
         if (part.added) {
             missingCount += part.value.length;
-            value = value.replaceAll('\n', '⤵\n');
+            value = value
+                .replaceAll('\n', '\\n\n')
+                .replaceAll('\t', '\\t\t')
+                .replaceAll('\r', '\\r\r')
             result.push('<span class="missing">' + value + '</span>');
         } else if (part.removed) {
             unexpectedCount += part.value.length;
-            value = value.replaceAll('\n', '⤵\n');
-            result.push('<span class="unexpected">' + value + '</span>');
+            value = value
+                .replaceAll('\n', '\\n\n')
+                .replaceAll('\t', '\\t\t')
+                .replaceAll('\r', '\\r\r')
+        result.push('<span class="unexpected">' + value + '</span>');
         } else {
             result.push('<span>' + value + '</span>');
         }

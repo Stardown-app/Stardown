@@ -13,7 +13,7 @@ In the `chrome` folder, don't make any changes unless they're to `config.js` or 
 
 To update Stardown after you make changes or you `git pull` changes:
 
-1. run `npm run dev-chrome`
+1. in Stardown's folder, run `npm run dev-chrome`
 2. in your browser, open `chrome://extensions/`
 3. click Stardown's reload button
 
@@ -29,6 +29,6 @@ In the `firefox` folder, don't make any changes unless they're to `config.js` or
 
 To update Stardown after you make changes or you `git pull` changes:
 
-1. run `npm run dev-firefox`
+1. in Stardown's folder, run `npm run dev-firefox`
 2. in Firefox, open `about:debugging#/runtime/this-firefox`
 3. click Stardown's reload button

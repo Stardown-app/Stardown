@@ -70,18 +70,17 @@ Here are a bunch of web pages with interesting features for testing.
 
 ### Context types
 
+When the user right-clicks part of a web page, their browser detects the type of the content they right-clicked and makes that info available to installed browser extensions.
+
 - **selection**: anything that the user has selected by clicking and dragging with their mouse or using selection keyboard shortcuts.
 - **link**: any clickable link on a page. However, for a link that is also an image, Stardown should show only the image copy option.
 - **image**: types supported include png, jpg, svg, webp, gif, and base64-encoded. Types not supported include background images, `canvas` HTML elements, inline `svg` HTML elements, and sometimes images within `a` HTML elements for some reason.
 - **video**: a video rendered with the `video` HTML element, such as YouTube videos and mp4 files hosted by GitHub ([example on this page](https://github.com/wheelercj/zq)). This option doesn't appear for some video sites like [Vimeo](https://player.vimeo.com/video/55073825) probably because their `video` HTML element is buried under many other things, and [Asciinema](https://asciinema.org/) because they don't use the `video` HTML element.
-  - Markdown of YouTube videos is expected to render well in Obsidian and Discord, but not GitHub or VS Code by default.
+  - Markdown of YouTube videos is expected to render well in Obsidian and Discord, but not in GitHub by default.
   - Markdown of GitHub mp4s is expected to render well only in GitHub.
   - If the user changes the setting "Optimize markdown of YouTube videos for __" to "GitHub", then the output should render well in at least GitHub, Obsidian, and VS Code.
 - **audio**: an audio player rendered with the `audio` HTML element. Some good examples are the first two audio players on [New Audio HTML Element: Master It Out Now With Our Code Example »](https://html.com/tags/audio/).
-- **table**: a table of data rendered with the `table` HTML element. Browsers do not offer a built-in context type for this, so Stardown has its own table detection code. Here are some examples of tables:
-  - [Tables for visually impaired users](https://developer.mozilla.org/en-US/docs/Learn/HTML/Tables/Advanced#tables_for_visually_impaired_users)
-  - [Extended Syntax | Markdown Guide](https://www.markdownguide.org/extended-syntax/#tables)
-  - [English modal auxiliary verbs - Wikipedia](https://en.wikipedia.org/wiki/English_modal_auxiliary_verbs#Modal_auxiliary_verbs_distinguished_grammatically)
+- **table**: a table of data rendered with the `table` HTML element. Browsers do not offer a built-in context type for this, so Stardown has its own table detection code that runs each time the user makes a selection.
 
 ### Features
 

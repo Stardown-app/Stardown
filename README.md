@@ -79,6 +79,7 @@ You're welcome to [make a feature request](https://github.com/Stardown-app/Stard
 * [MarkDownload](https://github.com/deathau/markdownload) was developed by an Obsidian community moderator. While Stardown is great for copying *parts* of web pages as markdown, MarkDownload is better for downloading entire pages, especially if you want to download directly into Obsidian. I use both Stardown and MarkDownload.
 * [Obsidian Web Clipper Bookmarklet](https://gist.github.com/kepano/90c05f162c37cf730abb8ff027987ca3) is a bookmarklet for saving web pages directly to Obsidian.
 * [Slurp](https://github.com/inhumantsar/slurp) is an Obsidian community plugin and bookmarklet for saving web pages directly to Obsidian.
+* [import-github-readme](https://github.com/chasebank87/import-github-readme) is an Obsidian plugin for downloading GitHub readme files directly into Obsidian.
 * [Omnivore](https://omnivore.app/) doesn't save pages as markdown but can export them as markdown.
 * [Zotero](https://www.zotero.org/) doesn't save pages as markdown (at least by default), but is one of the best tools for research.
 
@@ -109,6 +110,6 @@ You're welcome to [make a feature request](https://github.com/Stardown-app/Stard
 Unlike the alternatives listed above, Stardown is:
 
 * **Flexible**. Integrates well with many workflows. Just copy part of a web page and paste anywhere.
-* **Converts more formatting**. Stardown can convert almost any table to markdown or another markup language, and can create markdown of videos that renders well in GitHub.
+* **Converts more formatting**. Stardown can convert almost any table to markdown or other markup languages, and can create markdown of videos that renders well in GitHub.
 * **Creates [text fragments](https://web.dev/articles/text-fragments)** so you can link to specific parts of pages.
 * **Extensible**. Stardown's custom code for converting between markup languages is designed to be extended for more markdown flavors and other markup languages.

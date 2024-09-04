@@ -74,14 +74,16 @@ Also, please read [./docs/develop.md](docs/develop.md)
 
 You're welcome to [make a feature request](https://github.com/Stardown-app/Stardown/issues/new?assignees=&labels=enhancement&projects=&template=feature_request.md&title=), and there may already be other software that meets all of your needs. I am not affiliated with any of the alternatives below and have not tried all of them; use them at your own risk.
 
-### Download an entire web page
+### Integrate directly with an editor
 
 * [MarkDownload](https://github.com/deathau/markdownload) was developed by an Obsidian community moderator. While Stardown is great for copying *parts* of web pages as markdown, MarkDownload is better for downloading entire pages, especially if you want to download directly into Obsidian. I use both Stardown and MarkDownload.
+* [Omnivore](https://omnivore.app/) can save content in a variety of formats.
+* [Zotero](https://www.zotero.org/) is one of the best tools for research.
+* [Joplin](https://github.com/laurent22/joplin/blob/dev/readme/apps/clipper.md) has an official web clipper of its own.
+* [github.com/webclipper/web-clipper](https://github.com/webclipper/web-clipper) can integrate directly with Obsidian, Notion, OneNote, Bear, Yuque, Joplin, and more.
 * [Obsidian Web Clipper Bookmarklet](https://gist.github.com/kepano/90c05f162c37cf730abb8ff027987ca3) is a bookmarklet for saving web pages directly to Obsidian.
 * [Slurp](https://github.com/inhumantsar/slurp) is an Obsidian community plugin and bookmarklet for saving web pages directly to Obsidian.
 * [import-github-readme](https://github.com/chasebank87/import-github-readme) is an Obsidian plugin for downloading GitHub readme files directly into Obsidian.
-* [Omnivore](https://omnivore.app/) doesn't save pages as markdown but can export them as markdown.
-* [Zotero](https://www.zotero.org/) doesn't save pages as markdown (at least by default), but is one of the best tools for research.
 
 ### Scrape websites
 

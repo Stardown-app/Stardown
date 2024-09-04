@@ -1216,7 +1216,7 @@ function convertInput(ctx, el) {
     const result = [];
 
     if (!ctx.inList) {
-        result.push('- ');
+        result.push(ctx.bulletPoint + ' ');
     }
     if (checked) {
         result.push('[x] ');

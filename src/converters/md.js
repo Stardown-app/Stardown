@@ -1149,12 +1149,10 @@ function convertPortal(ctx, el) {
 function convertTable(ctx, el) {
     if (ctx.inTable) {
         return convertText(ctx, el);
+    } else if (el.getAttribute('role') === 'presentation') {
+        return convertNodes(ctx, el.childNodes);
     }
     const newCtx = { ...ctx, inTable: true, dontTrimText: true };
-
-    if (el.getAttribute('role') === 'presentation') {
-        return convertNodes(newCtx, el.childNodes);
-    }
 
     /** @type {string[]} */
     let result = ['\n\n'];

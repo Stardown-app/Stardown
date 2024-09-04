@@ -18,9 +18,13 @@ Run the tests with `npm run test`.
 
 If a certain test fails, its error message will tell you to run `npm run md-diff` (requires [nodemon](https://www.npmjs.com/package/nodemon); `npm install -g nodemon`) and open a file named `md.diff.html` that displays the differences between the markdown converter's actual output and its expected output. Any text with a green background is missing from the actual output, and any text with a red background is unexpected. You may want to use VS Code's [Live Server](https://marketplace.visualstudio.com/items?itemName=ritwickdey.LiveServer) extension to automatically reload `md.diff.html` when nodemon changes it. Note that VS Code sometimes makes automatic changes to markdown files while they're being edited that could mess up `expected.md`, such as changing table column widths or ordered list numbers. If you edit `expected.md` in VS Code, please fix any changes VS Code automatically makes before committing. The line endings in `expected.md` should be LF, not CRLF.
 
-## Git workflow for collaboration
+## Git workflow
 
 Let's create feature branches with descriptive names and make pull requests as described in [Getting started with Git and GitHub](https://chriswheeler.dev/posts/getting-started-with-git-and-github/#git-workflows).
+
+## Writing documentation
+
+This project uses [JSDoc](https://en.wikipedia.org/wiki/JSDoc) to annotate types. In VS Code with the [ESLint](https://marketplace.visualstudio.com/items?itemName=dbaeumer.vscode-eslint) extension, you can type `/**` above a function and press enter to auto-generate part of its JSDoc comment.
 
 ## How Stardown works
 

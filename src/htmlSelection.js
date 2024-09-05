@@ -15,7 +15,7 @@
 */
 
 import { getSetting } from './common.js';
-import * as md from './md.js';
+import * as md from './generators/md.js';
 import { htmlToMd, encodeUrl } from './converters/md.js';
 
 /**

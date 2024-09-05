@@ -19,7 +19,7 @@ import assert from 'node:assert/strict'; // https://nodejs.org/api/assert.html#a
 import { JSDOM } from 'jsdom'; // https://www.npmjs.com/package/jsdom
 import { diffMd } from './diffMd.js';
 import { htmlToMd } from '../src/converters/md.js';
-import * as md from '../src/md.js';
+import * as md from '../src/generators/md.js';
 
 global.location = { href: 'https://example.com' };
 

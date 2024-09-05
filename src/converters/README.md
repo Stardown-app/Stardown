@@ -46,7 +46,7 @@ When the markdown converter encounters a `<br>`, it queries the `elementConverte
 
 Every element is a node, but while most nodes are elements, not all are. Each node encountered requires first querying the `nodeConverters` map to determine whether the node is an element or something else like text. Then if the node is an element, the `elementConverters` map is queried.
 
-Stardown previously used [Turndown](https://github.com/mixmark-io/turndown) to convert HTML to markdown but eventually outgrew it. Turndown is better than Stardown-converters when any customization needed is relatively simple, or when the functionality must work in different environments such as with ActiveX. Stardown-converters is specially made for Stardown but is easy to separate from Stardown and may someday be turned into a separate, imported package.
+Stardown previously used [Turndown](https://github.com/mixmark-io/turndown) to convert HTML to markdown but eventually outgrew it. Turndown is better than Stardown-converters when any customization needed is relatively simple, or when the functionality must work in different environments such as with ActiveX. Stardown-converters is specially made for Stardown but is easy to separate from it and may someday be turned into a separate, imported package.
 
 Stardown-converters' strengths:
 

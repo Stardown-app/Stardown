@@ -15,7 +15,7 @@
 */
 
 import { browser, handleCopyRequest } from './config.js';
-import * as md from './md.js';
+import * as md from './generators/md.js';
 import * as htmlSelection from './htmlSelection.js';
 import { createTextFragmentArg } from './createTextFragmentArg.js';
 import { getSetting } from './common.js';

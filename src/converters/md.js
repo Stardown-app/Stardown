@@ -489,7 +489,12 @@ function newConvertHN(n) {
         for (let i = 0; i < n; i++) {
             result.push('#');
         }
-        result.push(' ' + convertNodes(newCtx, el.childNodes).replaceAll('\n', ' '));
+        const text = convertNodes(newCtx, el.childNodes).trim();
+        if (!text) {
+            return '';
+        }
+
+        result.push(' ' + text.replaceAll('\n', ' '));
 
         return result.join('') + '\n\n';
     }
@@ -539,7 +544,12 @@ function convertBlockquote(ctx, el) {
  */
 function convertDd(ctx, el) {
     const newCtx = { ...ctx, dontTrimText: true };
-    return ': ' + convertNodes(newCtx, el.childNodes).replaceAll('\n', ' ') + '\n';
+    const text = convertNodes(newCtx, el.childNodes).trim();
+    if (!text) {
+        return '';
+    }
+
+    return ': ' + text.replaceAll('\n', ' ') + '\n';
 }
 
 /**
@@ -700,7 +710,14 @@ function convertPre(ctx, el) {
         const result = [];
         for (let i = 0; i < el.childNodes.length; i++) {
             const child = el.childNodes[i];
-            result.push(child.textContent?.replaceAll('\n\n', ' ') || '');
+            const t = child.textContent;
+            if (!t) {
+                continue;
+            }
+            result.push(t.replaceAll('\n\n', ' '));
+        }
+        if (result.length === 0) {
+            return '';
         }
         text = result.join('');
     } else { // if there is only one child
@@ -710,7 +727,10 @@ function convertPre(ctx, el) {
             return convertCode(ctx, child);
         }
 
-        text = child.textContent || '';
+        text = child.textContent;
+        if (!text) {
+            return '';
+        }
 
         if (child.getAttribute) { // if the child is not a text node
             const class_ = child.getAttribute('class') || '';
@@ -820,8 +840,12 @@ function convertB(ctx, el) {
     }
     const newCtx = { ...ctx, inB: true };
 
-    const text = convertNodes(newCtx, el.childNodes);
-    return '**' + text.trim().replaceAll('\n', ' ') + '**';
+    const text = convertNodes(newCtx, el.childNodes).trim();
+    if (!text) {
+        return '';
+    }
+
+    return '**' + text.replaceAll('\n', ' ') + '**';
 }
 
 /**
@@ -835,8 +859,12 @@ function convertEm(ctx, el) {
     }
     const newCtx = { ...ctx, inEm: true };
 
-    const text = convertNodes(newCtx, el.childNodes);
-    return '*' + text.trim().replaceAll('\n', ' ') + '*';
+    const text = convertNodes(newCtx, el.childNodes).trim();
+    if (!text) {
+        return '';
+    }
+
+    return '*' + text.replaceAll('\n', ' ') + '*';
 }
 
 /**
@@ -845,8 +873,12 @@ function convertEm(ctx, el) {
  * @returns {string}
  */
 function convertMark(ctx, el) {
-    const text = convertNodes(ctx, el.childNodes);
-    return '==' + text.trim().replaceAll('\n', ' ') + '==';
+    const text = convertNodes(ctx, el.childNodes).trim();
+    if (!text) {
+        return '';
+    }
+
+    return '==' + text.replaceAll('\n', ' ') + '==';
 }
 
 /**
@@ -864,12 +896,12 @@ function convertQ(ctx, el) {
     }
     const newCtx = { ...ctx, inEm: true };
 
-    const text = convertNodes(newCtx, el.childNodes)
-        .trim()
-        .replaceAll('\n', ' ')
-        .replaceAll('"', '\\"')
+    const text = convertNodes(newCtx, el.childNodes).trim();
+    if (!text) {
+        return '';
+    }
 
-    return '*"' + text + '"*';
+    return '*"' + text.replaceAll('\n', ' ').replaceAll('"', '\\"') + '"*';
 }
 
 /**
@@ -883,12 +915,12 @@ function convertS(ctx, el) {
     }
     const newCtx = { ...ctx, inS: true };
 
-    const text = convertNodes(newCtx, el.childNodes)
-        .trim()
-        .replaceAll('\n', ' ')
-        .replaceAll('~', '\\~')
+    const text = convertNodes(newCtx, el.childNodes).trim();
+    if (!text) {
+        return '';
+    }
 
-    return '~~' + text + '~~';
+    return '~~' + text.replaceAll('\n', ' ').replaceAll('~', '\\~') + '~~';
 }
 
 /**
@@ -908,7 +940,12 @@ function convertVar(ctx, el) {
     }
 
     const newCtx = { ...ctx, inEm: true, inB: true };
-    result.push(convertNodes(newCtx, el.childNodes).trim().replaceAll('\n', ' '));
+    const text = convertNodes(newCtx, el.childNodes).trim();
+    if (!text) {
+        return '';
+    }
+
+    result.push(text.replaceAll('\n', ' '));
 
     if (!ctx.inB) {
         result.push('**');
@@ -1112,12 +1149,10 @@ function convertPortal(ctx, el) {
 function convertTable(ctx, el) {
     if (ctx.inTable) {
         return convertText(ctx, el);
+    } else if (el.getAttribute('role') === 'presentation') {
+        return convertNodes(ctx, el.childNodes);
     }
     const newCtx = { ...ctx, inTable: true, dontTrimText: true };
-
-    if (el.getAttribute('role') === 'presentation') {
-        return convertNodes(newCtx, el.childNodes);
-    }
 
     /** @type {string[]} */
     let result = ['\n\n'];
@@ -1181,7 +1216,7 @@ function convertInput(ctx, el) {
     const result = [];
 
     if (!ctx.inList) {
-        result.push('- ');
+        result.push(ctx.bulletPoint + ' ');
     }
     if (checked) {
         result.push('[x] ');

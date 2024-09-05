@@ -79,6 +79,12 @@ export default [
                         transform: transform,
                     },
                     {
+                        // copy js files in the generators folder
+                        src: ['src/generators/*'],
+                        dest: 'firefox/generators',
+                        transform: transform,
+                    },
+                    {
                         src: [
                             // copy js files that are directly in the src folder
                             'src/*.js',

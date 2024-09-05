@@ -19,7 +19,6 @@ import { getSetting } from './common.js';
 
 const form = document.querySelector('form');
 
-const selectionFormatEl = document.querySelector('#selectionFormat');
 const doubleClickWindowsEl = document.querySelector('#doubleClickWindows');
 const doubleClickIntervalEl = document.querySelector('#doubleClickInterval');
 const createTextFragmentEl = document.querySelector('#createTextFragment');
@@ -28,6 +27,7 @@ const omitFooterEl = document.querySelector('#omitFooter');
 const notifyOnWarningEl = document.querySelector('#notifyOnWarning');
 const notifyOnSuccessEl = document.querySelector('#notifyOnSuccess');
 
+const mdSelectionFormatEl = document.querySelector('#mdSelectionFormat');
 const mdYoutubeEl = document.querySelector('#mdYoutube');
 const mdSelectionTemplateEl = document.querySelector('#mdSelectionTemplate');
 const mdSelectionTemplateLabelEl = document.querySelector('#mdSelectionTemplateLabel');
@@ -41,7 +41,6 @@ const jsonDestinationEl = document.querySelector('#jsonDestination');
 const resetButton = document.querySelector('#reset');
 
 // set up setting autosaving
-initAutosave('selectionFormat', selectionFormatEl, 'value');
 initAutosave('createTextFragment', createTextFragmentEl, 'checked');
 initAutosave('omitNav', omitNavEl, 'checked');
 initAutosave('omitFooter', omitFooterEl, 'checked');
@@ -55,6 +54,7 @@ initAutosave('doubleClickInterval', doubleClickIntervalEl, 'value', () => {
     });
 });
 
+initAutosave('mdSelectionFormat', mdSelectionFormatEl, 'value');
 initAutosave('mdYoutube', mdYoutubeEl, 'value');
 initAutosave('mdSelectionTemplate', mdSelectionTemplateEl, 'value');
 initAutosave('mdSubBrackets', mdSubBracketsEl, 'value');
@@ -90,7 +90,6 @@ function initAutosave(settingName, el, valueProperty, then) {
  */
 async function loadSettings() {
     try {
-        selectionFormatEl.value = await getSetting('selectionFormat');
         doubleClickWindowsEl.value = await getSetting('doubleClickWindows');
         doubleClickIntervalEl.value = await getSetting('doubleClickInterval');
         createTextFragmentEl.checked = await getSetting('createTextFragment');
@@ -99,6 +98,7 @@ async function loadSettings() {
         notifyOnWarningEl.checked = await getSetting('notifyOnWarning');
         notifyOnSuccessEl.checked = await getSetting('notifyOnSuccess');
 
+        mdSelectionFormatEl.value = await getSetting('mdSelectionFormat');
         mdYoutubeEl.value = await getSetting('mdYoutube');
         mdSelectionTemplateEl.value = await getSetting('mdSelectionTemplate');
         mdSubBracketsEl.value = await getSetting('mdSubBrackets');
@@ -180,9 +180,9 @@ async function validateTemplateVariables() {
     mdSelectionTemplateErrorEl.style.display = 'none';
 }
 
-selectionFormatEl.addEventListener('change', function () {
+mdSelectionFormatEl.addEventListener('change', function () {
     // hide or show the selection template setting based on the selection format
-    if (selectionFormatEl.value === 'template') {
+    if (mdSelectionFormatEl.value === 'template') {
         mdSelectionTemplateEl.style.display = 'block';
         mdSelectionTemplateLabelEl.style.display = 'block';
     } else {
@@ -191,7 +191,7 @@ selectionFormatEl.addEventListener('change', function () {
     }
 });
 new Promise(resolve => setTimeout(resolve, 50)).then(() => {
-    selectionFormatEl.dispatchEvent(new Event('change'));
+    mdSelectionFormatEl.dispatchEvent(new Event('change'));
 });
 
 mdSelectionTemplateEl.addEventListener('input', async function () {

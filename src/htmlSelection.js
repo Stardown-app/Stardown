@@ -33,8 +33,8 @@ export async function createText(title, url, selection) {
         return await md.createLink(title, url);
     }
 
-    const selectionFormat = await getSetting('selectionFormat');
-    switch (selectionFormat) {
+    const mdSelectionFormat = await getSetting('mdSelectionFormat');
+    switch (mdSelectionFormat) {
         case 'source with link':
             return await getSourceFormatTextWithLink(title, url, selection, selectedText) + '\n';
         case 'source':
@@ -50,8 +50,8 @@ export async function createText(title, url, selection) {
         case 'link with page title as title':
             return await md.createLink(title, url);
         default:
-            console.error(`Unknown selectionFormat: ${selectionFormat}`);
-            throw new Error(`Unknown selectionFormat: ${selectionFormat}`);
+            console.error(`Unknown mdSelectionFormat: ${mdSelectionFormat}`);
+            throw new Error(`Unknown mdSelectionFormat: ${mdSelectionFormat}`);
     }
 }
 

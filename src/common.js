@@ -22,10 +22,10 @@ const defaultSettings = {
     omitFooter: true,
     notifyOnWarning: false,
     notifyOnSuccess: false,
-    selectionFormat: 'source with link',
     doubleClickWindows: 'current',
     doubleClickInterval: 500,
 
+    mdSelectionFormat: 'source with link',
     mdYoutube: 'almost everywhere',
     mdSubBrackets: 'underlined',
     mdBulletPoint: '-',

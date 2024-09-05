@@ -57,13 +57,13 @@ export async function htmlToMd(frag) {
 }
 
 /**
- * encodeUrl encodes a URL by replacing certain characters with their percent-encoded
+ * mdEncodeUri encodes a URI by replacing certain characters with their percent-encoded
  * equivalents.
- * @param {string} url
+ * @param {string} uri
  * @returns {string}
  */
-export function encodeUrl(url) {
-    return url.replaceAll('(', '%28').replaceAll(')', '%29').replaceAll(' ', '%20');
+export function mdEncodeUri(uri) {
+    return uri.replaceAll('(', '%28').replaceAll(')', '%29').replaceAll(' ', '%20');
 }
 
 /**
@@ -813,7 +813,7 @@ function convertCode(ctx, el) {
 function convertA(ctx, el) {
     let href = el.getAttribute('href') || '';
     href = absolutize(href, ctx.locationHref);
-    href = encodeUrl(href);
+    href = mdEncodeUri(href);
 
     const text = convertNodes(ctx, el.childNodes).trim().replaceAll('\n', ' ');
     if (!text) {
@@ -978,7 +978,7 @@ function convertAudio(ctx, el) {
         src = ctx.locationHref;
     }
     src = absolutize(src, ctx.locationHref);
-    src = encodeUrl(src);
+    src = mdEncodeUri(src);
 
     return '[audio](' + src + ')';
 }
@@ -999,7 +999,7 @@ function convertImg(ctx, el) {
         }
     }
     src = absolutize(src, ctx.locationHref);
-    src = encodeUrl(src);
+    src = mdEncodeUri(src);
 
     const title = ctx.escape(el.getAttribute('title') || '').replaceAll('"', '\\"');
 
@@ -1033,7 +1033,7 @@ function convertTrack(ctx, el) {
         return label;
     }
     src = absolutize(src, ctx.locationHref);
-    src = encodeUrl(src);
+    src = mdEncodeUri(src);
 
     return '[' + label + '](' + src + ')';
 }
@@ -1048,7 +1048,7 @@ function convertVideo(ctx, el) {
     const usingSrcUrl = src && !src.startsWith('blob:');
     let url = usingSrcUrl ? src : ctx.locationHref;
     url = absolutize(url, ctx.locationHref);
-    url = encodeUrl(url);
+    url = mdEncodeUri(url);
 
     let youtubeId; // TODO
     let isYoutube = false; // TODO
@@ -1075,7 +1075,7 @@ function convertEmbed(ctx, el) {
         return '';
     }
     src = absolutize(src, ctx.locationHref);
-    src = encodeUrl(src);
+    src = mdEncodeUri(src);
     const type = ctx.escape(el.getAttribute('type') || 'embed');
     return '[' + type + '](' + src + ')';
 }
@@ -1097,7 +1097,7 @@ function convertIframe(ctx, el) {
     let src = el.getAttribute('src');
     if (src && src !== 'about:blank') {
         src = absolutize(src, ctx.locationHref);
-        src = encodeUrl(src);
+        src = mdEncodeUri(src);
         const title = ctx.escape(
             el.getAttribute('title') ||
             el.getAttribute('name') ||
@@ -1119,7 +1119,7 @@ function convertObject(ctx, el) {
     let data = el.getAttribute('data');
     if (data) {
         data = absolutize(data, ctx.locationHref);
-        data = encodeUrl(data);
+        data = mdEncodeUri(data);
         const type = ctx.escape(el.getAttribute('type') || 'object');
         return '[' + type + '](' + data + ')';
     }
@@ -1137,7 +1137,7 @@ function convertPortal(ctx, el) {
         return '';
     }
     src = absolutize(src, ctx.locationHref);
-    src = encodeUrl(src);
+    src = mdEncodeUri(src);
     const id = ctx.escape(el.getAttribute('id') || 'portal');
     return '[' + id + '](' + src + ')';
 }

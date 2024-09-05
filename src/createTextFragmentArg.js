@@ -15,7 +15,7 @@
 */
 
 import { browser } from './config.js';
-import { encodeUrl } from './converters/md.js';
+import { mdEncodeUri } from './converters/md.js';
 
 /**
  * createTextFragmentArg creates for a markdown link a text fragment argument (the part
@@ -80,7 +80,7 @@ export function createTextFragmentArg(selection) {
         arg += ',-' + encodeFragmentComponent(fragment.suffix);
     }
 
-    arg = encodeUrl(arg);
+    arg = mdEncodeUri(arg);
 
     return arg;
 }

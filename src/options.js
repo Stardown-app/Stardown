@@ -19,6 +19,7 @@ import { getSetting } from './common.js';
 
 const form = document.querySelector('form');
 
+const markupLanguageEl = document.querySelector('#markupLanguage');
 const doubleClickWindowsEl = document.querySelector('#doubleClickWindows');
 const doubleClickIntervalEl = document.querySelector('#doubleClickInterval');
 const createTextFragmentEl = document.querySelector('#createTextFragment');
@@ -41,6 +42,7 @@ const jsonDestinationEl = document.querySelector('#jsonDestination');
 const resetButton = document.querySelector('#reset');
 
 // set up setting autosaving
+initAutosave('markupLanguage', markupLanguageEl, 'value');
 initAutosave('createTextFragment', createTextFragmentEl, 'checked');
 initAutosave('omitNav', omitNavEl, 'checked');
 initAutosave('omitFooter', omitFooterEl, 'checked');
@@ -90,6 +92,7 @@ function initAutosave(settingName, el, valueProperty, then) {
  */
 async function loadSettings() {
     try {
+        markupLanguageEl.value = await getSetting('markupLanguage');
         doubleClickWindowsEl.value = await getSetting('doubleClickWindows');
         doubleClickIntervalEl.value = await getSetting('doubleClickInterval');
         createTextFragmentEl.checked = await getSetting('createTextFragment');

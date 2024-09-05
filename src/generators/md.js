@@ -15,24 +15,24 @@
 */
 
 import { getSetting } from '../common.js';
-import { encodeUrl, newEscape } from '../converters/md.js';
+import { mdEncodeUri, newEscape } from '../converters/md.js';
 
 /**
  * createLink creates a markdown link.
  * @param {string|null} title - the title of the link. Square brackets are replaced,
  * escaped, or unchanged depending on the settings. Some other markdown characters are
  * escaped. If the given title is null, it is replaced with 'link'.
- * @param {string} url - the URL of the link. Parentheses are URL-encoded.
+ * @param {string} uri - the URI of the link. Parentheses are URL-encoded.
  * @param {string|null} mdSubBrackets - the setting for what to substitute any square
  * brackets with. If not given, the setting is read from storage.
  * @returns {Promise<string>}
  */
-export async function createLink(title, url, mdSubBrackets = null) {
+export async function createLink(title, uri, mdSubBrackets = null) {
     title = await createLinkTitle(title, mdSubBrackets);
 
-    url = encodeUrl(url);
+    uri = mdEncodeUri(uri);
 
-    return `[${title}](${url})`;
+    return `[${title}](${uri})`;
 }
 
 /**

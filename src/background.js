@@ -219,17 +219,36 @@ async function handleIconDoubleClick(activeTab) {
         }
     }
 
-    const mdSubBrackets = await getSetting('mdSubBrackets');
-    const links = await Promise.all(
-        tabs.map(tab => createTabLink(tab, mdSubBrackets))
-    );
-    const mdBulletPoint = await getSetting('mdBulletPoint');
-    const linksListMd = links.map(link => `${mdBulletPoint} ${link}\n`).join('');
+    const markupLanguage = await getSetting('markupLanguage');
+
+    let text = '';
+    switch (markupLanguage) {
+        case 'html':
+            const result = ['<ul>'];
+            for (let i = 0; i < tabs.length; i++) {
+                const anchor = `  <li><a href="${tabs[i].url}">${tabs[i].title}</a></li>`;
+                result.push(anchor);
+            }
+            result.push('</ul>');
+            text = result.join('\n');
+            break;
+        case 'markdown':
+            const mdSubBrackets = await getSetting('mdSubBrackets');
+            const links = await Promise.all(
+                tabs.map(tab => createTabLink(tab, mdSubBrackets))
+            );
+            const mdBulletPoint = await getSetting('mdBulletPoint');
+            text = links.map(link => `${mdBulletPoint} ${link}\n`).join('');
+            break;
+        default:
+            await showStatus(0, 'Error', 'Unsupported markup language');
+            return;
+    }
 
     const {
         status, notifTitle, notifBody,
     } = await browser.tabs.sendMessage(activeTab.id, {
-        category: 'copy', text: linksListMd,
+        category: 'copy', text: text,
     });
 
     if (status === 0) { // failure

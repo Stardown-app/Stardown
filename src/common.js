@@ -17,6 +17,7 @@
 import { browser } from './config.js';
 
 const defaultSettings = {
+    markupLanguage: 'markdown',
     createTextFragment: true,
     omitNav: true,
     omitFooter: true,

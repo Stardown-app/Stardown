@@ -19,15 +19,15 @@ import { getSetting } from './common.js';
 
 const form = document.querySelector('form');
 
-const youtubeMdEl = document.querySelector('#youtubeMd');
+const mdYoutubeEl = document.querySelector('#mdYoutube');
 const selectionFormatEl = document.querySelector('#selectionFormat');
-const selectionTemplateEl = document.querySelector('#selectionTemplate');
-const selectionTemplateLabelEl = document.querySelector('#selectionTemplateLabel');
-const selectionTemplateErrorEl = document.querySelector('#selectionTemplateError');
+const mdSelectionTemplateEl = document.querySelector('#mdSelectionTemplate');
+const mdSelectionTemplateLabelEl = document.querySelector('#mdSelectionTemplateLabel');
+const mdSelectionTemplateErrorEl = document.querySelector('#mdSelectionTemplateError');
 const jsonDestinationEl = document.querySelector('#jsonDestination');
-const emptyCellJsonEl = document.querySelector('#emptyCellJson');
-const subBracketsEl = document.querySelector('#subBrackets');
-const bulletPointEl = document.querySelector('#bulletPoint');
+const jsonEmptyCellEl = document.querySelector('#jsonEmptyCell');
+const mdSubBracketsEl = document.querySelector('#mdSubBrackets');
+const mdBulletPointEl = document.querySelector('#mdBulletPoint');
 const doubleClickWindowsEl = document.querySelector('#doubleClickWindows');
 const doubleClickIntervalEl = document.querySelector('#doubleClickInterval');
 const createTextFragmentEl = document.querySelector('#createTextFragment');
@@ -39,18 +39,18 @@ const notifyOnSuccessEl = document.querySelector('#notifyOnSuccess');
 const resetButton = document.querySelector('#reset');
 
 // set up setting autosaving
-initAutosave('youtubeMd', youtubeMdEl, 'value');
+initAutosave('mdYoutube', mdYoutubeEl, 'value');
 initAutosave('selectionFormat', selectionFormatEl, 'value');
-initAutosave('selectionTemplate', selectionTemplateEl, 'value');
+initAutosave('mdSelectionTemplate', mdSelectionTemplateEl, 'value');
 initAutosave('jsonDestination', jsonDestinationEl, 'value', () => {
     // send the updated jsonDestination to the background script
     browser.runtime.sendMessage({
         jsonDestination: jsonDestinationEl.value
     });
 });
-initAutosave('emptyCellJson', emptyCellJsonEl, 'value');
-initAutosave('subBrackets', subBracketsEl, 'value');
-initAutosave('bulletPoint', bulletPointEl, 'value');
+initAutosave('jsonEmptyCell', jsonEmptyCellEl, 'value');
+initAutosave('mdSubBrackets', mdSubBracketsEl, 'value');
+initAutosave('mdBulletPoint', mdBulletPointEl, 'value');
 initAutosave('createTextFragment', createTextFragmentEl, 'checked');
 initAutosave('omitNav', omitNavEl, 'checked');
 initAutosave('omitFooter', omitFooterEl, 'checked');
@@ -86,13 +86,13 @@ function initAutosave(settingName, el, valueProperty, then) {
  */
 async function loadSettings() {
     try {
-        youtubeMdEl.value = await getSetting('youtubeMd');
+        mdYoutubeEl.value = await getSetting('mdYoutube');
         selectionFormatEl.value = await getSetting('selectionFormat');
-        selectionTemplateEl.value = await getSetting('selectionTemplate');
+        mdSelectionTemplateEl.value = await getSetting('mdSelectionTemplate');
         jsonDestinationEl.value = await getSetting('jsonDestination');
-        emptyCellJsonEl.value = await getSetting('emptyCellJson') || 'null';
-        subBracketsEl.value = await getSetting('subBrackets');
-        bulletPointEl.value = await getSetting('bulletPoint');
+        jsonEmptyCellEl.value = await getSetting('jsonEmptyCell') || 'null';
+        mdSubBracketsEl.value = await getSetting('mdSubBrackets');
+        mdBulletPointEl.value = await getSetting('mdBulletPoint');
         doubleClickWindowsEl.value = await getSetting('doubleClickWindows');
         doubleClickIntervalEl.value = await getSetting('doubleClickInterval');
         createTextFragmentEl.checked = await getSetting('createTextFragment');
@@ -114,8 +114,8 @@ async function loadSettings() {
 async function resetSettings() {
     await browser.storage.sync.clear();
 
-    selectionTemplateEl.style.display = 'none';
-    selectionTemplateLabelEl.style.display = 'none';
+    mdSelectionTemplateEl.style.display = 'none';
+    mdSelectionTemplateLabelEl.style.display = 'none';
 
     resetButton.value = 'Reset all ✔';
     resetButton.style.backgroundColor = '#aadafa';
@@ -141,7 +141,7 @@ async function validateTemplateVariables() {
         selection,
     };
 
-    const matches = selectionTemplateEl.value.matchAll(/{{([^{}]+)}}/g);
+    const matches = mdSelectionTemplateEl.value.matchAll(/{{([^{}]+)}}/g);
     if (!matches) {
         return;
     }
@@ -163,32 +163,32 @@ async function validateTemplateVariables() {
         }
 
         if (value === undefined) {
-            selectionTemplateErrorEl.textContent = `Unknown variable "${group}"`;
-            selectionTemplateErrorEl.style.color = 'red';
-            selectionTemplateErrorEl.style.display = 'inline-block';
+            mdSelectionTemplateErrorEl.textContent = `Unknown variable "${group}"`;
+            mdSelectionTemplateErrorEl.style.color = 'red';
+            mdSelectionTemplateErrorEl.style.display = 'inline-block';
             return;
         }
     }
 
-    selectionTemplateErrorEl.textContent = '';
-    selectionTemplateErrorEl.style.display = 'none';
+    mdSelectionTemplateErrorEl.textContent = '';
+    mdSelectionTemplateErrorEl.style.display = 'none';
 }
 
 selectionFormatEl.addEventListener('change', function () {
     // hide or show the selection template setting based on the selection format
     if (selectionFormatEl.value === 'template') {
-        selectionTemplateEl.style.display = 'block';
-        selectionTemplateLabelEl.style.display = 'block';
+        mdSelectionTemplateEl.style.display = 'block';
+        mdSelectionTemplateLabelEl.style.display = 'block';
     } else {
-        selectionTemplateEl.style.display = 'none';
-        selectionTemplateLabelEl.style.display = 'none';
+        mdSelectionTemplateEl.style.display = 'none';
+        mdSelectionTemplateLabelEl.style.display = 'none';
     }
 });
 new Promise(resolve => setTimeout(resolve, 50)).then(() => {
     selectionFormatEl.dispatchEvent(new Event('change'));
 });
 
-selectionTemplateEl.addEventListener('input', async function () {
+mdSelectionTemplateEl.addEventListener('input', async function () {
     await validateTemplateVariables();
 });
 

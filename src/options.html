@@ -71,14 +71,14 @@ as the options page. -->
       </select>
       <br />
       <br />
-      <label id="selectionTemplateLabel" for="selectionTemplate">Selection template:</label>
-      <textarea id="selectionTemplate" name="selectionTemplate" rows="5" cols="75">
+      <label id="mdSelectionTemplateLabel" for="mdSelectionTemplate">Selection template:</label>
+      <textarea id="mdSelectionTemplate" name="mdSelectionTemplate" rows="5" cols="75">
 > [!note]
 > from [{{link.title}}]({{link.url}}) on {{date.YYYYMMDD}}
 
 {{selection}}
 </textarea>
-      <p id="selectionTemplateError" style="display: none"></p>
+      <p id="mdSelectionTemplateError" style="display: none"></p>
       <br />
       <br />
       <label for="jsonDestination">Save JSON output to</label>
@@ -88,31 +88,31 @@ as the options page. -->
       </select>
       <br />
       <br />
-      <label for="emptyCellJson">Empty table cells are converted to
-        <input id="emptyCellJson" name="emptyCellJson" type="text" placeholder="null" />
+      <label for="jsonEmptyCell">Empty table cells are converted to
+        <input id="jsonEmptyCell" name="jsonEmptyCell" type="text" placeholder="null" />
         in JSON
       </label>
       <br />
       <br />
-      <label for="youtubeMd">Optimize markdown of YouTube videos for</label>
-      <select id="youtubeMd" name="youtubeMd">
+      <label for="mdYoutube">Optimize markdown of YouTube videos for</label>
+      <select id="mdYoutube" name="mdYoutube">
         <option value="almost everywhere">almost everywhere</option>
         <option value="GitHub">GitHub</option>
       </select>
       <br />
       <br />
-      <label for="subBrackets">
+      <label for="mdSubBrackets">
         Replace square brackets in link titles with
       </label>
-      <select id="subBrackets" name="subBrackets">
+      <select id="mdSubBrackets" name="mdSubBrackets">
         <option value="underlined">underlined brackets ⦋ ⦌</option>
         <option value="escaped">escaped brackets \[ \]</option>
         <option value="original">don't replace them [ ]</option>
       </select>
       <br />
       <br />
-      <label for="bulletPoint">Bullet point symbol:</label>
-      <select id="bulletPoint" name="bulletPoint">
+      <label for="mdBulletPoint">Bullet point symbol:</label>
+      <select id="mdBulletPoint" name="mdBulletPoint">
         <option value="-">-</option>
         <option value="+">+</option>
         <option value="*">*</option>

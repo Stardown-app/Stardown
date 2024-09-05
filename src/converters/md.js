@@ -37,16 +37,16 @@ export async function htmlToMd(frag) {
     const ctx = {
         locationHref: location.href,
         document: document,
-        subBrackets: await getSetting('subBrackets'),
-        bulletPoint: await getSetting('bulletPoint'),
+        mdSubBrackets: await getSetting('mdSubBrackets'),
+        mdBulletPoint: await getSetting('mdBulletPoint'),
         omitNav: await getSetting('omitNav'),
         omitFooter: await getSetting('omitFooter'),
-        youtubeMd: await getSetting('youtubeMd'),
+        mdYoutube: await getSetting('mdYoutube'),
         indent: '',
     };
 
     /** @type {function(string): string} */
-    ctx.escape = newEscape(ctx.subBrackets);
+    ctx.escape = newEscape(ctx.mdSubBrackets);
 
     if (isInlineText(frag.childNodes)) {
         ctx.dontTrimText = true;
@@ -67,13 +67,13 @@ export function encodeUrl(url) {
 
 /**
  * newEscape creates a new function for escaping characters.
- * @param {string} subBrackets - the setting for what to substitute any square brackets
- * with.
+ * @param {string} mdSubBrackets - the setting for what to substitute any square
+ * brackets with.
  * @returns {function(string): string}
  */
-export function newEscape(subBrackets) {
+export function newEscape(mdSubBrackets) {
     let openSqrRepl, closeSqrRepl;
-    switch (subBrackets) {
+    switch (mdSubBrackets) {
         case 'underlined':
             openSqrRepl = '⦋';
             closeSqrRepl = '⦌';
@@ -655,7 +655,7 @@ function convertUl(ctx, el) {
             continue;
         }
 
-        result.push(ctx.indent + ctx.bulletPoint + ' ');
+        result.push(ctx.indent + ctx.mdBulletPoint + ' ');
         result.push(
             convertNodes(newCtx, child.childNodes)
                 .replace(/^ /, '')
@@ -1052,7 +1052,7 @@ function convertVideo(ctx, el) {
     let youtubeId; // TODO
     let isYoutube = false; // TODO
 
-    if (isYoutube && ctx.youtubeMd === 'GitHub') {
+    if (isYoutube && ctx.mdYoutube === 'GitHub') {
         // TODO: use fwd-microservice
     } else {
         if (usingSrcUrl) {
@@ -1216,7 +1216,7 @@ function convertInput(ctx, el) {
     const result = [];
 
     if (!ctx.inList) {
-        result.push(ctx.bulletPoint + ' ');
+        result.push(ctx.mdBulletPoint + ' ');
     }
     if (checked) {
         result.push('[x] ');

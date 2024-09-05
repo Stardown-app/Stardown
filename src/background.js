@@ -219,12 +219,12 @@ async function handleIconDoubleClick(activeTab) {
         }
     }
 
-    const subBrackets = await getSetting('subBrackets');
+    const mdSubBrackets = await getSetting('mdSubBrackets');
     const links = await Promise.all(
-        tabs.map(tab => createTabLink(tab, subBrackets))
+        tabs.map(tab => createTabLink(tab, mdSubBrackets))
     );
-    const bulletPoint = await getSetting('bulletPoint');
-    const linksListMd = links.map(link => `${bulletPoint} ${link}\n`).join('');
+    const mdBulletPoint = await getSetting('mdBulletPoint');
+    const linksListMd = links.map(link => `${mdBulletPoint} ${link}\n`).join('');
 
     const {
         status, notifTitle, notifBody,

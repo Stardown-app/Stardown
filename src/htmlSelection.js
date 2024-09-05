@@ -106,7 +106,7 @@ export async function getSourceFormatText(selection, selectedText) {
 }
 
 export async function getTemplatedText(title, url, selection, selectedText) {
-    const template = await getSetting('selectionTemplate');
+    const template = await getSetting('mdSelectionTemplate');
 
     title = await md.createLinkTitle(title);
     url = encodeUrl(url);

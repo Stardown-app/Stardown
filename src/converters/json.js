@@ -22,15 +22,15 @@ import * as tables from './tables.js';
 /**
  * htmlTableToJson converts an HTML table to JSON.
  * @param {DocumentFragment} frag
- * @param {string|undefined} emptyCellJson - the JSON representation of an empty cell.
+ * @param {string|undefined} jsonEmptyCell - the JSON representation of an empty cell.
  * @returns {Promise<string>}
  */
-export async function htmlTableToJson(frag, emptyCellJson) {
+export async function htmlTableToJson(frag, jsonEmptyCell) {
     const table = frag.firstChild;
 
     const ctx = {
         document: document,
-        emptyCellJson: emptyCellJson || await getSetting('emptyCellJson') || 'null',
+        jsonEmptyCell: jsonEmptyCell || await getSetting('jsonEmptyCell') || 'null',
     };
 
     return convertTable(ctx, table);
@@ -71,13 +71,13 @@ function convertTable(ctx, table) {
             if (x === 0) { // if this is the first column
                 if (cellStr.length === 0) { // if the cell is empty
                     if ( // if the empty cell JSON is already wrapped with quotes
-                        ctx.emptyCellJson.length > 0 &&
-                        ctx.emptyCellJson[0] === '"' &&
-                        ctx.emptyCellJson[ctx.emptyCellJson.length - 1] === '"'
+                        ctx.jsonEmptyCell.length > 0 &&
+                        ctx.jsonEmptyCell[0] === '"' &&
+                        ctx.jsonEmptyCell[ctx.jsonEmptyCell.length - 1] === '"'
                     ) {
-                        json.push(ctx.emptyCellJson + ': [');
+                        json.push(ctx.jsonEmptyCell + ': [');
                     } else { // if the empty cell JSON is not already wrapped with quotes
-                        cellStr = ctx.emptyCellJson.replaceAll('"', '\\"');
+                        cellStr = ctx.jsonEmptyCell.replaceAll('"', '\\"');
                         json.push('"' + cellStr + '": [');
                     }
                 } else { // if the cell is not empty
@@ -85,7 +85,7 @@ function convertTable(ctx, table) {
                     json.push('"' + cellStr + '": [');
                 }
             } else if (cellStr.length === 0) {
-                json.push(ctx.emptyCellJson);
+                json.push(ctx.jsonEmptyCell);
             } else if (['true', 'false', 'null'].includes(cellStr)) {
                 json.push(cellStr);
             } else if (canBeJsonNumber(cellStr)) {

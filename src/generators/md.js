@@ -14,8 +14,8 @@
    limitations under the License.
 */
 
-import { getSetting } from './common.js';
-import { encodeUrl, newEscape } from './converters/md.js';
+import { getSetting } from '../common.js';
+import { encodeUrl, newEscape } from '../converters/md.js';
 
 /**
  * createLink creates a markdown link.
@@ -37,7 +37,7 @@ export async function createLink(title, url, subBrackets = null) {
 
 /**
  * createLinkTitle creates a markdown link title.
- * @param {string|null} title - the title of the link. Square brackets are replaced,
+ * @param {string|null} title - the title of the link. Any square brackets are replaced,
  * escaped, or unchanged depending on the settings. Some other markdown characters are
  * escaped. If the given title is null, it is replaced with 'link'.
  * @param {string|null} subBrackets - the setting for what to substitute any square

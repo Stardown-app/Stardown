@@ -16,7 +16,7 @@
 
 import { browser, sleep, createContextMenus, updateContextMenu } from './config.js';
 import { getSetting } from './common.js';
-import { createTabLink } from './md.js';
+import { createTabLink } from './generators/md.js';
 
 createContextMenus();
 

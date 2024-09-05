@@ -37,12 +37,13 @@ export async function htmlToMd(frag) {
     const ctx = {
         locationHref: location.href,
         document: document,
-        mdSubBrackets: await getSetting('mdSubBrackets'),
-        mdBulletPoint: await getSetting('mdBulletPoint'),
         omitNav: await getSetting('omitNav'),
         omitFooter: await getSetting('omitFooter'),
-        mdYoutube: await getSetting('mdYoutube'),
         indent: '',
+
+        mdSubBrackets: await getSetting('mdSubBrackets'),
+        mdBulletPoint: await getSetting('mdBulletPoint'),
+        mdYoutube: await getSetting('mdYoutube'),
     };
 
     /** @type {function(string): string} */

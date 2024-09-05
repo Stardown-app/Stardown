@@ -19,15 +19,7 @@ import { getSetting } from './common.js';
 
 const form = document.querySelector('form');
 
-const mdYoutubeEl = document.querySelector('#mdYoutube');
 const selectionFormatEl = document.querySelector('#selectionFormat');
-const mdSelectionTemplateEl = document.querySelector('#mdSelectionTemplate');
-const mdSelectionTemplateLabelEl = document.querySelector('#mdSelectionTemplateLabel');
-const mdSelectionTemplateErrorEl = document.querySelector('#mdSelectionTemplateError');
-const jsonDestinationEl = document.querySelector('#jsonDestination');
-const jsonEmptyCellEl = document.querySelector('#jsonEmptyCell');
-const mdSubBracketsEl = document.querySelector('#mdSubBrackets');
-const mdBulletPointEl = document.querySelector('#mdBulletPoint');
 const doubleClickWindowsEl = document.querySelector('#doubleClickWindows');
 const doubleClickIntervalEl = document.querySelector('#doubleClickInterval');
 const createTextFragmentEl = document.querySelector('#createTextFragment');
@@ -36,21 +28,20 @@ const omitFooterEl = document.querySelector('#omitFooter');
 const notifyOnWarningEl = document.querySelector('#notifyOnWarning');
 const notifyOnSuccessEl = document.querySelector('#notifyOnSuccess');
 
+const mdYoutubeEl = document.querySelector('#mdYoutube');
+const mdSelectionTemplateEl = document.querySelector('#mdSelectionTemplate');
+const mdSelectionTemplateLabelEl = document.querySelector('#mdSelectionTemplateLabel');
+const mdSelectionTemplateErrorEl = document.querySelector('#mdSelectionTemplateError');
+const mdSubBracketsEl = document.querySelector('#mdSubBrackets');
+const mdBulletPointEl = document.querySelector('#mdBulletPoint');
+
+const jsonEmptyCellEl = document.querySelector('#jsonEmptyCell');
+const jsonDestinationEl = document.querySelector('#jsonDestination');
+
 const resetButton = document.querySelector('#reset');
 
 // set up setting autosaving
-initAutosave('mdYoutube', mdYoutubeEl, 'value');
 initAutosave('selectionFormat', selectionFormatEl, 'value');
-initAutosave('mdSelectionTemplate', mdSelectionTemplateEl, 'value');
-initAutosave('jsonDestination', jsonDestinationEl, 'value', () => {
-    // send the updated jsonDestination to the background script
-    browser.runtime.sendMessage({
-        jsonDestination: jsonDestinationEl.value
-    });
-});
-initAutosave('jsonEmptyCell', jsonEmptyCellEl, 'value');
-initAutosave('mdSubBrackets', mdSubBracketsEl, 'value');
-initAutosave('mdBulletPoint', mdBulletPointEl, 'value');
 initAutosave('createTextFragment', createTextFragmentEl, 'checked');
 initAutosave('omitNav', omitNavEl, 'checked');
 initAutosave('omitFooter', omitFooterEl, 'checked');
@@ -61,6 +52,19 @@ initAutosave('doubleClickInterval', doubleClickIntervalEl, 'value', () => {
     // send the updated doubleClickInterval to the background script
     browser.runtime.sendMessage({
         doubleClickInterval: doubleClickIntervalEl.value
+    });
+});
+
+initAutosave('mdYoutube', mdYoutubeEl, 'value');
+initAutosave('mdSelectionTemplate', mdSelectionTemplateEl, 'value');
+initAutosave('mdSubBrackets', mdSubBracketsEl, 'value');
+initAutosave('mdBulletPoint', mdBulletPointEl, 'value');
+
+initAutosave('jsonEmptyCell', jsonEmptyCellEl, 'value');
+initAutosave('jsonDestination', jsonDestinationEl, 'value', () => {
+    // send the updated jsonDestination to the background script
+    browser.runtime.sendMessage({
+        jsonDestination: jsonDestinationEl.value
     });
 });
 
@@ -86,13 +90,7 @@ function initAutosave(settingName, el, valueProperty, then) {
  */
 async function loadSettings() {
     try {
-        mdYoutubeEl.value = await getSetting('mdYoutube');
         selectionFormatEl.value = await getSetting('selectionFormat');
-        mdSelectionTemplateEl.value = await getSetting('mdSelectionTemplate');
-        jsonDestinationEl.value = await getSetting('jsonDestination');
-        jsonEmptyCellEl.value = await getSetting('jsonEmptyCell') || 'null';
-        mdSubBracketsEl.value = await getSetting('mdSubBrackets');
-        mdBulletPointEl.value = await getSetting('mdBulletPoint');
         doubleClickWindowsEl.value = await getSetting('doubleClickWindows');
         doubleClickIntervalEl.value = await getSetting('doubleClickInterval');
         createTextFragmentEl.checked = await getSetting('createTextFragment');
@@ -100,6 +98,14 @@ async function loadSettings() {
         omitFooterEl.checked = await getSetting('omitFooter');
         notifyOnWarningEl.checked = await getSetting('notifyOnWarning');
         notifyOnSuccessEl.checked = await getSetting('notifyOnSuccess');
+
+        mdYoutubeEl.value = await getSetting('mdYoutube');
+        mdSelectionTemplateEl.value = await getSetting('mdSelectionTemplate');
+        mdSubBracketsEl.value = await getSetting('mdSubBrackets');
+        mdBulletPointEl.value = await getSetting('mdBulletPoint');
+
+        jsonEmptyCellEl.value = await getSetting('jsonEmptyCell') || 'null';
+        jsonDestinationEl.value = await getSetting('jsonDestination');
     } catch (err) {
         console.error(err);
         throw err;

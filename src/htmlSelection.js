@@ -16,33 +16,64 @@
 
 import { getSetting } from './common.js';
 import * as md from './generators/md.js';
-import { htmlToMd, encodeUrl } from './converters/md.js';
+import { htmlToMd, mdEncodeUri } from './converters/md.js';
 
 /**
- * createText creates markdown (or another text format) of the selected part of the
- * page. The format is mostly determined by the user's settings. If no text is selected,
- * a link to the page is created.
+ * createText creates text of the selected part of the page. The language and format are
+ * determined by the user's settings. If there is no selection, a link to the page is
+ * created.
  * @param {string} title - the title of the page.
  * @param {string} url - the URL of the page.
  * @param {Selection|null} selection - a selection object.
  * @returns {Promise<string>}
  */
 export async function createText(title, url, selection) {
-    const selectedText = selection.toString().trim();
+    const markupLanguage = await getSetting('markupLanguage');
+
+    const selectedText = selection?.toString().trim() || '';
     if (!selectedText) {
-        return await md.createLink(title, url);
+        switch (markupLanguage) {
+            case 'markdown':
+                return await md.createLink(title, url);
+            case 'html':
+                return `<a href="${url}">${title}</a>`;
+            default:
+                console.error(`Unknown markupLanguage: ${markupLanguage}`);
+                throw new Error(`Unknown markupLanguage: ${markupLanguage}`);
+        }
     }
 
-    const selectionFormat = await getSetting('selectionFormat');
-    switch (selectionFormat) {
+    if (markupLanguage === 'html') {
+        /** @type {DocumentFragment|null} */
+        const frag = await getSelectionFragment(selection);
+        if (frag === null) {
+            return selectedText;
+        }
+        // make any links absolute
+        frag.querySelectorAll('a').forEach(a => {
+            a.href = new URL(a.href, url).href;
+        });
+        // convert the fragment to a string
+        const div = document.createElement('div');
+        div.appendChild(frag.cloneNode(true));
+        return div.innerHTML || selectedText;
+    }
+
+    if (markupLanguage !== 'markdown') {
+        console.error(`Unknown markupLanguage: ${markupLanguage}`);
+        throw new Error(`Unknown markupLanguage: ${markupLanguage}`);
+    }
+
+    const mdSelectionFormat = await getSetting('mdSelectionFormat');
+    switch (mdSelectionFormat) {
         case 'source with link':
-            return await getSourceFormatTextWithLink(title, url, selection, selectedText) + '\n';
+            return await getSourceFormatMdWithLink(title, url, selection, selectedText) + '\n';
         case 'source':
-            return await getSourceFormatText(selection, selectedText);
+            return await getSourceFormatMd(selection, selectedText);
         case 'template':
-            return await getTemplatedText(title, url, selection, selectedText);
+            return await getTemplatedMd(title, url, selection, selectedText);
         case 'blockquote with link':
-            const body = await getSourceFormatText(selection, selectedText);
+            const body = await getSourceFormatMd(selection, selectedText);
             return await md.createBlockquote(body, title, url) + '\n';
         case 'link with selection as title':
             selectedText = selectedText.replaceAll('\r\n', ' ').replaceAll('\n', ' ');
@@ -50,8 +81,8 @@ export async function createText(title, url, selection) {
         case 'link with page title as title':
             return await md.createLink(title, url);
         default:
-            console.error(`Unknown selectionFormat: ${selectionFormat}`);
-            throw new Error(`Unknown selectionFormat: ${selectionFormat}`);
+            console.error(`Unknown mdSelectionFormat: ${mdSelectionFormat}`);
+            throw new Error(`Unknown mdSelectionFormat: ${mdSelectionFormat}`);
     }
 }
 
@@ -60,7 +91,7 @@ export async function createText(title, url, selection) {
  * document fragment. If no selection exists, null is returned. The selection may be
  * expanded to include certain elements that are ancestors of the selection to make
  * copying easier.
- * @param {Selection} selection
+ * @param {Selection|null} selection
  * @returns {Promise<DocumentFragment|null>}
  */
 export async function getSelectionFragment(selection) {
@@ -89,14 +120,14 @@ export async function getSelectionFragment(selection) {
 }
 
 /**
- * getSourceFormatText gets markdown (or another text format) of the selected part of
- * the document and attempts to keep the source formatting. The selected text is used as
- * a fallback if the source formatting cannot be obtained.
- * @param {Selection|null} - a selection object.
+ * getSourceFormatMd gets markdown of the selected part of the document and attempts to
+ * keep the source formatting. The selected text is used as a fallback if the source
+ * formatting cannot be obtained.
+ * @param {Selection|null} selection - a selection object.
  * @param {string} selectedText - the selected text.
  * @returns {Promise<string>}
  */
-export async function getSourceFormatText(selection, selectedText) {
+export async function getSourceFormatMd(selection, selectedText) {
     /** @type {DocumentFragment} */
     const frag = await getSelectionFragment(selection);
     if (frag === null) {
@@ -105,11 +136,21 @@ export async function getSourceFormatText(selection, selectedText) {
     return await htmlToMd(frag);
 }
 
-export async function getTemplatedText(title, url, selection, selectedText) {
-    const template = await getSetting('selectionTemplate');
+/**
+ * getTemplatedMd gets markdown of the selected part of the document and uses a template
+ * to format it. The selected text is used as a fallback if the source formatting cannot
+ * be obtained.
+ * @param {string} title - the title of the page.
+ * @param {string} url - the URL of the page.
+ * @param {Selection|null} selection - a selection object.
+ * @param {string} selectedText - the selected text.
+ * @returns {Promise<string>}
+ */
+export async function getTemplatedMd(title, url, selection, selectedText) {
+    const template = await getSetting('mdSelectionTemplate');
 
     title = await md.createLinkTitle(title);
-    url = encodeUrl(url);
+    url = mdEncodeUri(url);
 
     /** @type {DocumentFragment} */
     const frag = await getSelectionFragment(selection);
@@ -138,16 +179,16 @@ export async function getTemplatedText(title, url, selection, selectedText) {
 }
 
 /**
- * getSourceFormatTextWithLink gets markdown of the selected part of the document,
+ * getSourceFormatMdWithLink gets markdown of the selected part of the document,
  * attempts to keep the source formatting, and adds a link to the page. The selected
  * text is used as a fallback if the source formatting cannot be obtained.
  * @param {string} title - the page's title.
  * @param {string} url - the page's URL.
- * @param {Selection|null} - a selection object.
+ * @param {Selection|null} selection - a selection object.
  * @param {string} selectedText - the selected text.
  * @returns {Promise<string>}
  */
-async function getSourceFormatTextWithLink(title, url, selection, selectedText) {
+async function getSourceFormatMdWithLink(title, url, selection, selectedText) {
     const link = await md.createLink(title, url);
     const today = new Date();
     const todayStr = today.getFullYear() + '/' + (today.getMonth() + 1) + '/' + today.getDate();

@@ -15,24 +15,24 @@
 */
 
 import { getSetting } from '../common.js';
-import { encodeUrl, newEscape } from '../converters/md.js';
+import { mdEncodeUri, newEscape } from '../converters/md.js';
 
 /**
  * createLink creates a markdown link.
  * @param {string|null} title - the title of the link. Square brackets are replaced,
  * escaped, or unchanged depending on the settings. Some other markdown characters are
  * escaped. If the given title is null, it is replaced with 'link'.
- * @param {string} url - the URL of the link. Parentheses are URL-encoded.
- * @param {string|null} subBrackets - the setting for what to substitute any square
+ * @param {string} uri - the URI of the link. Parentheses are URL-encoded.
+ * @param {string|null} mdSubBrackets - the setting for what to substitute any square
  * brackets with. If not given, the setting is read from storage.
  * @returns {Promise<string>}
  */
-export async function createLink(title, url, subBrackets = null) {
-    title = await createLinkTitle(title, subBrackets);
+export async function createLink(title, uri, mdSubBrackets = null) {
+    title = await createLinkTitle(title, mdSubBrackets);
 
-    url = encodeUrl(url);
+    uri = mdEncodeUri(uri);
 
-    return `[${title}](${url})`;
+    return `[${title}](${uri})`;
 }
 
 /**
@@ -40,19 +40,19 @@ export async function createLink(title, url, subBrackets = null) {
  * @param {string|null} title - the title of the link. Any square brackets are replaced,
  * escaped, or unchanged depending on the settings. Some other markdown characters are
  * escaped. If the given title is null, it is replaced with 'link'.
- * @param {string|null} subBrackets - the setting for what to substitute any square
+ * @param {string|null} mdSubBrackets - the setting for what to substitute any square
  * brackets with. If not given, the setting is read from storage.
  * @returns {Promise<string>}
  */
-export async function createLinkTitle(title, subBrackets = null) {
-    if (subBrackets === null) {
-        subBrackets = await getSetting('subBrackets');
+export async function createLinkTitle(title, mdSubBrackets = null) {
+    if (mdSubBrackets === null) {
+        mdSubBrackets = await getSetting('mdSubBrackets');
     }
 
     if (title === null) {
         title = 'link';
     } else {
-        const escape = newEscape(subBrackets);
+        const escape = newEscape(mdSubBrackets);
         title = escape(title);
     }
 
@@ -116,9 +116,9 @@ export async function createVideo(srcUrl, pageUrl) {
 
     let youtubeId; // TODO
     let isYoutube = false; // TODO
-    const youtubeMd = await getSetting('youtubeMd');
+    const mdYoutube = await getSetting('mdYoutube');
 
-    if (isYoutube && youtubeMd === 'GitHub') {
+    if (isYoutube && mdYoutube === 'GitHub') {
         // TODO: use fwd-microservice
     } else {
         const link = await createLink('video', url);
@@ -148,16 +148,16 @@ export async function createAudio(srcUrl, pageUrl) {
  * from, the link any HTML element ID or text fragment. The tab title is used as the
  * link title.
  * @param {any} tab - the tab to create the link from.
- * @param {string} subBrackets - the setting for what to substitute any square brackets
- * with.
+ * @param {string} mdSubBrackets - the setting for what to substitute any square
+ * brackets with.
  * @returns {Promise<string>} - a Promise that resolves to the markdown link.
  */
-export async function createTabLink(tab, subBrackets) {
+export async function createTabLink(tab, mdSubBrackets) {
     if (tab.title === undefined) {
         console.error('tab.title is undefined');
         throw new Error('tab.title is undefined');
         // Were the necessary permissions granted?
     }
 
-    return await createLink(tab.title, tab.url, subBrackets);
+    return await createLink(tab.title, tab.url, mdSubBrackets);
 }

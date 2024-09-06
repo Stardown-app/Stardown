@@ -37,16 +37,17 @@ export async function htmlToMd(frag) {
     const ctx = {
         locationHref: location.href,
         document: document,
-        subBrackets: await getSetting('subBrackets'),
-        bulletPoint: await getSetting('bulletPoint'),
         omitNav: await getSetting('omitNav'),
         omitFooter: await getSetting('omitFooter'),
-        youtubeMd: await getSetting('youtubeMd'),
         indent: '',
+
+        mdSubBrackets: await getSetting('mdSubBrackets'),
+        mdBulletPoint: await getSetting('mdBulletPoint'),
+        mdYoutube: await getSetting('mdYoutube'),
     };
 
     /** @type {function(string): string} */
-    ctx.escape = newEscape(ctx.subBrackets);
+    ctx.escape = newEscape(ctx.mdSubBrackets);
 
     if (isInlineText(frag.childNodes)) {
         ctx.dontTrimText = true;
@@ -56,24 +57,24 @@ export async function htmlToMd(frag) {
 }
 
 /**
- * encodeUrl encodes a URL by replacing certain characters with their percent-encoded
+ * mdEncodeUri encodes a URI by replacing certain characters with their percent-encoded
  * equivalents.
- * @param {string} url
+ * @param {string} uri
  * @returns {string}
  */
-export function encodeUrl(url) {
-    return url.replaceAll('(', '%28').replaceAll(')', '%29').replaceAll(' ', '%20');
+export function mdEncodeUri(uri) {
+    return uri.replaceAll('(', '%28').replaceAll(')', '%29').replaceAll(' ', '%20');
 }
 
 /**
  * newEscape creates a new function for escaping characters.
- * @param {string} subBrackets - the setting for what to substitute any square brackets
- * with.
+ * @param {string} mdSubBrackets - the setting for what to substitute any square
+ * brackets with.
  * @returns {function(string): string}
  */
-export function newEscape(subBrackets) {
+export function newEscape(mdSubBrackets) {
     let openSqrRepl, closeSqrRepl;
-    switch (subBrackets) {
+    switch (mdSubBrackets) {
         case 'underlined':
             openSqrRepl = '⦋';
             closeSqrRepl = '⦌';
@@ -655,7 +656,7 @@ function convertUl(ctx, el) {
             continue;
         }
 
-        result.push(ctx.indent + ctx.bulletPoint + ' ');
+        result.push(ctx.indent + ctx.mdBulletPoint + ' ');
         result.push(
             convertNodes(newCtx, child.childNodes)
                 .replace(/^ /, '')
@@ -812,7 +813,7 @@ function convertCode(ctx, el) {
 function convertA(ctx, el) {
     let href = el.getAttribute('href') || '';
     href = absolutize(href, ctx.locationHref);
-    href = encodeUrl(href);
+    href = mdEncodeUri(href);
 
     const text = convertNodes(ctx, el.childNodes).trim().replaceAll('\n', ' ');
     if (!text) {
@@ -977,7 +978,7 @@ function convertAudio(ctx, el) {
         src = ctx.locationHref;
     }
     src = absolutize(src, ctx.locationHref);
-    src = encodeUrl(src);
+    src = mdEncodeUri(src);
 
     return '[audio](' + src + ')';
 }
@@ -998,7 +999,7 @@ function convertImg(ctx, el) {
         }
     }
     src = absolutize(src, ctx.locationHref);
-    src = encodeUrl(src);
+    src = mdEncodeUri(src);
 
     const title = ctx.escape(el.getAttribute('title') || '').replaceAll('"', '\\"');
 
@@ -1032,7 +1033,7 @@ function convertTrack(ctx, el) {
         return label;
     }
     src = absolutize(src, ctx.locationHref);
-    src = encodeUrl(src);
+    src = mdEncodeUri(src);
 
     return '[' + label + '](' + src + ')';
 }
@@ -1047,12 +1048,12 @@ function convertVideo(ctx, el) {
     const usingSrcUrl = src && !src.startsWith('blob:');
     let url = usingSrcUrl ? src : ctx.locationHref;
     url = absolutize(url, ctx.locationHref);
-    url = encodeUrl(url);
+    url = mdEncodeUri(url);
 
     let youtubeId; // TODO
     let isYoutube = false; // TODO
 
-    if (isYoutube && ctx.youtubeMd === 'GitHub') {
+    if (isYoutube && ctx.mdYoutube === 'GitHub') {
         // TODO: use fwd-microservice
     } else {
         if (usingSrcUrl) {
@@ -1074,7 +1075,7 @@ function convertEmbed(ctx, el) {
         return '';
     }
     src = absolutize(src, ctx.locationHref);
-    src = encodeUrl(src);
+    src = mdEncodeUri(src);
     const type = ctx.escape(el.getAttribute('type') || 'embed');
     return '[' + type + '](' + src + ')';
 }
@@ -1096,7 +1097,7 @@ function convertIframe(ctx, el) {
     let src = el.getAttribute('src');
     if (src && src !== 'about:blank') {
         src = absolutize(src, ctx.locationHref);
-        src = encodeUrl(src);
+        src = mdEncodeUri(src);
         const title = ctx.escape(
             el.getAttribute('title') ||
             el.getAttribute('name') ||
@@ -1118,7 +1119,7 @@ function convertObject(ctx, el) {
     let data = el.getAttribute('data');
     if (data) {
         data = absolutize(data, ctx.locationHref);
-        data = encodeUrl(data);
+        data = mdEncodeUri(data);
         const type = ctx.escape(el.getAttribute('type') || 'object');
         return '[' + type + '](' + data + ')';
     }
@@ -1136,7 +1137,7 @@ function convertPortal(ctx, el) {
         return '';
     }
     src = absolutize(src, ctx.locationHref);
-    src = encodeUrl(src);
+    src = mdEncodeUri(src);
     const id = ctx.escape(el.getAttribute('id') || 'portal');
     return '[' + id + '](' + src + ')';
 }
@@ -1216,7 +1217,7 @@ function convertInput(ctx, el) {
     const result = [];
 
     if (!ctx.inList) {
-        result.push(ctx.bulletPoint + ' ');
+        result.push(ctx.mdBulletPoint + ' ');
     }
     if (checked) {
         result.push('[x] ');

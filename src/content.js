@@ -264,8 +264,18 @@ async function handleIconSingleClick() {
         // count as a selection click
         return await handleSelectionRightClick('', selection);
     } else {
-        const linkMd = await md.createLink(document.title, location.href);
-        return await handleCopyRequest(linkMd);
+        const markupLanguage = await getSetting('markupLanguage');
+        switch (markupLanguage) {
+            case 'markdown':
+                const linkMd = await md.createLink(document.title, location.href);
+                return await handleCopyRequest(linkMd);
+            case 'html':
+                const anchor = `<a href="${location.href}">${document.title}</a>`;
+                return await handleCopyRequest(anchor);
+            default:
+                console.error('Unknown markup language:', markupLanguage);
+                throw new Error('Unknown markup language:', markupLanguage);
+        }
     }
 }
 
@@ -311,9 +321,9 @@ async function handleSelectionRightClick(htmlId, selection) {
         }
     }
 
-    const markdown = await htmlSelection.createText(title, url, selection);
+    const text = await htmlSelection.createText(title, url, selection);
 
-    return await handleCopyRequest(markdown);
+    return await handleCopyRequest(text);
 }
 
 /**

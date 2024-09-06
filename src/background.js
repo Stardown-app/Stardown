@@ -14,16 +14,19 @@
    limitations under the License.
 */
 
-import { browser, sleep, createContextMenus, updateContextMenu } from './config.js';
+import { browser, sleep, createContextMenus, updateContextMenu, updateContextMenuLanguage } from './config.js';
 import { getSetting } from './common.js';
 import { createTabLink } from './generators/md.js';
 
-createContextMenus();
-
+let markupLanguage = 'markdown';
 let lastClick = new Date(0);
 let doubleClickInterval = 500;
 let jsonDestination = 'clipboard';
 
+getSetting('markupLanguage').then(value => {
+    markupLanguage = value;
+    createContextMenus(value);
+});
 getSetting('doubleClickInterval').then(value => doubleClickInterval = value);
 getSetting('jsonDestination').then(value => jsonDestination = value);
 
@@ -61,7 +64,10 @@ browser.runtime.onMessage.addListener(async (message, sender, sendResponse) => {
         // These context menu updates are done with messages from a content script
         // because the contextMenus.update method cannot update a context menu that is
         // already open. The content script listens for mouseover and mouseup events.
-        await updateContextMenu(message.context);
+        await updateContextMenu(message.context, markupLanguage);
+    } else if (message.markupLanguage) {
+        markupLanguage = message.markupLanguage;
+        updateContextMenuLanguage(markupLanguage);
     } else if (message.doubleClickInterval) {
         doubleClickInterval = message.doubleClickInterval;
     } else if (message.jsonDestination) {
@@ -219,17 +225,34 @@ async function handleIconDoubleClick(activeTab) {
         }
     }
 
-    const subBrackets = await getSetting('subBrackets');
-    const links = await Promise.all(
-        tabs.map(tab => createTabLink(tab, subBrackets))
-    );
-    const bulletPoint = await getSetting('bulletPoint');
-    const linksListMd = links.map(link => `${bulletPoint} ${link}\n`).join('');
+    let text = '';
+    switch (markupLanguage) {
+        case 'html':
+            const result = ['<ul>'];
+            for (let i = 0; i < tabs.length; i++) {
+                const anchor = `  <li><a href="${tabs[i].url}">${tabs[i].title}</a></li>`;
+                result.push(anchor);
+            }
+            result.push('</ul>');
+            text = result.join('\n');
+            break;
+        case 'markdown':
+            const mdSubBrackets = await getSetting('mdSubBrackets');
+            const links = await Promise.all(
+                tabs.map(tab => createTabLink(tab, mdSubBrackets))
+            );
+            const mdBulletPoint = await getSetting('mdBulletPoint');
+            text = links.map(link => `${mdBulletPoint} ${link}\n`).join('');
+            break;
+        default:
+            await showStatus(0, 'Error', 'Unsupported markup language');
+            return;
+    }
 
     const {
         status, notifTitle, notifBody,
     } = await browser.tabs.sendMessage(activeTab.id, {
-        category: 'copy', text: linksListMd,
+        category: 'copy', text: text,
     });
 
     if (status === 0) { // failure

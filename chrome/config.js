@@ -30,9 +30,10 @@ export async function sleep(ms) {
 
 /**
  * createContextMenus creates the context menu options.
+ * @param {string} markupLanguage - the markup language the user chose.
  * @returns {void}
  */
-export function createContextMenus() {
+export function createContextMenus(markupLanguage) {
     // This function should do nothing. It needs to exist because the Firefox extension
     // uses a function by the same name that is imported into the background script.
 }
@@ -48,9 +49,10 @@ let isTableSelected = false;
  * of HTML element the mouse is interacting with. This only has an effect if the context
  * menu is not currently visible.
  * @param {string} context - info about the element the mouse is interacting with.
+ * @param {string} markupLanguage - the markup language the user chose.
  * @returns {Promise<void>}
  */
-export async function updateContextMenu(context) {
+export async function updateContextMenu(context, markupLanguage) {
     // The `browser.contextMenus.update` method doesn't work well in Chromium because
     // when it's used to hide all but one context menu option, the one remaining would
     // appear under a "Stardown" parent menu option instead of being in the root of the
@@ -82,7 +84,40 @@ export async function updateContextMenu(context) {
             browser.contextMenus.create(menu.videoItem);
             browser.contextMenus.create(menu.audioItem);
         }
+
+        updateContextMenuLanguage(markupLanguage);
     }
+}
+
+/**
+ * updateContextMenuLanguage changes the context menu options to reflect the user's
+ * chosen markup language.
+ * @param {string} markupLanguage - the markup language the user chose.
+ * @returns {void}
+ */
+export function updateContextMenuLanguage(markupLanguage) {
+    if (markupLanguage === 'html') {
+        markupLanguage = 'HTML';
+    }
+
+    browser.contextMenus.update('page', {
+        title: `Copy ${markupLanguage} link to here`,
+    }, () => { if (browser.runtime.lastError) return; });
+    browser.contextMenus.update('selection', {
+        title: `Copy ${markupLanguage} of selection`,
+    }, () => { if (browser.runtime.lastError) return; });
+    browser.contextMenus.update('link', {
+        title: `Copy ${markupLanguage} of link`,
+    }, () => { if (browser.runtime.lastError) return; });
+    browser.contextMenus.update('image', {
+        title: `Copy ${markupLanguage} of image`,
+    }, () => { if (browser.runtime.lastError) return; });
+    browser.contextMenus.update('video', {
+        title: `Copy ${markupLanguage} of video`,
+    }, () => { if (browser.runtime.lastError) return; });
+    browser.contextMenus.update('audio', {
+        title: `Copy ${markupLanguage} of audio`,
+    }, () => { if (browser.runtime.lastError) return; });
 }
 
 /**

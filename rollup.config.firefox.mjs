@@ -73,6 +73,11 @@ export default [
                         dest: 'firefox',
                     },
                     {
+                        // copy all html files
+                        src: ['src/*.html'],
+                        dest: 'firefox',
+                    },
+                    {
                         // copy js files in the converters folder
                         src: ['src/converters/*'],
                         dest: 'firefox/converters',

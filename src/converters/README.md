@@ -73,12 +73,12 @@ For example, settings and environment info could be put into `ctx` to be used th
 const ctx = {
     locationHref: location.href,
     document: document,
-    subBrackets: await getSetting('subBrackets'),
-    bulletPoint: await getSetting('bulletPoint'),
     omitNav: await getSetting('omitNav'),
     omitFooter: await getSetting('omitFooter'),
-    youtubeMd: await getSetting('youtubeMd'),
     indent: '',
+    mdSubBrackets: await getSetting('mdSubBrackets'),
+    mdBulletPoint: await getSetting('mdBulletPoint'),
+    mdYoutube: await getSetting('mdYoutube'),
 };
 ```
 

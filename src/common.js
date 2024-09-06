@@ -17,25 +17,26 @@
 import { browser } from './config.js';
 
 const defaultSettings = {
-    youtubeMd: 'almost everywhere',
+    markupLanguage: 'markdown',
     createTextFragment: true,
     omitNav: true,
     omitFooter: true,
     notifyOnWarning: false,
     notifyOnSuccess: false,
-    subBrackets: 'underlined',
-    selectionFormat: 'source with link',
-    selectionTemplate: `
-> [!note]
-> from [{{link.title}}]({{link.url}}) on {{date.YYYYMMDD}}
-
-{{selection}}
-`.trim(),
-    jsonDestination: 'clipboard',
-    emptyCellJson: 'null',
-    bulletPoint: '-',
     doubleClickWindows: 'current',
     doubleClickInterval: 500,
+
+    mdSelectionFormat: 'source with link',
+    mdYoutube: 'almost everywhere',
+    mdSubBrackets: 'underlined',
+    mdBulletPoint: '-',
+    mdSelectionTemplate: `> [!note]
+> from [{{link.title}}]({{link.url}}) on {{date.YYYYMMDD}}
+
+{{selection}}`,
+
+    jsonEmptyCell: 'null',
+    jsonDestination: 'clipboard',
 };
 
 /**

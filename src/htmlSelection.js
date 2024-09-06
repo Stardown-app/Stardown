@@ -49,6 +49,11 @@ export async function createText(title, url, selection) {
         if (frag === null) {
             return selectedText;
         }
+        // make any links absolute
+        frag.querySelectorAll('a').forEach(a => {
+            a.href = new URL(a.href, url).href;
+        });
+        // convert the fragment to a string
         const div = document.createElement('div');
         div.appendChild(frag.cloneNode(true));
         return div.innerHTML || selectedText;

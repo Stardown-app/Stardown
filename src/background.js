@@ -14,16 +14,19 @@
    limitations under the License.
 */
 
-import { browser, sleep, createContextMenus, updateContextMenu } from './config.js';
+import { browser, sleep, createContextMenus, updateContextMenu, updateContextMenuLanguage } from './config.js';
 import { getSetting } from './common.js';
 import { createTabLink } from './generators/md.js';
 
-createContextMenus();
-
+let markupLanguage = 'markdown';
 let lastClick = new Date(0);
 let doubleClickInterval = 500;
 let jsonDestination = 'clipboard';
 
+getSetting('markupLanguage').then(value => {
+    markupLanguage = value;
+    createContextMenus(value);
+});
 getSetting('doubleClickInterval').then(value => doubleClickInterval = value);
 getSetting('jsonDestination').then(value => jsonDestination = value);
 
@@ -61,7 +64,10 @@ browser.runtime.onMessage.addListener(async (message, sender, sendResponse) => {
         // These context menu updates are done with messages from a content script
         // because the contextMenus.update method cannot update a context menu that is
         // already open. The content script listens for mouseover and mouseup events.
-        await updateContextMenu(message.context);
+        await updateContextMenu(message.context, markupLanguage);
+    } else if (message.markupLanguage) {
+        markupLanguage = message.markupLanguage;
+        updateContextMenuLanguage(markupLanguage);
     } else if (message.doubleClickInterval) {
         doubleClickInterval = message.doubleClickInterval;
     } else if (message.jsonDestination) {
@@ -218,8 +224,6 @@ async function handleIconDoubleClick(activeTab) {
             tabs = await browser.tabs.query({});
         }
     }
-
-    const markupLanguage = await getSetting('markupLanguage');
 
     let text = '';
     switch (markupLanguage) {

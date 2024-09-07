@@ -815,11 +815,13 @@ function convertA(ctx, el) {
     href = absolutize(href, ctx.locationHref);
     href = mdEncodeUri(href);
 
-    const text = convertNodes(ctx, el.childNodes).trim().replaceAll('\n', ' ');
+    let text = convertNodes(ctx, el.childNodes).trim().replaceAll('\n', ' ');
     if (!text) {
         return '';
     } else if (!href) {
         return text;
+    } else if (text.startsWith('^')) {
+        text = '\\^' + text.slice(1);
     }
 
     const title = ctx.escape(el.getAttribute('title') || '').replaceAll('"', '\\"');

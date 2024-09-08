@@ -2,9 +2,7 @@
 
 ## The right-click options disappeared
 
-Due to browser limitations, Stardown's context menu options cannot appear for certain kinds of links, images, and videos. Specifically, they cannot appear for canvases, background images, inline SVGs, HTML anchors that contain both text and image(s), videos that don't have a `<video>` HTML element, and videos with a `<video>` HTML element that's covered by other elements.
-
-Besides those possibilities, browsers have an occasionally reoccuring bug that makes the context menu options disappear. Reinstalling Stardown should fix this.
+Try reinstalling Stardown. The context menu options may have disappeared because of an occasionally reoccuring bug in browsers that is fixed by reinstalling the extension. However, due to browser limitations, the context menu options will never appear for some types of links, images, and videos. Specifically, they cannot appear for canvases, background images, inline SVGs, HTML anchors that contain both text and image(s), videos that don't have a `<video>` HTML element, and videos with a `<video>` HTML element that's covered by other elements.
 
 ## The right-click option copied a link for the entire page, not a specific part
 

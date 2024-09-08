@@ -68,24 +68,25 @@ export default [
                 // cannot run on folders.
                 targets: [
                     {
-                        // copy the images folder
-                        src: ['src/images'],
-                        dest: 'firefox',
-                    },
-                    {
-                        // copy all html files
-                        src: ['src/*.html'],
+                        // copy the images folder and html files
+                        src: ['src/images', 'src/*.html'],
                         dest: 'firefox',
                     },
                     {
                         // copy js files in the converters folder
-                        src: ['src/converters/*'],
+                        src: ['src/converters/*.js'],
                         dest: 'firefox/converters',
                         transform: transform,
                     },
                     {
+                        // copy js files in the converters/utils folder
+                        src: ['src/converters/utils/*.js'],
+                        dest: 'firefox/converters/utils',
+                        transform: transform,
+                    },
+                    {
                         // copy js files in the generators folder
-                        src: ['src/generators/*'],
+                        src: ['src/generators/*.js'],
                         dest: 'firefox/generators',
                         transform: transform,
                     },

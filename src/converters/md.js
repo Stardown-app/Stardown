@@ -15,9 +15,9 @@
 */
 
 import { getSetting } from '../common.js';
-import * as tables from './tables.js';
-import { absolutize } from './urls.js';
-import { removeHiddenElements, isInlineText } from './html.js';
+import * as tables from './utils/tables.js';
+import { absolutize } from './utils/urls.js';
+import { removeHiddenElements, isInlineText } from './utils/html.js';
 
 // [CommonMark Spec](https://spec.commonmark.org/)
 // [commonmark.js demo](https://spec.commonmark.org/dingus/)

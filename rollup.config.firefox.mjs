@@ -73,33 +73,13 @@ export default [
                         dest: 'firefox',
                     },
                     {
-                        // copy js files in the converters folder
-                        src: ['src/converters/*.js'],
-                        dest: 'firefox/converters',
-                        transform: transform,
-                    },
-                    {
-                        // copy js files in the converters/utils folder
-                        src: ['src/converters/utils/*.js'],
-                        dest: 'firefox/converters/utils',
-                        transform: transform,
-                    },
-                    {
-                        // copy js files in the generators folder
-                        src: ['src/generators/*.js'],
-                        dest: 'firefox/generators',
-                        transform: transform,
-                    },
-                    {
-                        src: [
-                            // copy js files that are directly in the src folder
-                            'src/*.js',
-                            '!src/config.js',
-                        ],
+                        // copy js files and transform them
+                        src: ['src/**/*.js', '!src/config.js'],
                         dest: 'firefox',
                         transform: transform,
                     },
                 ],
+                flatten: false,
                 hook: 'buildStart', // Run the copy before the build starts.
             }),
         ]

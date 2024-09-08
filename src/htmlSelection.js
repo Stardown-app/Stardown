@@ -103,18 +103,14 @@ export async function getSelectionFragment(selection) {
         return null;
     }
 
+    if (selection.rangeCount > 1) {
+        combineRanges(selection);
+    }
+
     /** @type {DocumentFragment} */
     const frag = document.createDocumentFragment();
-
     const startRange = getStartRange(selection);
     frag.appendChild(startRange.cloneContents());
-    for (let i = 1; i < selection.rangeCount - 1; i++) {
-        frag.appendChild(selection.getRangeAt(i).cloneContents());
-    }
-    if (selection.rangeCount > 1) {
-        const endRange = getEndRange(selection);
-        frag.appendChild(endRange.cloneContents());
-    }
 
     return frag;
 }
@@ -206,6 +202,63 @@ async function getSourceFormatMdWithLink(title, url, selection, selectedText) {
 }
 
 /**
+ * combineRanges combines the ranges of a selection into one range, modifying the
+ * selection in place.
+ * @param {Selection} selection
+ * @returns {void}
+ */
+function combineRanges(selection) {
+    const combinedRange = document.createRange();
+    const originalRanges = [];
+    for (let i = 0; i < selection.rangeCount; i++) {
+        originalRanges.push(selection.getRangeAt(i));
+    }
+
+    if (originalRanges.length > 0) {
+        combinedRange.setStart(
+            originalRanges[0].startContainer,
+            originalRanges[0].startOffset,
+        );
+
+        for (let i = 1; i < originalRanges.length; i++) {
+            const currentRange = originalRanges[i];
+
+            const rangesOverlap = Boolean(
+                currentRange.compareBoundaryPoints(
+                    currentRange.START_TO_END,
+                    combinedRange,
+                ) >= 0 &&
+                currentRange.compareBoundaryPoints(
+                    currentRange.END_TO_START,
+                    combinedRange,
+                ) <= 0
+            );
+
+            if (rangesOverlap) {
+                const combinedEnd = combinedRange.endContainer;
+                const combinedEndOffset = combinedRange.endOffset;
+
+                const isStartEqualToEnd = Boolean(
+                    currentRange.startContainer === combinedEnd &&
+                    currentRange.startOffset === combinedEndOffset
+                );
+
+                if (isStartEqualToEnd) {
+                    combinedRange.setEnd(currentRange.endContainer, currentRange.endOffset);
+                } else {
+                    combinedRange.setEnd(currentRange.startContainer, currentRange.startOffset);
+                }
+            } else { // if the ranges don't overlap
+                combinedRange.setEnd(currentRange.endContainer, currentRange.endOffset);
+            }
+        }
+    }
+
+    selection.removeAllRanges();
+    selection.addRange(combinedRange);
+}
+
+/**
  * getStartRange gets the first range of a selection. The start of the selection may be
  * expanded to include certain elements that are ancestors of the selection to make
  * copying easier.
@@ -222,23 +275,6 @@ function getStartRange(selection) {
     startNode = startBeforeParentPre(startRange, startNode);
 
     return startRange;
-}
-
-/**
- * getEndRange gets the last range of a selection. The end of the selection may be
- * expanded to include certain elements that are ancestors of the selection to make
- * copying easier.
- * @param {Selection} selection - a selection object.
- * @returns {Range} - the last range of the selection.
- */
-function getEndRange(selection) {
-    let endRange = selection.getRangeAt(selection.rangeCount - 1).cloneRange();
-    let endNode = endRange.endContainer;
-
-    endNode = endAfterAncestorCode(endRange, endNode);
-    endNode = endAfterParentPre(endRange, endNode);
-
-    return endRange;
 }
 
 /**
@@ -337,50 +373,4 @@ function startBeforeParentPre(startRange, startNode) {
     }
 
     return startNode;
-}
-
-/**
- * endAfterAncestorCode expands a selection to include any code element that is an
- * ancestor to the end of the selection as long as any tags between them are span tags.
- * @param {Range} endRange - a selection's last range.
- * @param {Node} endNode - a selection's last range's end container.
- * @returns {Node} - the new end node.
- */
-function endAfterAncestorCode(endRange, endNode) {
-    // If there are only span tags between the end node and an ancestor code tag, expand
-    // the end of the selection to include the code tag. This makes code blocks easier
-    // to copy.
-    let temp = endNode;
-    if (temp.parentNode && temp.parentNode.nodeName === 'SPAN') {
-        temp = temp.parentNode;
-    }
-    while (temp && temp.nodeName === 'SPAN') {
-        temp = temp.parentNode;
-    }
-
-    if (temp && temp.nodeName === 'CODE') {
-        endNode = temp;
-        endRange.setEndAfter(endNode);
-    }
-
-    return endNode;
-}
-
-/**
- * endAfterParentPre expands a selection to include pre elements that are the parent of
- * the end of the selection.
- * @param {Range} endRange - a selection's last range.
- * @param {Node} endNode - a selection's last range's end container.
- * @returns {Node} - the new end node.
- */
-function endAfterParentPre(endRange, endNode) {
-    // If the parent is a pre tag, expand the end of the selection to include the pre
-    // tag. This makes preformatted text including code blocks easier to copy.
-    const parent = endNode.parentNode;
-    if (parent && parent.nodeName === 'PRE') {
-        endNode = parent;
-        endRange.setEndAfter(endNode);
-    }
-
-    return endNode;
 }

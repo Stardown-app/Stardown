@@ -53,7 +53,7 @@ export async function htmlToMd(frag) {
         ctx.dontTrimText = true;
     }
 
-    return convertNodes(ctx, frag.childNodes).trim().replaceAll(/\n{3,}/g, '\n\n') + '\n';
+    return this.convertNodes(ctx, frag.childNodes).trim().replaceAll(/\n{3,}/g, '\n\n') + '\n';
 }
 
 /**
@@ -139,9 +139,9 @@ const nodeConverters = new Map([
     [ENTITY_NODE, (ctx, node) => ''], // deprecated
     [PROCESSING_INSTRUCTION_NODE, (ctx, node) => ''],
     [COMMENT_NODE, (ctx, node) => ''],
-    [DOCUMENT_NODE, convertDocument],
+    [DOCUMENT_NODE, convertDOCUMENT],
     [DOCUMENT_TYPE_NODE, (ctx, node) => ''],
-    [DOCUMENT_FRAGMENT_NODE, convertDocumentFragment],
+    [DOCUMENT_FRAGMENT_NODE, convertDOCUMENTFRAGMENT],
     [NOTATION_NODE, (ctx, node) => ''], // deprecated
 ]);
 
@@ -150,11 +150,11 @@ const elementConverters = new Map([
     // [Element: tagName property | MDN](https://developer.mozilla.org/en-US/docs/Web/API/Element/tagName)
     // [HTML elements reference | MDN](https://developer.mozilla.org/en-US/docs/Web/HTML/Element)
 
-    ['HTML', convertHtml],
+    ['HTML', convertHTML],
 
     // document metadata elements
-    ['BASE', convertBase],
-    ['HEAD', (ctx, node) => ''],
+    ['BASE', convertBASE],
+    ['HEAD', convertHEAD],
     ['LINK', (ctx, node) => ''],
     ['META', (ctx, node) => ''],
     ['STYLE', (ctx, node) => ''],
@@ -167,7 +167,7 @@ const elementConverters = new Map([
     ['ADDRESS', convertBlockElement],
     ['ARTICLE', convertBlockElement],
     ['ASIDE', convertBlockElement],
-    ['FOOTER', convertFooter],
+    ['FOOTER', convertFOOTER],
     ['HEADER', convertBlockElement],
     ['H1', newConvertHN(1)],
     ['H2', newConvertHN(2)],
@@ -177,7 +177,7 @@ const elementConverters = new Map([
     ['H6', newConvertHN(6)],
     ['HGROUP', convertBlockElement],
     ['MAIN', convertBlockElement],
-    ['NAV', convertNav],
+    ['NAV', convertNAV],
     ['SECTION', convertBlockElement],
     ['SEARCH', convertChildNodes],
 
@@ -319,913 +319,930 @@ const elementConverters = new Map([
     ['XMP', (ctx, el) => ''],
 ]);
 
-/**
- * @param {object} ctx
- * @param {Node} node
- * @returns {string}
- */
-function convertChildNodes(ctx, node) {
-    return convertNodes(ctx, node.childNodes);
-}
+export class ElementConverters {
 
-/**
- * @param {object} ctx
- * @param {Element} el
- * @returns {string}
- */
-function convertBlockElement(ctx, el) {
-    const newCtx = { ...ctx, dontTrimText: true };
-
-    /** @type {string[]} */
-    const result = ['\n\n'];
-    result.push(convertNodes(newCtx, el.childNodes).trim().replaceAll(/\n\s*\n\s*/g, '\n\n'));
-    if (!ctx.inList) {
-        result.push('\n\n');
+    /**
+     * @param {object} ctx
+     * @param {Node} node
+     * @returns {string}
+     */
+    convertChildNodes(ctx, node) {
+        return this.convertNodes(ctx, node.childNodes);
     }
 
-    return result.join('');
-}
-
-/**
- * @param {object} ctx
- * @param {Node[]|NodeList|HTMLCollection} nodes
- * @returns {string}
- */
-function convertNodes(ctx, nodes) {
-    /** @type {string[]} */
-    const result = [];
-    for (let i = 0; i < nodes.length; i++) {
-        result.push(convertNode(ctx, nodes[i]));
-    }
-    return result.join('');
-}
-
-/**
- * @param {object} ctx
- * @param {Node} node
- * @returns {string}
- */
-function convertNode(ctx, node) {
-    /** @type {function(object, Node): string} */
-    const convert = nodeConverters.get(node.nodeType);
-    if (convert === undefined) {
-        if (node.childNodes) {
-            return convertNodes(ctx, node.childNodes);
-        }
-        return convertText(ctx, node);
-    }
-    return convert(ctx, node);
-}
-
-/**
- * @param {object} ctx
- * @param {Element} el
- * @returns {string}
- */
-function convertElement(ctx, el) {
-    /** @type {function(object, Element): string} */
-    const convert = elementConverters.get(el.tagName);
-    if (convert === undefined) {
-        if (el.childNodes) {
-            return convertNodes(ctx, el.childNodes);
-        }
-        return convertText(ctx, el);
-    }
-    return convert(ctx, el);
-}
-
-/**
- * @param {object} ctx
- * @param {Node} node
- * @returns {string}
- */
-function convertText(ctx, node) {
-    if (!node.textContent) {
-        return '';
-    }
-
-    let content = ctx.escape(node.textContent);
-    if (!ctx.dontTrimText) {
-        content = content.trim();
-    }
-    if (!ctx.dontMinimizeWhitespace) {
-        content = content.replaceAll(/\s+/g, ' ');
-    }
-
-    return content;
-}
-
-/**
- * @param {object} ctx
- * @param {Document} node
- * @returns {string}
- */
-function convertDocument(ctx, node) {
-    return convertNodes(ctx, node.body.childNodes);
-}
-
-/**
- * @param {object} ctx
- * @param {DocumentFragment} node
- * @returns {string}
- */
-function convertDocumentFragment(ctx, node) {
-    return convertNodes(ctx, node.children);
-}
-
-/**
- * @param {object} ctx
- * @param {Element} el
- * @returns {string}
- */
-function convertHtml(ctx, el) {
-    const newCtx = { ...ctx }; // prevent mutations of the original context
-    return convertNodes(newCtx, el.childNodes);
-}
-
-/**
- * @param {object} ctx
- * @param {Element} el
- * @returns {string}
- */
-function convertBase(ctx, el) {
-    const href = el.getAttribute('href');
-    if (href) {
-        ctx.locationHref = href; // mutate the context
-    }
-}
-
-/**
- * @param {object} ctx
- * @param {Element} el
- * @returns {string}
- */
-function convertFooter(ctx, el) {
-    if (ctx.omitFooter) {
-        return '';
-    }
-    return convertNodes(ctx, el.childNodes);
-}
-
-/**
- * newConvertHN creates a function that converts H1, H2, H3, H4, H5, or H6 elements.
- * @param {number} n - the header level.
- * @returns {function(object, Element): string}
- */
-function newConvertHN(n) {
     /**
      * @param {object} ctx
      * @param {Element} el
      * @returns {string}
      */
-    return function (ctx, el) {
-        if (ctx.inTable) {
-            return convertText(ctx, el);
-        }
-
+    convertBlockElement(ctx, el) {
         const newCtx = { ...ctx, dontTrimText: true };
 
         /** @type {string[]} */
         const result = ['\n\n'];
-        for (let i = 0; i < n; i++) {
-            result.push('#');
+        result.push(
+            this.convertNodes(newCtx, el.childNodes).trim().replaceAll(/\n\s*\n\s*/g, '\n\n')
+        );
+        if (!ctx.inList) {
+            result.push('\n\n');
         }
-        const text = convertNodes(newCtx, el.childNodes).trim();
+
+        return result.join('');
+    }
+
+    /**
+     * @param {object} ctx
+     * @param {Node[]|NodeList|HTMLCollection} nodes
+     * @returns {string}
+     */
+    convertNodes(ctx, nodes) {
+        /** @type {string[]} */
+        const result = [];
+        for (let i = 0; i < nodes.length; i++) {
+            result.push(this.convertNode(ctx, nodes[i]));
+        }
+        return result.join('');
+    }
+
+    /**
+     * @param {object} ctx
+     * @param {Node} node
+     * @returns {string}
+     */
+    convertNode(ctx, node) {
+        /** @type {function(object, Node): string} */
+        const convert = nodeConverters.get(node.nodeType);
+        if (convert === undefined) {
+            if (node.childNodes) {
+                return this.convertNodes(ctx, node.childNodes);
+            }
+            return this.convertText(ctx, node);
+        }
+        return convert(ctx, node);
+    }
+
+    /**
+     * @param {object} ctx
+     * @param {Element} el
+     * @returns {string}
+     */
+    convertElement(ctx, el) {
+        /** @type {function(object, Element): string} */
+        const convert = this['convert' + el.tagName];
+        if (convert === undefined) {
+            if (el.childNodes) {
+                return this.convertNodes(ctx, el.childNodes);
+            }
+            return this.convertText(ctx, el);
+        }
+        return convert(ctx, el);
+    }
+
+    /**
+     * @param {object} ctx
+     * @param {Node} node
+     * @returns {string}
+     */
+    convertText(ctx, node) {
+        if (!node.textContent) {
+            return '';
+        }
+
+        let content = ctx.escape(node.textContent);
+        if (!ctx.dontTrimText) {
+            content = content.trim();
+        }
+        if (!ctx.dontMinimizeWhitespace) {
+            content = content.replaceAll(/\s+/g, ' ');
+        }
+
+        return content;
+    }
+
+    /**
+     * @param {object} ctx
+     * @param {Document} node
+     * @returns {string}
+     */
+    convertDOCUMENT(ctx, node) {
+        return this.convertNodes(ctx, node.body.childNodes);
+    }
+
+    /**
+     * @param {object} ctx
+     * @param {DocumentFragment} node
+     * @returns {string}
+     */
+    convertDOCUMENTFRAGMENT(ctx, node) {
+        return this.convertNodes(ctx, node.children);
+    }
+
+    /**
+     * @param {object} ctx
+     * @param {Element} el
+     * @returns {string}
+     */
+    convertHTML(ctx, el) {
+        const newCtx = { ...ctx }; // prevent mutations of the original context
+        return this.convertNodes(newCtx, el.childNodes);
+    }
+
+    /**
+     * @param {object} ctx
+     * @param {Element} el
+     * @returns {string}
+     */
+    convertBASE(ctx, el) {
+        const href = el.getAttribute('href');
+        if (href) {
+            ctx.locationHref = href; // mutate the context
+        }
+    }
+
+    /**
+     * @param {object} ctx
+     * @param {Element} el
+     * @returns {string}
+     */
+    convertHEAD(ctx, el) {
+        return '';
+    }
+
+    /**
+     * @param {object} ctx
+     * @param {Element} el
+     * @returns {string}
+     */
+    convertFOOTER(ctx, el) {
+        if (ctx.omitFooter) {
+            return '';
+        }
+        return this.convertNodes(ctx, el.childNodes);
+    }
+
+    /**
+     * newConvertHN creates a function that converts H1, H2, H3, H4, H5, or H6 elements.
+     * @param {number} n - the header level.
+     * @returns {function(object, Element): string}
+     */
+    newConvertHN(n) {
+        /**
+         * @param {object} ctx
+         * @param {Element} el
+         * @returns {string}
+         */
+        return function (ctx, el) {
+            if (ctx.inTable) {
+                return this.convertText(ctx, el);
+            }
+
+            const newCtx = { ...ctx, dontTrimText: true };
+
+            /** @type {string[]} */
+            const result = ['\n\n'];
+            for (let i = 0; i < n; i++) {
+                result.push('#');
+            }
+            const text = this.convertNodes(newCtx, el.childNodes).trim();
+            if (!text) {
+                return '';
+            }
+
+            result.push(' ' + text.replaceAll('\n', ' '));
+
+            return result.join('') + '\n\n';
+        }
+    }
+
+    /**
+     * @param {object} ctx
+     * @param {Element} el
+     * @returns {string}
+     */
+    convertNAV(ctx, el) {
+        if (ctx.omitNav) {
+            return '';
+        }
+        return this.convertNodes(ctx, el.childNodes) + '\n';
+    }
+
+    /**
+     * @param {object} ctx
+     * @param {Element} el
+     * @returns {string}
+     */
+    convertBlockquote(ctx, el) {
+        const newCtx = { ...ctx, dontTrimText: true };
+
+        /** @type {string[]} */
+        const result = ['\n\n'];
+        if (ctx.inList) {
+            result.push('\n\n' + ctx.indent);
+        }
+        result.push('> ');
+        result.push(
+            this.convertNodes(newCtx, el.childNodes)
+                .trim().replaceAll('\n', '\n>').replaceAll('> \n>\n>', '> ')
+        );
+        result.push('\n');
+        if (!ctx.inList) {
+            result.push('\n');
+        }
+
+        return result.join('');
+    }
+
+    /**
+     * @param {object} ctx
+     * @param {Element} el
+     * @returns {string}
+     */
+    convertDd(ctx, el) {
+        const newCtx = { ...ctx, dontTrimText: true };
+        const text = this.convertNodes(newCtx, el.childNodes).trim();
         if (!text) {
             return '';
         }
 
-        result.push(' ' + text.replaceAll('\n', ' '));
-
-        return result.join('') + '\n\n';
-    }
-}
-
-/**
- * @param {object} ctx
- * @param {Element} el
- * @returns {string}
- */
-function convertNav(ctx, el) {
-    if (ctx.omitNav) {
-        return '';
-    }
-    return convertNodes(ctx, el.childNodes) + '\n';
-}
-
-/**
- * @param {object} ctx
- * @param {Element} el
- * @returns {string}
- */
-function convertBlockquote(ctx, el) {
-    const newCtx = { ...ctx, dontTrimText: true };
-
-    /** @type {string[]} */
-    const result = ['\n\n'];
-    if (ctx.inList) {
-        result.push('\n\n' + ctx.indent);
-    }
-    result.push('> ');
-    result.push(
-        convertNodes(newCtx, el.childNodes).trim().replaceAll('\n', '\n>').replaceAll('> \n>\n>', '> ')
-    );
-    result.push('\n');
-    if (!ctx.inList) {
-        result.push('\n');
+        return ': ' + text.replaceAll('\n', ' ') + '\n';
     }
 
-    return result.join('');
-}
-
-/**
- * @param {object} ctx
- * @param {Element} el
- * @returns {string}
- */
-function convertDd(ctx, el) {
-    const newCtx = { ...ctx, dontTrimText: true };
-    const text = convertNodes(newCtx, el.childNodes).trim();
-    if (!text) {
-        return '';
+    /**
+     * @param {object} ctx
+     * @param {Element} el
+     * @returns {string}
+     */
+    convertDl(ctx, el) {
+        const newCtx = { ...ctx, dontTrimText: true };
+        return '\n\n' + this.convertNodes(newCtx, el.childNodes) + '\n\n';
     }
 
-    return ': ' + text.replaceAll('\n', ' ') + '\n';
-}
-
-/**
- * @param {object} ctx
- * @param {Element} el
- * @returns {string}
- */
-function convertDl(ctx, el) {
-    const newCtx = { ...ctx, dontTrimText: true };
-    return '\n\n' + convertNodes(newCtx, el.childNodes) + '\n\n';
-}
-
-/**
- * @param {object} ctx
- * @param {Element} el
- * @returns {string}
- */
-function convertDt(ctx, el) {
-    const newCtx = { ...ctx, dontTrimText: true };
-    return convertNodes(newCtx, el.childNodes).replaceAll('\n', ' ') + '\n';
-}
-
-/**
- * @param {object} ctx
- * @param {Element} el
- * @returns {string}
- */
-function convertOl(ctx, el) {
-    /** @type {string[]} */
-    const result = ['\n'];
-    if (!ctx.inList) {
-        result.push('\n');
+    /**
+     * @param {object} ctx
+     * @param {Element} el
+     * @returns {string}
+     */
+    convertDt(ctx, el) {
+        const newCtx = { ...ctx, dontTrimText: true };
+        return this.convertNodes(newCtx, el.childNodes).replaceAll('\n', ' ') + '\n';
     }
 
-    const newCtx = {
-        ...ctx, indent: ctx.indent + '    ', inList: true, dontTrimText: true,
-    };
-
-    let liNum = Number(el.getAttribute('start') || 1);
-    const reversed = Boolean(el.getAttribute('reversed'));
-
-    const children = el.childNodes;
-    for (let i = 0; i < children.length; i++) {
-        const child = children[i];
-        if (
-            child.nodeType === TEXT_NODE ||
-            child.childNodes.length === 0 ||
-            child.textContent?.match(/^\s+$/)
-        ) {
-            continue;
-        }
-
-        result.push(ctx.indent + String(liNum) + '. ');
-        result.push(
-            convertNodes(newCtx, child.childNodes)
-                .replace(/^ /, '')
-                .replace(/^\n+/, '')
-                .replace(/ \n/, '\n')
-                .replace(/ $/, '')
-        );
-        if (!ctx.inList || i < children.length - 2) {
+    /**
+     * @param {object} ctx
+     * @param {Element} el
+     * @returns {string}
+     */
+    convertOl(ctx, el) {
+        /** @type {string[]} */
+        const result = ['\n'];
+        if (!ctx.inList) {
             result.push('\n');
         }
 
-        if (reversed) {
-            liNum--;
-        } else {
-            liNum++;
-        }
-    }
+        const newCtx = {
+            ...ctx, indent: ctx.indent + '    ', inList: true, dontTrimText: true,
+        };
 
-    if (!ctx.inList) {
-        result.push('\n');
-    }
+        let liNum = Number(el.getAttribute('start') || 1);
+        const reversed = Boolean(el.getAttribute('reversed'));
 
-    return result.join('');
-}
-
-/**
- * @param {object} ctx
- * @param {Element} el
- * @returns {string}
- */
-function convertUl(ctx, el) {
-    /** @type {string[]} */
-    const result = ['\n'];
-    if (!ctx.inList) {
-        result.push('\n');
-    }
-
-    const newCtx = {
-        ...ctx, indent: ctx.indent + '    ', inList: true, dontTrimText: true,
-    };
-
-    const children = el.childNodes;
-    for (let i = 0; i < children.length; i++) {
-        const child = children[i];
-        if (
-            child.nodeType === TEXT_NODE ||
-            child.childNodes.length === 0 ||
-            child.textContent?.match(/^\s+$/)
-        ) {
-            continue;
-        }
-
-        result.push(ctx.indent + ctx.mdBulletPoint + ' ');
-        result.push(
-            convertNodes(newCtx, child.childNodes)
-                .replace(/^ /, '')
-                .replace(/^\n+/, '')
-                .replace(/ \n/, '\n')
-                .replace(/ $/, '')
-        );
-        if (!ctx.inList || i < children.length - 2) {
-            result.push('\n');
-        }
-    }
-
-    if (!ctx.inList) {
-        result.push('\n');
-    }
-
-    return result.join('');
-}
-
-/**
- * @param {object} ctx
- * @param {Element} el
- * @returns {string}
- */
-function convertP(ctx, el) {
-    const newCtx = { ...ctx, dontTrimText: true, dontMinimizeWhitespace: true };
-
-    /** @type {string[]} */
-    const result = ['\n\n'];
-    result.push(convertNodes(newCtx, el.childNodes).trim().replaceAll(/\n\s+/g, '\n'));
-    if (!ctx.inList) {
-        result.push('\n\n');
-    }
-
-    return result.join('');
-}
-
-
-/**
- * @param {object} ctx
- * @param {Element} el
- * @returns {string}
- */
-function convertPre(ctx, el) {
-    if (el.childNodes.length === 0) {
-        return '';
-    }
-
-    let text = '';
-    let language = '';
-    if (el.childNodes.length > 1) {
-        const result = [];
-        for (let i = 0; i < el.childNodes.length; i++) {
-            const child = el.childNodes[i];
-            const t = child.textContent;
-            if (!t) {
+        const children = el.childNodes;
+        for (let i = 0; i < children.length; i++) {
+            const child = children[i];
+            if (
+                child.nodeType === TEXT_NODE ||
+                child.childNodes.length === 0 ||
+                child.textContent?.match(/^\s+$/)
+            ) {
                 continue;
             }
-            result.push(t.replaceAll('\n\n', ' '));
-        }
-        if (result.length === 0) {
-            return '';
-        }
-        text = result.join('');
-    } else { // if there is only one child
-        /** @type {Node} */
-        const child = el.firstChild;
-        if (child.nodeName === 'SAMP' || child.nodeName === 'KBD') {
-            return convertCode(ctx, child);
+
+            result.push(ctx.indent + String(liNum) + '. ');
+            result.push(
+                this.convertNodes(newCtx, child.childNodes)
+                    .replace(/^ /, '')
+                    .replace(/^\n+/, '')
+                    .replace(/ \n/, '\n')
+                    .replace(/ $/, '')
+            );
+            if (!ctx.inList || i < children.length - 2) {
+                result.push('\n');
+            }
+
+            if (reversed) {
+                liNum--;
+            } else {
+                liNum++;
+            }
         }
 
-        text = child.textContent;
+        if (!ctx.inList) {
+            result.push('\n');
+        }
+
+        return result.join('');
+    }
+
+    /**
+     * @param {object} ctx
+     * @param {Element} el
+     * @returns {string}
+     */
+    convertUl(ctx, el) {
+        /** @type {string[]} */
+        const result = ['\n'];
+        if (!ctx.inList) {
+            result.push('\n');
+        }
+
+        const newCtx = {
+            ...ctx, indent: ctx.indent + '    ', inList: true, dontTrimText: true,
+        };
+
+        const children = el.childNodes;
+        for (let i = 0; i < children.length; i++) {
+            const child = children[i];
+            if (
+                child.nodeType === TEXT_NODE ||
+                child.childNodes.length === 0 ||
+                child.textContent?.match(/^\s+$/)
+            ) {
+                continue;
+            }
+
+            result.push(ctx.indent + ctx.mdBulletPoint + ' ');
+            result.push(
+                this.convertNodes(newCtx, child.childNodes)
+                    .replace(/^ /, '')
+                    .replace(/^\n+/, '')
+                    .replace(/ \n/, '\n')
+                    .replace(/ $/, '')
+            );
+            if (!ctx.inList || i < children.length - 2) {
+                result.push('\n');
+            }
+        }
+
+        if (!ctx.inList) {
+            result.push('\n');
+        }
+
+        return result.join('');
+    }
+
+    /**
+     * @param {object} ctx
+     * @param {Element} el
+     * @returns {string}
+     */
+    convertP(ctx, el) {
+        const newCtx = { ...ctx, dontTrimText: true, dontMinimizeWhitespace: true };
+
+        /** @type {string[]} */
+        const result = ['\n\n'];
+        result.push(
+            this.convertNodes(newCtx, el.childNodes).trim().replaceAll(/\n\s+/g, '\n')
+        );
+        if (!ctx.inList) {
+            result.push('\n\n');
+        }
+
+        return result.join('');
+    }
+
+
+    /**
+     * @param {object} ctx
+     * @param {Element} el
+     * @returns {string}
+     */
+    convertPre(ctx, el) {
+        if (el.childNodes.length === 0) {
+            return '';
+        }
+
+        let text = '';
+        let language = '';
+        if (el.childNodes.length > 1) {
+            const result = [];
+            for (let i = 0; i < el.childNodes.length; i++) {
+                const child = el.childNodes[i];
+                const t = child.textContent;
+                if (!t) {
+                    continue;
+                }
+                result.push(t.replaceAll('\n\n', ' '));
+            }
+            if (result.length === 0) {
+                return '';
+            }
+            text = result.join('');
+        } else { // if there is only one child
+            /** @type {Node} */
+            const child = el.firstChild;
+            if (child.nodeName === 'SAMP' || child.nodeName === 'KBD') {
+                return this.convertCode(ctx, child);
+            }
+
+            text = child.textContent;
+            if (!text) {
+                return '';
+            }
+
+            if (child.getAttribute) { // if the child is not a text node
+                const class_ = child.getAttribute('class') || '';
+                const languageMatch = class_.match(/language-(\S+)/);
+                if (languageMatch) {
+                    language = languageMatch[1];
+                }
+            }
+        }
+
+        const result = ['\n\n'];
+
+        if (ctx.inList) {
+            result.push('\n\n' + ctx.indent);
+        }
+
+        let backtickCount = 3;
+        const match = text.match(/(`{3,})/);
+        if (match) {
+            backtickCount = match[1].length + 1;
+        }
+
+        for (let i = 0; i < backtickCount; i++) {
+            result.push('`');
+        }
+
+        result.push(language + '\n');
+
+        text = text.replaceAll('\n', '\n' + ctx.indent);
+        result.push(ctx.indent + text + '\n' + ctx.indent);
+
+        for (let i = 0; i < backtickCount; i++) {
+            result.push('`');
+        }
+        result.push('\n');
+        if (!ctx.inList) {
+            result.push('\n');
+        }
+
+        return result.join('');
+    }
+
+    /**
+     * @param {object} ctx
+     * @param {Element} el
+     * @returns {string}
+     */
+    convertCode(ctx, el) {
+        let text = el.textContent;
+        if (!text) {
+            return '';
+        }
+        text = text.replaceAll('\n', ' ');
+
+        const result = [];
+
+        let backtickCount = 1;
+        const match = text.match(/(`+)/);
+        if (match) {
+            backtickCount = match[1].length + 1;
+        }
+
+        for (let i = 0; i < backtickCount; i++) {
+            result.push('`');
+        }
+        result.push(text);
+        for (let i = 0; i < backtickCount; i++) {
+            result.push('`');
+        }
+
+        return result.join('');
+    }
+
+    /**
+     * @param {object} ctx
+     * @param {Element} el
+     * @returns {string}
+     */
+    convertA(ctx, el) {
+        let href = el.getAttribute('href') || '';
+        href = absolutize(href, ctx.locationHref);
+        href = mdEncodeUri(href);
+
+        let text = this.convertNodes(ctx, el.childNodes).trim().replaceAll('\n', ' ');
+        if (!text) {
+            return '';
+        } else if (!href) {
+            return text;
+        } else if (text.startsWith('^')) {
+            text = '\\^' + text.slice(1);
+        }
+
+        const title = ctx.escape(el.getAttribute('title') || '').replaceAll('"', '\\"');
+
+        if (title) {
+            return '[' + text + '](' + href + ' "' + title + '")';
+        }
+        return '[' + text + '](' + href + ')';
+    }
+
+    /**
+     * @param {object} ctx
+     * @param {Element} el
+     * @returns {string}
+     */
+    convertB(ctx, el) {
+        if (ctx.inB) {
+            return this.convertNodes(ctx, el.childNodes);
+        }
+        const newCtx = { ...ctx, inB: true };
+
+        const text = this.convertNodes(newCtx, el.childNodes).trim();
         if (!text) {
             return '';
         }
 
-        if (child.getAttribute) { // if the child is not a text node
-            const class_ = child.getAttribute('class') || '';
-            const languageMatch = class_.match(/language-(\S+)/);
-            if (languageMatch) {
-                language = languageMatch[1];
+        return '**' + text.replaceAll('\n', ' ') + '**';
+    }
+
+    /**
+     * @param {object} ctx
+     * @param {Element} el
+     * @returns {string}
+     */
+    convertEm(ctx, el) {
+        if (ctx.inEm) {
+            return this.convertNodes(ctx, el.childNodes);
+        }
+        const newCtx = { ...ctx, inEm: true };
+
+        const text = this.convertNodes(newCtx, el.childNodes).trim();
+        if (!text) {
+            return '';
+        }
+
+        return '*' + text.replaceAll('\n', ' ') + '*';
+    }
+
+    /**
+     * @param {object} ctx
+     * @param {Element} el
+     * @returns {string}
+     */
+    convertMark(ctx, el) {
+        const text = this.convertNodes(ctx, el.childNodes).trim();
+        if (!text) {
+            return '';
+        }
+
+        return '==' + text.replaceAll('\n', ' ') + '==';
+    }
+
+    /**
+     * @param {object} ctx
+     * @param {Element} el
+     * @returns {string}
+     */
+    convertQ(ctx, el) {
+        if (ctx.inEm) {
+            const text = this.convertNodes(ctx, el.childNodes)
+                .trim()
+                .replaceAll('\n', ' ')
+                .replaceAll('"', '\\"')
+            return '"' + text + '"';
+        }
+        const newCtx = { ...ctx, inEm: true };
+
+        const text = this.convertNodes(newCtx, el.childNodes).trim();
+        if (!text) {
+            return '';
+        }
+
+        return '*"' + text.replaceAll('\n', ' ').replaceAll('"', '\\"') + '"*';
+    }
+
+    /**
+     * @param {object} ctx
+     * @param {Element} el
+     * @returns {string}
+     */
+    convertS(ctx, el) {
+        if (ctx.inS) {
+            return this.convertNodes(ctx, el.childNodes);
+        }
+        const newCtx = { ...ctx, inS: true };
+
+        const text = this.convertNodes(newCtx, el.childNodes).trim();
+        if (!text) {
+            return '';
+        }
+
+        return '~~' + text.replaceAll('\n', ' ').replaceAll('~', '\\~') + '~~';
+    }
+
+    /**
+     * @param {object} ctx
+     * @param {Element} el
+     * @returns {string}
+     */
+    convertVar(ctx, el) {
+        /** @type {string[]} */
+        const result = [];
+
+        if (!ctx.inEm) {
+            result.push('*');
+        }
+        if (!ctx.inB) {
+            result.push('**');
+        }
+
+        const newCtx = { ...ctx, inEm: true, inB: true };
+        const text = this.convertNodes(newCtx, el.childNodes).trim();
+        if (!text) {
+            return '';
+        }
+
+        result.push(text.replaceAll('\n', ' '));
+
+        if (!ctx.inB) {
+            result.push('**');
+        }
+        if (!ctx.inEm) {
+            result.push('*');
+        }
+
+        return result.join('');
+    }
+
+    /**
+     * @param {object} ctx
+     * @param {Element} el
+     * @returns {string}
+     */
+    convertAudio(ctx, el) {
+        let src = el.getAttribute('src');
+        if (!src || src.startsWith('blob:')) {
+            const sourceEl = el.querySelector('source');
+            if (sourceEl) {
+                src = sourceEl.getAttribute('src');
             }
         }
-    }
-
-    const result = ['\n\n'];
-
-    if (ctx.inList) {
-        result.push('\n\n' + ctx.indent);
-    }
-
-    let backtickCount = 3;
-    const match = text.match(/(`{3,})/);
-    if (match) {
-        backtickCount = match[1].length + 1;
-    }
-
-    for (let i = 0; i < backtickCount; i++) {
-        result.push('`');
-    }
-
-    result.push(language + '\n');
-
-    text = text.replaceAll('\n', '\n' + ctx.indent);
-    result.push(ctx.indent + text + '\n' + ctx.indent);
-
-    for (let i = 0; i < backtickCount; i++) {
-        result.push('`');
-    }
-    result.push('\n');
-    if (!ctx.inList) {
-        result.push('\n');
-    }
-
-    return result.join('');
-}
-
-/**
- * @param {object} ctx
- * @param {Element} el
- * @returns {string}
- */
-function convertCode(ctx, el) {
-    let text = el.textContent;
-    if (!text) {
-        return '';
-    }
-    text = text.replaceAll('\n', ' ');
-
-    const result = [];
-
-    let backtickCount = 1;
-    const match = text.match(/(`+)/);
-    if (match) {
-        backtickCount = match[1].length + 1;
-    }
-
-    for (let i = 0; i < backtickCount; i++) {
-        result.push('`');
-    }
-    result.push(text);
-    for (let i = 0; i < backtickCount; i++) {
-        result.push('`');
-    }
-
-    return result.join('');
-}
-
-/**
- * @param {object} ctx
- * @param {Element} el
- * @returns {string}
- */
-function convertA(ctx, el) {
-    let href = el.getAttribute('href') || '';
-    href = absolutize(href, ctx.locationHref);
-    href = mdEncodeUri(href);
-
-    let text = convertNodes(ctx, el.childNodes).trim().replaceAll('\n', ' ');
-    if (!text) {
-        return '';
-    } else if (!href) {
-        return text;
-    } else if (text.startsWith('^')) {
-        text = '\\^' + text.slice(1);
-    }
-
-    const title = ctx.escape(el.getAttribute('title') || '').replaceAll('"', '\\"');
-
-    if (title) {
-        return '[' + text + '](' + href + ' "' + title + '")';
-    }
-    return '[' + text + '](' + href + ')';
-}
-
-/**
- * @param {object} ctx
- * @param {Element} el
- * @returns {string}
- */
-function convertB(ctx, el) {
-    if (ctx.inB) {
-        return convertNodes(ctx, el.childNodes);
-    }
-    const newCtx = { ...ctx, inB: true };
-
-    const text = convertNodes(newCtx, el.childNodes).trim();
-    if (!text) {
-        return '';
-    }
-
-    return '**' + text.replaceAll('\n', ' ') + '**';
-}
-
-/**
- * @param {object} ctx
- * @param {Element} el
- * @returns {string}
- */
-function convertEm(ctx, el) {
-    if (ctx.inEm) {
-        return convertNodes(ctx, el.childNodes);
-    }
-    const newCtx = { ...ctx, inEm: true };
-
-    const text = convertNodes(newCtx, el.childNodes).trim();
-    if (!text) {
-        return '';
-    }
-
-    return '*' + text.replaceAll('\n', ' ') + '*';
-}
-
-/**
- * @param {object} ctx
- * @param {Element} el
- * @returns {string}
- */
-function convertMark(ctx, el) {
-    const text = convertNodes(ctx, el.childNodes).trim();
-    if (!text) {
-        return '';
-    }
-
-    return '==' + text.replaceAll('\n', ' ') + '==';
-}
-
-/**
- * @param {object} ctx
- * @param {Element} el
- * @returns {string}
- */
-function convertQ(ctx, el) {
-    if (ctx.inEm) {
-        const text = convertNodes(ctx, el.childNodes)
-            .trim()
-            .replaceAll('\n', ' ')
-            .replaceAll('"', '\\"')
-        return '"' + text + '"';
-    }
-    const newCtx = { ...ctx, inEm: true };
-
-    const text = convertNodes(newCtx, el.childNodes).trim();
-    if (!text) {
-        return '';
-    }
-
-    return '*"' + text.replaceAll('\n', ' ').replaceAll('"', '\\"') + '"*';
-}
-
-/**
- * @param {object} ctx
- * @param {Element} el
- * @returns {string}
- */
-function convertS(ctx, el) {
-    if (ctx.inS) {
-        return convertNodes(ctx, el.childNodes);
-    }
-    const newCtx = { ...ctx, inS: true };
-
-    const text = convertNodes(newCtx, el.childNodes).trim();
-    if (!text) {
-        return '';
-    }
-
-    return '~~' + text.replaceAll('\n', ' ').replaceAll('~', '\\~') + '~~';
-}
-
-/**
- * @param {object} ctx
- * @param {Element} el
- * @returns {string}
- */
-function convertVar(ctx, el) {
-    /** @type {string[]} */
-    const result = [];
-
-    if (!ctx.inEm) {
-        result.push('*');
-    }
-    if (!ctx.inB) {
-        result.push('**');
-    }
-
-    const newCtx = { ...ctx, inEm: true, inB: true };
-    const text = convertNodes(newCtx, el.childNodes).trim();
-    if (!text) {
-        return '';
-    }
-
-    result.push(text.replaceAll('\n', ' '));
-
-    if (!ctx.inB) {
-        result.push('**');
-    }
-    if (!ctx.inEm) {
-        result.push('*');
-    }
-
-    return result.join('');
-}
-
-/**
- * @param {object} ctx
- * @param {Element} el
- * @returns {string}
- */
-function convertAudio(ctx, el) {
-    let src = el.getAttribute('src');
-    if (!src || src.startsWith('blob:')) {
-        const sourceEl = el.querySelector('source');
-        if (sourceEl) {
-            src = sourceEl.getAttribute('src');
+        if (!src || src.startsWith('blob:')) {
+            if (el.childNodes.length > 0) {
+                return this.convertNodes(ctx, el.childNodes);
+            }
+            src = ctx.locationHref;
         }
-    }
-    if (!src || src.startsWith('blob:')) {
-        if (el.childNodes.length > 0) {
-            return convertNodes(ctx, el.childNodes);
-        }
-        src = ctx.locationHref;
-    }
-    src = absolutize(src, ctx.locationHref);
-    src = mdEncodeUri(src);
-
-    return '[audio](' + src + ')';
-}
-
-/**
- * @param {object} ctx
- * @param {Element} el
- * @returns {string}
- */
-function convertImg(ctx, el) {
-    const alt = ctx.escape(el.getAttribute('alt') || '').replaceAll('\n', ' ');
-
-    let src = el.getAttribute('src') || '';
-    if (!src || src.startsWith('data:')) {
-        src = el.getAttribute('data-srcset') || '';
-        if (!src) {
-            return alt;
-        }
-    }
-    src = absolutize(src, ctx.locationHref);
-    src = mdEncodeUri(src);
-
-    const title = ctx.escape(el.getAttribute('title') || '').replaceAll('"', '\\"');
-
-    /** @type {string[]} */
-    const result = [];
-    if (ctx.inList) {
-        result.push('\n\n' + ctx.indent);
-    }
-    result.push('![' + alt + '](' + src);
-    if (title) {
-        result.push(' "' + title + '"');
-    }
-    result.push(')');
-    if (ctx.inList) {
-        result.push('\n');
-    }
-
-    return result.join('');
-}
-
-/**
- * @param {object} ctx
- * @param {Element} el
- * @returns {string}
- */
-function convertTrack(ctx, el) {
-    const label = ctx.escape(el.getAttribute('label') || 'track');
-
-    let src = el.getAttribute('src');
-    if (!src) {
-        return label;
-    }
-    src = absolutize(src, ctx.locationHref);
-    src = mdEncodeUri(src);
-
-    return '[' + label + '](' + src + ')';
-}
-
-/**
- * @param {object} ctx
- * @param {Element} el
- * @returns {string}
- */
-function convertVideo(ctx, el) {
-    const src = el.getAttribute('src');
-    const usingSrcUrl = src && !src.startsWith('blob:');
-    let url = usingSrcUrl ? src : ctx.locationHref;
-    url = absolutize(url, ctx.locationHref);
-    url = mdEncodeUri(url);
-
-    let youtubeId; // TODO
-    let isYoutube = false; // TODO
-
-    if (isYoutube && ctx.mdYoutube === 'GitHub') {
-        // TODO: use fwd-microservice
-    } else {
-        if (usingSrcUrl) {
-            return '[video](' + url + ')';
-        } else {
-            return '![video](' + url + ')';
-        }
-    }
-}
-
-/**
- * @param {object} ctx
- * @param {Element} el
- * @returns {string}
- */
-function convertEmbed(ctx, el) {
-    let src = el.getAttribute('src');
-    if (!src) {
-        return '';
-    }
-    src = absolutize(src, ctx.locationHref);
-    src = mdEncodeUri(src);
-    const type = ctx.escape(el.getAttribute('type') || 'embed');
-    return '[' + type + '](' + src + ')';
-}
-
-/**
- * @param {object} ctx
- * @param {Element} el
- * @returns {string}
- */
-function convertIframe(ctx, el) {
-    const srcdoc = el.getAttribute('srcdoc');
-    if (srcdoc && DOMParser) {
-        const doc = new DOMParser().parseFromString(srcdoc, 'text/html');
-        // The iframe uses the embedding document's URL as its base URL when resolving
-        // any relative URLs.
-        return convertDocument(ctx, doc);
-    }
-
-    let src = el.getAttribute('src');
-    if (src && src !== 'about:blank') {
         src = absolutize(src, ctx.locationHref);
         src = mdEncodeUri(src);
-        const title = ctx.escape(
-            el.getAttribute('title') ||
-            el.getAttribute('name') ||
-            el.getAttribute('id') ||
-            'iframe'
-        );
-        return '[' + title + '](' + src + ')';
+
+        return '[audio](' + src + ')';
     }
 
-    return '';
-}
+    /**
+     * @param {object} ctx
+     * @param {Element} el
+     * @returns {string}
+     */
+    convertImg(ctx, el) {
+        const alt = ctx.escape(el.getAttribute('alt') || '').replaceAll('\n', ' ');
 
-/**
- * @param {object} ctx
- * @param {Element} el
- * @returns {string}
- */
-function convertObject(ctx, el) {
-    let data = el.getAttribute('data');
-    if (data) {
-        data = absolutize(data, ctx.locationHref);
-        data = mdEncodeUri(data);
-        const type = ctx.escape(el.getAttribute('type') || 'object');
-        return '[' + type + '](' + data + ')';
-    }
-    return convertNodes(ctx, el.childNodes);
-}
-
-/**
- * @param {object} ctx
- * @param {Element} el
- * @returns {string}
- */
-function convertPortal(ctx, el) {
-    let src = el.getAttribute('src');
-    if (!src) {
-        return '';
-    }
-    src = absolutize(src, ctx.locationHref);
-    src = mdEncodeUri(src);
-    const id = ctx.escape(el.getAttribute('id') || 'portal');
-    return '[' + id + '](' + src + ')';
-}
-
-/**
- * @param {object} ctx
- * @param {Element} el
- * @returns {string}
- */
-function convertTable(ctx, el) {
-    if (ctx.inTable) {
-        return convertText(ctx, el);
-    } else if (el.getAttribute('role') === 'presentation') {
-        return convertNodes(ctx, el.childNodes);
-    }
-    const newCtx = { ...ctx, inTable: true, dontTrimText: true };
-
-    /** @type {string[]} */
-    let result = ['\n\n'];
-
-    const caption = el.querySelector('caption');
-    if (caption) {
-        result.push(convertB(ctx, caption) + '\n\n');
-    }
-
-    /** @type {Element[][]} */
-    let table2d = tables.to2dArray(el, ctx.document);
-    table2d = tables.removeEmptyRows(table2d);
-    table2d = tables.rectangularize(table2d, ctx.document);
-
-    // for each row
-    for (let y = 0; y < table2d.length; y++) {
-        const row = table2d[y];
-        result.push('|');
-
-        // for each cell
-        for (let x = 0; x < row.length; x++) {
-            const cell = row[x]; // a `<th>` or `<td>` element
-            const cellStr = convertNodes(newCtx, cell.childNodes)
-                .trim().replaceAll(/\s+/g, ' ').replaceAll('|', '\\|');
-            result.push(` ${cellStr} |`);
-        }
-
-        result.push('\n');
-
-        // if this is the first row, add a separator row
-        if (y === 0) {
-            result.push('|');
-            for (let x = 0; x < row.length; x++) {
-                result.push(' --- |');
+        let src = el.getAttribute('src') || '';
+        if (!src || src.startsWith('data:')) {
+            src = el.getAttribute('data-srcset') || '';
+            if (!src) {
+                return alt;
             }
+        }
+        src = absolutize(src, ctx.locationHref);
+        src = mdEncodeUri(src);
+
+        const title = ctx.escape(el.getAttribute('title') || '').replaceAll('"', '\\"');
+
+        /** @type {string[]} */
+        const result = [];
+        if (ctx.inList) {
+            result.push('\n\n' + ctx.indent);
+        }
+        result.push('![' + alt + '](' + src);
+        if (title) {
+            result.push(' "' + title + '"');
+        }
+        result.push(')');
+        if (ctx.inList) {
             result.push('\n');
         }
+
+        return result.join('');
     }
 
-    return result.join('') + '\n';
-}
+    /**
+     * @param {object} ctx
+     * @param {Element} el
+     * @returns {string}
+     */
+    convertTrack(ctx, el) {
+        const label = ctx.escape(el.getAttribute('label') || 'track');
 
-/**
- * @param {object} ctx
- * @param {Element} el
- * @returns {string}
- */
-function convertInput(ctx, el) {
-    const type = el.getAttribute('type');
-    if (type !== 'checkbox') {
+        let src = el.getAttribute('src');
+        if (!src) {
+            return label;
+        }
+        src = absolutize(src, ctx.locationHref);
+        src = mdEncodeUri(src);
+
+        return '[' + label + '](' + src + ')';
+    }
+
+    /**
+     * @param {object} ctx
+     * @param {Element} el
+     * @returns {string}
+     */
+    convertVideo(ctx, el) {
+        const src = el.getAttribute('src');
+        const usingSrcUrl = src && !src.startsWith('blob:');
+        let url = usingSrcUrl ? src : ctx.locationHref;
+        url = absolutize(url, ctx.locationHref);
+        url = mdEncodeUri(url);
+
+        let youtubeId; // TODO
+        let isYoutube = false; // TODO
+
+        if (isYoutube && ctx.mdYoutube === 'GitHub') {
+            // TODO: use fwd-microservice
+        } else {
+            if (usingSrcUrl) {
+                return '[video](' + url + ')';
+            } else {
+                return '![video](' + url + ')';
+            }
+        }
+    }
+
+    /**
+     * @param {object} ctx
+     * @param {Element} el
+     * @returns {string}
+     */
+    convertEmbed(ctx, el) {
+        let src = el.getAttribute('src');
+        if (!src) {
+            return '';
+        }
+        src = absolutize(src, ctx.locationHref);
+        src = mdEncodeUri(src);
+        const type = ctx.escape(el.getAttribute('type') || 'embed');
+        return '[' + type + '](' + src + ')';
+    }
+
+    /**
+     * @param {object} ctx
+     * @param {Element} el
+     * @returns {string}
+     */
+    convertIframe(ctx, el) {
+        const srcdoc = el.getAttribute('srcdoc');
+        if (srcdoc && DOMParser) {
+            const doc = new DOMParser().parseFromString(srcdoc, 'text/html');
+            // The iframe uses the embedding document's URL as its base URL when
+            // resolving any relative URLs.
+            return this.convertDOCUMENT(ctx, doc);
+        }
+
+        let src = el.getAttribute('src');
+        if (src && src !== 'about:blank') {
+            src = absolutize(src, ctx.locationHref);
+            src = mdEncodeUri(src);
+            const title = ctx.escape(
+                el.getAttribute('title') ||
+                el.getAttribute('name') ||
+                el.getAttribute('id') ||
+                'iframe'
+            );
+            return '[' + title + '](' + src + ')';
+        }
+
         return '';
     }
-    const ariaHasPopup = el.getAttribute('aria-haspopup');
-    if (ariaHasPopup) {
-        return '';
+
+    /**
+     * @param {object} ctx
+     * @param {Element} el
+     * @returns {string}
+     */
+    convertObject(ctx, el) {
+        let data = el.getAttribute('data');
+        if (data) {
+            data = absolutize(data, ctx.locationHref);
+            data = mdEncodeUri(data);
+            const type = ctx.escape(el.getAttribute('type') || 'object');
+            return '[' + type + '](' + data + ')';
+        }
+        return this.convertNodes(ctx, el.childNodes);
     }
 
-    const checked = el.getAttribute('checked') !== null;
-
-    /** @type {string[]} */
-    const result = [];
-
-    if (!ctx.inList) {
-        result.push(ctx.mdBulletPoint + ' ');
+    /**
+     * @param {object} ctx
+     * @param {Element} el
+     * @returns {string}
+     */
+    convertPortal(ctx, el) {
+        let src = el.getAttribute('src');
+        if (!src) {
+            return '';
+        }
+        src = absolutize(src, ctx.locationHref);
+        src = mdEncodeUri(src);
+        const id = ctx.escape(el.getAttribute('id') || 'portal');
+        return '[' + id + '](' + src + ')';
     }
-    if (checked) {
-        result.push('[x] ');
-    } else {
-        result.push('[ ] ');
+
+    /**
+     * @param {object} ctx
+     * @param {Element} el
+     * @returns {string}
+     */
+    convertTable(ctx, el) {
+        if (ctx.inTable) {
+            return this.convertText(ctx, el);
+        } else if (el.getAttribute('role') === 'presentation') {
+            return this.convertNodes(ctx, el.childNodes);
+        }
+        const newCtx = { ...ctx, inTable: true, dontTrimText: true };
+
+        /** @type {string[]} */
+        let result = ['\n\n'];
+
+        const caption = el.querySelector('caption');
+        if (caption) {
+            result.push(this.convertB(ctx, caption) + '\n\n');
+        }
+
+        /** @type {Element[][]} */
+        let table2d = tables.to2dArray(el, ctx.document);
+        table2d = tables.removeEmptyRows(table2d);
+        table2d = tables.rectangularize(table2d, ctx.document);
+
+        // for each row
+        for (let y = 0; y < table2d.length; y++) {
+            const row = table2d[y];
+            result.push('|');
+
+            // for each cell
+            for (let x = 0; x < row.length; x++) {
+                const cell = row[x]; // a `<th>` or `<td>` element
+                const cellStr = this.convertNodes(newCtx, cell.childNodes)
+                    .trim().replaceAll(/\s+/g, ' ').replaceAll('|', '\\|');
+                result.push(` ${cellStr} |`);
+            }
+
+            result.push('\n');
+
+            // if this is the first row, add a separator row
+            if (y === 0) {
+                result.push('|');
+                for (let x = 0; x < row.length; x++) {
+                    result.push(' --- |');
+                }
+                result.push('\n');
+            }
+        }
+
+        return result.join('') + '\n';
     }
 
-    return result.join('');
+    /**
+     * @param {object} ctx
+     * @param {Element} el
+     * @returns {string}
+     */
+    convertInput(ctx, el) {
+        const type = el.getAttribute('type');
+        if (type !== 'checkbox') {
+            return '';
+        }
+        const ariaHasPopup = el.getAttribute('aria-haspopup');
+        if (ariaHasPopup) {
+            return '';
+        }
+
+        const checked = el.getAttribute('checked') !== null;
+
+        /** @type {string[]} */
+        const result = [];
+
+        if (!ctx.inList) {
+            result.push(ctx.mdBulletPoint + ' ');
+        }
+        if (checked) {
+            result.push('[x] ');
+        } else {
+            result.push('[ ] ');
+        }
+
+        return result.join('');
+    }
 }

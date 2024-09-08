@@ -12,7 +12,7 @@
    governing permissions and limitations under the License.
 */
 
-import * as tables from './tables.js';
+import * as tables from './utils/tables.js';
 
 // - RFC 4180: https://datatracker.ietf.org/doc/html/rfc4180
 // - Comma-separated values - Wikipedia:

@@ -68,37 +68,18 @@ export default [
                 // cannot run on folders.
                 targets: [
                     {
-                        // copy the images folder
-                        src: ['src/images'],
+                        // copy the images folder and html files
+                        src: ['src/images', 'src/*.html'],
                         dest: 'firefox',
                     },
                     {
-                        // copy all html files
-                        src: ['src/*.html'],
-                        dest: 'firefox',
-                    },
-                    {
-                        // copy js files in the converters folder
-                        src: ['src/converters/*'],
-                        dest: 'firefox/converters',
-                        transform: transform,
-                    },
-                    {
-                        // copy js files in the generators folder
-                        src: ['src/generators/*'],
-                        dest: 'firefox/generators',
-                        transform: transform,
-                    },
-                    {
-                        src: [
-                            // copy js files that are directly in the src folder
-                            'src/*.js',
-                            '!src/config.js',
-                        ],
+                        // copy js files and transform them
+                        src: ['src/**/*.js', '!src/config.js'],
                         dest: 'firefox',
                         transform: transform,
                     },
                 ],
+                flatten: false,
                 hook: 'buildStart', // Run the copy before the build starts.
             }),
         ]

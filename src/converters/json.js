@@ -15,7 +15,7 @@
 */
 
 import { getSetting } from '../common.js';
-import * as tables from './tables.js';
+import * as tables from './utils/tables.js';
 
 // [RFC 8259](https://www.rfc-editor.org/rfc/rfc8259)
 

@@ -53,7 +53,11 @@ export async function htmlToMd(frag) {
         ctx.dontTrimText = true;
     }
 
-    return this.convertNodes(ctx, frag.childNodes).trim().replaceAll(/\n{3,}/g, '\n\n') + '\n';
+    return mdConverter
+        .convertNodes(ctx, frag.childNodes)
+        .trim()
+        .replaceAll(/\n{3,}/g, '\n\n')
+        + '\n';
 }
 
 /**
@@ -112,6 +116,7 @@ export function newEscape(mdSubBrackets) {
     }
 }
 
+// [Node: nodeType property | MDN](https://developer.mozilla.org/en-US/docs/Web/API/Node/nodeType)
 const ELEMENT_NODE = 1;
 const ATTRIBUTE_NODE = 2;
 const TEXT_NODE = 3;
@@ -127,228 +132,16 @@ const NOTATION_NODE = 12;
 // `Node.ELEMENT_NODE`, `Node.ATTRIBUTE_NODE`, etc. are not used here because `Node` is
 // not defined by Node.js, which is used when running tests.
 
-/** @type {Map<number, function(object, Node): string>} */
-const nodeConverters = new Map([
-    // [Node: nodeType property | MDN](https://developer.mozilla.org/en-US/docs/Web/API/Node/nodeType)
+/**
+ * @typedef {function(object, Node): string} NodeConverter
+ */
 
-    [ELEMENT_NODE, convertElement],
-    [ATTRIBUTE_NODE, (ctx, node) => ''],
-    [TEXT_NODE, convertText],
-    [CDATA_SECTION_NODE, (ctx, node) => ''],
-    [ENTITY_REFERENCE_NODE, (ctx, node) => ''], // deprecated
-    [ENTITY_NODE, (ctx, node) => ''], // deprecated
-    [PROCESSING_INSTRUCTION_NODE, (ctx, node) => ''],
-    [COMMENT_NODE, (ctx, node) => ''],
-    [DOCUMENT_NODE, convertDOCUMENT],
-    [DOCUMENT_TYPE_NODE, (ctx, node) => ''],
-    [DOCUMENT_FRAGMENT_NODE, convertDOCUMENTFRAGMENT],
-    [NOTATION_NODE, (ctx, node) => ''], // deprecated
-]);
+/**
+ * @typedef {function(object, Element): string} ElementConverter
+ */
 
-/** @type {Map<string, function(object, Element): string>} */
-const elementConverters = new Map([
-    // [Element: tagName property | MDN](https://developer.mozilla.org/en-US/docs/Web/API/Element/tagName)
+export class MdConverter {
     // [HTML elements reference | MDN](https://developer.mozilla.org/en-US/docs/Web/HTML/Element)
-
-    ['HTML', convertHTML],
-
-    // document metadata elements
-    ['BASE', convertBASE],
-    ['HEAD', convertHEAD],
-    ['LINK', (ctx, node) => ''],
-    ['META', (ctx, node) => ''],
-    ['STYLE', (ctx, node) => ''],
-    ['TITLE', (ctx, node) => ''],
-
-    // sectioning root elements
-    ['BODY', convertChildNodes],
-
-    // content sectioning elements
-    ['ADDRESS', convertBlockElement],
-    ['ARTICLE', convertBlockElement],
-    ['ASIDE', convertBlockElement],
-    ['FOOTER', convertFOOTER],
-    ['HEADER', convertBlockElement],
-    ['H1', newConvertHN(1)],
-    ['H2', newConvertHN(2)],
-    ['H3', newConvertHN(3)],
-    ['H4', newConvertHN(4)],
-    ['H5', newConvertHN(5)],
-    ['H6', newConvertHN(6)],
-    ['HGROUP', convertBlockElement],
-    ['MAIN', convertBlockElement],
-    ['NAV', convertNAV],
-    ['SECTION', convertBlockElement],
-    ['SEARCH', convertChildNodes],
-
-    // text content elements
-    ['BLOCKQUOTE', convertBlockquote],
-    ['DD', convertDd],
-    ['DIV', convertChildNodes],
-    ['DL', convertDl],
-    ['DT', convertDt],
-    ['FIGCAPTION', convertBlockElement],
-    ['FIGURE', convertBlockElement],
-    ['HR', (ctx, el) => '\n\n* * *\n\n'],
-    ['LI', (ctx, el) => ''],
-    ['MENU', convertUl],
-    ['OL', convertOl],
-    ['P', convertP],
-    ['PRE', convertPre],
-    ['UL', convertUl],
-
-    // inline text semantics elements
-    ['A', convertA],
-    ['ABBR', convertChildNodes],
-    ['B', convertB],
-    ['BDI', convertChildNodes],
-    ['BDO', convertChildNodes],
-    ['BR', (ctx, el) => '\n'],
-    ['CITE', convertChildNodes],
-    ['CODE', convertCode],
-    ['DATA', convertChildNodes],
-    ['DFN', convertChildNodes],
-    ['EM', convertEm],
-    ['I', convertEm],
-    ['KBD', convertCode],
-    ['MARK', convertMark],
-    ['Q', convertQ],
-    ['RP', (ctx, el) => el.textContent],
-    ['RT', (ctx, el) => el.textContent],
-    ['RUBY', convertChildNodes],
-    ['S', convertS],
-    ['SAMP', convertCode],
-    ['SMALL', convertChildNodes],
-    ['SPAN', convertChildNodes],
-    ['STRONG', convertB],
-    ['SUB', convertChildNodes],
-    ['SUP', convertChildNodes],
-    ['TIME', convertChildNodes],
-    ['U', convertChildNodes],
-    ['VAR', convertVar],
-    ['WBR', (ctx, el) => ''],
-
-    // image and multimedia elements
-    ['AREA', (ctx, el) => ''],
-    ['AUDIO', convertAudio],
-    ['IMG', convertImg],
-    ['MAP', (ctx, el) => ''],
-    ['TRACK', convertTrack],
-    ['VIDEO', convertVideo],
-
-    // embedded content elements
-    ['EMBED', convertEmbed],
-    ['IFRAME', convertIframe],
-    ['OBJECT', convertObject],
-    ['PICTURE', convertChildNodes],
-    ['PORTAL', convertPortal],
-    ['SOURCE', (ctx, el) => ''],
-
-    // SVG and MathMl elements
-    ['SVG', (ctx, el) => ''],
-    ['MATH', (ctx, el) => ''],
-
-    // scripting elements
-    ['CANVAS', convertBlockElement],
-    ['NOSCRIPT', (ctx, el) => ''],
-    ['SCRIPT', (ctx, el) => ''],
-
-    // demarcating edits elements
-    ['DEL', convertS],
-    ['INS', convertChildNodes],
-
-    // table content elements
-    ['CAPTION', convertChildNodes],
-    ['COL', (ctx, el) => ''],
-    ['COLGROUP', (ctx, el) => ''],
-    ['TABLE', convertTable],
-    ['TBODY', convertChildNodes],
-    ['TD', convertChildNodes],
-    ['TFOOT', convertChildNodes],
-    ['TH', convertChildNodes],
-    ['THEAD', convertChildNodes],
-    ['TR', convertChildNodes],
-
-    // form elements
-    ['BUTTON', convertChildNodes],
-    ['DATALIST', convertChildNodes],
-    ['FIELDSET', convertBlockElement],
-    ['FORM', convertBlockElement],
-    ['INPUT', convertInput],
-    ['LABEL', convertChildNodes],
-    ['LEGEND', convertB],
-    ['METER', convertChildNodes],
-    ['OPTGROUP', convertChildNodes],
-    ['OPTION', convertChildNodes],
-    ['OUTPUT', convertBlockElement],
-    ['PROGRESS', convertChildNodes],
-    ['SELECT', convertChildNodes],
-    ['TEXTAREA', convertChildNodes],
-
-    // interactive elements
-    ['DETAILS', convertChildNodes],
-    ['DIALOG', convertChildNodes],
-    ['SUMMARY', convertChildNodes],
-
-    // web compontent elements
-    ['SLOT', convertChildNodes],
-    ['TEMPLATE', (ctx, el) => ''],
-
-    // deprecated elements
-    ['ACRONYM', convertChildNodes],
-    ['BIG', convertChildNodes],
-    ['CENTER', convertChildNodes],
-    ['CONTENT', convertChildNodes],
-    ['DIR', (ctx, el) => ''],
-    ['FONT', (ctx, el) => ''],
-    ['FRAME', (ctx, el) => ''],
-    ['FRAMESET', (ctx, el) => ''],
-    ['IMAGE', (ctx, el) => ''],
-    ['MARQUEE', (ctx, el) => ''],
-    ['MENUITEM', (ctx, el) => ''],
-    ['NOBR', (ctx, el) => ''],
-    ['NOEMBED', (ctx, el) => ''],
-    ['NOFRAMES', (ctx, el) => ''],
-    ['PARAM', (ctx, el) => ''],
-    ['PLAINTEXT', (ctx, el) => ''],
-    ['RB', (ctx, el) => ''],
-    ['RTC', (ctx, el) => ''],
-    ['SHADOW', (ctx, el) => ''],
-    ['STRIKE', convertS],
-    ['TT', (ctx, el) => ''],
-    ['XMP', (ctx, el) => ''],
-]);
-
-export class ElementConverters {
-
-    /**
-     * @param {object} ctx
-     * @param {Node} node
-     * @returns {string}
-     */
-    convertChildNodes(ctx, node) {
-        return this.convertNodes(ctx, node.childNodes);
-    }
-
-    /**
-     * @param {object} ctx
-     * @param {Element} el
-     * @returns {string}
-     */
-    convertBlockElement(ctx, el) {
-        const newCtx = { ...ctx, dontTrimText: true };
-
-        /** @type {string[]} */
-        const result = ['\n\n'];
-        result.push(
-            this.convertNodes(newCtx, el.childNodes).trim().replaceAll(/\n\s*\n\s*/g, '\n\n')
-        );
-        if (!ctx.inList) {
-            result.push('\n\n');
-        }
-
-        return result.join('');
-    }
 
     /**
      * @param {object} ctx
@@ -364,30 +157,47 @@ export class ElementConverters {
         return result.join('');
     }
 
-    /**
-     * @param {object} ctx
-     * @param {Node} node
-     * @returns {string}
-     */
+    /** @type {NodeConverter} */
     convertNode(ctx, node) {
-        /** @type {function(object, Node): string} */
-        const convert = nodeConverters.get(node.nodeType);
-        if (convert === undefined) {
-            if (node.childNodes) {
-                return this.convertNodes(ctx, node.childNodes);
-            }
-            return this.convertText(ctx, node);
+        // [Node: nodeType property | MDN](https://developer.mozilla.org/en-US/docs/Web/API/Node/nodeType)
+        switch (node.nodeType) {
+            case ELEMENT_NODE:
+                return this.convertElement(ctx, node);
+            case ATTRIBUTE_NODE:
+                return '';
+            case TEXT_NODE:
+                return this.convertText(ctx, node);
+            case CDATA_SECTION_NODE:
+                return '';
+            case ENTITY_REFERENCE_NODE: // deprecated
+                return '';
+            case ENTITY_NODE: // deprecated
+                return '';
+            case PROCESSING_INSTRUCTION_NODE:
+                return '';
+            case COMMENT_NODE:
+                return '';
+            case DOCUMENT_NODE:
+                return this.convertDocument(ctx, node);
+            case DOCUMENT_TYPE_NODE:
+                return '';
+            case DOCUMENT_FRAGMENT_NODE:
+                return this.convertDocumentFragment(ctx, node);
+            case NOTATION_NODE: // deprecated
+                return '';
+            default:
+                if (node.childNodes) {
+                    return this.convertNodes(ctx, node.childNodes);
+                }
+                return this.convertText(ctx, node);
         }
-        return convert(ctx, node);
     }
 
-    /**
-     * @param {object} ctx
-     * @param {Element} el
-     * @returns {string}
-     */
+    /** @type {ElementConverter} */
     convertElement(ctx, el) {
-        /** @type {function(object, Element): string} */
+        // [Element: tagName property | MDN](https://developer.mozilla.org/en-US/docs/Web/API/Element/tagName)
+
+        /** @type {ElementConverter} */
         const convert = this['convert' + el.tagName];
         if (convert === undefined) {
             if (el.childNodes) {
@@ -395,14 +205,26 @@ export class ElementConverters {
             }
             return this.convertText(ctx, el);
         }
-        return convert(ctx, el);
+        return convert.call(this, ctx, el);
     }
 
-    /**
-     * @param {object} ctx
-     * @param {Node} node
-     * @returns {string}
-     */
+    /** @type {ElementConverter} */
+    convertBlockElement(ctx, el) {
+        const newCtx = { ...ctx, dontTrimText: true };
+
+        /** @type {string[]} */
+        const result = ['\n\n'];
+        result.push(
+            this.convertNodes(newCtx, el.childNodes).trim().replaceAll(/\n\s*\n\s*/g, '\n\n')
+        );
+        if (!ctx.inList) {
+            result.push('\n\n');
+        }
+
+        return result.join('');
+    }
+
+    /** @type {NodeConverter} */
     convertText(ctx, node) {
         if (!node.textContent) {
             return '';
@@ -419,39 +241,25 @@ export class ElementConverters {
         return content;
     }
 
-    /**
-     * @param {object} ctx
-     * @param {Document} node
-     * @returns {string}
-     */
-    convertDOCUMENT(ctx, node) {
+    /** @type {NodeConverter} */
+    convertDocument(ctx, node) {
         return this.convertNodes(ctx, node.body.childNodes);
     }
 
-    /**
-     * @param {object} ctx
-     * @param {DocumentFragment} node
-     * @returns {string}
-     */
-    convertDOCUMENTFRAGMENT(ctx, node) {
+    /** @type {NodeConverter} */
+    convertDocumentFragment(ctx, node) {
         return this.convertNodes(ctx, node.children);
     }
 
-    /**
-     * @param {object} ctx
-     * @param {Element} el
-     * @returns {string}
-     */
+    /** @type {ElementConverter} */
     convertHTML(ctx, el) {
         const newCtx = { ...ctx }; // prevent mutations of the original context
         return this.convertNodes(newCtx, el.childNodes);
     }
 
-    /**
-     * @param {object} ctx
-     * @param {Element} el
-     * @returns {string}
-     */
+    // document metadata elements
+
+    /** @type {ElementConverter} */
     convertBASE(ctx, el) {
         const href = el.getAttribute('href');
         if (href) {
@@ -459,20 +267,56 @@ export class ElementConverters {
         }
     }
 
-    /**
-     * @param {object} ctx
-     * @param {Element} el
-     * @returns {string}
-     */
+    /** @type {ElementConverter} */
     convertHEAD(ctx, el) {
         return '';
     }
 
-    /**
-     * @param {object} ctx
-     * @param {Element} el
-     * @returns {string}
-     */
+    /** @type {ElementConverter} */
+    convertLINK(ctx, el) {
+        return '';
+    }
+
+    /** @type {ElementConverter} */
+    convertMETA(ctx, el) {
+        return '';
+    }
+
+    /** @type {ElementConverter} */
+    convertSTYLE(ctx, el) {
+        return '';
+    }
+
+    /** @type {ElementConverter} */
+    convertTITLE(ctx, el) {
+        return '';
+    }
+
+    // sectioning root elements
+
+    /** @type {ElementConverter} */
+    convertBODY(ctx, el) {
+        return this.convertNodes(ctx, el.childNodes);
+    }
+
+    // content sectioning elements
+
+    /** @type {ElementConverter} */
+    convertADDRESS(ctx, el) {
+        return this.convertBlockElement(ctx, el);
+    }
+
+    /** @type {ElementConverter} */
+    convertARTICLE(ctx, el) {
+        return this.convertBlockElement(ctx, el);
+    }
+
+    /** @type {ElementConverter} */
+    convertASIDE(ctx, el) {
+        return this.convertBlockElement(ctx, el);
+    }
+
+    /** @type {ElementConverter} */
     convertFOOTER(ctx, el) {
         if (ctx.omitFooter) {
             return '';
@@ -480,45 +324,81 @@ export class ElementConverters {
         return this.convertNodes(ctx, el.childNodes);
     }
 
-    /**
-     * newConvertHN creates a function that converts H1, H2, H3, H4, H5, or H6 elements.
-     * @param {number} n - the header level.
-     * @returns {function(object, Element): string}
-     */
-    newConvertHN(n) {
-        /**
-         * @param {object} ctx
-         * @param {Element} el
-         * @returns {string}
-         */
-        return function (ctx, el) {
-            if (ctx.inTable) {
-                return this.convertText(ctx, el);
-            }
-
-            const newCtx = { ...ctx, dontTrimText: true };
-
-            /** @type {string[]} */
-            const result = ['\n\n'];
-            for (let i = 0; i < n; i++) {
-                result.push('#');
-            }
-            const text = this.convertNodes(newCtx, el.childNodes).trim();
-            if (!text) {
-                return '';
-            }
-
-            result.push(' ' + text.replaceAll('\n', ' '));
-
-            return result.join('') + '\n\n';
-        }
+    /** @type {ElementConverter} */
+    convertHEADER(ctx, el) {
+        return this.convertBlockElement(ctx, el);
     }
 
-    /**
-     * @param {object} ctx
-     * @param {Element} el
-     * @returns {string}
-     */
+    /** @type {ElementConverter} */
+    newConvertH_(ctx, el) {
+        if (ctx.inTable) {
+            return this.convertText(ctx, el);
+        }
+
+        const newCtx = { ...ctx, dontTrimText: true };
+
+        /** @type {string[]} */
+        const result = ['\n\n'];
+        for (let i = 0; i < ctx.hn; i++) {
+            result.push('#');
+        }
+        const text = this.convertNodes(newCtx, el.childNodes).trim();
+        if (!text) {
+            return '';
+        }
+
+        result.push(' ' + text.replaceAll('\n', ' '));
+
+        return result.join('') + '\n\n';
+    }
+
+    /** @type {ElementConverter} */
+    convertH1(ctx, el) {
+        const newCtx = { ...ctx, hn: 1 };
+        return this.newConvertH_(newCtx, el);
+    }
+
+    /** @type {ElementConverter} */
+    convertH2(ctx, el) {
+        const newCtx = { ...ctx, hn: 2 };
+        return this.newConvertH_(newCtx, el);
+    }
+
+    /** @type {ElementConverter} */
+    convertH3(ctx, el) {
+        const newCtx = { ...ctx, hn: 3 };
+        return this.newConvertH_(newCtx, el);
+    }
+
+    /** @type {ElementConverter} */
+    convertH4(ctx, el) {
+        const newCtx = { ...ctx, hn: 4 };
+        return this.newConvertH_(newCtx, el);
+    }
+
+    /** @type {ElementConverter} */
+    convertH5(ctx, el) {
+        const newCtx = { ...ctx, hn: 5 };
+        return this.newConvertH_(newCtx, el);
+    }
+
+    /** @type {ElementConverter} */
+    convertH6(ctx, el) {
+        const newCtx = { ...ctx, hn: 6 };
+        return this.newConvertH_(newCtx, el);
+    }
+
+    /** @type {ElementConverter} */
+    convertHGROUP(ctx, el) {
+        return this.convertBlockElement(ctx, el);
+    }
+
+    /** @type {ElementConverter} */
+    convertMAIN(ctx, el) {
+        return this.convertBlockElement(ctx, el);
+    }
+
+    /** @type {ElementConverter} */
     convertNAV(ctx, el) {
         if (ctx.omitNav) {
             return '';
@@ -526,12 +406,20 @@ export class ElementConverters {
         return this.convertNodes(ctx, el.childNodes) + '\n';
     }
 
-    /**
-     * @param {object} ctx
-     * @param {Element} el
-     * @returns {string}
-     */
-    convertBlockquote(ctx, el) {
+    /** @type {ElementConverter} */
+    convertSECTION(ctx, el) {
+        return this.convertBlockElement(ctx, el);
+    }
+
+    /** @type {ElementConverter} */
+    convertSEARCH(ctx, el) {
+        return this.convertNodes(ctx, el.childNodes);
+    }
+
+    // text content elements
+
+    /** @type {ElementConverter} */
+    convertBLOCKQUOTE(ctx, el) {
         const newCtx = { ...ctx, dontTrimText: true };
 
         /** @type {string[]} */
@@ -552,12 +440,8 @@ export class ElementConverters {
         return result.join('');
     }
 
-    /**
-     * @param {object} ctx
-     * @param {Element} el
-     * @returns {string}
-     */
-    convertDd(ctx, el) {
+    /** @type {ElementConverter} */
+    convertDD(ctx, el) {
         const newCtx = { ...ctx, dontTrimText: true };
         const text = this.convertNodes(newCtx, el.childNodes).trim();
         if (!text) {
@@ -567,32 +451,50 @@ export class ElementConverters {
         return ': ' + text.replaceAll('\n', ' ') + '\n';
     }
 
-    /**
-     * @param {object} ctx
-     * @param {Element} el
-     * @returns {string}
-     */
-    convertDl(ctx, el) {
+    /** @type {ElementConverter} */
+    convertDIV(ctx, el) {
+        return this.convertNodes(ctx, el.childNodes);
+    }
+
+    /** @type {ElementConverter} */
+    convertDL(ctx, el) {
         const newCtx = { ...ctx, dontTrimText: true };
         return '\n\n' + this.convertNodes(newCtx, el.childNodes) + '\n\n';
     }
 
-    /**
-     * @param {object} ctx
-     * @param {Element} el
-     * @returns {string}
-     */
-    convertDt(ctx, el) {
+    /** @type {ElementConverter} */
+    convertDT(ctx, el) {
         const newCtx = { ...ctx, dontTrimText: true };
         return this.convertNodes(newCtx, el.childNodes).replaceAll('\n', ' ') + '\n';
     }
 
-    /**
-     * @param {object} ctx
-     * @param {Element} el
-     * @returns {string}
-     */
-    convertOl(ctx, el) {
+    /** @type {ElementConverter} */
+    convertFIGCAPTION(ctx, el) {
+        return this.convertBlockElement(ctx, el);
+    }
+
+    /** @type {ElementConverter} */
+    convertFIGURE(ctx, el) {
+        return this.convertBlockElement(ctx, el);
+    }
+
+    /** @type {ElementConverter} */
+    convertHR(ctx, el) {
+        return '\n\n* * *\n\n';
+    }
+
+    /** @type {ElementConverter} */
+    convertLI(ctx, el) {
+        return '';
+    }
+
+    /** @type {ElementConverter} */
+    convertMENU(ctx, el) {
+        return this.convertUL(ctx, el);
+    }
+
+    /** @type {ElementConverter} */
+    convertOL(ctx, el) {
         /** @type {string[]} */
         const result = ['\n'];
         if (!ctx.inList) {
@@ -643,58 +545,7 @@ export class ElementConverters {
         return result.join('');
     }
 
-    /**
-     * @param {object} ctx
-     * @param {Element} el
-     * @returns {string}
-     */
-    convertUl(ctx, el) {
-        /** @type {string[]} */
-        const result = ['\n'];
-        if (!ctx.inList) {
-            result.push('\n');
-        }
-
-        const newCtx = {
-            ...ctx, indent: ctx.indent + '    ', inList: true, dontTrimText: true,
-        };
-
-        const children = el.childNodes;
-        for (let i = 0; i < children.length; i++) {
-            const child = children[i];
-            if (
-                child.nodeType === TEXT_NODE ||
-                child.childNodes.length === 0 ||
-                child.textContent?.match(/^\s+$/)
-            ) {
-                continue;
-            }
-
-            result.push(ctx.indent + ctx.mdBulletPoint + ' ');
-            result.push(
-                this.convertNodes(newCtx, child.childNodes)
-                    .replace(/^ /, '')
-                    .replace(/^\n+/, '')
-                    .replace(/ \n/, '\n')
-                    .replace(/ $/, '')
-            );
-            if (!ctx.inList || i < children.length - 2) {
-                result.push('\n');
-            }
-        }
-
-        if (!ctx.inList) {
-            result.push('\n');
-        }
-
-        return result.join('');
-    }
-
-    /**
-     * @param {object} ctx
-     * @param {Element} el
-     * @returns {string}
-     */
+    /** @type {ElementConverter} */
     convertP(ctx, el) {
         const newCtx = { ...ctx, dontTrimText: true, dontMinimizeWhitespace: true };
 
@@ -710,13 +561,8 @@ export class ElementConverters {
         return result.join('');
     }
 
-
-    /**
-     * @param {object} ctx
-     * @param {Element} el
-     * @returns {string}
-     */
-    convertPre(ctx, el) {
+    /** @type {ElementConverter} */
+    convertPRE(ctx, el) {
         if (el.childNodes.length === 0) {
             return '';
         }
@@ -741,7 +587,7 @@ export class ElementConverters {
             /** @type {Node} */
             const child = el.firstChild;
             if (child.nodeName === 'SAMP' || child.nodeName === 'KBD') {
-                return this.convertCode(ctx, child);
+                return this.convertCODE(ctx, child);
             }
 
             text = child.textContent;
@@ -790,12 +636,106 @@ export class ElementConverters {
         return result.join('');
     }
 
-    /**
-     * @param {object} ctx
-     * @param {Element} el
-     * @returns {string}
-     */
-    convertCode(ctx, el) {
+    /** @type {ElementConverter} */
+    convertUL(ctx, el) {
+        /** @type {string[]} */
+        const result = ['\n'];
+        if (!ctx.inList) {
+            result.push('\n');
+        }
+
+        const newCtx = {
+            ...ctx, indent: ctx.indent + '    ', inList: true, dontTrimText: true,
+        };
+
+        const children = el.childNodes;
+        for (let i = 0; i < children.length; i++) {
+            const child = children[i];
+            if (
+                child.nodeType === TEXT_NODE ||
+                child.childNodes.length === 0 ||
+                child.textContent?.match(/^\s+$/)
+            ) {
+                continue;
+            }
+
+            result.push(ctx.indent + ctx.mdBulletPoint + ' ');
+            result.push(
+                this.convertNodes(newCtx, child.childNodes)
+                    .replace(/^ /, '')
+                    .replace(/^\n+/, '')
+                    .replace(/ \n/, '\n')
+                    .replace(/ $/, '')
+            );
+            if (!ctx.inList || i < children.length - 2) {
+                result.push('\n');
+            }
+        }
+
+        if (!ctx.inList) {
+            result.push('\n');
+        }
+
+        return result.join('');
+    }
+
+    // inline text semantics elements
+
+    /** @type {ElementConverter} */
+    convertA(ctx, el) {
+        let href = el.getAttribute('href') || '';
+        href = absolutize(href, ctx.locationHref);
+        href = mdEncodeUri(href);
+
+        let text = this.convertNodes(ctx, el.childNodes).trim().replaceAll('\n', ' ');
+        if (!text) {
+            return '';
+        } else if (!href) {
+            return text;
+        } else if (text.startsWith('^')) {
+            text = '\\^' + text.slice(1);
+        }
+
+        const title = ctx.escape(el.getAttribute('title') || '').replaceAll('"', '\\"');
+
+        if (title) {
+            return '[' + text + '](' + href + ' "' + title + '")';
+        }
+        return '[' + text + '](' + href + ')';
+    }
+
+    /** @type {ElementConverter} */
+    convertABBR(ctx, el) {
+        return this.convertNodes(ctx, el.childNodes);
+    }
+
+    /** @type {ElementConverter} */
+    convertB(ctx, el) {
+        return this.convertSTRONG(ctx, el);
+    }
+
+    /** @type {ElementConverter} */
+    convertBDI(ctx, el) {
+        return this.convertNodes(ctx, el.childNodes);
+    }
+
+    /** @type {ElementConverter} */
+    convertBDO(ctx, el) {
+        return this.convertNodes(ctx, el.childNodes);
+    }
+
+    /** @type {ElementConverter} */
+    convertBR(ctx, el) {
+        return '\n';
+    }
+
+    /** @type {ElementConverter} */
+    convertCITE(ctx, el) {
+        return this.convertNodes(ctx, el.childNodes);
+    }
+
+    /** @type {ElementConverter} */
+    convertCODE(ctx, el) {
         let text = el.textContent;
         if (!text) {
             return '';
@@ -821,58 +761,18 @@ export class ElementConverters {
         return result.join('');
     }
 
-    /**
-     * @param {object} ctx
-     * @param {Element} el
-     * @returns {string}
-     */
-    convertA(ctx, el) {
-        let href = el.getAttribute('href') || '';
-        href = absolutize(href, ctx.locationHref);
-        href = mdEncodeUri(href);
-
-        let text = this.convertNodes(ctx, el.childNodes).trim().replaceAll('\n', ' ');
-        if (!text) {
-            return '';
-        } else if (!href) {
-            return text;
-        } else if (text.startsWith('^')) {
-            text = '\\^' + text.slice(1);
-        }
-
-        const title = ctx.escape(el.getAttribute('title') || '').replaceAll('"', '\\"');
-
-        if (title) {
-            return '[' + text + '](' + href + ' "' + title + '")';
-        }
-        return '[' + text + '](' + href + ')';
+    /** @type {ElementConverter} */
+    convertDATA(ctx, el) {
+        return this.convertNodes(ctx, el.childNodes);
     }
 
-    /**
-     * @param {object} ctx
-     * @param {Element} el
-     * @returns {string}
-     */
-    convertB(ctx, el) {
-        if (ctx.inB) {
-            return this.convertNodes(ctx, el.childNodes);
-        }
-        const newCtx = { ...ctx, inB: true };
-
-        const text = this.convertNodes(newCtx, el.childNodes).trim();
-        if (!text) {
-            return '';
-        }
-
-        return '**' + text.replaceAll('\n', ' ') + '**';
+    /** @type {ElementConverter} */
+    convertDFN(ctx, el) {
+        return this.convertNodes(ctx, el.childNodes);
     }
 
-    /**
-     * @param {object} ctx
-     * @param {Element} el
-     * @returns {string}
-     */
-    convertEm(ctx, el) {
+    /** @type {ElementConverter} */
+    convertEM(ctx, el) {
         if (ctx.inEm) {
             return this.convertNodes(ctx, el.childNodes);
         }
@@ -886,12 +786,18 @@ export class ElementConverters {
         return '*' + text.replaceAll('\n', ' ') + '*';
     }
 
-    /**
-     * @param {object} ctx
-     * @param {Element} el
-     * @returns {string}
-     */
-    convertMark(ctx, el) {
+    /** @type {ElementConverter} */
+    convertI(ctx, el) {
+        return this.convertEM(ctx, el);
+    }
+
+    /** @type {ElementConverter} */
+    convertKBD(ctx, el) {
+        return this.convertCODE(ctx, el);
+    }
+
+    /** @type {ElementConverter} */
+    convertMARK(ctx, el) {
         const text = this.convertNodes(ctx, el.childNodes).trim();
         if (!text) {
             return '';
@@ -900,11 +806,7 @@ export class ElementConverters {
         return '==' + text.replaceAll('\n', ' ') + '==';
     }
 
-    /**
-     * @param {object} ctx
-     * @param {Element} el
-     * @returns {string}
-     */
+    /** @type {ElementConverter} */
     convertQ(ctx, el) {
         if (ctx.inEm) {
             const text = this.convertNodes(ctx, el.childNodes)
@@ -923,11 +825,22 @@ export class ElementConverters {
         return '*"' + text.replaceAll('\n', ' ').replaceAll('"', '\\"') + '"*';
     }
 
-    /**
-     * @param {object} ctx
-     * @param {Element} el
-     * @returns {string}
-     */
+    /** @type {ElementConverter} */
+    convertRP(ctx, el) {
+        return el.textContent;
+    }
+
+    /** @type {ElementConverter} */
+    convertRT(ctx, el) {
+        return el.textContent;
+    }
+
+    /** @type {ElementConverter} */
+    convertRUBY(ctx, el) {
+        return this.convertNodes(ctx, el.childNodes);
+    }
+
+    /** @type {ElementConverter} */
     convertS(ctx, el) {
         if (ctx.inS) {
             return this.convertNodes(ctx, el.childNodes);
@@ -942,12 +855,58 @@ export class ElementConverters {
         return '~~' + text.replaceAll('\n', ' ').replaceAll('~', '\\~') + '~~';
     }
 
-    /**
-     * @param {object} ctx
-     * @param {Element} el
-     * @returns {string}
-     */
-    convertVar(ctx, el) {
+    /** @type {ElementConverter} */
+    convertSAMP(ctx, el) {
+        return this.convertCODE(ctx, el);
+    }
+
+    /** @type {ElementConverter} */
+    convertSMALL(ctx, el) {
+        return this.convertNodes(ctx, el.childNodes);
+    }
+
+    /** @type {ElementConverter} */
+    convertSPAN(ctx, el) {
+        return this.convertNodes(ctx, el.childNodes);
+    }
+
+    /** @type {ElementConverter} */
+    convertSTRONG(ctx, el) {
+        if (ctx.inStrong) {
+            return this.convertNodes(ctx, el.childNodes);
+        }
+        const newCtx = { ...ctx, inStrong: true };
+
+        const text = this.convertNodes(newCtx, el.childNodes).trim();
+        if (!text) {
+            return '';
+        }
+
+        return '**' + text.replaceAll('\n', ' ') + '**';
+    }
+
+    /** @type {ElementConverter} */
+    convertSUB(ctx, el) {
+        return this.convertNodes(ctx, el.childNodes);
+    }
+
+    /** @type {ElementConverter} */
+    convertSUP(ctx, el) {
+        return this.convertNodes(ctx, el.childNodes);
+    }
+
+    /** @type {ElementConverter} */
+    convertTIME(ctx, el) {
+        return this.convertNodes(ctx, el.childNodes);
+    }
+
+    /** @type {ElementConverter} */
+    convertU(ctx, el) {
+        return this.convertNodes(ctx, el.childNodes);
+    }
+
+    /** @type {ElementConverter} */
+    convertVAR(ctx, el) {
         /** @type {string[]} */
         const result = [];
 
@@ -976,12 +935,20 @@ export class ElementConverters {
         return result.join('');
     }
 
-    /**
-     * @param {object} ctx
-     * @param {Element} el
-     * @returns {string}
-     */
-    convertAudio(ctx, el) {
+    /** @type {ElementConverter} */
+    convertWBR(ctx, el) {
+        return '';
+    }
+
+    // image and multimedia elements
+
+    /** @type {ElementConverter} */
+    convertAREA(ctx, el) {
+        return '';
+    }
+
+    /** @type {ElementConverter} */
+    convertAUDIO(ctx, el) {
         let src = el.getAttribute('src');
         if (!src || src.startsWith('blob:')) {
             const sourceEl = el.querySelector('source');
@@ -1001,12 +968,8 @@ export class ElementConverters {
         return '[audio](' + src + ')';
     }
 
-    /**
-     * @param {object} ctx
-     * @param {Element} el
-     * @returns {string}
-     */
-    convertImg(ctx, el) {
+    /** @type {ElementConverter} */
+    convertIMG(ctx, el) {
         const alt = ctx.escape(el.getAttribute('alt') || '').replaceAll('\n', ' ');
 
         let src = el.getAttribute('src') || '';
@@ -1038,12 +1001,13 @@ export class ElementConverters {
         return result.join('');
     }
 
-    /**
-     * @param {object} ctx
-     * @param {Element} el
-     * @returns {string}
-     */
-    convertTrack(ctx, el) {
+    /** @type {ElementConverter} */
+    convertMAP(ctx, el) {
+        return '';
+    }
+
+    /** @type {ElementConverter} */
+    convertTRACK(ctx, el) {
         const label = ctx.escape(el.getAttribute('label') || 'track');
 
         let src = el.getAttribute('src');
@@ -1056,12 +1020,8 @@ export class ElementConverters {
         return '[' + label + '](' + src + ')';
     }
 
-    /**
-     * @param {object} ctx
-     * @param {Element} el
-     * @returns {string}
-     */
-    convertVideo(ctx, el) {
+    /** @type {ElementConverter} */
+    convertVIDEO(ctx, el) {
         const src = el.getAttribute('src');
         const usingSrcUrl = src && !src.startsWith('blob:');
         let url = usingSrcUrl ? src : ctx.locationHref;
@@ -1082,12 +1042,10 @@ export class ElementConverters {
         }
     }
 
-    /**
-     * @param {object} ctx
-     * @param {Element} el
-     * @returns {string}
-     */
-    convertEmbed(ctx, el) {
+    // embedded content elements
+
+    /** @type {ElementConverter} */
+    convertEMBED(ctx, el) {
         let src = el.getAttribute('src');
         if (!src) {
             return '';
@@ -1098,18 +1056,14 @@ export class ElementConverters {
         return '[' + type + '](' + src + ')';
     }
 
-    /**
-     * @param {object} ctx
-     * @param {Element} el
-     * @returns {string}
-     */
-    convertIframe(ctx, el) {
+    /** @type {ElementConverter} */
+    convertIFRAME(ctx, el) {
         const srcdoc = el.getAttribute('srcdoc');
         if (srcdoc && DOMParser) {
             const doc = new DOMParser().parseFromString(srcdoc, 'text/html');
             // The iframe uses the embedding document's URL as its base URL when
             // resolving any relative URLs.
-            return this.convertDOCUMENT(ctx, doc);
+            return this.convertDocument(ctx, doc);
         }
 
         let src = el.getAttribute('src');
@@ -1128,12 +1082,8 @@ export class ElementConverters {
         return '';
     }
 
-    /**
-     * @param {object} ctx
-     * @param {Element} el
-     * @returns {string}
-     */
-    convertObject(ctx, el) {
+    /** @type {ElementConverter} */
+    convertOBJECT(ctx, el) {
         let data = el.getAttribute('data');
         if (data) {
             data = absolutize(data, ctx.locationHref);
@@ -1144,12 +1094,13 @@ export class ElementConverters {
         return this.convertNodes(ctx, el.childNodes);
     }
 
-    /**
-     * @param {object} ctx
-     * @param {Element} el
-     * @returns {string}
-     */
-    convertPortal(ctx, el) {
+    /** @type {ElementConverter} */
+    convertPICTURE(ctx, el) {
+        return this.convertNodes(ctx, el.childNodes);
+    }
+
+    /** @type {ElementConverter} */
+    convertPORTAL(ctx, el) {
         let src = el.getAttribute('src');
         if (!src) {
             return '';
@@ -1160,12 +1111,71 @@ export class ElementConverters {
         return '[' + id + '](' + src + ')';
     }
 
-    /**
-     * @param {object} ctx
-     * @param {Element} el
-     * @returns {string}
-     */
-    convertTable(ctx, el) {
+    /** @type {ElementConverter} */
+    convertSOURCE(ctx, el) {
+        return '';
+    }
+
+    // SVG and MathMl elements
+
+    /** @type {ElementConverter} */
+    convertSVG(ctx, el) {
+        return '';
+    }
+
+    /** @type {ElementConverter} */
+    convertMATH(ctx, el) {
+        return '';
+    }
+
+    // scripting elements
+
+    /** @type {ElementConverter} */
+    convertCANVAS(ctx, el) {
+        return '';
+    }
+
+    /** @type {ElementConverter} */
+    convertNOSCRIPT(ctx, el) {
+        return '';
+    }
+
+    /** @type {ElementConverter} */
+    convertSCRIPT(ctx, el) {
+        return '';
+    }
+
+    // demarcating edits elements
+
+    /** @type {ElementConverter} */
+    convertDEL(ctx, el) {
+        return this.convertS(ctx, el);
+    }
+
+    /** @type {ElementConverter} */
+    convertINS(ctx, el) {
+        return this.convertNodes(ctx, el.childNodes);
+    }
+
+    // table content elements
+
+    /** @type {ElementConverter} */
+    convertCAPTION(ctx, el) {
+        return this.convertBlockElement(ctx, el);
+    }
+
+    /** @type {ElementConverter} */
+    convertCOL(ctx, el) {
+        return '';
+    }
+
+    /** @type {ElementConverter} */
+    convertCOLGROUP(ctx, el) {
+        return '';
+    }
+
+    /** @type {ElementConverter} */
+    convertTABLE(ctx, el) {
         if (ctx.inTable) {
             return this.convertText(ctx, el);
         } else if (el.getAttribute('role') === 'presentation') {
@@ -1178,7 +1188,7 @@ export class ElementConverters {
 
         const caption = el.querySelector('caption');
         if (caption) {
-            result.push(this.convertB(ctx, caption) + '\n\n');
+            result.push(this.convertSTRONG(ctx, caption) + '\n\n');
         }
 
         /** @type {Element[][]} */
@@ -1214,12 +1224,60 @@ export class ElementConverters {
         return result.join('') + '\n';
     }
 
-    /**
-     * @param {object} ctx
-     * @param {Element} el
-     * @returns {string}
-     */
-    convertInput(ctx, el) {
+    /** @type {ElementConverter} */
+    convertTBODY(ctx, el) {
+        return this.convertNodes(ctx, el.childNodes);
+    }
+
+    /** @type {ElementConverter} */
+    convertTD(ctx, el) {
+        return this.convertNodes(ctx, el.childNodes);
+    }
+
+    /** @type {ElementConverter} */
+    convertTFOOT(ctx, el) {
+        return this.convertNodes(ctx, el.childNodes);
+    }
+
+    /** @type {ElementConverter} */
+    convertTH(ctx, el) {
+        return this.convertNodes(ctx, el.childNodes);
+    }
+
+    /** @type {ElementConverter} */
+    convertTHEAD(ctx, el) {
+        return this.convertNodes(ctx, el.childNodes);
+    }
+
+    /** @type {ElementConverter} */
+    convertTR(ctx, el) {
+        return this.convertNodes(ctx, el.childNodes);
+    }
+
+    // form elements
+
+    /** @type {ElementConverter} */
+    convertBUTTON(ctx, el) {
+        return this.convertNodes(ctx, el.childNodes);
+    }
+
+    /** @type {ElementConverter} */
+    convertDATALIST(ctx, el) {
+        return this.convertNodes(ctx, el.childNodes);
+    }
+
+    /** @type {ElementConverter} */
+    convertFIELDSET(ctx, el) {
+        return this.convertBlockElement(ctx, el);
+    }
+
+    /** @type {ElementConverter} */
+    convertFORM(ctx, el) {
+        return this.convertBlockElement(ctx, el);
+    }
+
+    /** @type {ElementConverter} */
+    convertINPUT(ctx, el) {
         const type = el.getAttribute('type');
         if (type !== 'checkbox') {
             return '';
@@ -1245,4 +1303,192 @@ export class ElementConverters {
 
         return result.join('');
     }
+
+    /** @type {ElementConverter} */
+    convertLABEL(ctx, el) {
+        return this.convertNodes(ctx, el.childNodes);
+    }
+
+    /** @type {ElementConverter} */
+    convertLEGEND(ctx, el) {
+        return this.convertSTRONG(ctx, el);
+    }
+
+    /** @type {ElementConverter} */
+    convertMETER(ctx, el) {
+        return this.convertNodes(ctx, el.childNodes);
+    }
+
+    /** @type {ElementConverter} */
+    convertOPTGROUP(ctx, el) {
+        return this.convertNodes(ctx, el.childNodes);
+    }
+
+    /** @type {ElementConverter} */
+    convertOPTION(ctx, el) {
+        return this.convertNodes(ctx, el.childNodes);
+    }
+
+    /** @type {ElementConverter} */
+    convertOUTPUT(ctx, el) {
+        return this.convertBlockElement(ctx, el);
+    }
+
+    /** @type {ElementConverter} */
+    convertPROGRESS(ctx, el) {
+        return this.convertNodes(ctx, el.childNodes);
+    }
+
+    /** @type {ElementConverter} */
+    convertSELECT(ctx, el) {
+        return this.convertNodes(ctx, el.childNodes);
+    }
+
+    /** @type {ElementConverter} */
+    convertTEXTAREA(ctx, el) {
+        return this.convertNodes(ctx, el.childNodes);
+    }
+
+    // interactive elements
+
+    /** @type {ElementConverter} */
+    convertDETAILS(ctx, el) {
+        return this.convertBlockElement(ctx, el);
+    }
+
+    /** @type {ElementConverter} */
+    convertDIALOG(ctx, el) {
+        return this.convertBlockElement(ctx, el);
+    }
+
+    /** @type {ElementConverter} */
+    convertSUMMARY(ctx, el) {
+        return this.convertNodes(ctx, el.childNodes);
+    }
+
+    // web component elements
+
+    /** @type {ElementConverter} */
+    convertSLOT(ctx, el) {
+        return this.convertNodes(ctx, el.childNodes);
+    }
+
+    /** @type {ElementConverter} */
+    convertTEMPLATE(ctx, el) {
+        return '';
+    }
+
+    // deprecated elements
+
+    /** @type {ElementConverter} */
+    convertACRONYM(ctx, el) {
+        return this.convertABBR(ctx, el);
+    }
+
+    /** @type {ElementConverter} */
+    convertBIG(ctx, el) {
+        return this.convertSTRONG(ctx, el);
+    }
+
+    /** @type {ElementConverter} */
+    convertCENTER(ctx, el) {
+        return this.convertNodes(ctx, el.childNodes);
+    }
+
+    /** @type {ElementConverter} */
+    convertCONTENT(ctx, el) {
+        return this.convertNodes(ctx, el.childNodes);
+    }
+
+    /** @type {ElementConverter} */
+    convertDIR(ctx, el) {
+        return '';
+    }
+
+    /** @type {ElementConverter} */
+    convertFONT(ctx, el) {
+        return '';
+    }
+
+    /** @type {ElementConverter} */
+    convertFRAME(ctx, el) {
+        return '';
+    }
+
+    /** @type {ElementConverter} */
+    convertFRAMESET(ctx, el) {
+        return '';
+    }
+
+    /** @type {ElementConverter} */
+    convertIMAGE(ctx, el) {
+        return '';
+    }
+
+    /** @type {ElementConverter} */
+    convertMARQUEE(ctx, el) {
+        return '';
+    }
+
+    /** @type {ElementConverter} */
+    convertMENUITEM(ctx, el) {
+        return '';
+    }
+
+    /** @type {ElementConverter} */
+    convertNOBR(ctx, el) {
+        return '';
+    }
+
+    /** @type {ElementConverter} */
+    convertNOEMBED(ctx, el) {
+        return '';
+    }
+
+    /** @type {ElementConverter} */
+    convertNOFRAMES(ctx, el) {
+        return '';
+    }
+
+    /** @type {ElementConverter} */
+    convertPARAM(ctx, el) {
+        return '';
+    }
+
+    /** @type {ElementConverter} */
+    convertPLAINTEXT(ctx, el) {
+        return '';
+    }
+
+    /** @type {ElementConverter} */
+    convertRB(ctx, el) {
+        return '';
+    }
+
+    /** @type {ElementConverter} */
+    convertRTC(ctx, el) {
+        return '';
+    }
+
+    /** @type {ElementConverter} */
+    convertSHADOW(ctx, el) {
+        return '';
+    }
+
+    /** @type {ElementConverter} */
+    convertSTRIKE(ctx, el) {
+        return this.convertS(ctx, el);
+    }
+
+    /** @type {ElementConverter} */
+    convertTT(ctx, el) {
+        return '';
+    }
+
+    /** @type {ElementConverter} */
+    convertXMP(ctx, el) {
+        return '';
+    }
 }
+
+const mdConverter = new MdConverter();

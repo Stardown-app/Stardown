@@ -36,6 +36,24 @@ export function absolutize(url, locationHref) {
 }
 
 /**
+ * absolutizeElementUrls makes URLs in an element and its children absolute.
+ * @param {Element} el
+ * @param {string} locationHref
+ * @returns {void}
+ */
+export function absolutizeElementUrls(el, locationHref) {
+    const hrefs = el.querySelectorAll('[href]');
+    for (let i = 0; i < hrefs.length; i++) {
+        hrefs[i].href = absolutize(hrefs[i].href, locationHref);
+    }
+
+    const srcs = el.querySelectorAll('[src]');
+    for (let i = 0; i < srcs.length; i++) {
+        srcs[i].src = absolutize(srcs[i].src, locationHref);
+    }
+}
+
+/**
  * removeIdAndTextFragment removes any HTML element ID and any text fragment from a URL.
  * If the URL has neither, it is returned unchanged.
  * @param {string} url

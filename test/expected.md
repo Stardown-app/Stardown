@@ -61,7 +61,7 @@ boldAndEmphasizedLetters***Within***String
 
 anchor with no href
 
-![Grapefruit slice](grapefruit-slice.jpg)
+![Grapefruit slice](https://example.com/grapefruit-slice.jpg)
 
 - [ ] Checkbox on its own
 
@@ -171,7 +171,7 @@ h.J(true, false, k);
 
 - image
 
-    ![Lime slice](lime-slice.jpg)
+    ![Lime slice](https://example.com/lime-slice.jpg)
 
 - # header in list
 
@@ -195,7 +195,7 @@ h.J(true, false, k);
 
 5. List item with image
 
-    ![Orange slice](orange-slice.jpg)
+    ![Orange slice](https://example.com/orange-slice.jpg)
 
 6. List item with **bold**, *italic*, and [a link](https://puter.com/app/code).
 7. [ ] List item with unchecked checkbox
@@ -211,13 +211,13 @@ Click **[here](https://pairdrop.net/)** to send something to another device in y
 
 *[Bitwarden](https://bitwarden.com/)* is a great password manager.
 
-[![Lemon slice](lemon-slice.jpg)](zombo.com)
+[![Lemon slice](https://example.com/lemon-slice.jpg)](https://zombo.com)
 
 | one | two |
 | --- | --- |
 | three | four |
 
-| ![Melon slice](melon-slice.jpg) |  |
+| ![Melon slice](https://example.com/melon-slice.jpg) |  |
 | --- | --- |
 | hi | hi |
 

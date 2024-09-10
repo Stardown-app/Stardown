@@ -22,17 +22,11 @@
  * @returns {string}
  */
 export function absolutize(url, locationHref) {
-    if (url.startsWith('//')) {
-        return 'https:' + url;
-    } else if (url.startsWith('/')) {
-        const urlObj = new URL(locationHref);
-        return urlObj.origin + url;
-    } else if (url.startsWith('#')) {
-        locationHref = locationHref.split('#')[0];
-        return locationHref + url;
+    if (url === '' || url.startsWith('http://') || url.startsWith('https://')) {
+        return url;
     }
-
-    return url;
+    const locationUrl = new URL(locationHref);
+    return new URL(url, locationUrl).toString();
 }
 
 /**

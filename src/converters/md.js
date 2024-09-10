@@ -248,7 +248,7 @@ export class MdConverter {
 
     /** @type {NodeConverter} */
     convertDocumentFragment(ctx, node) {
-        return this.convertNodes(ctx, node.children);
+        return this.convertNodes(ctx, node.childNodes);
     }
 
     /** @type {ElementConverter} */

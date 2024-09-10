@@ -74,6 +74,7 @@ Here are a bunch of web pages with interesting features for testing.
 - [images with relative srcs](https://textbundle.org/)
 - [iframe](https://www.w3schools.com/html/html_iframe.asp)
 - [YouTube video](https://www.youtube.com/watch?v=jfKfPfyJRdk)
+- [PDF](https://haslab.github.io/SAFER/scp21.pdf) should make Stardown show an error message like "Stardown cannot run on PDFs"
 
 ### Context types
 

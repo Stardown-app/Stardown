@@ -70,7 +70,8 @@ Here are a bunch of web pages with interesting features for testing.
 - [code blocks with inline element headers](https://developer.mozilla.org/en-US/docs/Learn/HTML/Tables/Advanced#the_scope_attribute)
 - [MS doc code blocks](https://devblogs.microsoft.com/dotnet/csharp-13-explore-preview-features/)
 - [block quote](https://markdownguide.offshoot.io/basic-syntax/#blockquotes-1)
-- [image](https://betterexplained.com/articles/math-empathy/#post-6251:~:text=Math%20Empathy%20Checklist,different%20mental%20checklist.)
+- [image with an absolute src](https://betterexplained.com/articles/math-empathy/#post-6251:~:text=Math%20Empathy%20Checklist,different%20mental%20checklist.)
+- [images with relative srcs](https://textbundle.org/)
 - [iframe](https://www.w3schools.com/html/html_iframe.asp)
 - [YouTube video](https://www.youtube.com/watch?v=jfKfPfyJRdk)
 

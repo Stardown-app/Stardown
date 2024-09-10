@@ -64,7 +64,8 @@ Here are a bunch of web pages with interesting features for testing.
 - [tables with spanned images](https://en.wikipedia.org/wiki/Toshimi_Kitazawa)
 - [massive table](https://www.worldometers.info/world-population/population-by-country/)
 - [tables used for presentation without the presentation role](https://news.ycombinator.com/)
-- [references](https://en.wikipedia.org/wiki/Shanti_Kumar_Morarjee)
+- [Wikipedia references](https://en.wikipedia.org/wiki/Shanti_Kumar_Morarjee)
+- [Wikipedia location map](https://en.wikipedia.org/wiki/Bush_Kill_%28Pepacton_Reservoir_tributary%29) cannot render well because two images have to overlap
 - [code blocks that use `<pre>` but not `<code>`](https://www.cnblogs.com/unity2018/p/8492463.html)
 - [code blocks with inline element headers](https://developer.mozilla.org/en-US/docs/Learn/HTML/Tables/Advanced#the_scope_attribute)
 - [MS doc code blocks](https://devblogs.microsoft.com/dotnet/csharp-13-explore-preview-features/)

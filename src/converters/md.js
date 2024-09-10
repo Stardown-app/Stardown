@@ -186,10 +186,7 @@ export class MdConverter {
             case NOTATION_NODE: // deprecated
                 return '';
             default:
-                if (node.childNodes) {
-                    return this.convertNodes(ctx, node.childNodes);
-                }
-                return this.convertText(ctx, node);
+                return this.convertNodes(ctx, node.childNodes);
         }
     }
 
@@ -200,10 +197,7 @@ export class MdConverter {
         /** @type {ElementConverter} */
         const convert = this['convert' + el.tagName];
         if (convert === undefined) {
-            if (el.childNodes) {
-                return this.convertNodes(ctx, el.childNodes);
-            }
-            return this.convertText(ctx, el);
+            return this.convertNodes(ctx, el.childNodes);
         }
         return convert.call(this, ctx, el);
     }

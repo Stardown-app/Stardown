@@ -28,29 +28,61 @@ console.log(csv);
 
 ## Implementation
 
-Stardown-converters' markdown converter uses two map data structures to determine how to convert each HTML node. Below are parts of one of the maps.
+Stardown-converters' markdown converter is implemented with a class named `MdConverter` that has many methods, including one method for each [HTML element](https://developer.mozilla.org/en-US/docs/Web/HTML/Element). These have names that start with `convert` and end with the element's uppercase tag name. A few examples are below. They each take a context object named `ctx` (details in the next section) and an [element](https://developer.mozilla.org/en-US/docs/Web/API/Element), and return a string.
 
 ```js
-/** @type {Map<string, function(object, Element): string>} */
-const elementConverters = new Map([
-    ['BR', (ctx, el) => '\n'],
-    ['HR', (ctx, el) => '\n\n* * *\n\n'],
-    ['A', convertA],
-    ['EM', convertEm],
-    ['IMG', convertImg],
-    ['DIV', convertChildNodes],
-    ['SCRIPT', (ctx, el) => ''],
+export class MdConverter {
+
+    convertBR(ctx, el) {
+        return '\n';
+    }
+
+    convertHR(ctx, el) {
+        return '\n\n* * *\n\n';
+    }
+
+    convertSCRIPT(ctx, el) {
+        return '';
+    }
+
+    convertLI(ctx, el) {
+        return '';
+    }
+
+    convertSTRONG(ctx, el) {
+        if (ctx.inStrong) {
+            return this.convertNodes(ctx, el.childNodes);
+        }
+        const newCtx = { ...ctx, inStrong: true };
+
+        const text = this.convertNodes(newCtx, el.childNodes).trim();
+        if (!text) {
+            return '';
+        }
+
+        return '**' + text.replaceAll('\n', ' ') + '**';
+    }
+}
 ```
 
-When the markdown converter encounters a `<br>`, it queries the `elementConverters` map for `BR`, gets the corresponding function, and calls that function. Some elements like `<br>` are easy to convert which is why they have anonymous functions, but most of them are more complicated. Every function in the map takes in a context object named `ctx` (see details below) and an element's data, and returns a string. Some of the functions are specialized for a specific element, like the `convertImg` function which is just for `<img>` elements, but others are more general such as `convertChildNodes`, which is for any element that should be ignored but may have descendants that should not be ignored. Some of the element types have the anonymous function `(ctx, el) => ''` so that they and their descendants are ignored. Some element types are ignored in the map because they are handled in another element's convert function; for example, `<li>` (list item) is ignored in the map because it is handled in `convertUl` and `convertOl`. Any element whose type is not present in the `elementConverters` map will have `convertChildNodes` called on it. Many elements that use `convertChildNodes` are kept in the map so that the code is more explicit and easier to modify if needed.
+A few elements including `<br>` and `<hr>` are simple to convert, and some elements like `<script>` are always converted to empty strings so that they are ignored. Some elements like `<li>` are set to be converted to empty strings because they are expected to only appear within other elements that are handled as a group (in this case, either `<ul>`, `<ol>`, or `<menu>`). However, most are more complicated like `<strong>`. The `convertSTRONG` example above shows:
 
-Every element is a node, but while most nodes are elements, not all are. Each node encountered requires first querying the `nodeConverters` map to determine whether the node is an element or something else like text. Then if the node is an element, the `elementConverters` map is queried.
+1. `<strong>` element nesting is detected to avoid adding extra asterisks
+2. all of the `<strong>` element's child nodes are converted to a string of markdown
+3. the string is trimmed because markdown renderers require the asterisks to be next to non-whitespace characters
+4. the string is checked to make sure it's not empty because markdown renderers require bold elements to have content
+5. newline characters are removed because markdown renderers don't allow bold elements to span multiple lines
+6. the result is wrapped with asterisks and returned
+
+The `MdConverter` class should have a method for each HTML element, but any element without a corresponding method will be skipped and its child nodes will be processed. The markdown converter is implemented as a class so that it can be subclassed, such as to add support for other markdown flavors.
+
+In HTML, every element is a node but not all nodes are elements. Each node encountered requires first checking its type to determine whether the node is an element or something else like text.
 
 Stardown previously used [Turndown](https://github.com/mixmark-io/turndown) to convert HTML to markdown but eventually outgrew it. Turndown is better than Stardown-converters when any customization needed is relatively simple, or when the functionality must work in different environments such as with ActiveX. Stardown-converters is specially made for Stardown but is easy to separate from it and may someday be turned into a separate, imported package.
 
 Stardown-converters' strengths:
 
-- easier to add support for other markup languages
+- easier to add support for other markdown flavors and markup languages
 - fewer abstractions, making it easier to understand and modify
 - great performance
 - stateless interface
@@ -73,9 +105,9 @@ For example, settings and environment info could be put into `ctx` to be used th
 const ctx = {
     locationHref: location.href,
     document: document,
+    indent: '',
     omitNav: await getSetting('omitNav'),
     omitFooter: await getSetting('omitFooter'),
-    indent: '',
     mdSubBrackets: await getSetting('mdSubBrackets'),
     mdBulletPoint: await getSetting('mdBulletPoint'),
     mdYoutube: await getSetting('mdYoutube'),
@@ -85,14 +117,9 @@ const ctx = {
 `ctx` can be used to send info to all descendants of a specific element:
 
 ```js
-/**
- * @param {object} ctx
- * @param {Element} el
- * @returns {string}
- */
-function convertTable(ctx, el) {
+function convertTABLE(ctx, el) {
     if (ctx.inTable) {
-        return ctx.escape(el.textContent);
+        return this.convertText(ctx, el);
     }
     const newCtx = { ...ctx, inTable: true };
     // below this, another convert function is called with newCtx on the table's descendants

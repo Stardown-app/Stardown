@@ -16,7 +16,7 @@
 
 import { getSetting } from '../common.js';
 import { absolutizeElementUrls } from './utils/urls.js';
-import { removeHiddenElements, isInlineText } from './utils/html.js';
+import { removeHiddenElements, removeStyles, isInlineText } from './utils/html.js';
 import { newEscape, MdConverter } from './md.js';
 
 /**
@@ -27,6 +27,7 @@ import { newEscape, MdConverter } from './md.js';
  */
 export async function htmlToMdAndHtml(frag) {
     removeHiddenElements(frag, document);
+    removeStyles(frag);
     absolutizeElementUrls(frag, location.Href);
 
     const ctx = {

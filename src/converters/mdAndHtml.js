@@ -98,28 +98,18 @@ export class MdAndHtmlConverter extends MdConverter {
     }
 
     /** @type {ElementConverter} */
-    convertAREA(ctx, el) {
-        return el.outerHTML;
-    }
-
-    /** @type {ElementConverter} */
     convertAUDIO(ctx, el) {
-        return el.outerHTML;
+        return '\n\n' + el.outerHTML + '\n\n';
     }
 
     /** @type {ElementConverter} */
     convertIMG(ctx, el) {
-        return el.outerHTML;
-    }
-
-    /** @type {ElementConverter} */
-    convertMAP(ctx, el) {
-        return el.outerHTML;
+        return '\n\n' + el.outerHTML + '\n\n';
     }
 
     /** @type {ElementConverter} */
     convertVIDEO(ctx, el) {
-        return el.outerHTML;
+        return '\n\n' + el.outerHTML + '\n\n';
     }
 
     /** @type {ElementConverter} */
@@ -159,7 +149,7 @@ export class MdAndHtmlConverter extends MdConverter {
 
     /** @type {ElementConverter} */
     convertCANVAS(ctx, el) {
-        return el.outerHTML;
+        return '\n\n' + el.outerHTML + '\n\n';
     }
 
     /** @type {ElementConverter} */

@@ -267,6 +267,7 @@ async function handleIconSingleClick() {
         const markupLanguage = await getSetting('markupLanguage');
         switch (markupLanguage) {
             case 'markdown':
+            case 'markdown with some html':
                 const linkMd = await md.createLink(document.title, location.href);
                 return await handleCopyRequest(linkMd);
             case 'html':

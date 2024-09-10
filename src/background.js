@@ -237,6 +237,7 @@ async function handleIconDoubleClick(activeTab) {
             text = result.join('\n');
             break;
         case 'markdown':
+        case 'markdown with some html':
             const mdSubBrackets = await getSetting('mdSubBrackets');
             const links = await Promise.all(
                 tabs.map(tab => createTabLink(tab, mdSubBrackets))

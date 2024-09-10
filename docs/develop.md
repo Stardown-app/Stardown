@@ -63,6 +63,7 @@ Here are a bunch of web pages with interesting features for testing.
 - [table with link images](https://en.wikipedia.org/wiki/1926_World_Table_Tennis_Championships)
 - [tables with spanned images](https://en.wikipedia.org/wiki/Toshimi_Kitazawa)
 - [massive table](https://www.worldometers.info/world-population/population-by-country/)
+- [tables used for presentation without the presentation role](https://news.ycombinator.com/)
 - [references](https://en.wikipedia.org/wiki/Shanti_Kumar_Morarjee)
 - [code blocks that use `<pre>` but not `<code>`](https://www.cnblogs.com/unity2018/p/8492463.html)
 - [code blocks with inline element headers](https://developer.mozilla.org/en-US/docs/Learn/HTML/Tables/Advanced#the_scope_attribute)

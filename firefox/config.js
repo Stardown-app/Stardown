@@ -113,6 +113,8 @@ export async function updateContextMenu(context, markupLanguage) {
 export function updateContextMenuLanguage(markupLanguage) {
     if (markupLanguage === 'html') {
         markupLanguage = 'HTML';
+    } else if (markupLanguage === 'markdown with some html') {
+        markupLanguage = 'markdown';
     }
 
     browser.contextMenus.update('page', {

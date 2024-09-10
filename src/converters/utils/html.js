@@ -36,6 +36,22 @@ export function removeHiddenElements(node, doc) {
 }
 
 /**
+ * removeStyles removes style-related attributes from each element in the given
+ * fragment.
+ * @param {DocumentFragment} frag
+ */
+export function removeStyles(frag) {
+    const iterator = document.createNodeIterator(frag, NodeFilter.SHOW_ELEMENT);
+    let currentNode = iterator.nextNode();
+    while (currentNode) {
+        currentNode.removeAttribute('style');
+        currentNode.removeAttribute('bgcolor');
+
+        currentNode = iterator.nextNode();
+    }
+}
+
+/**
  * isInlineText reports whether the given nodes are only text nodes and inline text
  * elements.
  * @param {Node[]|NodeList|HTMLCollection} nodes

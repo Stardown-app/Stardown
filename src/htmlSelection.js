@@ -17,6 +17,7 @@
 import { getSetting } from './common.js';
 import * as md from './generators/md.js';
 import { htmlToMd, mdEncodeUri } from './converters/md.js';
+import { htmlToMdAndHtml } from './converters/mdAndHtml.js';
 
 /**
  * createText creates text of the selected part of the page. The language and format are
@@ -34,6 +35,7 @@ export async function createText(title, url, selection) {
     if (!selectedText) {
         switch (markupLanguage) {
             case 'markdown':
+            case 'markdown with some html':
                 return await md.createLink(title, url);
             case 'html':
                 return `<a href="${url}">${title}</a>`;
@@ -59,7 +61,7 @@ export async function createText(title, url, selection) {
         return div.innerHTML || selectedText;
     }
 
-    if (markupLanguage !== 'markdown') {
+    if (markupLanguage !== 'markdown' && markupLanguage !== 'markdown with some html') {
         console.error(`Unknown markupLanguage: ${markupLanguage}`);
         throw new Error(`Unknown markupLanguage: ${markupLanguage}`);
     }
@@ -67,13 +69,15 @@ export async function createText(title, url, selection) {
     const mdSelectionFormat = await getSetting('mdSelectionFormat');
     switch (mdSelectionFormat) {
         case 'source with link':
-            return await getSourceFormatMdWithLink(title, url, selection, selectedText) + '\n';
+            return await getSourceFormatMdWithLink(
+                title, url, selection, selectedText, markupLanguage,
+            ) + '\n';
         case 'source':
-            return await getSourceFormatMd(selection, selectedText);
+            return await getSourceFormatMd(selection, selectedText, markupLanguage);
         case 'template':
-            return await getTemplatedMd(title, url, selection, selectedText);
+            return await getTemplatedMd(title, url, selection, selectedText, markupLanguage);
         case 'blockquote with link':
-            const body = await getSourceFormatMd(selection, selectedText);
+            const body = await getSourceFormatMd(selection, selectedText, markupLanguage);
             return await md.createBlockquote(body, title, url) + '\n';
         case 'link with selection as title':
             selectedText = selectedText.replaceAll('\r\n', ' ').replaceAll('\n', ' ');
@@ -121,15 +125,24 @@ export async function getSelectionFragment(selection) {
  * formatting cannot be obtained.
  * @param {Selection|null} selection - a selection object.
  * @param {string} selectedText - the selected text.
+ * @param {string} markupLanguage - the user's chosen markup language.
  * @returns {Promise<string>}
  */
-export async function getSourceFormatMd(selection, selectedText) {
+export async function getSourceFormatMd(selection, selectedText, markupLanguage) {
     /** @type {DocumentFragment} */
     const frag = await getSelectionFragment(selection);
     if (frag === null) {
         return selectedText;
     }
-    return await htmlToMd(frag);
+
+    if (markupLanguage === 'markdown') {
+        return await htmlToMd(frag);
+    } else if (markupLanguage === 'markdown with some html') {
+        return await htmlToMdAndHtml(frag);
+    } else {
+        console.error(`Unknown markupLanguage: ${markupLanguage}`);
+        throw new Error(`Unknown markupLanguage: ${markupLanguage}`);
+    }
 }
 
 /**
@@ -140,21 +153,28 @@ export async function getSourceFormatMd(selection, selectedText) {
  * @param {string} url - the URL of the page.
  * @param {Selection|null} selection - a selection object.
  * @param {string} selectedText - the selected text.
+ * @param {string} markupLanguage - the user's chosen markup language.
  * @returns {Promise<string>}
  */
-export async function getTemplatedMd(title, url, selection, selectedText) {
+export async function getTemplatedMd(title, url, selection, selectedText, markupLanguage) {
     const template = await getSetting('mdSelectionTemplate');
 
     title = await md.createLinkTitle(title);
     url = mdEncodeUri(url);
 
-    /** @type {DocumentFragment} */
+    let text = '';
     const frag = await getSelectionFragment(selection);
     if (frag === null) {
         text = selectedText;
-    } else {
+    } else if (markupLanguage === 'markdown') {
         text = await htmlToMd(frag);
+    } else if (markupLanguage === 'markdown with some html') {
+        text = await htmlToMdAndHtml(frag);
+    } else {
+        console.error(`Unknown markupLanguage: ${markupLanguage}`);
+        throw new Error(`Unknown markupLanguage: ${markupLanguage}`);
     }
+
     const today = new Date();
     const YYYYMMDD = today.getFullYear() + '/' + (today.getMonth() + 1) + '/' + today.getDate();
     const templateVars = {
@@ -182,9 +202,10 @@ export async function getTemplatedMd(title, url, selection, selectedText) {
  * @param {string} url - the page's URL.
  * @param {Selection|null} selection - a selection object.
  * @param {string} selectedText - the selected text.
+ * @param {string} markupLanguage - the user's chosen markup language.
  * @returns {Promise<string>}
  */
-async function getSourceFormatMdWithLink(title, url, selection, selectedText) {
+async function getSourceFormatMdWithLink(title, url, selection, selectedText, markupLanguage) {
     const link = await md.createLink(title, url);
     const today = new Date();
     const todayStr = today.getFullYear() + '/' + (today.getMonth() + 1) + '/' + today.getDate();
@@ -196,7 +217,15 @@ async function getSourceFormatMdWithLink(title, url, selection, selectedText) {
         return alert + '\n\n' + selectedText;
     }
 
-    const text = await htmlToMd(frag);
+    let text = '';
+    if (markupLanguage === 'markdown') {
+        text = await htmlToMd(frag);
+    } else if (markupLanguage === 'markdown with some html') {
+        text = await htmlToMdAndHtml(frag);
+    } else {
+        console.error(`Unknown markupLanguage: ${markupLanguage}`);
+        throw new Error(`Unknown markupLanguage: ${markupLanguage}`);
+    }
 
     return alert + '\n\n' + text;
 }

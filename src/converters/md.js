@@ -32,7 +32,10 @@ import { removeHiddenElements, isInlineText } from './utils/html.js';
  * @returns {Promise<string>}
  */
 export async function htmlToMd(frag) {
-    removeHiddenElements(frag, document);
+    const omitHidden = await getSetting('omitHidden');
+    if (omitHidden) {
+        removeHiddenElements(frag, document);
+    }
 
     const ctx = {
         locationHref: location.href,

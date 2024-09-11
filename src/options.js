@@ -25,6 +25,7 @@ const doubleClickIntervalEl = document.querySelector('#doubleClickInterval');
 const createTextFragmentEl = document.querySelector('#createTextFragment');
 const omitNavEl = document.querySelector('#omitNav');
 const omitFooterEl = document.querySelector('#omitFooter');
+const omitHiddenEl = document.querySelector('#omitHidden');
 const notifyOnWarningEl = document.querySelector('#notifyOnWarning');
 const notifyOnSuccessEl = document.querySelector('#notifyOnSuccess');
 
@@ -52,6 +53,7 @@ initAutosave('markupLanguage', markupLanguageEl, 'value', async () => {
 initAutosave('createTextFragment', createTextFragmentEl, 'checked');
 initAutosave('omitNav', omitNavEl, 'checked');
 initAutosave('omitFooter', omitFooterEl, 'checked');
+initAutosave('omitHidden', omitHiddenEl, 'checked');
 initAutosave('notifyOnWarning', notifyOnWarningEl, 'checked');
 initAutosave('notifyOnSuccess', notifyOnSuccessEl, 'checked');
 initAutosave('doubleClickWindows', doubleClickWindowsEl, 'value');
@@ -104,6 +106,7 @@ async function loadSettings() {
         createTextFragmentEl.checked = await getSetting('createTextFragment');
         omitNavEl.checked = await getSetting('omitNav');
         omitFooterEl.checked = await getSetting('omitFooter');
+        omitHiddenEl.checked = await getSetting('omitHidden');
         notifyOnWarningEl.checked = await getSetting('notifyOnWarning');
         notifyOnSuccessEl.checked = await getSetting('notifyOnSuccess');
 

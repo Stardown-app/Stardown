@@ -26,7 +26,10 @@ import { newEscape, MdConverter } from './md.js';
  * @returns {Promise<string>}
  */
 export async function htmlToMdAndHtml(frag) {
-    removeHiddenElements(frag, document);
+    const omitHidden = await getSetting('omitHidden');
+    if (omitHidden) {
+        removeHiddenElements(frag, document);
+    }
     removeStyles(frag);
     absolutizeElementUrls(frag, location.Href);
 

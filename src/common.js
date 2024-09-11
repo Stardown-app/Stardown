@@ -21,6 +21,7 @@ const defaultSettings = {
     createTextFragment: true,
     omitNav: true,
     omitFooter: true,
+    omitHidden: true,
     notifyOnWarning: false,
     notifyOnSuccess: false,
     doubleClickWindows: 'current',

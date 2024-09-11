@@ -184,6 +184,11 @@ browser.contextMenus.onClicked.addListener(async (info, tab) => {
  * @returns {Promise<void>}
  */
 async function handleInteraction(tab, message, options = {}) {
+    if (tab.url.endsWith('.pdf')) {
+        await showStatus(0, 'Error', 'Stardown cannot run on PDFs');
+        return;
+    }
+
     let status, notifTitle, notifBody;
     try {
         console.log('Sending message from background.js to content.js');

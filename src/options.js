@@ -19,7 +19,6 @@ import { getSetting } from './common.js';
 
 const form = document.querySelector('form');
 
-const iconActionEl = document.querySelector('#iconAction');
 const markupLanguageEl = document.querySelector('#markupLanguage');
 const doubleClickWindowsEl = document.querySelector('#doubleClickWindows');
 const doubleClickIntervalEl = document.querySelector('#doubleClickInterval');
@@ -44,12 +43,6 @@ const jsonDestinationEl = document.querySelector('#jsonDestination');
 const resetButton = document.querySelector('#reset');
 
 // set up setting autosaving
-initAutosave('iconAction', iconActionEl, 'value', async () => {
-    // send the updated iconAction to the background script
-    browser.runtime.sendMessage({
-        iconAction: iconActionEl.value
-    });
-});
 initAutosave('markupLanguage', markupLanguageEl, 'value', async () => {
     // send the updated markupLanguage to the background script
     browser.runtime.sendMessage({
@@ -107,7 +100,6 @@ function initAutosave(settingName, el, valueProperty, then) {
  */
 async function loadSettings() {
     try {
-        iconActionEl.value = await getSetting('iconAction');
         markupLanguageEl.value = await getSetting('markupLanguage');
         doubleClickWindowsEl.value = await getSetting('doubleClickWindows');
         doubleClickIntervalEl.value = await getSetting('doubleClickInterval');

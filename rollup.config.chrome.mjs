@@ -77,6 +77,7 @@ export default [
                     '!chrome/background.js',
                     '!chrome/content.js',
                     '!chrome/popup.js',
+                    '!chrome/sidebar.js',
                     '!chrome/options.js',
                     '!chrome/text-fragment-utils.js',
                     '!chrome/fragment-generation-utils.js',

@@ -18,13 +18,15 @@ import { browser, sleep, createContextMenus, updateContextMenu, updateContextMen
 import { getSetting } from './common.js';
 import { createTabLink } from './generators/md.js';
 
+let iconAction = 'copy';
 let markupLanguage = 'markdown';
 let lastClick = new Date(0);
 let doubleClickInterval = 500;
 let jsonDestination = 'clipboard';
 
 getSetting('iconAction').then(value => {
-    browser.action.setPopup({ popup: value === 'popup' ? 'popup.html' : '' });
+    iconAction = value;
+    browser.action.setPopup({ popup: iconAction === 'popup' ? 'popup.html' : '' });
 });
 getSetting('markupLanguage').then(value => {
     markupLanguage = value;
@@ -34,6 +36,20 @@ getSetting('doubleClickInterval').then(value => doubleClickInterval = value);
 getSetting('jsonDestination').then(value => jsonDestination = value);
 
 browser.action.onClicked.addListener(async (tab) => {
+    if (iconAction === 'sidebar') {
+        // Chrome does not define sidebarAction, and its sidePanel API is not exactly
+        // equivalent.
+        if (browser.sidebarAction) { // https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/API/sidebarAction
+            browser.sidebarAction.toggle();
+        } else if (browser.sidePanel) { // https://developer.chrome.com/docs/extensions/reference/api/sidePanel
+            browser.sidePanel.open({ windowId: tab.windowId });
+        } else {
+            console.error('No sidebar API available');
+            throw new Error('No sidebar API available');
+        }
+        return;
+    }
+
     const now = new Date();
     const msSinceLastClick = now - lastClick; // milliseconds
     const isDoubleClick = msSinceLastClick < doubleClickInterval;
@@ -69,11 +85,8 @@ browser.runtime.onMessage.addListener(async (message, sender, sendResponse) => {
         // already open. The content script listens for mouseover and mouseup events.
         await updateContextMenu(message.context, markupLanguage);
     } else if (message.iconAction) {
-        if (message.iconAction === 'popup') {
-            await browser.action.setPopup({ popup: 'popup.html' });
-        } else {
-            await browser.action.setPopup({ popup: '' });
-        }
+        iconAction = message.iconAction;
+        browser.action.setPopup({ popup: iconAction === 'popup' ? 'popup.html' : '' });
     } else if (message.markupLanguage) {
         markupLanguage = message.markupLanguage;
         updateContextMenuLanguage(markupLanguage);

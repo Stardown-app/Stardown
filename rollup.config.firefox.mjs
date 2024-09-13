@@ -110,6 +110,7 @@ export default [
                     '!firefox/background.js',
                     '!firefox/content.js',
                     '!firefox/popup.js',
+                    '!firefox/sidebar.js',
                     '!firefox/options.js',
                     '!firefox/text-fragment-utils.js',
                     '!firefox/fragment-generation-utils.js',

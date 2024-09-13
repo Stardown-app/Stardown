@@ -9,6 +9,7 @@
         "clipboardWrite",
         "contextMenus",
         "storage",
+        "sidePanel",
         "notifications"
     ],
     "optional_permissions": [
@@ -51,6 +52,11 @@
         },
         "default_title": "Stardown",
         "default_popup": "popup.html"
+    },
+    "side_panel": {
+        "default_title": "Stardown",
+        "default_path": "sidebar.html",
+        "default_icon": "images/icon-16.png"
     },
     "commands": {
         "_execute_action": {

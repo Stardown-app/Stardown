@@ -54,7 +54,9 @@
             "48": "images/icon-48.png",
             "96": "images/icon-96.png",
             "128": "images/icon-128.png"
-        }
+        },
+        "default_title": "Stardown",
+        "default_popup": "popup.html"
     },
     "commands": {
         "_execute_browser_action": {

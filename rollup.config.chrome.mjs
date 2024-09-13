@@ -70,15 +70,16 @@ export default [
                 // other files there and are no longer needed.
                 targets: [
                     'chrome/*', // Delete all files except the ones below.
+                    '!chrome/*.json',
+                    '!chrome/*.html',
                     '!chrome/images',
-                    '!chrome/background.js',
                     '!chrome/config.js',
+                    '!chrome/background.js',
                     '!chrome/content.js',
-                    '!chrome/fragment-generation-utils.js',
-                    '!chrome/manifest.json',
-                    '!chrome/options.html',
+                    '!chrome/popup.js',
                     '!chrome/options.js',
                     '!chrome/text-fragment-utils.js',
+                    '!chrome/fragment-generation-utils.js',
                 ],
                 hook: 'buildEnd', // Run the delete after the build ends.
             })

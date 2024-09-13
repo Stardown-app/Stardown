@@ -23,6 +23,9 @@ let lastClick = new Date(0);
 let doubleClickInterval = 500;
 let jsonDestination = 'clipboard';
 
+getSetting('iconAction').then(value => {
+    browser.action.setPopup({ popup: value === 'popup' ? 'popup.html' : '' });
+});
 getSetting('markupLanguage').then(value => {
     markupLanguage = value;
     createContextMenus(value);
@@ -65,6 +68,12 @@ browser.runtime.onMessage.addListener(async (message, sender, sendResponse) => {
         // because the contextMenus.update method cannot update a context menu that is
         // already open. The content script listens for mouseover and mouseup events.
         await updateContextMenu(message.context, markupLanguage);
+    } else if (message.iconAction) {
+        if (message.iconAction === 'popup') {
+            await browser.action.setPopup({ popup: 'popup.html' });
+        } else {
+            await browser.action.setPopup({ popup: '' });
+        }
     } else if (message.markupLanguage) {
         markupLanguage = message.markupLanguage;
         updateContextMenuLanguage(markupLanguage);

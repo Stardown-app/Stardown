@@ -103,15 +103,16 @@ export default [
                 // other files there and are no longer needed.
                 targets: [
                     'firefox/*', // Delete all files except the ones below.
+                    '!firefox/*.json',
+                    '!firefox/*.html',
                     '!firefox/images',
-                    '!firefox/background.js',
                     '!firefox/config.js',
+                    '!firefox/background.js',
                     '!firefox/content.js',
-                    '!firefox/fragment-generation-utils.js',
-                    '!firefox/manifest.json',
-                    '!firefox/options.html',
+                    '!firefox/popup.js',
                     '!firefox/options.js',
                     '!firefox/text-fragment-utils.js',
+                    '!firefox/fragment-generation-utils.js',
                 ],
                 hook: 'buildEnd', // Run the delete after the build ends.
             })

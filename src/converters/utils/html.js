@@ -24,11 +24,14 @@ export function removeHiddenElements(node, doc) {
     const SHOW_ELEMENT = 1;
     const iterator = doc.createNodeIterator(node, SHOW_ELEMENT);
 
+    const ELEMENT_NODE = 1;
     let currentNode = iterator.nextNode();
     while (currentNode) {
-        const style = currentNode.style;
-        if (style.display === "none" || style.visibility === "hidden") {
-            currentNode.parentNode.removeChild(currentNode);
+        if (currentNode.nodeType === ELEMENT_NODE) {
+            const style = doc.defaultView.getComputedStyle(currentNode);
+            if (style.display === 'none' || style.visibility === 'hidden') {
+                currentNode.parentNode.removeChild(currentNode);
+            }
         }
 
         currentNode = iterator.nextNode();

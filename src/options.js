@@ -20,8 +20,8 @@ import { getSetting } from './common.js';
 const form = document.querySelector('form');
 
 const markupLanguageEl = document.querySelector('#markupLanguage');
-const doubleClickWindowsEl = document.querySelector('#doubleClickWindows');
-const doubleClickIntervalEl = document.querySelector('#doubleClickInterval');
+const doublePressWindowsEl = document.querySelector('#doublePressWindows');
+const doublePressIntervalEl = document.querySelector('#doublePressInterval');
 const createTextFragmentEl = document.querySelector('#createTextFragment');
 const omitNavEl = document.querySelector('#omitNav');
 const omitFooterEl = document.querySelector('#omitFooter');
@@ -56,11 +56,11 @@ initAutosave('omitFooter', omitFooterEl, 'checked');
 initAutosave('omitHidden', omitHiddenEl, 'checked');
 initAutosave('notifyOnWarning', notifyOnWarningEl, 'checked');
 initAutosave('notifyOnSuccess', notifyOnSuccessEl, 'checked');
-initAutosave('doubleClickWindows', doubleClickWindowsEl, 'value');
-initAutosave('doubleClickInterval', doubleClickIntervalEl, 'value', () => {
-    // send the updated doubleClickInterval to the background script
+initAutosave('doublePressWindows', doublePressWindowsEl, 'value');
+initAutosave('doublePressInterval', doublePressIntervalEl, 'value', () => {
+    // send the updated doublePressInterval to the background script
     browser.runtime.sendMessage({
-        doubleClickInterval: doubleClickIntervalEl.value
+        doublePressInterval: doublePressIntervalEl.value
     });
 });
 
@@ -101,8 +101,8 @@ function initAutosave(settingName, el, valueProperty, then) {
 async function loadSettings() {
     try {
         markupLanguageEl.value = await getSetting('markupLanguage');
-        doubleClickWindowsEl.value = await getSetting('doubleClickWindows');
-        doubleClickIntervalEl.value = await getSetting('doubleClickInterval');
+        doublePressWindowsEl.value = await getSetting('doublePressWindows');
+        doublePressIntervalEl.value = await getSetting('doublePressInterval');
         createTextFragmentEl.checked = await getSetting('createTextFragment');
         omitNavEl.checked = await getSetting('omitNav');
         omitFooterEl.checked = await getSetting('omitFooter');

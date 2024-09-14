@@ -21,20 +21,15 @@
 
 <p align="center"><img alt="demo gif" src="https://github.com/Stardown-app/assets/blob/main/Stardown.gif"></p>
 
-* Click the extension's icon to copy a link for the current page.
-* Press `Alt+C` to copy a selection or a page's link.
+* Press `Alt+C` to **c**opy a selection or a page's link.
+* Press `Alt+N` to open a **n**otepad that copying with `Alt+C` automatically pastes into.
 * Right-click part of a page to copy it as markdown. Select before right-clicking to copy multiple parts.
-* Double-click the extension's icon or press `Alt+CC` to copy links for all tabs.
-* Select tabs before double-clicking the icon to copy links for only those tabs.
-* Use [the options page](#settings) to customize these features.
-
-By default, the markdown created from a selection includes a link that navigates to the part of the page you selected, when possible. This is accomplished with [text fragments](https://web.dev/articles/text-fragments) and/or HTML element IDs. [Firefox does not support text fragments yet](https://bugzilla.mozilla.org/show_bug.cgi?id=1753933), but the Firefox version of Stardown allows you to create links with text fragments.
+* Press `Alt+CC` to copy links for all tabs. Select tabs before pressing `Alt+CC` to copy links for only those tabs.
+* Use [the settings page](#settings) to customize these features.
 
 <!--
 Stardown is free except that if you get it from Apple's App Store, there is a small fee to help cover the $99 USD per year cost I'm paying to keep Stardown available in the App Store.
 -->
-
-Want to just copy markdown links for pages without installing an extension? You can use this [bookmarklet](https://en.wikipedia.org/wiki/Bookmarklet) instead: `javascript: navigator.clipboard.writeText('[' + document.title + '](' + location.href + ')');`
 
 ## Privacy
 
@@ -46,7 +41,7 @@ For why Stardown requests the permissions that it does, see [./docs/permissions.
 
 ## Settings
 
-To open Stardown's options page, right-click the extension's icon and choose:
+To open Stardown's settings page, right-click the extension's icon and choose:
 
 * Firefox: "Manange extension" and then "Options"
 * Chrome, Edge, Arc, Brave, Vivaldi, or Opera: "Options" or "Extension options"
@@ -72,7 +67,13 @@ Also, please read [./docs/develop.md](docs/develop.md)
 
 ## Feature requests and alternatives
 
-You're welcome to [make a feature request](https://github.com/Stardown-app/Stardown/issues/new?assignees=&labels=enhancement&projects=&template=feature_request.md&title=), and there may already be other software that meets all of your needs. I am not affiliated with any of the alternatives below and have not tried all of them; use them at your own risk.
+You're welcome to [make a feature request](https://github.com/Stardown-app/Stardown/issues/new?assignees=&labels=enhancement&projects=&template=feature_request.md&title=), and there may already be other software that meets all of your needs. I am not affiliated with any of the alternatives below unless noted otherwise and have not tried all of them; use them at your own risk.
+
+### Copy markdown links for pages without installing anything
+
+You can use this [bookmarklet](https://en.wikipedia.org/wiki/Bookmarklet) I made:
+
+`javascript: navigator.clipboard.writeText('[' + document.title + '](' + location.href + ')');`
 
 ### Integrate directly with an editor
 
@@ -88,6 +89,7 @@ You're welcome to [make a feature request](https://github.com/Stardown-app/Stard
 ### Scrape websites
 
 * [Firecrawl](https://github.com/mendableai/firecrawl) is an API and SDKs for scraping websites and saving them as markdown or structured data.
+* [Reader-LM](https://jina.ai/news/reader-lm-small-language-models-for-cleaning-and-converting-html-to-markdown/?nocache=1) is small language models that convert HTML to markdown.
 
 ### Paste structured data
 

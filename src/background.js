@@ -19,8 +19,8 @@ import { getSetting } from './common.js';
 import { createTabLink } from './generators/md.js';
 
 let markupLanguage = 'markdown';
-let lastClick = new Date(0);
-let doubleClickInterval = 500;
+let lastPress = new Date(0); // last time the copy shortcut was pressed
+let doublePressInterval = 500;
 let jsonDestination = 'clipboard';
 let windowId = null;
 
@@ -28,7 +28,7 @@ getSetting('markupLanguage').then(value => {
     markupLanguage = value;
     createContextMenus(value);
 });
-getSetting('doubleClickInterval').then(value => doubleClickInterval = value);
+getSetting('doublePressInterval').then(value => doublePressInterval = value);
 getSetting('jsonDestination').then(value => jsonDestination = value);
 browser.tabs.query({ currentWindow: true, active: true }).then(tabs => {
     windowId = tabs[0].windowId;
@@ -47,9 +47,9 @@ browser.commands.onCommand.addListener(async command => {
     }
 
     const now = new Date();
-    const msSinceLastClick = now - lastClick; // milliseconds
-    const isDoubleClick = msSinceLastClick < doubleClickInterval;
-    if (isDoubleClick) {
+    const msSinceLastPress = now - lastPress; // milliseconds
+    const isDoublePress = msSinceLastPress < doublePressInterval;
+    if (isDoublePress) {
         let havePerm;
         try {
             // The permissions request must be the first async function call in the
@@ -64,16 +64,16 @@ browser.commands.onCommand.addListener(async command => {
             return;
         }
 
-        lastClick = new Date(0);
+        lastPress = new Date(0);
         const tabs = await browser.tabs.query({ active: true, currentWindow: true });
-        await handleIconDoubleClick(tabs[0]);
+        await handleCopyAllTabs(tabs[0]);
         return;
     }
-    // it's a single-click
-    lastClick = now;
+    // the copy shortcut was pressed once
+    lastPress = now;
 
     const tabs = await browser.tabs.query({ active: true, currentWindow: true });
-    await handleInteraction(tabs[0], { category: 'iconSingleClick' });
+    await handleInteraction(tabs[0], { category: 'copyShortcut' });
 });
 
 browser.runtime.onMessage.addListener(async (message, sender, sendResponse) => {
@@ -85,8 +85,8 @@ browser.runtime.onMessage.addListener(async (message, sender, sendResponse) => {
     } else if (message.markupLanguage) {
         markupLanguage = message.markupLanguage;
         updateContextMenuLanguage(markupLanguage);
-    } else if (message.doubleClickInterval) {
-        doubleClickInterval = message.doubleClickInterval;
+    } else if (message.doublePressInterval) {
+        doublePressInterval = message.doublePressInterval;
     } else if (message.jsonDestination) {
         jsonDestination = message.jsonDestination;
     } else if (message.downloadFile) {
@@ -228,21 +228,21 @@ async function handleInteraction(tab, message, options = {}) {
 }
 
 /**
- * handleIconDoubleClick handles the user double-clicking the extension's icon by
- * creating a markdown list of links and sending it to the content script to be copied.
- * A status indicator is then shown to the user.
- * @param {any} activeTab - the tab that was active when the icon was double-clicked.
+ * handleCopyAllTabs handles a request from the user to create a markdown list of links,
+ * and sends it to the content script to be copied. A status indicator is then shown
+ * to the user.
+ * @param {any} activeTab
  * @returns {Promise<void>}
  */
-async function handleIconDoubleClick(activeTab) {
+async function handleCopyAllTabs(activeTab) {
     // figure out which tabs to create links for
     let tabs = await browser.tabs.query({ currentWindow: true, highlighted: true });
     if (tabs.length === 1) { // if only one tab is highlighted
         // get unhighlighted tabs
-        const doubleClickWindows = await getSetting('doubleClickWindows');
-        if (doubleClickWindows === 'current') {
+        const doublePressWindows = await getSetting('doublePressWindows');
+        if (doublePressWindows === 'current') {
             tabs = await browser.tabs.query({ currentWindow: true });
-        } else if (doubleClickWindows === 'all') {
+        } else if (doublePressWindows === 'all') {
             tabs = await browser.tabs.query({});
         }
     }
@@ -275,7 +275,7 @@ async function handleIconDoubleClick(activeTab) {
     const {
         status, notifTitle, notifBody,
     } = await browser.tabs.sendMessage(activeTab.id, {
-        category: 'copy', text: text,
+        category: 'copyText', text: text,
     });
 
     if (status === 0) { // failure

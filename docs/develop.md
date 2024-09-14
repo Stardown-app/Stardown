@@ -4,9 +4,7 @@ I wrote some general extension development tips in [Making browser extensions](h
 
 ## Goals
 
-Stardown's main goal is to be so simple, fast, reliable, and flexible that people think of it as "it's like Ctrl+C but it keeps formatting". It should generally have only one keyboard shortcut, no popup, and as few context menu options at a time as reasonable. The options page can have many options as long as they are well organized, useful, and not so important that many users will be constantly changing them. Stardown's output should render well in at least Obsidian and GitHub, if not also other markdown renderers and converters like [Pandoc](https://boisgera.github.io/pandoc/markdown/), [Google Docs](https://workspaceupdates.googleblog.com/2024/07/import-and-export-markdown-in-google-docs.html), [VS Code](https://code.visualstudio.com/docs/languages/markdown#_markdown-preview), [Overleaf](https://www.overleaf.com/learn/how-to/Writing_Markdown_in_LaTeX_Documents), [Mattermost](https://docs.mattermost.com/collaborate/format-messages.html), Discourse, GitLab, Stack Overflow, Joplin, Reddit, and Discord.
-
-I would also like to keep Stardown's code relatively simple so that it's reliable, has few bugs that get fixed quickly, and is easy to maintain.
+Stardown's main goal is to be so simple, fast, reliable, and flexible that people think of it as "it's like Ctrl+C but it keeps formatting". The settings page can have many settings as long as they are well organized, useful, and not so important that many users will be constantly changing them. Stardown's output should render well in at least Obsidian and GitHub, if not also other markdown renderers and converters like [Pandoc](https://boisgera.github.io/pandoc/markdown/), [Google Docs](https://workspaceupdates.googleblog.com/2024/07/import-and-export-markdown-in-google-docs.html), [VS Code](https://code.visualstudio.com/docs/languages/markdown#_markdown-preview), [Overleaf](https://www.overleaf.com/learn/how-to/Writing_Markdown_in_LaTeX_Documents), [Mattermost](https://docs.mattermost.com/collaborate/format-messages.html), Discourse, GitLab, Stack Overflow, Joplin, Reddit, Discord, etc.
 
 ## Installing Stardown from source for development
 
@@ -24,7 +22,7 @@ Let's create feature branches with descriptive names and make pull requests as d
 
 ## Writing documentation
 
-This project uses [JSDoc](https://en.wikipedia.org/wiki/JSDoc) to annotate types. In VS Code with the [ESLint](https://marketplace.visualstudio.com/items?itemName=dbaeumer.vscode-eslint) extension, you can type `/**` above a function and press enter to auto-generate part of its JSDoc comment.
+This project uses [JSDoc](https://en.wikipedia.org/wiki/JSDoc) to annotate types. In VS Code you can type `/**` above a function and press enter to auto-generate part of its JSDoc comment (this might require the [ESLint](https://marketplace.visualstudio.com/items?itemName=dbaeumer.vscode-eslint) extension).
 
 ## How Stardown works
 
@@ -36,7 +34,7 @@ In Stardown, every user interaction (except on the options page) sends a request
 
 Here are the steps Stardown goes through with each user interaction (except on the options page):
 
-1. The user interacts with the extension by clicking the icon, choosing a context menu option, or using the keyboard shortcut. This interaction is received in the background script.
+1. The user presses Stardown's copy shortcut or chooses a context menu option. This interaction is received in the background script.
 2. The background script gets some data about the interaction, may process the data a little, and then sends it to the content script.
 3. The content script does most or all of the data processing needed, writes markdown to the clipboard, and sends the background script some info about whether it succeeded and what to tell the user.
 4. The background script tells the user whether all of this succeeded by showing a green check (✓) for success or a red X (✗) for failure on the extension's icon, and possibly a system notification. (Any error notifications are always shown. Warning and/or success notifications are shown if the user chose that in settings.)
@@ -74,13 +72,13 @@ Here are a bunch of web pages with interesting features for testing.
 - [images with relative srcs](https://textbundle.org/)
 - [iframe](https://www.w3schools.com/html/html_iframe.asp)
 - [YouTube video](https://www.youtube.com/watch?v=jfKfPfyJRdk)
-- [PDF](https://haslab.github.io/SAFER/scp21.pdf) should make Stardown show an error message like "Stardown cannot run on PDFs"
+- [PDFs](https://haslab.github.io/SAFER/scp21.pdf) should make Stardown's icon gray and disable copying
 
 ### Context types
 
 When the user right-clicks part of a web page, their browser detects the type of the content they right-clicked and makes that info available to installed browser extensions.
 
-- **selection**: anything that the user has selected by clicking and dragging with their mouse or using selection keyboard shortcuts.
+- **selection**: anything that the user has selected by clicking and dragging with their mouse or using selection shortcuts.
 - **link**: any clickable link on a page. However, for a link that is also an image, Stardown should show only the image copy option.
 - **image**: types supported include png, jpg, svg, webp, gif, and base64-encoded. Types not supported include background images, `canvas` HTML elements, inline `svg` HTML elements, and sometimes images within `a` HTML elements for some reason.
 - **video**: a video rendered with the `video` HTML element, such as YouTube videos and mp4 files hosted by GitHub ([example on this page](https://github.com/wheelercj/zq)). This option doesn't appear for some video sites like [Vimeo](https://player.vimeo.com/video/55073825) probably because their `video` HTML element is buried under many other things, and [Asciinema](https://asciinema.org/) because they don't use the `video` HTML element.
@@ -92,9 +90,9 @@ When the user right-clicks part of a web page, their browser detects the type of
 
 ### Features
 
-- [ ] **Clicking the icon or pressing Alt+C** copies a markdown link for the page, unless part of the page is selected in which case markdown of the selection is copied instead.
-- [ ] **Double-clicking the icon or pressing Alt+CC** copies a markdown unordered list of markdown links for all open tabs.
-- [ ] **Selecting tabs, then double-clicking the icon or pressing Alt+CC** copies a markdown unordered list of markdown links for all selected tabs.
+- [ ] **Pressing Alt+C** copies a markdown link for the page, unless part of the page is selected in which case markdown of the selection is copied instead.
+- [ ] **Pressing Alt+CC** copies a markdown unordered list of markdown links for all open tabs.
+- [ ] **Selecting tabs, then pressing Alt+CC** copies a markdown unordered list of markdown links for all selected tabs.
 - [ ] **Right-clicking an empty part of a page** shows the "Copy markdown link to here" option.
 - [ ] **Right-clicking a website's unselected header** shows the "Copy markdown link to here" option.
 - [ ] **Right-clicking selected text** shows the "Copy markdown of selection" option.
@@ -138,6 +136,8 @@ When something goes wrong, Stardown should still respond well.
 - Although Stardown no longer uses Firefox's manifest v3, [Firefox does not support service_worker in manifest v3](https://stackoverflow.com/questions/75043889/manifest-v3-background-scripts-service-worker-on-firefox).
 - Firefox [sometimes requires an add-on ID](https://extensionworkshop.com/documentation/develop/extensions-and-the-add-on-id/) in `browser_specific_settings` in manifest.json, but Chromium doesn't allow `browser_specific_settings`.
 - Based on testing I took notes on in [#11](https://github.com/Stardown-app/Stardown/issues/11), it appears Firefox manifest v2 does not allow use of the `import` and `export` keywords, and Chrome manifest v3 does not allow their use in content scripts. That's why Stardown requires using a bundler.
+- Firefox has [sidebars](https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/API/sidebarAction) and Chromium has [side panels](https://developer.chrome.com/docs/extensions/reference/api/sidePanel), which are mostly the same but have different APIs.
+- [Firefox does not support text fragments yet](https://bugzilla.mozilla.org/show_bug.cgi?id=1753933).
 - Further differences are described in comments throughout Stardown's code.
 
 ## Text fragments

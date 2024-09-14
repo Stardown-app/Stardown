@@ -142,9 +142,10 @@ window.onload = setUpListeners;
 // window.onload, the content script will not be able to receive messages and an error
 // message will appear: "Error: Could not establish connection. Receiving end does not
 // exist." Firefox also requires setUpListeners to NOT be called in window.onload, or
-// else clicking Stardown's icon for some sites will show the error message "Clipboard
-// write is not allowed" even though writing to the clipboard is still successful. The
-// bundle script should comment out the `window.onload` assignment for Firefox.
+// else pressing Stardown's copy shortcut for some sites will show the error message
+// "Clipboard write is not allowed" even though writing to the clipboard is still
+// successful. The bundle script should comment out the `window.onload` assignment for
+// Firefox.
 setUpListeners();
 
 /**
@@ -166,10 +167,12 @@ let lastRequestId = null;
  */
 async function handleRequest(message) {
     switch (message.category) {
-        case 'copy':
+        case 'copyText':
+            // just write to the clipboard & return a response
             return await handleCopyRequest(message.text);
-        case 'iconSingleClick':
-            return await handleIconSingleClick();
+        case 'copyShortcut':
+            // respond to use of the copy keyboard shortcut or copy button
+            return await handleCopyShortcut();
         case 'pageRightClick':
             const id1 = await getClickedElementId(clickedElement);
             return await handlePageRightClick(id1);
@@ -254,13 +257,13 @@ async function getClickedElementId(clickedElement) {
 }
 
 /**
- * handleIconSingleClick handles a single left-click on the browser action icon.
+ * handleCopyShortcut handles a copy request from the user.
  * @returns {Promise<ContentResponse>}
  */
-async function handleIconSingleClick() {
+async function handleCopyShortcut() {
     const selection = window.getSelection();
     if (selection && selection.type === 'Range') {
-        // only allow Range (and not Caret) selections or else every icon click will
+        // only allow Range (and not Caret) selections or else every copy request will
         // count as a selection click
         return await handleSelectionRightClick('', selection);
     } else {

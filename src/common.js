@@ -24,8 +24,8 @@ const defaultSettings = {
     omitHidden: true,
     notifyOnWarning: false,
     notifyOnSuccess: false,
-    doubleClickWindows: 'current',
-    doubleClickInterval: 500,
+    doublePressWindows: 'current',
+    doublePressInterval: 500,
 
     mdSelectionFormat: 'source with link',
     mdYoutube: 'almost everywhere',

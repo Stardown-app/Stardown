@@ -30,7 +30,12 @@ getSetting('markupLanguage').then(value => {
 getSetting('doubleClickInterval').then(value => doubleClickInterval = value);
 getSetting('jsonDestination').then(value => jsonDestination = value);
 
-browser.action.onClicked.addListener(async (tab) => {
+browser.commands.onCommand.addListener(async command => {
+    if (command !== 'copy') {
+        console.error(`Unknown command: ${command}`);
+        return;
+    }
+
     const now = new Date();
     const msSinceLastClick = now - lastClick; // milliseconds
     const isDoubleClick = msSinceLastClick < doubleClickInterval;
@@ -50,13 +55,15 @@ browser.action.onClicked.addListener(async (tab) => {
         }
 
         lastClick = new Date(0);
-        await handleIconDoubleClick(tab);
+        const tabs = await browser.tabs.query({ active: true, currentWindow: true });
+        await handleIconDoubleClick(tabs[0]);
         return;
     }
     // it's a single-click
     lastClick = now;
 
-    await handleInteraction(tab, { category: 'iconSingleClick' });
+    const tabs = await browser.tabs.query({ active: true, currentWindow: true });
+    await handleInteraction(tabs[0], { category: 'iconSingleClick' });
 });
 
 browser.runtime.onMessage.addListener(async (message, sender, sendResponse) => {

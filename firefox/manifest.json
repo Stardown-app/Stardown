@@ -64,12 +64,11 @@
         "default_icon": "images/icon-16.png"
     },
     "commands": {
-        "_execute_browser_action": {
+        "copy": {
             "suggested_key": {
-                "default": "Alt+C",
-                "mac": "Alt+C"
+                "default": "Alt+C"
             },
-            "description": "Copy markdown links or selections"
+            "description": "Copy a selection as markdown"
         }
     }
 }

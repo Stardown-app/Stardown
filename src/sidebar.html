@@ -19,10 +19,29 @@
 
   <head>
     <title>Stardown</title>
+    <style>
+      #notepad {
+        width: 100%;
+        height: 100%;
+        box-sizing: border-box;
+      }
+
+      .container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 95vh;
+        padding: 10px;
+      }
+    </style>
   </head>
 
   <body>
-    <textarea id="editor" class="editor" rows="40" cols="44"></textarea>
+    <main>
+      <div class="container">
+        <textarea id="notepad"></textarea>
+      </div>
+    </main>
     <script src="./sidebar.js"></script>
   </body>
 

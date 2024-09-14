@@ -14,4 +14,49 @@
    limitations under the License.
 */
 
-const notepad = document.getElementById("notepad");
+if (typeof browser === 'undefined') {
+    var browser = chrome;
+}
+
+const notepad = document.getElementById('notepad');
+
+// load the notepad content when the page loads
+getSetting('notepadContent').then(content => {
+    notepad.value = content || '';
+});
+
+// save the notepad content when it changes
+notepad.addEventListener('input', () => {
+    browser.storage.sync.set({ notepadContent: notepad.value });
+});
+
+
+const defaultSettings = {
+    notepadContent: '',
+};
+
+/**
+ * getSetting gets a setting from the browser's sync storage. If the setting does not
+ * exist there, its default value is returned.
+ * @param {string} name - the name of the setting.
+ * @returns {Promise<any>}
+ */
+async function getSetting(name) {
+    let obj;
+    try {
+        obj = await browser.storage?.sync.get(name);
+    } catch (err) {
+        console.error(err);
+        return defaultSettings[name];
+    }
+    if (obj === undefined) {
+        return defaultSettings[name];
+    }
+
+    const value = obj[name];
+    if (value === undefined) {
+        return defaultSettings[name];
+    }
+
+    return value;
+}

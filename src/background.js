@@ -34,7 +34,9 @@ browser.tabs.query({ currentWindow: true, active: true }).then(tabs => {
     windowId = tabs[0].windowId;
 });
 browser.windows.onFocusChanged.addListener(async windowId_ => {
-    windowId = windowId_;
+    if (windowId_ !== -1) {
+        windowId = windowId_;
+    }
 });
 
 browser.commands.onCommand.addListener(async command => {

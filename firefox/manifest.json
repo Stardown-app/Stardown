@@ -69,6 +69,12 @@
                 "default": "Alt+C"
             },
             "description": "Copy a selection as markdown"
+        },
+        "_execute_sidebar_action": {
+            "suggested_key": {
+                "default": "Alt+N"
+            },
+            "description": "Toggle Stardown's notepad"
         }
     }
 }

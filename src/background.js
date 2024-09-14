@@ -22,6 +22,7 @@ let markupLanguage = 'markdown';
 let lastClick = new Date(0);
 let doubleClickInterval = 500;
 let jsonDestination = 'clipboard';
+let windowId = null;
 
 getSetting('markupLanguage').then(value => {
     markupLanguage = value;
@@ -29,9 +30,18 @@ getSetting('markupLanguage').then(value => {
 });
 getSetting('doubleClickInterval').then(value => doubleClickInterval = value);
 getSetting('jsonDestination').then(value => jsonDestination = value);
+browser.tabs.query({ currentWindow: true, active: true }).then(tabs => {
+    windowId = tabs[0].windowId;
+});
+browser.windows.onFocusChanged.addListener(async windowId_ => {
+    windowId = windowId_;
+});
 
 browser.commands.onCommand.addListener(async command => {
-    if (command !== 'copy') {
+    if (command === 'openSidePanel') {
+        browser.sidePanel.open({ windowId: windowId });
+        return;
+    } else if (command !== 'copy') {
         console.error(`Unknown command: ${command}`);
         return;
     }

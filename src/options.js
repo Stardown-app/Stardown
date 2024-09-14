@@ -45,10 +45,7 @@ const resetButton = document.querySelector('#reset');
 // set up setting autosaving
 initAutosave('markupLanguage', markupLanguageEl, 'value', async () => {
     // send the updated markupLanguage to the background script
-    browser.runtime.sendMessage({
-        category: 'markupLanguage',
-        markupLanguage: markupLanguageEl.value
-    });
+    browser.runtime.sendMessage({ markupLanguage: markupLanguageEl.value });
 });
 initAutosave('createTextFragment', createTextFragmentEl, 'checked');
 initAutosave('omitNav', omitNavEl, 'checked');

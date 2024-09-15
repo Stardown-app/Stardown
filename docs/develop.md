@@ -26,7 +26,7 @@ This project uses [JSDoc](https://en.wikipedia.org/wiki/JSDoc) to annotate types
 
 ## How Stardown works
 
-In Stardown, every user interaction (except on the options page) sends a request from the background to the content, which returns a response to the background. You can think of it like client-server architecture where the background is the client and the content is the server.
+Most user interactions are received in the background, which then sends a request to the content and receives a response. You can think of it like client-server architecture where the background is the client and the content is the server.
 
 Every ***request*** must have `category` and `id` properties and may optionally have other properties.
 
@@ -39,7 +39,7 @@ Every ***response*** is either null or an object with the properties `status`, `
 - `notifTitle`: the title of the notification to show to the user.
 - `notifBody`: the body of the notification to show to the user.
 
-Here are the steps Stardown goes through with each user interaction (except on the options page):
+Here are the steps Stardown goes through with each user interaction:
 
 1. The user presses Stardown's copy shortcut or chooses a context menu option. This interaction is received in the background script.
 2. The background script gets some data about the interaction, may process the data a little, and then sends it to the content script.

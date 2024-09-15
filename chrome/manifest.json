@@ -16,7 +16,7 @@
         "tabs",
         "downloads"
     ],
-    "options_page": "options.html",
+    "options_page": "settings.html",
     "background": {
         "service_worker": "background.js",
         "type": "module"

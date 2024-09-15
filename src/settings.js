@@ -93,7 +93,7 @@ function initAutosave(settingName, el, valueProperty, then) {
 }
 
 /**
- * loadSettings loads the settings from browser storage into the options page.
+ * loadSettings loads the settings from browser storage into the settings page.
  */
 async function loadSettings() {
     try {
@@ -124,7 +124,7 @@ async function loadSettings() {
 /**
  * resetSettings deletes all settings from browser storage and indicates success. It
  * assumes it's being used as a form event listener for the 'reset' event so that it
- * doesn't have to reset the options page.
+ * doesn't have to reset the settings page.
  */
 async function resetSettings() {
     await browser.storage.sync.clear();

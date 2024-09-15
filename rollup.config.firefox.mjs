@@ -20,9 +20,9 @@ import del from 'rollup-plugin-delete'; // https://www.npmjs.com/package/rollup-
 
 // This is a Rollup configuration file for building the Firefox extension. It first
 // copies all the necessary files from `src` to the `firefox` directory, then replaces
-// all imports in background.js, content.js, and options.js with the code the imports
-// correspond to. Lastly, it deletes all files in the `firefox` directory that were
-// imported into other files there and are no longer needed.
+// all imports with the code the imports correspond to. Lastly, it deletes all files in
+// the `firefox` directory that were imported into other files there and are no longer
+// needed.
 //
 // Each time this runs, any existing files with the same names as those copied are
 // overwritten.
@@ -63,9 +63,9 @@ export default [
         },
         plugins: [
             copy({
-                // Copy all files and folders to the firefox folder except the test
-                // config.js. There are multiple targets because the tranform function
-                // cannot run on folders.
+                // Copy all files and folders to the firefox folder except the config.js
+                // that is for testing. There are multiple targets because the tranform
+                // function must only be called on JavaScript files.
                 targets: [
                     {
                         // copy the images folder and html files
@@ -92,9 +92,9 @@ export default [
         },
     },
     {
-        input: 'firefox/options.js',
+        input: 'firefox/settings.js',
         output: {
-            file: 'firefox/options.js',
+            file: 'firefox/settings.js',
             format: 'iife', // immediately-invoked function expression
         },
         plugins: [
@@ -111,7 +111,7 @@ export default [
                     '!firefox/content.js',
                     '!firefox/popup.js',
                     '!firefox/sidebar.js',
-                    '!firefox/options.js',
+                    '!firefox/settings.js',
                     '!firefox/text-fragment-utils.js',
                     '!firefox/fragment-generation-utils.js',
                 ],

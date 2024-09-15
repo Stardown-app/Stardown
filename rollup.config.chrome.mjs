@@ -20,9 +20,9 @@ import del from 'rollup-plugin-delete'; // https://www.npmjs.com/package/rollup-
 
 // This is a Rollup configuration file for building the Chrome extension. It first
 // copies all the necessary files from `src` to the `chrome` directory, then replaces
-// all imports in background.js, content.js, and options.js with the code the imports
-// correspond to. Lastly, it deletes all files in the `chrome` directory that were
-// imported into other files there and are no longer needed.
+// all imports with the code the imports correspond to. Lastly, it deletes all files in
+// the `chrome` directory that were imported into other files there and are no longer
+// needed.
 //
 // Each time this runs, any existing files with the same names as those copied are
 // overwritten.
@@ -40,7 +40,7 @@ export default [
                     {
                         src: [
                             // Copy everything from `src` to `chrome` except the
-                            // config.js for testing.
+                            // config.js that is for testing.
                             'src/*',
                             '!src/config.js',
                         ],
@@ -59,9 +59,9 @@ export default [
         },
     },
     {
-        input: 'chrome/options.js',
+        input: 'chrome/settings.js',
         output: {
-            file: 'chrome/options.js',
+            file: 'chrome/settings.js',
             format: 'iife', // immediately-invoked function expression
         },
         plugins: [
@@ -78,7 +78,7 @@ export default [
                     '!chrome/content.js',
                     '!chrome/popup.js',
                     '!chrome/sidebar.js',
-                    '!chrome/options.js',
+                    '!chrome/settings.js',
                     '!chrome/text-fragment-utils.js',
                     '!chrome/fragment-generation-utils.js',
                 ],

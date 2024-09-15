@@ -20,10 +20,14 @@ if (typeof browser === 'undefined') {
 
 const copyButton = document.getElementById('copyButton');
 const helpButton = document.getElementById('helpButton');
+const settingsButton = document.getElementById('settingsButton');
 
 copyButton.addEventListener('click', async () => {
     browser.runtime.sendMessage({ copyButtonPressed: true });
 });
 helpButton.addEventListener('click', async () => {
     browser.runtime.sendMessage({ helpButtonPressed: true });
+});
+settingsButton.addEventListener('click', async () => {
+    browser.runtime.sendMessage({ settingsButtonPressed: true });
 });

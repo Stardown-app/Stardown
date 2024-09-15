@@ -89,6 +89,8 @@ browser.runtime.onMessage.addListener(async (message, sender, sendResponse) => {
         await handleInteraction(tabs[0], { category: 'copyShortcut' });
     } else if (message.helpButtonPressed) {
         browser.tabs.create({ url: 'https://github.com/Stardown-app/Stardown?tab=readme-ov-file#-stardown' });
+    } else if (message.settingsButtonPressed) {
+        browser.runtime.openOptionsPage();
     } else if (message.markupLanguage) {
         markupLanguage = message.markupLanguage;
         updateContextMenuLanguage(markupLanguage);

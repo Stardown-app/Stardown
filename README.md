@@ -24,8 +24,8 @@
 * Press `Alt+C` to **c**opy a selection or a page's link.
 * Press `Alt+N` to open a **n**otepad that copying with `Alt+C` automatically pastes into.
 * Right-click part of a page to copy it as markdown. Select before right-clicking to copy multiple parts.
-* Press `Alt+CC` to copy links for all tabs. Select tabs before pressing `Alt+CC` to copy links for only those tabs.
-* Customize these features in Stardown's settings.
+* Copy links for all tabs. Select tabs first to copy links for only those tabs.
+* Customize these features including keyboard shortcuts in Stardown's settings.
 
 <!--
 Stardown is free except that if you get it from Apple's App Store, there is a small fee to help cover the $99 USD per year cost I'm paying to keep Stardown available in the App Store.

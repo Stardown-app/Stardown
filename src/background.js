@@ -19,8 +19,6 @@ import { getSetting } from './common.js';
 import { createTabLink } from './generators/md.js';
 
 let markupLanguage = 'markdown';
-let lastPress = new Date(0); // last time the copy shortcut was pressed
-let doublePressInterval = 500;
 let jsonDestination = 'clipboard';
 let windowId = null;
 
@@ -28,7 +26,6 @@ getSetting('markupLanguage').then(value => {
     markupLanguage = value;
     createContextMenus(value);
 });
-getSetting('doublePressInterval').then(value => doublePressInterval = value);
 getSetting('jsonDestination').then(value => jsonDestination = value);
 browser.tabs.query({ currentWindow: true, active: true }).then(tabs => {
     windowId = tabs[0].windowId;
@@ -41,41 +38,15 @@ browser.windows.onFocusChanged.addListener(async windowId_ => {
 
 browser.commands.onCommand.addListener(async command => {
     if (command === 'openSidePanel') {
+        // Chromium only
         browser.sidePanel.open({ windowId: windowId });
-        return;
-    } else if (command !== 'copy') {
-        console.error(`Unknown command: ${command}`);
-        return;
-    }
-
-    const now = new Date();
-    const msSinceLastPress = now - lastPress; // milliseconds
-    const isDoublePress = msSinceLastPress < doublePressInterval;
-    if (isDoublePress) {
-        let havePerm;
-        try {
-            // The permissions request must be the first async function call in the
-            // event handler or it will throw an error.
-            havePerm = await browser.permissions.request({ permissions: ['tabs'] });
-        } catch (err) {
-            await showStatus(0, 'Error', err.message);
-            return;
-        }
-        if (!havePerm) {
-            await showStatus(0, 'Error', 'Unable to copy links for multiple tabs without permission');
-            return;
-        }
-
-        lastPress = new Date(0);
+    } else if (command === 'copy') {
         const tabs = await browser.tabs.query({ active: true, currentWindow: true });
-        await handleCopyAllTabs(tabs[0]);
-        return;
+        await handleInteraction(tabs[0], { category: 'copyShortcut' });
+    } else {
+        console.error(`Unknown command: ${command}`);
+        throw new Error(`Unknown command: ${command}`);
     }
-    // the copy shortcut was pressed once
-    lastPress = now;
-
-    const tabs = await browser.tabs.query({ active: true, currentWindow: true });
-    await handleInteraction(tabs[0], { category: 'copyShortcut' });
 });
 
 browser.runtime.onMessage.addListener(async (message, sender, sendResponse) => {
@@ -84,12 +55,17 @@ browser.runtime.onMessage.addListener(async (message, sender, sendResponse) => {
         // because the contextMenus.update method cannot update a context menu that is
         // already open. The content script listens for mouseover and mouseup events.
         await updateContextMenu(message.context, markupLanguage);
+    } else if (message.showStatus) {
+        await showStatus(message.status, message.notifTitle, message.notifBody);
     } else if (message.copyButtonPressed) {
         const tabs = await browser.tabs.query({ active: true, currentWindow: true });
         await handleInteraction(tabs[0], { category: 'copyShortcut' });
+    } else if (message.copyMultipleButtonPressed) {
+        const tabs = await browser.tabs.query({ active: true, currentWindow: true });
+        await handleCopyAllTabs(tabs[0]);
     } else if (message.sidebarButtonPressed) {
+        // Chromium only
         browser.sidePanel?.open({ windowId: windowId });
-        // in Firefox, the sidebar is toggled in the sidebar button's event listener
     } else if (message.helpButtonPressed) {
         browser.tabs.create({ url: 'https://github.com/Stardown-app/Stardown?tab=readme-ov-file#-stardown' });
     } else if (message.settingsButtonPressed) {
@@ -97,8 +73,6 @@ browser.runtime.onMessage.addListener(async (message, sender, sendResponse) => {
     } else if (message.markupLanguage) {
         markupLanguage = message.markupLanguage;
         updateContextMenuLanguage(markupLanguage);
-    } else if (message.doublePressInterval) {
-        doublePressInterval = message.doublePressInterval;
     } else if (message.jsonDestination) {
         jsonDestination = message.jsonDestination;
     } else if (message.downloadFile) {
@@ -245,10 +219,10 @@ async function handleCopyAllTabs(activeTab) {
     let tabs = await browser.tabs.query({ currentWindow: true, highlighted: true });
     if (tabs.length === 1) { // if only one tab is highlighted
         // get unhighlighted tabs
-        const doublePressWindows = await getSetting('doublePressWindows');
-        if (doublePressWindows === 'current') {
+        const copyTabsWindows = await getSetting('copyTabsWindows');
+        if (copyTabsWindows === 'current') {
             tabs = await browser.tabs.query({ currentWindow: true });
-        } else if (doublePressWindows === 'all') {
+        } else if (copyTabsWindows === 'all') {
             tabs = await browser.tabs.query({});
         }
     }

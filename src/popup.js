@@ -19,6 +19,7 @@ if (typeof browser === 'undefined') {
 }
 
 const copyButton = document.getElementById('copyButton');
+const copyMultipleButton = document.getElementById('copyMultipleButton');
 const sidebarButton = document.getElementById('sidebarButton');
 const settingsButton = document.getElementById('settingsButton');
 const helpButton = document.getElementById('helpButton');
@@ -29,8 +30,34 @@ const sidebarShortcutEl = document.getElementById('sidebarShortcut');
 copyButton.addEventListener('click', async () => {
     browser.runtime.sendMessage({ copyButtonPressed: true });
 });
+copyMultipleButton.addEventListener('click', async () => {
+    let havePerm;
+    try {
+        // The permissions request must be the first async function call in the event
+        // handler or it will throw an error.
+        havePerm = await browser.permissions.request({ permissions: ['tabs'] });
+    } catch (err) {
+        console.error('browser.permissions.request:', err);
+        browser.runtime.sendMessage({
+            showStatus: {
+                status: 0,
+                notifTitle: 'Error',
+                notifBody: err.message,
+            }
+        });
+        return;
+    }
+    if (!havePerm) {
+        console.log('User denied permission request.');
+        return;
+    }
+
+    console.log('User granted permission request.');
+    browser.runtime.sendMessage({ copyMultipleButtonPressed: true });
+});
 sidebarButton.addEventListener('click', async () => {
     if (browser.sidebarAction) {
+        // Firefox only
         await browser.sidebarAction.toggle();
     } else {
         browser.runtime.sendMessage({ sidebarButtonPressed: true });

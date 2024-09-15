@@ -24,8 +24,7 @@ const defaultSettings = {
     omitHidden: true,
     notifyOnWarning: false,
     notifyOnSuccess: false,
-    doublePressWindows: 'current',
-    doublePressInterval: 500,
+    copyTabsWindows: 'current',
 
     mdSelectionFormat: 'source with link',
     mdYoutube: 'almost everywhere',

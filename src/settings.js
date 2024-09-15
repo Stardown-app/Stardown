@@ -20,8 +20,7 @@ import { getSetting } from './common.js';
 const form = document.querySelector('form');
 
 const markupLanguageEl = document.querySelector('#markupLanguage');
-const doublePressWindowsEl = document.querySelector('#doublePressWindows');
-const doublePressIntervalEl = document.querySelector('#doublePressInterval');
+const copyTabsWindowsEl = document.querySelector('#copyTabsWindows');
 const createTextFragmentEl = document.querySelector('#createTextFragment');
 const omitNavEl = document.querySelector('#omitNav');
 const omitFooterEl = document.querySelector('#omitFooter');
@@ -53,13 +52,7 @@ initAutosave('omitFooter', omitFooterEl, 'checked');
 initAutosave('omitHidden', omitHiddenEl, 'checked');
 initAutosave('notifyOnWarning', notifyOnWarningEl, 'checked');
 initAutosave('notifyOnSuccess', notifyOnSuccessEl, 'checked');
-initAutosave('doublePressWindows', doublePressWindowsEl, 'value');
-initAutosave('doublePressInterval', doublePressIntervalEl, 'value', () => {
-    // send the updated doublePressInterval to the background script
-    browser.runtime.sendMessage({
-        doublePressInterval: doublePressIntervalEl.value
-    });
-});
+initAutosave('copyTabsWindows', copyTabsWindowsEl, 'value');
 
 initAutosave('mdSelectionFormat', mdSelectionFormatEl, 'value');
 initAutosave('mdYoutube', mdYoutubeEl, 'value');
@@ -98,8 +91,7 @@ function initAutosave(settingName, el, valueProperty, then) {
 async function loadSettings() {
     try {
         markupLanguageEl.value = await getSetting('markupLanguage');
-        doublePressWindowsEl.value = await getSetting('doublePressWindows');
-        doublePressIntervalEl.value = await getSetting('doublePressInterval');
+        copyTabsWindowsEl.value = await getSetting('copyTabsWindows');
         createTextFragmentEl.checked = await getSetting('createTextFragment');
         omitNavEl.checked = await getSetting('omitNav');
         omitFooterEl.checked = await getSetting('omitFooter');

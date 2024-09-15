@@ -87,6 +87,9 @@ browser.runtime.onMessage.addListener(async (message, sender, sendResponse) => {
     } else if (message.copyButtonPressed) {
         const tabs = await browser.tabs.query({ active: true, currentWindow: true });
         await handleInteraction(tabs[0], { category: 'copyShortcut' });
+    } else if (message.sidebarButtonPressed) {
+        browser.sidePanel?.open({ windowId: windowId });
+        // in Firefox, the sidebar is toggled in the sidebar button's event listener
     } else if (message.helpButtonPressed) {
         browser.tabs.create({ url: 'https://github.com/Stardown-app/Stardown?tab=readme-ov-file#-stardown' });
     } else if (message.settingsButtonPressed) {

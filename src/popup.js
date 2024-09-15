@@ -19,11 +19,19 @@ if (typeof browser === 'undefined') {
 }
 
 const copyButton = document.getElementById('copyButton');
+const sidebarButton = document.getElementById('sidebarButton');
 const helpButton = document.getElementById('helpButton');
 const settingsButton = document.getElementById('settingsButton');
 
 copyButton.addEventListener('click', async () => {
     browser.runtime.sendMessage({ copyButtonPressed: true });
+});
+sidebarButton.addEventListener('click', async () => {
+    if (browser.sidebarAction) {
+        await browser.sidebarAction.toggle();
+    } else {
+        browser.runtime.sendMessage({ sidebarButtonPressed: true });
+    }
 });
 helpButton.addEventListener('click', async () => {
     browser.runtime.sendMessage({ helpButtonPressed: true });

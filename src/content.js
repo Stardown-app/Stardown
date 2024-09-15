@@ -189,7 +189,7 @@ async function handleRequest(message) {
         case 'selectionRightClick':
             const selection1 = window.getSelection();
             const id2 = await getClickedElementId(clickedElement);
-            return await handleSelectionRightClick(id2, selection1);
+            return await handleSelectionCopyRequest(id2, selection1);
         case 'linkRightClick':
             const linkMd = await md.createLink(linkText, message.linkUrl);
             await htmlSelection.appendToNotepad(linkMd);
@@ -208,7 +208,7 @@ async function handleRequest(message) {
             return await handleCopyRequest(audioMd + '\n');
         case 'markdownTableRightClick':
             const id3 = await getClickedElementId(clickedElement);
-            return await handleSelectionRightClick(id3, tableSelection);
+            return await handleSelectionCopyRequest(id3, tableSelection);
         case 'tsvTableRightClick':
             return await handleCsvTableRightClick(tableSelection, '\t');
         case 'csvTableRightClick':
@@ -261,7 +261,7 @@ async function handleCopyShortcut() {
     if (selection && selection.type === 'Range') {
         // only allow Range (and not Caret) selections or else every copy request will
         // count as a selection click
-        return await handleSelectionRightClick('', selection);
+        return await handleSelectionCopyRequest('', selection);
     }
 
     const markupLanguage = await getSetting('markupLanguage');
@@ -299,12 +299,12 @@ async function handlePageRightClick(htmlId) {
 }
 
 /**
- * handleSelectionRightClick handles a right-click on a selection.
+ * handleSelectionCopyRequest handles a request to copy a selection.
  * @param {string} htmlId - the ID of the HTML element that was right-clicked.
  * @param {Selection} selection - a selection object.
  * @returns {Promise<ContentResponse>}
  */
-async function handleSelectionRightClick(htmlId, selection) {
+async function handleSelectionCopyRequest(htmlId, selection) {
     let title = document.title;
     let url = removeIdAndTextFragment(location.href);
 

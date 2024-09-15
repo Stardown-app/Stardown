@@ -67,8 +67,10 @@ You can use this [bookmarklet](https://en.wikipedia.org/wiki/Bookmarklet) I made
 
 * [MarkDownload](https://github.com/deathau/markdownload) was developed by an Obsidian community moderator. While Stardown is great for copying *parts* of web pages as markdown, MarkDownload is better for downloading entire pages, especially if you want to download directly into Obsidian. I use both Stardown and MarkDownload.
 * [Omnivore](https://omnivore.app/) can save content in a variety of formats.
-* [Zotero](https://www.zotero.org/) is one of the best tools for research.
+* [linkding](https://github.com/sissbruecker/linkding) is a self-hosted bookmarks manager.
+* [Zotero](https://www.zotero.org/) is one of the best tools for saving and organizing research.
 * [Joplin](https://github.com/laurent22/joplin/blob/dev/readme/apps/clipper.md) has an official web clipper of its own.
+* [Send To Logseq](https://chromewebstore.google.com/detail/send-to-logseq/mgdccnefjlmhnfbmlnhddoogimbpmilj) is a browser extension that saves web pages to [Logseq](https://github.com/logseq/logseq?tab=readme-ov-file).
 * [github.com/webclipper/web-clipper](https://github.com/webclipper/web-clipper) can integrate directly with Obsidian, Notion, OneNote, Bear, Yuque, Joplin, and more.
 * [Obsidian Web Clipper Bookmarklet](https://gist.github.com/kepano/90c05f162c37cf730abb8ff027987ca3) is a bookmarklet for saving web pages directly to Obsidian.
 * [Slurp](https://github.com/inhumantsar/slurp) is an Obsidian community plugin and bookmarklet for saving web pages directly to Obsidian.

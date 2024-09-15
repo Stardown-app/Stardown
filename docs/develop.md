@@ -26,7 +26,14 @@ This project uses [JSDoc](https://en.wikipedia.org/wiki/JSDoc) to annotate types
 
 ## How Stardown works
 
-In Stardown, every user interaction (except on the options page) sends a request from the background to the content, which returns a response to the background. You can think of it like client-server architecture where the background is the client and the content is the server. Every request must have a `category` property and may optionally have other properties. Every response is an object with the properties `status`, `notifTitle`, and `notifBody`.
+In Stardown, every user interaction (except on the options page) sends a request from the background to the content, which returns a response to the background. You can think of it like client-server architecture where the background is the client and the content is the server.
+
+Every ***request*** must have `category` and `id` properties and may optionally have other properties.
+
+- `category`: a string describing what is being requested.
+- `id`: a unique, pseudorandom number for detecting [duplicate requests](https://github.com/Stardown-app/Stardown/issues/98).
+
+Every ***response*** is either null or an object with the properties `status`, `notifTitle`, and `notifBody`.
 
 - `status`: the number of markdown items successfully created and written to the clipboard. Zero means failure, and one or above means success.
 - `notifTitle`: the title of the notification to show to the user.

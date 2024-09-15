@@ -30,6 +30,13 @@ notepad.addEventListener('input', () => {
     browser.storage.sync.set({ notepadContent: notepad.value });
 });
 
+browser.runtime.onMessage.addListener(message => {
+    if (message.type === 'appendToNotepad') {
+        notepad.value += message.text;
+        notepad.scrollTop = notepad.scrollHeight; // scroll down if possible
+        browser.storage.sync.set({ notepadContent: notepad.value });
+    }
+});
 
 const defaultSettings = {
     notepadContent: '',

@@ -14,10 +14,26 @@
    limitations under the License.
 */
 
+import { browser } from './config.js';
 import { getSetting } from './common.js';
 import * as md from './generators/md.js';
 import { htmlToMd, mdEncodeUri } from './converters/md.js';
 import { htmlToMdAndHtml } from './converters/mdAndHtml.js';
+
+/**
+ * appendToNotepad sends text to Stardown's sidebar notepad to be appended.
+ * @param {string} text
+ * @returns {Promise<void>}
+ */
+export async function appendToNotepad(text) {
+    while (!text.endsWith('\n\n')) {
+        text += '\n';
+    }
+    browser.runtime.sendMessage({
+        type: 'appendToNotepad',
+        text: text,
+    });
+}
 
 /**
  * createText creates text of the selected part of the page. The language and format are
@@ -36,9 +52,13 @@ export async function createText(title, url, selection) {
         switch (markupLanguage) {
             case 'markdown':
             case 'markdown with some html':
-                return await md.createLink(title, url);
+                const mdLink = await md.createLink(title, url);
+                await appendToNotepad(mdLink);
+                return mdLink;
             case 'html':
-                return `<a href="${url}">${title}</a>`;
+                const htmlLink = `<a href="${url}">${title}</a>`;
+                await appendToNotepad(htmlLink);
+                return htmlLink;
             default:
                 console.error(`Unknown markupLanguage: ${markupLanguage}`);
                 throw new Error(`Unknown markupLanguage: ${markupLanguage}`);
@@ -49,6 +69,7 @@ export async function createText(title, url, selection) {
         /** @type {DocumentFragment|null} */
         const frag = await getSelectionFragment(selection);
         if (frag === null) {
+            await appendToNotepad(selectedText);
             return selectedText;
         }
         // make any links absolute
@@ -58,7 +79,9 @@ export async function createText(title, url, selection) {
         // convert the fragment to a string
         const div = document.createElement('div');
         div.appendChild(frag.cloneNode(true));
-        return div.innerHTML || selectedText;
+        const result = div.innerHTML || selectedText;
+        await appendToNotepad(result);
+        return result;
     }
 
     if (markupLanguage !== 'markdown' && markupLanguage !== 'markdown with some html') {
@@ -73,17 +96,29 @@ export async function createText(title, url, selection) {
                 title, url, selection, selectedText, markupLanguage,
             ) + '\n';
         case 'source':
-            return await getSourceFormatMd(selection, selectedText, markupLanguage);
+            const srcMd = await getSourceFormatMd(selection, selectedText, markupLanguage);
+            await appendToNotepad(srcMd);
+            return srcMd;
         case 'template':
-            return await getTemplatedMd(title, url, selection, selectedText, markupLanguage);
+            const templateMd = await getTemplatedMd(
+                title, url, selection, selectedText, markupLanguage,
+            );
+            await appendToNotepad(templateMd);
+            return templateMd;
         case 'blockquote with link':
             const body = await getSourceFormatMd(selection, selectedText, markupLanguage);
-            return await md.createBlockquote(body, title, url) + '\n';
+            const blockquote = await md.createBlockquote(body, title, url) + '\n';
+            await appendToNotepad(blockquote);
+            return blockquote;
         case 'link with selection as title':
             selectedText = selectedText.replaceAll('\r\n', ' ').replaceAll('\n', ' ');
-            return await md.createLink(selectedText, url);
+            const link = await md.createLink(selectedText, url);
+            await appendToNotepad(link);
+            return link;
         case 'link with page title as title':
-            return await md.createLink(title, url);
+            const link2 = await md.createLink(title, url);
+            await appendToNotepad(link2);
+            return link2;
         default:
             console.error(`Unknown mdSelectionFormat: ${mdSelectionFormat}`);
             throw new Error(`Unknown mdSelectionFormat: ${mdSelectionFormat}`);
@@ -214,6 +249,7 @@ async function getSourceFormatMdWithLink(title, url, selection, selectedText, ma
     /** @type {DocumentFragment} */
     const frag = await getSelectionFragment(selection);
     if (frag === null) {
+        await appendToNotepad(selectedText);
         return alert + '\n\n' + selectedText;
     }
 
@@ -227,6 +263,7 @@ async function getSourceFormatMdWithLink(title, url, selection, selectedText, ma
         throw new Error(`Unknown markupLanguage: ${markupLanguage}`);
     }
 
+    await appendToNotepad(text);
     return alert + '\n\n' + text;
 }
 

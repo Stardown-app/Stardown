@@ -137,27 +137,21 @@ browser.contextMenus.onClicked.addListener(async (info, tab) => {
             );
             break;
         case 'markdownTable':
-            console.log('markdownTableRightClick in background.js');
             await handleInteraction(
                 tab, { category: 'markdownTableRightClick' }, { frameId: info.frameId },
             );
             break;
         case 'tsvTable':
-            console.log('tsvTableRightClick in background.js');
-            const id = Math.random(); // why: https://github.com/Stardown-app/Stardown/issues/98
             await handleInteraction(
-                tab, { category: 'tsvTableRightClick', id: id }, { frameId: info.frameId },
+                tab, { category: 'tsvTableRightClick' }, { frameId: info.frameId },
             );
             break;
         case 'csvTable':
-            console.log('csvTableRightClick in background.js');
-            const id2 = Math.random(); // why: https://github.com/Stardown-app/Stardown/issues/98
             await handleInteraction(
-                tab, { category: 'csvTableRightClick', id: id2 }, { frameId: info.frameId },
+                tab, { category: 'csvTableRightClick' }, { frameId: info.frameId },
             );
             break;
         case 'jsonTable':
-            console.log('jsonTableRightClick in background.js');
             if (jsonDestination === 'file') {
                 let havePerm;
                 try {
@@ -174,13 +168,11 @@ browser.contextMenus.onClicked.addListener(async (info, tab) => {
                 }
             }
 
-            const id3 = Math.random(); // why: https://github.com/Stardown-app/Stardown/issues/98
             await handleInteraction(
-                tab, { category: 'jsonTableRightClick', id: id3 }, { frameId: info.frameId },
+                tab, { category: 'jsonTableRightClick' }, { frameId: info.frameId },
             );
             break;
         case 'htmlTable':
-            console.log('htmlTableRightClick in background.js');
             await handleInteraction(
                 tab, { category: 'htmlTableRightClick' }, { frameId: info.frameId },
             );
@@ -207,6 +199,8 @@ async function handleInteraction(tab, message, options = {}) {
         await showStatus(0, 'Error', 'Stardown cannot run on PDFs');
         return;
     }
+
+    message.id = Math.random(); // why: https://github.com/Stardown-app/Stardown/issues/98
 
     let status, notifTitle, notifBody;
     try {
@@ -274,10 +268,12 @@ async function handleCopyAllTabs(activeTab) {
             return;
     }
 
+    const id = Math.random(); // why: https://github.com/Stardown-app/Stardown/issues/98
+
     const {
         status, notifTitle, notifBody,
     } = await browser.tabs.sendMessage(activeTab.id, {
-        category: 'copyText', text: text,
+        category: 'copyText', id: id, text: text,
     });
 
     if (status === 0) { // failure

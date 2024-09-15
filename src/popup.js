@@ -18,19 +18,11 @@ if (typeof browser === 'undefined') {
     var browser = chrome;
 }
 
-const copyButton = document.getElementById('copyButton');
-const copyMultipleButton = document.getElementById('copyMultipleButton');
-const sidebarButton = document.getElementById('sidebarButton');
-const settingsButton = document.getElementById('settingsButton');
-const helpButton = document.getElementById('helpButton');
-
-const copyShortcutEl = document.getElementById('copyShortcut');
-const sidebarShortcutEl = document.getElementById('sidebarShortcut');
-
-copyButton.addEventListener('click', async () => {
+document.querySelector('#copyButton').addEventListener('click', async () => {
     browser.runtime.sendMessage({ copyButtonPressed: true });
 });
-copyMultipleButton.addEventListener('click', async () => {
+
+document.querySelector('#copyMultipleButton').addEventListener('click', async () => {
     let havePerm;
     try {
         // The permissions request must be the first async function call in the event
@@ -55,7 +47,8 @@ copyMultipleButton.addEventListener('click', async () => {
     console.log('User granted permission request.');
     browser.runtime.sendMessage({ copyMultipleButtonPressed: true });
 });
-sidebarButton.addEventListener('click', async () => {
+
+document.querySelector('#sidebarButton').addEventListener('click', async () => {
     if (browser.sidebarAction) {
         // Firefox only
         await browser.sidebarAction.toggle();
@@ -63,10 +56,12 @@ sidebarButton.addEventListener('click', async () => {
         browser.runtime.sendMessage({ sidebarButtonPressed: true });
     }
 });
-settingsButton.addEventListener('click', async () => {
+
+document.querySelector('#settingsButton').addEventListener('click', async () => {
     browser.runtime.sendMessage({ settingsButtonPressed: true });
 });
-helpButton.addEventListener('click', async () => {
+
+document.querySelector('#helpButton').addEventListener('click', async () => {
     browser.runtime.sendMessage({ helpButtonPressed: true });
 });
 
@@ -78,10 +73,11 @@ async function loadCommands() {
     );
 
     if (copyCmd) {
-        copyShortcutEl.textContent = copyCmd.shortcut || '';
+        document.querySelector('#copyShortcut').textContent = copyCmd.shortcut || '';
     }
     if (sidebarCmd) {
-        sidebarShortcutEl.textContent = sidebarCmd.shortcut || '';
+        document.querySelector('#sidebarShortcut').textContent = sidebarCmd.shortcut || '';
     }
 }
+
 loadCommands();

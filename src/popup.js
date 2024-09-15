@@ -19,7 +19,11 @@ if (typeof browser === 'undefined') {
 }
 
 const copyButton = document.getElementById('copyButton');
+const helpButton = document.getElementById('helpButton');
 
 copyButton.addEventListener('click', async () => {
     browser.runtime.sendMessage({ copyButtonPressed: true });
+});
+helpButton.addEventListener('click', async () => {
+    browser.runtime.sendMessage({ helpButtonPressed: true });
 });

@@ -24,7 +24,6 @@
         justify-content: center;
         align-items: center;
         text-align: center;
-        width: 180px;
       }
     </style>
   </head>
@@ -32,10 +31,23 @@
   <body>
     <main>
       <h2>Stardown</h2>
-      <button id="copyButton"><img src="./images/copy.svg" /></button>
-      <button id="sidebarButton"><img src="./images/sidebar.svg" /></button>
-      <button id="helpButton"><img src="./images/help.svg" /></button>
-      <button id="settingsButton"><img src="./images/settings.svg" /></button>
+
+      <table role="presentation">
+        <tr>
+          <td><button id="copyButton"><img src="./images/copy.svg" /></button></td>
+          <td><label for="copyButton" id="copyShortcut">Alt+C</label></td>
+        </tr>
+        <tr>
+          <td><button id="sidebarButton"><img src="./images/sidebar.svg" /></button></td>
+          <td><label for="sidebarButton" id="sidebarShortcut">Alt+N</label></td>
+        </tr>
+        <tr>
+          <td><button id="settingsButton"><img src="./images/settings.svg" /></button></td>
+        </tr>
+        <tr>
+          <td><button id="helpButton"><img src="./images/help.svg" /></button></td>
+        </tr>
+      </table>
     </main>
     <script src="./popup.js"></script>
   </body>

@@ -20,8 +20,11 @@ if (typeof browser === 'undefined') {
 
 const copyButton = document.getElementById('copyButton');
 const sidebarButton = document.getElementById('sidebarButton');
-const helpButton = document.getElementById('helpButton');
 const settingsButton = document.getElementById('settingsButton');
+const helpButton = document.getElementById('helpButton');
+
+const copyShortcutEl = document.getElementById('copyShortcut');
+const sidebarShortcutEl = document.getElementById('sidebarShortcut');
 
 copyButton.addEventListener('click', async () => {
     browser.runtime.sendMessage({ copyButtonPressed: true });
@@ -33,9 +36,25 @@ sidebarButton.addEventListener('click', async () => {
         browser.runtime.sendMessage({ sidebarButtonPressed: true });
     }
 });
-helpButton.addEventListener('click', async () => {
-    browser.runtime.sendMessage({ helpButtonPressed: true });
-});
 settingsButton.addEventListener('click', async () => {
     browser.runtime.sendMessage({ settingsButtonPressed: true });
 });
+helpButton.addEventListener('click', async () => {
+    browser.runtime.sendMessage({ helpButtonPressed: true });
+});
+
+async function loadCommands() {
+    const cmds = await browser.commands.getAll();
+    const copyCmd = cmds.find(cmd => cmd.name === 'copy');
+    const sidebarCmd = cmds.find(
+        cmd => cmd.name === '_execute_sidebar_action' || cmd.name === 'openSidePanel'
+    );
+
+    if (copyCmd) {
+        copyShortcutEl.textContent = copyCmd.shortcut || '';
+    }
+    if (sidebarCmd) {
+        sidebarShortcutEl.textContent = sidebarCmd.shortcut || '';
+    }
+}
+loadCommands();

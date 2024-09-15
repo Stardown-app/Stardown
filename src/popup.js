@@ -13,3 +13,13 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 */
+
+if (typeof browser === 'undefined') {
+    var browser = chrome;
+}
+
+const copyButton = document.getElementById('copyButton');
+
+copyButton.addEventListener('click', async () => {
+    browser.runtime.sendMessage({ copyButtonPressed: true });
+});

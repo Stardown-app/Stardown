@@ -84,6 +84,9 @@ browser.runtime.onMessage.addListener(async (message, sender, sendResponse) => {
         // because the contextMenus.update method cannot update a context menu that is
         // already open. The content script listens for mouseover and mouseup events.
         await updateContextMenu(message.context, markupLanguage);
+    } else if (message.copyButtonPressed) {
+        const tabs = await browser.tabs.query({ active: true, currentWindow: true });
+        await handleInteraction(tabs[0], { category: 'copyShortcut' });
     } else if (message.markupLanguage) {
         markupLanguage = message.markupLanguage;
         updateContextMenuLanguage(markupLanguage);

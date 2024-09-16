@@ -43,6 +43,13 @@ browser.commands.onCommand.addListener(async command => {
     } else if (command === 'copy') {
         const tabs = await browser.tabs.query({ active: true, currentWindow: true });
         await handleInteraction(tabs[0], { category: 'copyShortcut' });
+    } else if (command === 'copyMultiple') {
+        const tabs = await browser.tabs.query({ active: true, currentWindow: true });
+        await handleCopyAllTabs(tabs[0]);
+    } else if (command === 'openSettings') {
+        browser.runtime.openOptionsPage();
+    } else if (command === 'openHelp') {
+        browser.tabs.create({ url: 'https://github.com/Stardown-app/Stardown?tab=readme-ov-file#-stardown' });
     } else {
         console.error(`Unknown command: ${command}`);
         throw new Error(`Unknown command: ${command}`);

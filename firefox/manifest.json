@@ -68,11 +68,20 @@
             },
             "description": "Copy a selection as markdown"
         },
+        "copyMultiple": {
+            "description": "Copy multiple tabs"
+        },
         "_execute_sidebar_action": {
             "suggested_key": {
                 "default": "Alt+N"
             },
             "description": "Toggle Stardown's notepad"
+        },
+        "openSettings": {
+            "description": "Open settings"
+        },
+        "openHelp": {
+            "description": "Open help"
         }
     }
 }

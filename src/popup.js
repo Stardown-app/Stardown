@@ -67,16 +67,29 @@ document.querySelector('#helpButton').addEventListener('click', async () => {
 
 async function loadCommands() {
     const cmds = await browser.commands.getAll();
+
     const copyCmd = cmds.find(cmd => cmd.name === 'copy');
+    const copyMultipleCmd = cmds.find(cmd => cmd.name === 'copyMultiple');
     const sidebarCmd = cmds.find(
         cmd => cmd.name === '_execute_sidebar_action' || cmd.name === 'openSidePanel'
     );
+    const settingsCmd = cmds.find(cmd => cmd.name === 'openSettings');
+    const helpCmd = cmds.find(cmd => cmd.name === 'openHelp');
 
     if (copyCmd) {
         document.querySelector('#copyShortcut').textContent = copyCmd.shortcut || '';
     }
+    if (copyMultipleCmd) {
+        document.querySelector('#copyMultipleShortcut').textContent = copyMultipleCmd.shortcut || '';
+    }
     if (sidebarCmd) {
         document.querySelector('#sidebarShortcut').textContent = sidebarCmd.shortcut || '';
+    }
+    if (settingsCmd) {
+        document.querySelector('#settingsShortcut').textContent = settingsCmd.shortcut || '';
+    }
+    if (helpCmd) {
+        document.querySelector('#helpShortcut').textContent = helpCmd.shortcut || '';
     }
 }
 

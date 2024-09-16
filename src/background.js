@@ -37,22 +37,30 @@ browser.windows.onFocusChanged.addListener(async windowId_ => {
 });
 
 browser.commands.onCommand.addListener(async command => {
-    if (command === 'openSidePanel') {
-        // Chromium only
-        browser.sidePanel.open({ windowId: windowId });
-    } else if (command === 'copy') {
-        const tabs = await browser.tabs.query({ active: true, currentWindow: true });
-        await handleInteraction(tabs[0], { category: 'copyShortcut' });
-    } else if (command === 'copyMultiple') {
-        const tabs = await browser.tabs.query({ active: true, currentWindow: true });
-        await handleCopyAllTabs(tabs[0]);
-    } else if (command === 'openSettings') {
-        browser.runtime.openOptionsPage();
-    } else if (command === 'openHelp') {
-        browser.tabs.create({ url: 'https://github.com/Stardown-app/Stardown?tab=readme-ov-file#-stardown' });
-    } else {
-        console.error(`Unknown command: ${command}`);
-        throw new Error(`Unknown command: ${command}`);
+    switch (command) {
+        case 'openSidePanel':
+            // Chromium only
+            browser.sidePanel.open({ windowId: windowId });
+            break;
+        case 'copy':
+            const tabs = await browser.tabs.query({ active: true, currentWindow: true });
+            await handleInteraction(tabs[0], { category: 'copyShortcut' });
+            break;
+        case 'copyMultiple':
+            const tabs1 = await browser.tabs.query({ active: true, currentWindow: true });
+            await handleCopyAllTabs(tabs1[0]);
+            break;
+        case 'openSettings':
+            browser.runtime.openOptionsPage();
+            break;
+        case 'openHelp':
+            browser.tabs.create({
+                url: 'https://github.com/Stardown-app/Stardown?tab=readme-ov-file#-stardown'
+            });
+            break;
+        default:
+            console.error(`Unknown command: ${command}`);
+            throw new Error(`Unknown command: ${command}`);
     }
 });
 

@@ -106,7 +106,7 @@ browser.contextMenus.onClicked.addListener(async (info, tab) => {
             );
             break;
         case 'link':
-            // In Chromium, unlike in Firefox, `info.linkText` is undefined and no
+            // In Chromium unlike in Firefox, `info.linkText` is undefined and no
             // property in `info` has the link's text.
             await handleInteraction(
                 tab, { category: 'linkRightClick', linkUrl: info.linkUrl },
@@ -183,9 +183,10 @@ browser.contextMenus.onClicked.addListener(async (info, tab) => {
  * @param {string} message.category - the category of the message.
  * @param {object} options - the options for the message. For example, the `frameId`
  * option can be used to specify the frame to send the message to.
+ * @param {number} successStatus - the status to show if the operation was successful.
  * @returns {Promise<void>}
  */
-async function handleInteraction(tab, message, options = {}) {
+async function handleInteraction(tab, message, options = {}, successStatus = 1) {
     if (tab.url.endsWith('.pdf')) {
         await showStatus(0, 'Error', 'Stardown cannot run on PDFs');
         return;
@@ -211,7 +212,11 @@ async function handleInteraction(tab, message, options = {}) {
         await showStatus(0, 'Error', err.message);
         return;
     }
-    await showStatus(status, notifTitle, notifBody);
+    if (status === 1) { // success
+        await showStatus(successStatus, notifTitle, notifBody);
+    } else { // failure
+        await showStatus(status, notifTitle, notifBody);
+    }
 }
 
 /**
@@ -234,6 +239,7 @@ async function handleCopyAllTabs(activeTab) {
         }
     }
 
+    // create the links
     let text = '';
     switch (markupLanguage) {
         case 'html':
@@ -259,19 +265,9 @@ async function handleCopyAllTabs(activeTab) {
             return;
     }
 
-    const id = Math.random(); // why: https://github.com/Stardown-app/Stardown/issues/98
-
-    const {
-        status, notifTitle, notifBody,
-    } = await browser.tabs.sendMessage(activeTab.id, {
-        category: 'copyText', id: id, text: text,
-    });
-
-    if (status === 0) { // failure
-        await showStatus(0, notifTitle, notifBody);
-    } else { // success
-        await showStatus(tabs.length, notifTitle, notifBody);
-    }
+    const message = { category: 'copyText', text: text };
+    const options = {};
+    await handleInteraction(activeTab, message, options, tabs.length);
 }
 
 /**

@@ -68,11 +68,17 @@ function setUpListeners() {
         // contain the first of those that was detected.
         const s = window.getSelection();
         if (s && s.type === 'Range') {
-            browser.runtime.sendMessage({ context: { mouseover: 'selection' } });
+            browser.runtime.sendMessage({
+                category: 'updateContextMenu', context: { mouseover: 'selection' },
+            });
         } else if (event.target.nodeName === 'IMG') {
-            browser.runtime.sendMessage({ context: { mouseover: 'image' } });
+            browser.runtime.sendMessage({
+                category: 'updateContextMenu', context: { mouseover: 'image' },
+            });
         } else if (event.target.nodeName === 'A') {
-            browser.runtime.sendMessage({ context: { mouseover: 'link' } });
+            browser.runtime.sendMessage({
+                category: 'updateContextMenu', context: { mouseover: 'link' },
+            });
         }
     });
 
@@ -90,7 +96,9 @@ function setUpListeners() {
         const isTable = frag?.firstChild?.nodeName === 'TABLE';
         if (isTable) {
             tableSelection = selection;
-            browser.runtime.sendMessage({ context: { mouseup: 'table' } });
+            browser.runtime.sendMessage({
+                category: 'updateContextMenu', context: { mouseup: 'table' },
+            });
         } else {
             tableSelection = null;
         }
@@ -100,7 +108,9 @@ function setUpListeners() {
         // This event listener detects when the user has deselected a table and sends a
         // message to the background script so it can load the correct context menu
         // items.
-        browser.runtime.sendMessage({ context: { selectionchange: 'selection' } });
+        browser.runtime.sendMessage({
+            category: 'updateContextMenu', context: { selectionchange: 'selection' },
+        });
     });
 
     document.addEventListener('contextmenu', (event) => {
@@ -377,8 +387,10 @@ async function handleJsonTableRightClick(tableSelection) {
     // Tell the background what to download because apparently `browser.downloads` is
     // always undefined in content scripts.
     browser.runtime.sendMessage({
-        downloadFile: {
-            filename: 'table.json',
+        category: 'downloadFile',
+        file: {
+            name: 'table.json',
+            type: 'json',
             json: tableJson,
         }
     });

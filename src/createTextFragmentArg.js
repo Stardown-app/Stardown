@@ -38,7 +38,10 @@ export function createTextFragmentArg(selection) {
         result = window.generateFragment(selection);
     } catch (err) {
         if (err.message !== 'window.generateFragment is not a function') {
-            browser.runtime.sendMessage({ warning: err.message });
+            browser.runtime.sendMessage({
+                category: 'showWarning',
+                warning: err.message,
+            });
             return '';
         }
     }
@@ -46,21 +49,25 @@ export function createTextFragmentArg(selection) {
     switch (result.status) {
         case 1:
             browser.runtime.sendMessage({
+                category: 'showWarning',
                 warning: 'The selection provided could not be used to create a text fragment'
             });
             return '';
         case 2:
             browser.runtime.sendMessage({
+                category: 'showWarning',
                 warning: 'No unique text fragment could be identified for this selection'
             });
             return '';
         case 3:
             browser.runtime.sendMessage({
+                category: 'showWarning',
                 warning: 'Text fragment computation could not complete in time'
             });
             return '';
         case 4:
             browser.runtime.sendMessage({
+                category: 'showWarning',
                 warning: 'An exception was raised during text fragment generation'
             });
             return '';

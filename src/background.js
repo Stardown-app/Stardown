@@ -65,39 +65,57 @@ browser.commands.onCommand.addListener(async command => {
 });
 
 browser.runtime.onMessage.addListener(async (message, sender, sendResponse) => {
-    if (message.context) {
-        // These context menu updates are done with messages from a content script
-        // because the contextMenus.update method cannot update a context menu that is
-        // already open. The content script listens for mouseover and mouseup events.
-        await updateContextMenu(message.context, markupLanguage);
-    } else if (message.showStatus) {
-        await showStatus(message.status, message.notifTitle, message.notifBody);
-    } else if (message.copyButtonPressed) {
-        const tabs = await browser.tabs.query({ active: true, currentWindow: true });
-        await handleInteraction(tabs[0], { category: 'copyShortcut' });
-    } else if (message.copyMultipleButtonPressed) {
-        const tabs = await browser.tabs.query({ active: true, currentWindow: true });
-        await handleCopyAllTabs(tabs[0]);
-    } else if (message.sidebarButtonPressed) {
-        // Chromium only
-        browser.sidePanel?.open({ windowId: windowId });
-    } else if (message.helpButtonPressed) {
-        browser.tabs.create({ url: 'https://github.com/Stardown-app/Stardown?tab=readme-ov-file#-stardown' });
-    } else if (message.settingsButtonPressed) {
-        browser.runtime.openOptionsPage();
-    } else if (message.markupLanguage) {
-        markupLanguage = message.markupLanguage;
-        updateContextMenuLanguage(markupLanguage);
-    } else if (message.jsonDestination) {
-        jsonDestination = message.jsonDestination;
-    } else if (message.downloadFile) {
-        await downloadFile(message.downloadFile);
-    } else if (message.warning) {
-        console.warn(`Warning: ${message.warning}`);
-        const notifyOnWarning = await getSetting('notifyOnWarning');
-        if (notifyOnWarning) {
-            await showNotification('Warning', message.warning);
-        }
+    switch (message.category) {
+        case 'updateContextMenu':
+            // These context menu updates are done with messages from the content script
+            // because the contextMenus.update method cannot update a context menu that
+            // is already open. The content script listens for mouseover and mouseup
+            // events.
+            await updateContextMenu(message.context, markupLanguage);
+            break;
+        case 'downloadFile':
+            await downloadFile(message.file);
+            break;
+        case 'showStatus':
+            await showStatus(message.status, message.notifTitle, message.notifBody);
+            break;
+        case 'showWarning':
+            console.warn(message.warning);
+            const notifyOnWarning = await getSetting('notifyOnWarning');
+            if (notifyOnWarning) {
+                await showNotification('Warning', message.warning);
+            }
+            break;
+        case 'copyButtonPressed':
+            const tabs = await browser.tabs.query({ active: true, currentWindow: true });
+            await handleInteraction(tabs[0], { category: 'copyShortcut' });
+            break;
+        case 'copyMultipleButtonPressed':
+            const tabs1 = await browser.tabs.query({ active: true, currentWindow: true });
+            await handleCopyAllTabs(tabs1[0]);
+            break;
+        case 'sidebarButtonPressed':
+            // Chromium only
+            browser.sidePanel?.open({ windowId: windowId });
+            break;
+        case 'helpButtonPressed':
+            browser.tabs.create({
+                url: 'https://github.com/Stardown-app/Stardown?tab=readme-ov-file#-stardown'
+            });
+            break;
+        case 'settingsButtonPressed':
+            browser.runtime.openOptionsPage();
+            break;
+        case 'markupLanguage':
+            markupLanguage = message.markupLanguage;
+            updateContextMenuLanguage(markupLanguage);
+            break;
+        case 'jsonDestination':
+            jsonDestination = message.jsonDestination;
+            break;
+        default:
+            console.error(`Unknown message category: ${message.category}`);
+            throw new Error(`Unknown message category: ${message.category}`);
     }
 });
 
@@ -282,20 +300,21 @@ async function handleCopyAllTabs(activeTab) {
  * downloadFile downloads a file to the user's computer. This must be in the background
  * script because `browser.downloads` appears to always be undefined in content scripts.
  * @param {object} fileObj - the object containing info about a file to download.
- * @param {string} fileObj.filename - the name of the file to download.
+ * @param {string} fileObj.name - the name of the file to download.
+ * @param {string} fileObj.type - the type of the file to download.
  * @param {string|undefined} fileObj.json - the content of the file to download if the
  * file is JSON.
  * @returns {Promise<void>}
  */
 async function downloadFile(fileObj) {
-    if (fileObj.json) {
+    if (fileObj.type === 'json' && fileObj.json) {
         const json = fileObj.json;
         const blob = new Blob([json], { type: 'application/json' });
         const url = URL.createObjectURL(blob);
-        const filename = fileObj.filename || 'file.json';
+        const name = fileObj.name || 'file.json';
         await browser.downloads.download({
             url: url,
-            filename: filename,
+            filename: name,
             saveAs: true,
             conflictAction: 'uniquify',
         }).then(

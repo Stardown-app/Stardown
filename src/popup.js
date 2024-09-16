@@ -19,7 +19,7 @@ if (typeof browser === 'undefined') {
 }
 
 document.querySelector('#copyButton').addEventListener('click', async () => {
-    browser.runtime.sendMessage({ copyButtonPressed: true });
+    browser.runtime.sendMessage({ category: 'copyButtonPressed' });
 });
 
 document.querySelector('#copyMultipleButton').addEventListener('click', async () => {
@@ -31,11 +31,10 @@ document.querySelector('#copyMultipleButton').addEventListener('click', async ()
     } catch (err) {
         console.error('browser.permissions.request:', err);
         browser.runtime.sendMessage({
-            showStatus: {
-                status: 0,
-                notifTitle: 'Error',
-                notifBody: err.message,
-            }
+            category: 'showStatus',
+            status: 0,
+            notifTitle: 'Error',
+            notifBody: err.message,
         });
         return;
     }
@@ -45,7 +44,7 @@ document.querySelector('#copyMultipleButton').addEventListener('click', async ()
     }
 
     console.log('User granted permission request.');
-    browser.runtime.sendMessage({ copyMultipleButtonPressed: true });
+    browser.runtime.sendMessage({ category: 'copyMultipleButtonPressed' });
 });
 
 document.querySelector('#sidebarButton').addEventListener('click', async () => {
@@ -53,16 +52,16 @@ document.querySelector('#sidebarButton').addEventListener('click', async () => {
         // Firefox only
         await browser.sidebarAction.toggle();
     } else {
-        browser.runtime.sendMessage({ sidebarButtonPressed: true });
+        browser.runtime.sendMessage({ category: 'sidebarButtonPressed' });
     }
 });
 
 document.querySelector('#settingsButton').addEventListener('click', async () => {
-    browser.runtime.sendMessage({ settingsButtonPressed: true });
+    browser.runtime.sendMessage({ category: 'settingsButtonPressed' });
 });
 
 document.querySelector('#helpButton').addEventListener('click', async () => {
-    browser.runtime.sendMessage({ helpButtonPressed: true });
+    browser.runtime.sendMessage({ category: 'helpButtonPressed' });
 });
 
 async function loadCommands() {

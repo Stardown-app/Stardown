@@ -153,13 +153,13 @@ export async function handleCopyRequest(text) {
         console.error(err);
         return {
             status: 0, // failure
-            notifTitle: 'Failed to copy markdown',
+            notifTitle: 'Failed to copy text',
             notifBody: err.message,
         };
     }
     return {
         status: 1, // successfully copied one item
-        notifTitle: 'Markdown copied',
-        notifBody: 'Your markdown can now be pasted',
+        notifTitle: 'Text copied',
+        notifBody: 'Your text can now be pasted',
     };
 }

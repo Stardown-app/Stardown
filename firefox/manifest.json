@@ -59,7 +59,8 @@
     "sidebar_action": {
         "default_title": "Stardown",
         "default_panel": "sidebar.html",
-        "default_icon": "images/icon-16.png"
+        "default_icon": "images/icon-16.png",
+        "open_at_install": false
     },
     "commands": {
         "copy": {

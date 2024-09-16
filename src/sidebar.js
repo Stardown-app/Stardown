@@ -20,6 +20,11 @@ if (typeof browser === 'undefined') {
 
 const notepad = document.getElementById('notepad');
 
+browser.commands.getAll().then(cmds => {
+    const copyShortcut = cmds.find(cmd => cmd.name === 'copy')?.shortcut || 'Alt+C';
+    notepad.placeholder = `Press ${copyShortcut} to copy to here...`;
+});
+
 // load the notepad content when the page loads
 getSetting('notepadContent').then(content => {
     notepad.value = content || '';

@@ -81,8 +81,8 @@
         "openSettings": {
             "description": "Open settings"
         },
-        "openHelp": {
-            "description": "Open help"
+        "openGithub": {
+            "description": "Open GitHub"
         }
     }
 }

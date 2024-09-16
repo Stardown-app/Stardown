@@ -53,7 +53,7 @@ browser.commands.onCommand.addListener(async command => {
         case 'openSettings':
             browser.runtime.openOptionsPage();
             break;
-        case 'openHelp':
+        case 'openGithub':
             browser.tabs.create({
                 url: 'https://github.com/Stardown-app/Stardown?tab=readme-ov-file#-stardown'
             });
@@ -98,7 +98,7 @@ browser.runtime.onMessage.addListener(async (message, sender, sendResponse) => {
             // Chromium only
             browser.sidePanel?.open({ windowId: windowId });
             break;
-        case 'helpButtonPressed':
+        case 'githubButtonPressed':
             browser.tabs.create({
                 url: 'https://github.com/Stardown-app/Stardown?tab=readme-ov-file#-stardown'
             });

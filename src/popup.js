@@ -60,8 +60,8 @@ document.querySelector('#settingsButton').addEventListener('click', async () => 
     browser.runtime.sendMessage({ category: 'settingsButtonPressed' });
 });
 
-document.querySelector('#helpButton').addEventListener('click', async () => {
-    browser.runtime.sendMessage({ category: 'helpButtonPressed' });
+document.querySelector('#githubButton').addEventListener('click', async () => {
+    browser.runtime.sendMessage({ category: 'githubButtonPressed' });
 });
 
 async function loadCommands() {
@@ -73,7 +73,7 @@ async function loadCommands() {
         cmd => cmd.name === '_execute_sidebar_action' || cmd.name === 'openSidePanel'
     );
     const settingsCmd = cmds.find(cmd => cmd.name === 'openSettings');
-    const helpCmd = cmds.find(cmd => cmd.name === 'openHelp');
+    const githubCmd = cmds.find(cmd => cmd.name === 'openGithub');
 
     if (copyCmd) {
         document.querySelector('#copyShortcut').textContent = copyCmd.shortcut || '';
@@ -87,8 +87,8 @@ async function loadCommands() {
     if (settingsCmd) {
         document.querySelector('#settingsShortcut').textContent = settingsCmd.shortcut || '';
     }
-    if (helpCmd) {
-        document.querySelector('#helpShortcut').textContent = helpCmd.shortcut || '';
+    if (githubCmd) {
+        document.querySelector('#githubShortcut').textContent = githubCmd.shortcut || '';
     }
 }
 

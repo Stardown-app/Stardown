@@ -61,7 +61,7 @@
             "suggested_key": {
                 "default": "Alt+C"
             },
-            "description": "Copy a selection as markdown"
+            "description": "Copy selection"
         },
         "copyMultiple": {
             "description": "Copy multiple tabs"

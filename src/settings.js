@@ -14,8 +14,10 @@
    limitations under the License.
 */
 
-import { browser } from './config.js';
+import { browser, getShortcutInstructions } from './config.js';
 import { getSetting } from './common.js';
+
+document.querySelector('#shortcutInstructions').innerHTML = getShortcutInstructions();
 
 const form = document.querySelector('form');
 

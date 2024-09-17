@@ -29,6 +29,14 @@ export async function sleep(ms) {
 }
 
 /**
+ * getShortcutInstructions returns instructions for managing extension shortcuts.
+ * @returns {string}
+ */
+export function getShortcutInstructions() {
+    return `Navigate to <code>chrome://extensions/shortcuts</code>`;
+}
+
+/**
  * createContextMenus creates the context menu options.
  * @param {string} markupLanguage - the markup language the user chose.
  * @returns {void}

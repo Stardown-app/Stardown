@@ -53,9 +53,9 @@ browser.commands.onCommand.addListener(async command => {
         case 'openSettings':
             browser.runtime.openOptionsPage();
             break;
-        case 'openGithub':
+        case 'openSource':
             browser.tabs.create({
-                url: 'https://github.com/Stardown-app/Stardown?tab=readme-ov-file#-stardown'
+                url: 'https://github.com/Stardown-app/Stardown'
             });
             break;
         default:
@@ -98,9 +98,24 @@ browser.runtime.onMessage.addListener(async (message, sender, sendResponse) => {
             // Chromium only
             browser.sidePanel?.open({ windowId: windowId });
             break;
-        case 'githubButtonPressed':
+        case 'reportBugButtonPressed':
             browser.tabs.create({
-                url: 'https://github.com/Stardown-app/Stardown?tab=readme-ov-file#-stardown'
+                url: 'https://github.com/Stardown-app/Stardown/issues'
+            });
+            break;
+        case 'requestFeatureButtonPressed':
+            browser.tabs.create({
+                url: 'https://github.com/Stardown-app/Stardown/issues'
+            });
+            break;
+        case 'discussButtonPressed':
+            browser.tabs.create({
+                url: 'https://github.com/Stardown-app/Stardown/discussions'
+            });
+            break;
+        case 'sourceButtonPressed':
+            browser.tabs.create({
+                url: 'https://github.com/Stardown-app/Stardown'
             });
             break;
         case 'settingsButtonPressed':
@@ -369,7 +384,7 @@ async function showNotification(title, body) {
     }
     browser.notifications.create('', {
         type: 'basic',
-        iconUrl: 'images/icon-128.png',
+        iconUrl: 'images/stardown-128.png',
         title: title,
         message: body,
     });

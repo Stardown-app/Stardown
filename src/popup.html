@@ -68,6 +68,23 @@
         cursor: pointer;
         margin-left: 5px;
       }
+
+      table {
+        margin: 0 auto;
+        border-collapse: collapse;
+      }
+
+      tr.firstOfSection {
+        border-top: 1px solid #dbdbdb;
+      }
+
+      tr.firstOfSection td {
+        padding-top: 10px;
+      }
+
+      tr.lastOfSection td {
+        padding-bottom: 10px;
+      }
     </style>
   </head>
 
@@ -75,7 +92,7 @@
     <main>
       <header>
         <a href="https://github.com/Stardown-app/Stardown">
-          <img src="./images/icon-32.png" alt="Stardown's Icon" />
+          <img src="./images/stardown-32.png" alt="Stardown's Icon" />
           <h2>Stardown</h2>
         </a>
       </header>
@@ -97,13 +114,25 @@
           <td><button id="sidebarButton"><img src="./images/sidebar.svg" /></button></td>
           <td><label for="sidebarButton">Notepad</label></td>
         </tr>
-        <tr>
+        <tr class="lastOfSection">
           <td><button id="settingsButton"><img src="./images/settings.svg" /></button></td>
           <td><label for="settingsButton">Settings</label></td>
         </tr>
+        <tr class="firstOfSection">
+          <td><button id="reportBugButton"><img src="./images/bug.svg" /></button></td>
+          <td><label for="reportBugButton">Report a bug</label></td>
+        </tr>
         <tr>
-          <td><button id="githubButton"><img src="./images/github.svg" /></button></td>
-          <td><label for="githubButton">GitHub repo</label></td>
+          <td><button id="requestFeatureButton"><img src="./images/idea.svg" /></button></td>
+          <td><label for="requestFeatureButton">Request a feature</label></td>
+        </tr>
+        <tr>
+          <td><button id="discussButton"><img src="./images/chat.svg" /></button></td>
+          <td><label for="discussButton">Join the discussion</label></td>
+        </tr>
+        <tr>
+          <td><button id="sourceButton"><img src="./images/github.svg" /></button></td>
+          <td><label for="sourceButton">Source code</label></td>
         </tr>
       </table>
     </main>

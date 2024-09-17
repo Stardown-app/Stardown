@@ -39,19 +39,19 @@
         }
     ],
     "icons": {
-        "16": "images/icon-16.png",
-        "32": "images/icon-32.png",
-        "48": "images/icon-48.png",
-        "96": "images/icon-96.png",
-        "128": "images/icon-128.png"
+        "16": "images/stardown-16.png",
+        "32": "images/stardown-32.png",
+        "48": "images/stardown-48.png",
+        "96": "images/stardown-96.png",
+        "128": "images/stardown-128.png"
     },
     "browser_action": {
         "default_icon": {
-            "16": "images/icon-16.png",
-            "32": "images/icon-32.png",
-            "48": "images/icon-48.png",
-            "96": "images/icon-96.png",
-            "128": "images/icon-128.png"
+            "16": "images/stardown-16.png",
+            "32": "images/stardown-32.png",
+            "48": "images/stardown-48.png",
+            "96": "images/stardown-96.png",
+            "128": "images/stardown-128.png"
         },
         "default_title": "Stardown",
         "default_popup": "popup.html"
@@ -59,7 +59,7 @@
     "sidebar_action": {
         "default_title": "Stardown",
         "default_panel": "sidebar.html",
-        "default_icon": "images/icon-16.png",
+        "default_icon": "images/stardown-16.png",
         "open_at_install": false
     },
     "commands": {
@@ -81,8 +81,17 @@
         "openSettings": {
             "description": "Open settings"
         },
-        "openGithub": {
-            "description": "Open GitHub"
+        "reportBug": {
+            "description": "Report a bug"
+        },
+        "requestFeature": {
+            "description": "Request a feature"
+        },
+        "discuss": {
+            "description": "Join the discussion"
+        },
+        "openSource": {
+            "description": "See the source code"
         }
     }
 }

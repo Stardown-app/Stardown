@@ -29,6 +29,16 @@ export async function sleep(ms) {
 }
 
 /**
+ * getShortcutInstructions returns instructions for managing extension shortcuts.
+ * @returns {string}
+ */
+export function getShortcutInstructions() {
+    return `See <a href="https://support.mozilla.org/en-US/kb/manage-extension-shortcuts-firefox" target="_blank">
+        Manage extension shortcuts in Firefox
+        </a>`;
+}
+
+/**
  * createContextMenus creates the context menu options.
  * @param {string} markupLanguage - the markup language the user chose.
  * @returns {void}

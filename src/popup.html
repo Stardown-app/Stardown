@@ -68,6 +68,23 @@
         cursor: pointer;
         margin-left: 5px;
       }
+
+      table {
+        margin: 0 auto;
+        border-collapse: collapse;
+      }
+
+      tr.firstOfSection {
+        border-top: 1px solid #dbdbdb;
+      }
+
+      tr.firstOfSection td {
+        padding-top: 10px;
+      }
+
+      tr.lastOfSection td {
+        padding-bottom: 10px;
+      }
     </style>
   </head>
 
@@ -97,11 +114,11 @@
           <td><button id="sidebarButton"><img src="./images/sidebar.svg" /></button></td>
           <td><label for="sidebarButton">Notepad</label></td>
         </tr>
-        <tr>
+        <tr class="lastOfSection">
           <td><button id="settingsButton"><img src="./images/settings.svg" /></button></td>
           <td><label for="settingsButton">Settings</label></td>
         </tr>
-        <tr>
+        <tr class="firstOfSection">
           <td><button id="reportBugButton"><img src="./images/bug.svg" /></button></td>
           <td><label for="reportBugButton">Report a bug</label></td>
         </tr>

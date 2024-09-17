@@ -36,10 +36,20 @@ notepad.addEventListener('input', () => {
 });
 
 browser.runtime.onMessage.addListener(message => {
-    if (message.type === 'appendToNotepad') {
-        notepad.value += message.text;
-        notepad.scrollTop = notepad.scrollHeight; // scroll down if possible
-        browser.storage.sync.set({ notepadContent: notepad.value });
+    switch (message.category) {
+        case 'sendToNotepad':
+            let text = message.text;
+            if (text.endsWith('\n')) {
+                text = text.slice(0, -1); // Remove trailing newline
+            }
+            const start = notepad.selectionStart;
+            const end = notepad.selectionEnd;
+            notepad.value = notepad.value.slice(0, start) + text + notepad.value.slice(end);
+            browser.storage.sync.set({ notepadContent: notepad.value });
+            break;
+        default:
+            console.error(`Unknown message category: ${message.category}`);
+            throw new Error(`Unknown message category: ${message.category}`);
     }
 });
 

@@ -21,16 +21,13 @@ import { htmlToMd, mdEncodeUri } from './converters/md.js';
 import { htmlToMdAndHtml } from './converters/mdAndHtml.js';
 
 /**
- * appendToNotepad sends text to Stardown's sidebar notepad to be appended.
+ * sendToNotepad sends text to Stardown's sidebar notepad to be inserted.
  * @param {string} text
  * @returns {Promise<void>}
  */
-export async function appendToNotepad(text) {
-    while (!text.endsWith('\n\n')) {
-        text += '\n';
-    }
+export async function sendToNotepad(text) {
     browser.runtime.sendMessage({
-        type: 'appendToNotepad',
+        category: 'sendToNotepad',
         text: text,
     });
 }
@@ -53,11 +50,11 @@ export async function createText(title, url, selection) {
             case 'markdown':
             case 'markdown with some html':
                 const mdLink = await md.createLink(title, url);
-                await appendToNotepad(mdLink);
+                await sendToNotepad(mdLink);
                 return mdLink;
             case 'html':
                 const htmlLink = `<a href="${url}">${title}</a>`;
-                await appendToNotepad(htmlLink);
+                await sendToNotepad(htmlLink);
                 return htmlLink;
             default:
                 console.error(`Unknown markupLanguage: ${markupLanguage}`);
@@ -69,7 +66,7 @@ export async function createText(title, url, selection) {
         /** @type {DocumentFragment|null} */
         const frag = await getSelectionFragment(selection);
         if (frag === null) {
-            await appendToNotepad(selectedText);
+            await sendToNotepad(selectedText);
             return selectedText;
         }
         // make any links absolute
@@ -80,7 +77,7 @@ export async function createText(title, url, selection) {
         const div = document.createElement('div');
         div.appendChild(frag.cloneNode(true));
         const result = div.innerHTML || selectedText;
-        await appendToNotepad(result);
+        await sendToNotepad(result);
         return result;
     }
 
@@ -97,27 +94,27 @@ export async function createText(title, url, selection) {
             ) + '\n';
         case 'source':
             const srcMd = await getSourceFormatMd(selection, selectedText, markupLanguage);
-            await appendToNotepad(srcMd);
+            await sendToNotepad(srcMd);
             return srcMd;
         case 'template':
             const templateMd = await getTemplatedMd(
                 title, url, selection, selectedText, markupLanguage,
             );
-            await appendToNotepad(templateMd);
+            await sendToNotepad(templateMd);
             return templateMd;
         case 'blockquote with link':
             const body = await getSourceFormatMd(selection, selectedText, markupLanguage);
             const blockquote = await md.createBlockquote(body, title, url) + '\n';
-            await appendToNotepad(blockquote);
+            await sendToNotepad(blockquote);
             return blockquote;
         case 'link with selection as title':
             selectedText = selectedText.replaceAll('\r\n', ' ').replaceAll('\n', ' ');
             const link = await md.createLink(selectedText, url);
-            await appendToNotepad(link);
+            await sendToNotepad(link);
             return link;
         case 'link with page title as title':
             const link2 = await md.createLink(title, url);
-            await appendToNotepad(link2);
+            await sendToNotepad(link2);
             return link2;
         default:
             console.error(`Unknown mdSelectionFormat: ${mdSelectionFormat}`);
@@ -249,7 +246,7 @@ async function getSourceFormatMdWithLink(title, url, selection, selectedText, ma
     /** @type {DocumentFragment} */
     const frag = await getSelectionFragment(selection);
     if (frag === null) {
-        await appendToNotepad(selectedText);
+        await sendToNotepad(selectedText);
         return alert + '\n\n' + selectedText;
     }
 
@@ -263,7 +260,7 @@ async function getSourceFormatMdWithLink(title, url, selection, selectedText, ma
         throw new Error(`Unknown markupLanguage: ${markupLanguage}`);
     }
 
-    await appendToNotepad(text);
+    await sendToNotepad(text);
     return alert + '\n\n' + text;
 }
 

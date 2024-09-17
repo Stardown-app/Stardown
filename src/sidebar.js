@@ -38,13 +38,12 @@ notepad.addEventListener('input', () => {
 browser.runtime.onMessage.addListener(message => {
     switch (message.category) {
         case 'sendToNotepad':
-            let text = message.text;
-            if (text.endsWith('\n')) {
-                text = text.slice(0, -1); // Remove trailing newline
-            }
-            const start = notepad.selectionStart;
-            const end = notepad.selectionEnd;
-            notepad.value = notepad.value.slice(0, start) + text + notepad.value.slice(end);
+            const newText = '\n\n' + message.text.trim() + '\n\n';
+
+            const before = notepad.value.slice(0, notepad.selectionStart).trimEnd();
+            const after = notepad.value.slice(notepad.selectionEnd).trimStart();
+
+            notepad.value = (before + newText + after).trim();
             browser.storage.sync.set({ notepadContent: notepad.value });
             break;
         default:

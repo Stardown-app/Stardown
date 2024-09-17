@@ -98,6 +98,11 @@ browser.runtime.onMessage.addListener(async (message, sender, sendResponse) => {
             // Chromium only
             browser.sidePanel?.open({ windowId: windowId });
             break;
+        case 'reportBugButtonPressed':
+            browser.tabs.create({
+                url: 'https://github.com/Stardown-app/Stardown/issues'
+            });
+            break;
         case 'githubButtonPressed':
             browser.tabs.create({
                 url: 'https://github.com/Stardown-app/Stardown?tab=readme-ov-file#-stardown'

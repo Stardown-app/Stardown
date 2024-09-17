@@ -108,6 +108,11 @@ browser.runtime.onMessage.addListener(async (message, sender, sendResponse) => {
                 url: 'https://github.com/Stardown-app/Stardown/issues'
             });
             break;
+        case 'discussButtonPressed':
+            browser.tabs.create({
+                url: 'https://github.com/Stardown-app/Stardown/discussions'
+            });
+            break;
         case 'githubButtonPressed':
             browser.tabs.create({
                 url: 'https://github.com/Stardown-app/Stardown?tab=readme-ov-file#-stardown'

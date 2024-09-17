@@ -28,7 +28,7 @@ This project uses [JSDoc](https://en.wikipedia.org/wiki/JSDoc) to annotate types
 
 ## How Stardown works
 
-If you want to read a broad overview of how the most important parts of Stardown works, see [./how-it-works.md](./how-it-works.md).
+If you want to read a broad overview of how Stardown works, see [./how-it-works.md](./how-it-works.md).
 
 Stardown converts HTML to other formats using custom code explained in [../src/converters/README.md](../src/converters/README.md).
 

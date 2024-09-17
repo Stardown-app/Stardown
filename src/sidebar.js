@@ -22,7 +22,7 @@ const notepad = document.getElementById('notepad');
 
 browser.commands.getAll().then(cmds => {
     const copyShortcut = cmds.find(cmd => cmd.name === 'copy')?.shortcut || 'Alt+C';
-    notepad.placeholder = `Press ${copyShortcut} to copy to here...`;
+    notepad.placeholder = `Press ${copyShortcut} to copy and paste.`;
 });
 
 // load the notepad content when the page loads
@@ -38,13 +38,12 @@ notepad.addEventListener('input', () => {
 browser.runtime.onMessage.addListener(message => {
     switch (message.category) {
         case 'sendToNotepad':
-            let text = message.text;
-            if (text.endsWith('\n')) {
-                text = text.slice(0, -1); // Remove trailing newline
-            }
-            const start = notepad.selectionStart;
-            const end = notepad.selectionEnd;
-            notepad.value = notepad.value.slice(0, start) + text + notepad.value.slice(end);
+            const newText = '\n\n' + message.text.trim() + '\n\n';
+
+            const before = notepad.value.slice(0, notepad.selectionStart).trimEnd();
+            const after = notepad.value.slice(notepad.selectionEnd).trimStart();
+
+            notepad.value = (before + newText + after).trim();
             browser.storage.sync.set({ notepadContent: notepad.value });
             break;
         default:

@@ -21,8 +21,8 @@
 
 <p align="center"><img alt="demo gif" src="https://github.com/Stardown-app/assets/blob/main/Stardown.gif"></p>
 
-* Press `Alt+C` to **c**opy a selection or a page's link.
-* Press `Alt+N` to open a **n**otepad that copying with `Alt+C` automatically pastes into.
+* Press `Alt+C` to copy a selection or a page's link.
+* Press `Alt+N` to open a notepad that copying with `Alt+C` automatically pastes into.
 * Right-click part of a page to copy it as markdown. Select before right-clicking to copy multiple parts.
 * Copy links for all tabs. Select tabs first to copy links for only those tabs.
 * Customize these features including keyboard shortcuts in Stardown's settings.
@@ -33,27 +33,19 @@ Stardown is free except that if you get it from Apple's App Store, there is a sm
 
 ## Privacy
 
-Stardown will never sell any data to anyone, and does not collect nor send any of your personal data anywhere besides putting markdown text into your clipboard.
+Stardown will never sell any data to anyone, and does not collect nor send any of your personal data anywhere. What you copy with Stardown is stored locally in your device's clipboard and/or locally in Stardown's notepad.
 
 ## Permissions
 
 For why Stardown requests the permissions that it does, see [./docs/permissions.md](./docs/permissions.md).
 
-## Troubleshooting and reporting bugs
-
-See [./docs/troubleshooting.md](./docs/troubleshooting.md)
-
-## Install from source
-
-See [./docs/install-from-source.md](./docs/install-from-source.md)
-
 ## Development
 
 Contributions are welcome! Let me know (such as in [an issue](https://github.com/Stardown-app/Stardown/issues) or [a discussion](https://github.com/Stardown-app/Stardown/discussions)) what you have in mind ahead of time if you think there's a chance it won't be approved.
 
-Also, please read [./docs/develop.md](docs/develop.md)
+Also, please read [./docs/develop.md](docs/develop.md).
 
-## Feature requests and alternatives
+## Alternatives
 
 You're welcome to [make a feature request](https://github.com/Stardown-app/Stardown/issues/new?assignees=&labels=enhancement&projects=&template=feature_request.md&title=), and there may already be other software that meets all of your needs. I am not affiliated with any of the alternatives below unless noted otherwise and have not tried all of them; use them at your own risk.
 

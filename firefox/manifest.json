@@ -81,8 +81,8 @@
         "openSettings": {
             "description": "Open settings"
         },
-        "openGithub": {
-            "description": "Open GitHub"
+        "openSource": {
+            "description": "See the source code"
         }
     }
 }

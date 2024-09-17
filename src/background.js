@@ -53,9 +53,9 @@ browser.commands.onCommand.addListener(async command => {
         case 'openSettings':
             browser.runtime.openOptionsPage();
             break;
-        case 'openGithub':
+        case 'openSource':
             browser.tabs.create({
-                url: 'https://github.com/Stardown-app/Stardown?tab=readme-ov-file#-stardown'
+                url: 'https://github.com/Stardown-app/Stardown'
             });
             break;
         default:
@@ -113,9 +113,9 @@ browser.runtime.onMessage.addListener(async (message, sender, sendResponse) => {
                 url: 'https://github.com/Stardown-app/Stardown/discussions'
             });
             break;
-        case 'githubButtonPressed':
+        case 'sourceButtonPressed':
             browser.tabs.create({
-                url: 'https://github.com/Stardown-app/Stardown?tab=readme-ov-file#-stardown'
+                url: 'https://github.com/Stardown-app/Stardown'
             });
             break;
         case 'settingsButtonPressed':

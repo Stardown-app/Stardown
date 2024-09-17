@@ -20,42 +20,90 @@
 
   <head>
     <style>
+      body {
+        background-color: #3c3c3c;
+        color: #dbdbdb;
+      }
+
       main {
         justify-content: center;
         align-items: center;
         text-align: center;
+      }
+
+      h2 {
+        color: #00ddff;
+      }
+
+      header {
+        margin-left: 10px;
+        margin-right: 10px;
+      }
+
+      header a {
+        display: flex;
+        align-items: center;
+        text-decoration: none;
+      }
+
+      header img {
+        margin-right: 10px;
+      }
+
+      table td {
+        text-align: left;
+      }
+
+      button {
+        background: none;
+        border: none;
+        cursor: pointer;
+      }
+
+      button:hover {
+        opacity: 0.7;
+      }
+
+      label {
+        cursor: pointer;
+        margin-left: 5px;
       }
     </style>
   </head>
 
   <body>
     <main>
-      <h2>Stardown</h2>
+      <header>
+        <a href="https://github.com/Stardown-app/Stardown">
+          <img src="./images/icon-32.png" alt="Stardown's Icon" />
+          <h2>Stardown</h2>
+        </a>
+      </header>
 
       <table role="presentation">
         <tr>
-          <td><button id="copyButton" title="Copy"><img src="./images/copy.svg" /></button></td>
-          <td><label for="copyButton" id="copyShortcut">Alt+C</label></td>
+          <td><button id="copyButton"><img src="./images/copy.svg" /></button></td>
+          <td><label for="copyButton">Copy</label></td>
         </tr>
         <tr>
           <td>
-            <button id="copyMultipleButton" title="Copy multiple tabs">
+            <button id="copyMultipleButton">
               <img src="./images/copy-multiple.svg" />
             </button>
           </td>
-          <td><label for="copyMultipleButton" id="copyMultipleShortcut"></label></td>
+          <td><label for="copyMultipleButton">Copy multiple tabs</label></td>
         </tr>
         <tr>
-          <td><button id="sidebarButton" title="Notepad"><img src="./images/sidebar.svg" /></button></td>
-          <td><label for="sidebarButton" id="sidebarShortcut">Alt+N</label></td>
+          <td><button id="sidebarButton"><img src="./images/sidebar.svg" /></button></td>
+          <td><label for="sidebarButton">Notepad</label></td>
         </tr>
         <tr>
-          <td><button id="settingsButton" title="Settings"><img src="./images/settings.svg" /></button></td>
-          <td><label for="settingsButton" id="settingsShortcut"></label></td>
+          <td><button id="settingsButton"><img src="./images/settings.svg" /></button></td>
+          <td><label for="settingsButton">Settings</label></td>
         </tr>
         <tr>
-          <td><button id="githubButton" title="GitHub"><img src="./images/github.svg" /></button></td>
-          <td><label for="githubButton" id="githubShortcut"></label></td>
+          <td><button id="githubButton"><img src="./images/github.svg" /></button></td>
+          <td><label for="githubButton">GitHub repo</label></td>
         </tr>
       </table>
     </main>

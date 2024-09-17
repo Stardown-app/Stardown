@@ -18,11 +18,17 @@ if (typeof browser === 'undefined') {
     var browser = chrome;
 }
 
-document.querySelector('#copyButton').addEventListener('click', async () => {
+const copyButton = document.querySelector('#copyButton');
+const copyMultipleButton = document.querySelector('#copyMultipleButton');
+const sidebarButton = document.querySelector('#sidebarButton');
+const settingsButton = document.querySelector('#settingsButton');
+const githubButton = document.querySelector('#githubButton');
+
+copyButton.addEventListener('click', async () => {
     browser.runtime.sendMessage({ category: 'copyButtonPressed' });
 });
 
-document.querySelector('#copyMultipleButton').addEventListener('click', async () => {
+copyMultipleButton.addEventListener('click', async () => {
     let havePerm;
     try {
         // The permissions request must be the first async function call in the event
@@ -47,20 +53,21 @@ document.querySelector('#copyMultipleButton').addEventListener('click', async ()
     browser.runtime.sendMessage({ category: 'copyMultipleButtonPressed' });
 });
 
-document.querySelector('#sidebarButton').addEventListener('click', async () => {
+sidebarButton.addEventListener('click', async () => {
     if (browser.sidebarAction) {
         // Firefox only
         await browser.sidebarAction.toggle();
     } else {
+        // Chromium only
         browser.runtime.sendMessage({ category: 'sidebarButtonPressed' });
     }
 });
 
-document.querySelector('#settingsButton').addEventListener('click', async () => {
+settingsButton.addEventListener('click', async () => {
     browser.runtime.sendMessage({ category: 'settingsButtonPressed' });
 });
 
-document.querySelector('#githubButton').addEventListener('click', async () => {
+githubButton.addEventListener('click', async () => {
     browser.runtime.sendMessage({ category: 'githubButtonPressed' });
 });
 
@@ -76,19 +83,19 @@ async function loadCommands() {
     const githubCmd = cmds.find(cmd => cmd.name === 'openGithub');
 
     if (copyCmd) {
-        document.querySelector('#copyShortcut').textContent = copyCmd.shortcut || '';
+        copyButton.title = copyCmd.shortcut || '(no keyboard shortcut set)';
     }
     if (copyMultipleCmd) {
-        document.querySelector('#copyMultipleShortcut').textContent = copyMultipleCmd.shortcut || '';
+        copyMultipleButton.title = copyMultipleCmd.shortcut || '(no keyboard shortcut set)';
     }
     if (sidebarCmd) {
-        document.querySelector('#sidebarShortcut').textContent = sidebarCmd.shortcut || '';
+        sidebarButton.title = sidebarCmd.shortcut || '(no keyboard shortcut set)';
     }
     if (settingsCmd) {
-        document.querySelector('#settingsShortcut').textContent = settingsCmd.shortcut || '';
+        settingsButton.title = settingsCmd.shortcut || '(no keyboard shortcut set)';
     }
     if (githubCmd) {
-        document.querySelector('#githubShortcut').textContent = githubCmd.shortcut || '';
+        githubButton.title = githubCmd.shortcut || '(no keyboard shortcut set)';
     }
 }
 

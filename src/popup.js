@@ -23,6 +23,7 @@ const copyMultipleButton = document.querySelector('#copyMultipleButton');
 const sidebarButton = document.querySelector('#sidebarButton');
 const settingsButton = document.querySelector('#settingsButton');
 const reportBugButton = document.querySelector('#reportBugButton');
+const requestFeatureButton = document.querySelector('#requestFeatureButton');
 const githubButton = document.querySelector('#githubButton');
 
 copyButton.addEventListener('click', async () => {
@@ -72,6 +73,10 @@ reportBugButton.addEventListener('click', async () => {
     browser.runtime.sendMessage({ category: 'reportBugButtonPressed' });
 });
 
+requestFeatureButton.addEventListener('click', async () => {
+    browser.runtime.sendMessage({ category: 'requestFeatureButtonPressed' });
+});
+
 githubButton.addEventListener('click', async () => {
     browser.runtime.sendMessage({ category: 'githubButtonPressed' });
 });
@@ -86,6 +91,7 @@ async function loadCommands() {
     );
     const settingsCmd = cmds.find(cmd => cmd.name === 'openSettings');
     const reportBugCmd = cmds.find(cmd => cmd.name === 'reportBug');
+    const requestFeatureCmd = cmds.find(cmd => cmd.name === 'requestFeature');
     const githubCmd = cmds.find(cmd => cmd.name === 'openGithub');
 
     if (copyCmd) {
@@ -102,6 +108,9 @@ async function loadCommands() {
     }
     if (reportBugCmd) {
         reportBugButton.title = reportBugCmd.shortcut || '(no keyboard shortcut set)';
+    }
+    if (requestFeatureCmd) {
+        requestFeatureButton.title = requestFeatureCmd.shortcut || '(no keyboard shortcut set)';
     }
     if (githubCmd) {
         githubButton.title = githubCmd.shortcut || '(no keyboard shortcut set)';

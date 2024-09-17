@@ -81,6 +81,15 @@
         "openSettings": {
             "description": "Open settings"
         },
+        "reportBug": {
+            "description": "Report a bug"
+        },
+        "requestFeature": {
+            "description": "Request a feature"
+        },
+        "discuss": {
+            "description": "Join the discussion"
+        },
         "openSource": {
             "description": "See the source code"
         }

@@ -24,7 +24,7 @@ A clear and concise description of what you expected to happen.
 If applicable, add screenshots to help explain your problem.
 
 **Environment**
-- Stardown's version (in the options page): [e.g. v0.1.5]
+- Stardown's version (in the settings page): [e.g. v0.1.5]
 - OS: [e.g. Windows, MacOS, Linux]
 - Browser: [e.g. Chrome, Firefox, Edge]
 - Device: [e.g. mobile, desktop]

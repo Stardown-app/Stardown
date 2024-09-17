@@ -20,8 +20,7 @@ import { getSetting } from './common.js';
 const form = document.querySelector('form');
 
 const markupLanguageEl = document.querySelector('#markupLanguage');
-const doubleClickWindowsEl = document.querySelector('#doubleClickWindows');
-const doubleClickIntervalEl = document.querySelector('#doubleClickInterval');
+const copyTabsWindowsEl = document.querySelector('#copyTabsWindows');
 const createTextFragmentEl = document.querySelector('#createTextFragment');
 const omitNavEl = document.querySelector('#omitNav');
 const omitFooterEl = document.querySelector('#omitFooter');
@@ -47,7 +46,7 @@ initAutosave('markupLanguage', markupLanguageEl, 'value', async () => {
     // send the updated markupLanguage to the background script
     browser.runtime.sendMessage({
         category: 'markupLanguage',
-        markupLanguage: markupLanguageEl.value
+        markupLanguage: markupLanguageEl.value,
     });
 });
 initAutosave('createTextFragment', createTextFragmentEl, 'checked');
@@ -56,13 +55,7 @@ initAutosave('omitFooter', omitFooterEl, 'checked');
 initAutosave('omitHidden', omitHiddenEl, 'checked');
 initAutosave('notifyOnWarning', notifyOnWarningEl, 'checked');
 initAutosave('notifyOnSuccess', notifyOnSuccessEl, 'checked');
-initAutosave('doubleClickWindows', doubleClickWindowsEl, 'value');
-initAutosave('doubleClickInterval', doubleClickIntervalEl, 'value', () => {
-    // send the updated doubleClickInterval to the background script
-    browser.runtime.sendMessage({
-        doubleClickInterval: doubleClickIntervalEl.value
-    });
-});
+initAutosave('copyTabsWindows', copyTabsWindowsEl, 'value');
 
 initAutosave('mdSelectionFormat', mdSelectionFormatEl, 'value');
 initAutosave('mdYoutube', mdYoutubeEl, 'value');
@@ -74,6 +67,7 @@ initAutosave('jsonEmptyCell', jsonEmptyCellEl, 'value');
 initAutosave('jsonDestination', jsonDestinationEl, 'value', () => {
     // send the updated jsonDestination to the background script
     browser.runtime.sendMessage({
+        category: 'jsonDestination',
         jsonDestination: jsonDestinationEl.value
     });
 });
@@ -96,13 +90,12 @@ function initAutosave(settingName, el, valueProperty, then) {
 }
 
 /**
- * loadSettings loads the settings from browser storage into the options page.
+ * loadSettings loads the settings from browser storage into the settings page.
  */
 async function loadSettings() {
     try {
         markupLanguageEl.value = await getSetting('markupLanguage');
-        doubleClickWindowsEl.value = await getSetting('doubleClickWindows');
-        doubleClickIntervalEl.value = await getSetting('doubleClickInterval');
+        copyTabsWindowsEl.value = await getSetting('copyTabsWindows');
         createTextFragmentEl.checked = await getSetting('createTextFragment');
         omitNavEl.checked = await getSetting('omitNav');
         omitFooterEl.checked = await getSetting('omitFooter');
@@ -127,7 +120,7 @@ async function loadSettings() {
 /**
  * resetSettings deletes all settings from browser storage and indicates success. It
  * assumes it's being used as a form event listener for the 'reset' event so that it
- * doesn't have to reset the options page.
+ * doesn't have to reset the settings page.
  */
 async function resetSettings() {
     await browser.storage.sync.clear();

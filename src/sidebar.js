@@ -14,29 +14,37 @@
    limitations under the License.
 */
 
-import { browser } from './config.js';
+if (typeof browser === 'undefined') {
+    var browser = chrome;
+}
+
+const notepad = document.getElementById('notepad');
+
+browser.commands.getAll().then(cmds => {
+    const copyShortcut = cmds.find(cmd => cmd.name === 'copy')?.shortcut || 'Alt+C';
+    notepad.placeholder = `Press ${copyShortcut} to copy to here...`;
+});
+
+// load the notepad content when the page loads
+getSetting('notepadContent').then(content => {
+    notepad.value = content || '';
+});
+
+// save the notepad content when it changes
+notepad.addEventListener('input', () => {
+    browser.storage.sync.set({ notepadContent: notepad.value });
+});
+
+browser.runtime.onMessage.addListener(message => {
+    if (message.type === 'appendToNotepad') {
+        notepad.value += message.text;
+        notepad.scrollTop = notepad.scrollHeight; // scroll down if possible
+        browser.storage.sync.set({ notepadContent: notepad.value });
+    }
+});
 
 const defaultSettings = {
-    markupLanguage: 'markdown',
-    createTextFragment: true,
-    omitNav: true,
-    omitFooter: true,
-    omitHidden: true,
-    notifyOnWarning: false,
-    notifyOnSuccess: false,
-    copyTabsWindows: 'current',
-
-    mdSelectionFormat: 'source with link',
-    mdYoutube: 'almost everywhere',
-    mdSubBrackets: 'underlined',
-    mdBulletPoint: '-',
-    mdSelectionTemplate: `> [!note]
-> from [{{link.title}}]({{link.url}}) on {{date.YYYYMMDD}}
-
-{{selection}}`,
-
-    jsonEmptyCell: 'null',
-    jsonDestination: 'clipboard',
+    notepadContent: '',
 };
 
 /**
@@ -45,7 +53,7 @@ const defaultSettings = {
  * @param {string} name - the name of the setting.
  * @returns {Promise<any>}
  */
-export async function getSetting(name) {
+async function getSetting(name) {
     let obj;
     try {
         obj = await browser.storage?.sync.get(name);

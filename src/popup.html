@@ -1,0 +1,113 @@
+<!-- 
+   Copyright 2024 Chris Wheeler
+
+   Licensed under the Apache License, Version 2.0 (the "License");
+   you may not use this file except in compliance with the License.
+   You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License.
+-->
+
+<!DOCTYPE html>
+
+<html>
+
+  <head>
+    <style>
+      body {
+        background-color: #3c3c3c;
+        color: #dbdbdb;
+      }
+
+      main {
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+      }
+
+      h2 {
+        color: #00ddff;
+      }
+
+      header {
+        margin-left: 10px;
+        margin-right: 10px;
+      }
+
+      header a {
+        display: flex;
+        align-items: center;
+        text-decoration: none;
+      }
+
+      header img {
+        margin-right: 10px;
+      }
+
+      table td {
+        text-align: left;
+      }
+
+      button {
+        background: none;
+        border: none;
+        cursor: pointer;
+      }
+
+      button:hover {
+        opacity: 0.7;
+      }
+
+      label {
+        cursor: pointer;
+        margin-left: 5px;
+      }
+    </style>
+  </head>
+
+  <body>
+    <main>
+      <header>
+        <a href="https://github.com/Stardown-app/Stardown">
+          <img src="./images/icon-32.png" alt="Stardown's Icon" />
+          <h2>Stardown</h2>
+        </a>
+      </header>
+
+      <table role="presentation">
+        <tr>
+          <td><button id="copyButton"><img src="./images/copy.svg" /></button></td>
+          <td><label for="copyButton">Copy</label></td>
+        </tr>
+        <tr>
+          <td>
+            <button id="copyMultipleButton">
+              <img src="./images/copy-multiple.svg" />
+            </button>
+          </td>
+          <td><label for="copyMultipleButton">Copy multiple tabs</label></td>
+        </tr>
+        <tr>
+          <td><button id="sidebarButton"><img src="./images/sidebar.svg" /></button></td>
+          <td><label for="sidebarButton">Notepad</label></td>
+        </tr>
+        <tr>
+          <td><button id="settingsButton"><img src="./images/settings.svg" /></button></td>
+          <td><label for="settingsButton">Settings</label></td>
+        </tr>
+        <tr>
+          <td><button id="githubButton"><img src="./images/github.svg" /></button></td>
+          <td><label for="githubButton">GitHub repo</label></td>
+        </tr>
+      </table>
+    </main>
+    <script src="./popup.js"></script>
+  </body>
+
+</html>

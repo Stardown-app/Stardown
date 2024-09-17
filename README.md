@@ -21,20 +21,15 @@
 
 <p align="center"><img alt="demo gif" src="https://github.com/Stardown-app/assets/blob/main/Stardown.gif"></p>
 
-* Click the extension's icon to copy a link for the current page.
-* Press `Alt+C` to copy a selection or a page's link.
+* Press `Alt+C` to **c**opy a selection or a page's link.
+* Press `Alt+N` to open a **n**otepad that copying with `Alt+C` automatically pastes into.
 * Right-click part of a page to copy it as markdown. Select before right-clicking to copy multiple parts.
-* Double-click the extension's icon or press `Alt+CC` to copy links for all tabs.
-* Select tabs before double-clicking the icon to copy links for only those tabs.
-* Use [the options page](#settings) to customize these features.
-
-By default, the markdown created from a selection includes a link that navigates to the part of the page you selected, when possible. This is accomplished with [text fragments](https://web.dev/articles/text-fragments) and/or HTML element IDs. [Firefox does not support text fragments yet](https://bugzilla.mozilla.org/show_bug.cgi?id=1753933), but the Firefox version of Stardown allows you to create links with text fragments.
+* Copy links for all tabs. Select tabs first to copy links for only those tabs.
+* Customize these features including keyboard shortcuts in Stardown's settings.
 
 <!--
 Stardown is free except that if you get it from Apple's App Store, there is a small fee to help cover the $99 USD per year cost I'm paying to keep Stardown available in the App Store.
 -->
-
-Want to just copy markdown links for pages without installing an extension? You can use this [bookmarklet](https://en.wikipedia.org/wiki/Bookmarklet) instead: `javascript: navigator.clipboard.writeText('[' + document.title + '](' + location.href + ')');`
 
 ## Privacy
 
@@ -43,18 +38,6 @@ Stardown will never sell any data to anyone, and does not collect nor send any o
 ## Permissions
 
 For why Stardown requests the permissions that it does, see [./docs/permissions.md](./docs/permissions.md).
-
-## Settings
-
-To open Stardown's options page, right-click the extension's icon and choose:
-
-* Firefox: "Manange extension" and then "Options"
-* Chrome, Edge, Arc, Brave, Vivaldi, or Opera: "Options" or "Extension options"
-
-### How to change the keyboard shortcut
-
-* [Firefox](https://support.mozilla.org/en-US/kb/manage-extension-shortcuts-firefox)
-* Chrome, Edge, Arc, Brave, Vivaldi, or Opera: `chrome://extensions/shortcuts`
 
 ## Troubleshooting and reporting bugs
 
@@ -72,14 +55,22 @@ Also, please read [./docs/develop.md](docs/develop.md)
 
 ## Feature requests and alternatives
 
-You're welcome to [make a feature request](https://github.com/Stardown-app/Stardown/issues/new?assignees=&labels=enhancement&projects=&template=feature_request.md&title=), and there may already be other software that meets all of your needs. I am not affiliated with any of the alternatives below and have not tried all of them; use them at your own risk.
+You're welcome to [make a feature request](https://github.com/Stardown-app/Stardown/issues/new?assignees=&labels=enhancement&projects=&template=feature_request.md&title=), and there may already be other software that meets all of your needs. I am not affiliated with any of the alternatives below unless noted otherwise and have not tried all of them; use them at your own risk.
+
+### Copy markdown links for pages without installing anything
+
+You can use this [bookmarklet](https://en.wikipedia.org/wiki/Bookmarklet) I made:
+
+`javascript: navigator.clipboard.writeText('[' + document.title + '](' + location.href + ')');`
 
 ### Integrate directly with an editor
 
 * [MarkDownload](https://github.com/deathau/markdownload) was developed by an Obsidian community moderator. While Stardown is great for copying *parts* of web pages as markdown, MarkDownload is better for downloading entire pages, especially if you want to download directly into Obsidian. I use both Stardown and MarkDownload.
 * [Omnivore](https://omnivore.app/) can save content in a variety of formats.
-* [Zotero](https://www.zotero.org/) is one of the best tools for research.
-* [Joplin](https://github.com/laurent22/joplin/blob/dev/readme/apps/clipper.md) has an official web clipper of its own.
+* [linkding](https://github.com/sissbruecker/linkding) is a self-hosted bookmarks manager.
+* [Zotero](https://www.zotero.org/) is one of the best tools for saving and organizing research.
+* [Joplin](https://github.com/laurent22/joplin) has an [official web clipper](https://github.com/laurent22/joplin/blob/dev/readme/apps/clipper.md) of its own.
+* [Send To Logseq](https://chromewebstore.google.com/detail/send-to-logseq/mgdccnefjlmhnfbmlnhddoogimbpmilj) is a browser extension that saves web pages to [Logseq](https://github.com/logseq/logseq?tab=readme-ov-file).
 * [github.com/webclipper/web-clipper](https://github.com/webclipper/web-clipper) can integrate directly with Obsidian, Notion, OneNote, Bear, Yuque, Joplin, and more.
 * [Obsidian Web Clipper Bookmarklet](https://gist.github.com/kepano/90c05f162c37cf730abb8ff027987ca3) is a bookmarklet for saving web pages directly to Obsidian.
 * [Slurp](https://github.com/inhumantsar/slurp) is an Obsidian community plugin and bookmarklet for saving web pages directly to Obsidian.
@@ -88,6 +79,7 @@ You're welcome to [make a feature request](https://github.com/Stardown-app/Stard
 ### Scrape websites
 
 * [Firecrawl](https://github.com/mendableai/firecrawl) is an API and SDKs for scraping websites and saving them as markdown or structured data.
+* [Reader-LM](https://jina.ai/news/reader-lm-small-language-models-for-cleaning-and-converting-html-to-markdown/?nocache=1) is small language models that convert HTML to markdown.
 
 ### Paste structured data
 
@@ -98,10 +90,6 @@ You're welcome to [make a feature request](https://github.com/Stardown-app/Stard
 
 * [url2clipboard](https://github.com/asamuzaK/url2clipboard) supports HTML, Markdown, BBCode, Textile, AsciiDoc, MediaWiki, Jira, reStructuredText, LaTeX, Org Mode, and text.
 * [TabCopy](https://chromewebstore.google.com/detail/tabcopy/micdllihgoppmejpecmkilggmaagfdmb) might only be on the Chrome Web Store, but supports many markup languages including HTML, Markdown, BBCode, CSV, and JSON, and lets you create custom link formats.
-
-### Copy just the titles or just the URLs of all tabs
-
-* [Copy as Markdown](https://github.com/yorkxin/copy-as-markdown) is similar to Stardown but has a popup menu with different options, and different priorities in what markdown it generates.
 
 ### Copy just a URL with a text fragment
 

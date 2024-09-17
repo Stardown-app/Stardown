@@ -19,67 +19,103 @@ import { getSetting } from './common.js';
 import { createTabLink } from './generators/md.js';
 
 let markupLanguage = 'markdown';
-let lastClick = new Date(0);
-let doubleClickInterval = 500;
 let jsonDestination = 'clipboard';
+let windowId = null;
 
 getSetting('markupLanguage').then(value => {
     markupLanguage = value;
     createContextMenus(value);
 });
-getSetting('doubleClickInterval').then(value => doubleClickInterval = value);
 getSetting('jsonDestination').then(value => jsonDestination = value);
-
-browser.action.onClicked.addListener(async (tab) => {
-    const now = new Date();
-    const msSinceLastClick = now - lastClick; // milliseconds
-    const isDoubleClick = msSinceLastClick < doubleClickInterval;
-    if (isDoubleClick) {
-        let havePerm;
-        try {
-            // The permissions request must be the first async function call in the
-            // event handler or it will throw an error.
-            havePerm = await browser.permissions.request({ permissions: ['tabs'] });
-        } catch (err) {
-            await showStatus(0, 'Error', err.message);
-            return;
-        }
-        if (!havePerm) {
-            await showStatus(0, 'Error', 'Unable to copy links for multiple tabs without permission');
-            return;
-        }
-
-        lastClick = new Date(0);
-        await handleIconDoubleClick(tab);
-        return;
+browser.tabs.query({ currentWindow: true, active: true }).then(tabs => {
+    windowId = tabs[0].windowId;
+});
+browser.windows.onFocusChanged.addListener(async windowId_ => {
+    if (windowId_ !== -1) {
+        windowId = windowId_;
     }
-    // it's a single-click
-    lastClick = now;
+});
 
-    await handleInteraction(tab, { category: 'iconSingleClick' });
+browser.commands.onCommand.addListener(async command => {
+    switch (command) {
+        case 'openSidePanel':
+            // Chromium only
+            browser.sidePanel.open({ windowId: windowId });
+            break;
+        case 'copy':
+            const tabs = await browser.tabs.query({ active: true, currentWindow: true });
+            await handleInteraction(tabs[0], { category: 'copyShortcut' });
+            break;
+        case 'copyMultiple':
+            const tabs1 = await browser.tabs.query({ active: true, currentWindow: true });
+            await handleCopyAllTabs(tabs1[0]);
+            break;
+        case 'openSettings':
+            browser.runtime.openOptionsPage();
+            break;
+        case 'openGithub':
+            browser.tabs.create({
+                url: 'https://github.com/Stardown-app/Stardown?tab=readme-ov-file#-stardown'
+            });
+            break;
+        default:
+            console.error(`Unknown command: ${command}`);
+            throw new Error(`Unknown command: ${command}`);
+    }
 });
 
 browser.runtime.onMessage.addListener(async (message, sender, sendResponse) => {
-    if (message.context) {
-        // These context menu updates are done with messages from a content script
-        // because the contextMenus.update method cannot update a context menu that is
-        // already open. The content script listens for mouseover and mouseup events.
-        await updateContextMenu(message.context, markupLanguage);
-    } else if (message.markupLanguage) {
-        markupLanguage = message.markupLanguage;
-        updateContextMenuLanguage(markupLanguage);
-    } else if (message.doubleClickInterval) {
-        doubleClickInterval = message.doubleClickInterval;
-    } else if (message.jsonDestination) {
-        jsonDestination = message.jsonDestination;
-    } else if (message.downloadFile) {
-        await downloadFile(message.downloadFile);
-    } else if (message.warning) {
-        console.warn(`Warning: ${message.warning}`);
-        const notifyOnWarning = await getSetting('notifyOnWarning');
-        if (notifyOnWarning) {
-            await showNotification('Warning', message.warning);
-        }
+    switch (message.category) {
+        case 'updateContextMenu':
+            // These context menu updates are done with messages from the content script
+            // because the contextMenus.update method cannot update a context menu that
+            // is already open. The content script listens for mouseover and mouseup
+            // events.
+            await updateContextMenu(message.context, markupLanguage);
+            break;
+        case 'downloadFile':
+            await downloadFile(message.file);
+            break;
+        case 'showStatus':
+            await showStatus(message.status, message.notifTitle, message.notifBody);
+            break;
+        case 'showWarning':
+            console.warn(message.warning);
+            const notifyOnWarning = await getSetting('notifyOnWarning');
+            if (notifyOnWarning) {
+                await showNotification('Warning', message.warning);
+            }
+            break;
+        case 'copyButtonPressed':
+            const tabs = await browser.tabs.query({ active: true, currentWindow: true });
+            await handleInteraction(tabs[0], { category: 'copyShortcut' });
+            break;
+        case 'copyMultipleButtonPressed':
+            const tabs1 = await browser.tabs.query({ active: true, currentWindow: true });
+            await handleCopyAllTabs(tabs1[0]);
+            break;
+        case 'sidebarButtonPressed':
+            // Chromium only
+            browser.sidePanel?.open({ windowId: windowId });
+            break;
+        case 'githubButtonPressed':
+            browser.tabs.create({
+                url: 'https://github.com/Stardown-app/Stardown?tab=readme-ov-file#-stardown'
+            });
+            break;
+        case 'settingsButtonPressed':
+            browser.runtime.openOptionsPage();
+            break;
+        case 'markupLanguage':
+            markupLanguage = message.markupLanguage;
+            updateContextMenuLanguage(markupLanguage);
+            break;
+        case 'jsonDestination':
+            jsonDestination = message.jsonDestination;
+            break;
+        default:
+            console.error(`Unknown message category: ${message.category}`);
+            throw new Error(`Unknown message category: ${message.category}`);
     }
 });
 
@@ -96,7 +132,7 @@ browser.contextMenus.onClicked.addListener(async (info, tab) => {
             );
             break;
         case 'link':
-            // In Chromium, unlike in Firefox, `info.linkText` is undefined and no
+            // In Chromium unlike in Firefox, `info.linkText` is undefined and no
             // property in `info` has the link's text.
             await handleInteraction(
                 tab, { category: 'linkRightClick', linkUrl: info.linkUrl },
@@ -118,27 +154,21 @@ browser.contextMenus.onClicked.addListener(async (info, tab) => {
             );
             break;
         case 'markdownTable':
-            console.log('markdownTableRightClick in background.js');
             await handleInteraction(
                 tab, { category: 'markdownTableRightClick' }, { frameId: info.frameId },
             );
             break;
         case 'tsvTable':
-            console.log('tsvTableRightClick in background.js');
-            const id = Math.random(); // why: https://github.com/Stardown-app/Stardown/issues/98
             await handleInteraction(
-                tab, { category: 'tsvTableRightClick', id: id }, { frameId: info.frameId },
+                tab, { category: 'tsvTableRightClick' }, { frameId: info.frameId },
             );
             break;
         case 'csvTable':
-            console.log('csvTableRightClick in background.js');
-            const id2 = Math.random(); // why: https://github.com/Stardown-app/Stardown/issues/98
             await handleInteraction(
-                tab, { category: 'csvTableRightClick', id: id2 }, { frameId: info.frameId },
+                tab, { category: 'csvTableRightClick' }, { frameId: info.frameId },
             );
             break;
         case 'jsonTable':
-            console.log('jsonTableRightClick in background.js');
             if (jsonDestination === 'file') {
                 let havePerm;
                 try {
@@ -155,13 +185,11 @@ browser.contextMenus.onClicked.addListener(async (info, tab) => {
                 }
             }
 
-            const id3 = Math.random(); // why: https://github.com/Stardown-app/Stardown/issues/98
             await handleInteraction(
-                tab, { category: 'jsonTableRightClick', id: id3 }, { frameId: info.frameId },
+                tab, { category: 'jsonTableRightClick' }, { frameId: info.frameId },
             );
             break;
         case 'htmlTable':
-            console.log('htmlTableRightClick in background.js');
             await handleInteraction(
                 tab, { category: 'htmlTableRightClick' }, { frameId: info.frameId },
             );
@@ -181,13 +209,16 @@ browser.contextMenus.onClicked.addListener(async (info, tab) => {
  * @param {string} message.category - the category of the message.
  * @param {object} options - the options for the message. For example, the `frameId`
  * option can be used to specify the frame to send the message to.
+ * @param {number} successStatus - the status to show if the operation was successful.
  * @returns {Promise<void>}
  */
-async function handleInteraction(tab, message, options = {}) {
+async function handleInteraction(tab, message, options = {}, successStatus = 1) {
     if (tab.url.endsWith('.pdf')) {
         await showStatus(0, 'Error', 'Stardown cannot run on PDFs');
         return;
     }
+
+    message.id = Math.random(); // why: https://github.com/Stardown-app/Stardown/issues/98
 
     let status, notifTitle, notifBody;
     try {
@@ -207,29 +238,34 @@ async function handleInteraction(tab, message, options = {}) {
         await showStatus(0, 'Error', err.message);
         return;
     }
-    await showStatus(status, notifTitle, notifBody);
+    if (status === 1) { // success
+        await showStatus(successStatus, notifTitle, notifBody);
+    } else { // failure
+        await showStatus(status, notifTitle, notifBody);
+    }
 }
 
 /**
- * handleIconDoubleClick handles the user double-clicking the extension's icon by
- * creating a markdown list of links and sending it to the content script to be copied.
- * A status indicator is then shown to the user.
- * @param {any} activeTab - the tab that was active when the icon was double-clicked.
+ * handleCopyAllTabs handles a request from the user to create a markdown list of links,
+ * and sends it to the content script to be copied. A status indicator is then shown
+ * to the user.
+ * @param {any} activeTab
  * @returns {Promise<void>}
  */
-async function handleIconDoubleClick(activeTab) {
+async function handleCopyAllTabs(activeTab) {
     // figure out which tabs to create links for
     let tabs = await browser.tabs.query({ currentWindow: true, highlighted: true });
     if (tabs.length === 1) { // if only one tab is highlighted
         // get unhighlighted tabs
-        const doubleClickWindows = await getSetting('doubleClickWindows');
-        if (doubleClickWindows === 'current') {
+        const copyTabsWindows = await getSetting('copyTabsWindows');
+        if (copyTabsWindows === 'current') {
             tabs = await browser.tabs.query({ currentWindow: true });
-        } else if (doubleClickWindows === 'all') {
+        } else if (copyTabsWindows === 'all') {
             tabs = await browser.tabs.query({});
         }
     }
 
+    // create the links
     let text = '';
     switch (markupLanguage) {
         case 'html':
@@ -255,37 +291,30 @@ async function handleIconDoubleClick(activeTab) {
             return;
     }
 
-    const {
-        status, notifTitle, notifBody,
-    } = await browser.tabs.sendMessage(activeTab.id, {
-        category: 'copy', text: text,
-    });
-
-    if (status === 0) { // failure
-        await showStatus(0, notifTitle, notifBody);
-    } else { // success
-        await showStatus(tabs.length, notifTitle, notifBody);
-    }
+    const message = { category: 'copyText', text: text };
+    const options = {};
+    await handleInteraction(activeTab, message, options, tabs.length);
 }
 
 /**
  * downloadFile downloads a file to the user's computer. This must be in the background
  * script because `browser.downloads` appears to always be undefined in content scripts.
  * @param {object} fileObj - the object containing info about a file to download.
- * @param {string} fileObj.filename - the name of the file to download.
+ * @param {string} fileObj.name - the name of the file to download.
+ * @param {string} fileObj.type - the type of the file to download.
  * @param {string|undefined} fileObj.json - the content of the file to download if the
  * file is JSON.
  * @returns {Promise<void>}
  */
 async function downloadFile(fileObj) {
-    if (fileObj.json) {
+    if (fileObj.type === 'json' && fileObj.json) {
         const json = fileObj.json;
         const blob = new Blob([json], { type: 'application/json' });
         const url = URL.createObjectURL(blob);
-        const filename = fileObj.filename || 'file.json';
+        const name = fileObj.name || 'file.json';
         await browser.downloads.download({
             url: url,
-            filename: filename,
+            filename: name,
             saveAs: true,
             conflictAction: 'uniquify',
         }).then(

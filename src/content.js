@@ -68,11 +68,17 @@ function setUpListeners() {
         // contain the first of those that was detected.
         const s = window.getSelection();
         if (s && s.type === 'Range') {
-            browser.runtime.sendMessage({ context: { mouseover: 'selection' } });
+            browser.runtime.sendMessage({
+                category: 'updateContextMenu', context: { mouseover: 'selection' },
+            });
         } else if (event.target.nodeName === 'IMG') {
-            browser.runtime.sendMessage({ context: { mouseover: 'image' } });
+            browser.runtime.sendMessage({
+                category: 'updateContextMenu', context: { mouseover: 'image' },
+            });
         } else if (event.target.nodeName === 'A') {
-            browser.runtime.sendMessage({ context: { mouseover: 'link' } });
+            browser.runtime.sendMessage({
+                category: 'updateContextMenu', context: { mouseover: 'link' },
+            });
         }
     });
 
@@ -90,7 +96,9 @@ function setUpListeners() {
         const isTable = frag?.firstChild?.nodeName === 'TABLE';
         if (isTable) {
             tableSelection = selection;
-            browser.runtime.sendMessage({ context: { mouseup: 'table' } });
+            browser.runtime.sendMessage({
+                category: 'updateContextMenu', context: { mouseup: 'table' },
+            });
         } else {
             tableSelection = null;
         }
@@ -100,7 +108,9 @@ function setUpListeners() {
         // This event listener detects when the user has deselected a table and sends a
         // message to the background script so it can load the correct context menu
         // items.
-        browser.runtime.sendMessage({ context: { selectionchange: 'selection' } });
+        browser.runtime.sendMessage({
+            category: 'updateContextMenu', context: { selectionchange: 'selection' },
+        });
     });
 
     document.addEventListener('contextmenu', (event) => {
@@ -142,17 +152,18 @@ window.onload = setUpListeners;
 // window.onload, the content script will not be able to receive messages and an error
 // message will appear: "Error: Could not establish connection. Receiving end does not
 // exist." Firefox also requires setUpListeners to NOT be called in window.onload, or
-// else clicking Stardown's icon for some sites will show the error message "Clipboard
-// write is not allowed" even though writing to the clipboard is still successful. The
-// bundle script should comment out the `window.onload` assignment for Firefox.
+// else pressing Stardown's copy shortcut for some sites will show the error message
+// "Clipboard write is not allowed" even though writing to the clipboard is still
+// successful. The bundle script should comment out the `window.onload` assignment for
+// Firefox.
 setUpListeners();
 
 /**
  * lastRequestId is the ID of the last request sent from background.js to content.js. It
- * is used by certain request categories to prevent duplicate requests from being
- * processed. This is necessary because Chromium sometimes duplicates requests for some
- * reason, which can cause the wrong output configuration to be used if not handled
- * carefully.
+ * is used to prevent duplicate requests from being processed. This is necessary because
+ * Chromium duplicates requests for some reason, which can cause the wrong output
+ * configuration to be used if not handled carefully. More details in
+ * https://github.com/Stardown-app/Stardown/issues/98.
  * @type {number|null}
  */
 let lastRequestId = null;
@@ -160,71 +171,69 @@ let lastRequestId = null;
 /**
  * handleRequest processes a message from the background script and returns a response.
  * @param {object} message - the message object sent from the background script. Must
- * have a `category` property and may have other properties depending on the category.
+ * have `category` and `id` properties and may have other properties depending on the
+ * category.
  * @param {string} message.category - the category of the message.
+ * @param {number} message.id - the ID of the message.
  * @returns {Promise<ContentResponse|null>}
  */
 async function handleRequest(message) {
+    if (message.id === lastRequestId) {
+        console.log(`Ignoring duplicate request: ${message.category}`);
+        return null;
+    }
+    lastRequestId = message.id;
+    console.log('Handling request:', message.category);
+
     switch (message.category) {
-        case 'copy':
+        case 'copyText':
+            await htmlSelection.appendToNotepad(message.text);
+            // write to the clipboard & return a response
             return await handleCopyRequest(message.text);
-        case 'iconSingleClick':
-            return await handleIconSingleClick();
+        case 'copyShortcut':
+            // respond to use of the copy keyboard shortcut or copy button
+            return await handleCopyShortcut();
         case 'pageRightClick':
             const id1 = await getClickedElementId(clickedElement);
             return await handlePageRightClick(id1);
         case 'selectionRightClick':
             const selection1 = window.getSelection();
             const id2 = await getClickedElementId(clickedElement);
-            return await handleSelectionRightClick(id2, selection1);
+            return await handleSelectionCopyRequest(id2, selection1);
         case 'linkRightClick':
             const linkMd = await md.createLink(linkText, message.linkUrl);
+            await htmlSelection.appendToNotepad(linkMd);
             return await handleCopyRequest(linkMd);
         case 'imageRightClick':
             const imageMd = await md.createImage(message.srcUrl);
+            await htmlSelection.appendToNotepad(imageMd + '\n');
             return await handleCopyRequest(imageMd + '\n');
         case 'videoRightClick':
             const videoMd = await md.createVideo(message.srcUrl, message.pageUrl);
+            await htmlSelection.appendToNotepad(videoMd + '\n');
             return await handleCopyRequest(videoMd + '\n');
         case 'audioRightClick':
             const audioMd = await md.createAudio(message.srcUrl, message.pageUrl);
+            await htmlSelection.appendToNotepad(audioMd + '\n');
             return await handleCopyRequest(audioMd + '\n');
         case 'markdownTableRightClick':
-            console.log('markdownTableRightClick in content.js');
             const id3 = await getClickedElementId(clickedElement);
-            return await handleSelectionRightClick(id3, tableSelection);
+            return await handleSelectionCopyRequest(id3, tableSelection);
         case 'tsvTableRightClick':
-            if (message.id === lastRequestId) {
-                console.log('Ignoring duplicate request: tsvTableRightClick in content.js');
-                return null;
-            }
-            lastRequestId = message.id;
-            console.log('tsvTableRightClick in content.js');
             return await handleCsvTableRightClick(tableSelection, '\t');
         case 'csvTableRightClick':
-            if (message.id === lastRequestId) {
-                console.log('Ignoring duplicate request: csvTableRightClick in content.js');
-                return null;
-            }
-            lastRequestId = message.id;
-            console.log('csvTableRightClick in content.js');
             return await handleCsvTableRightClick(tableSelection, ',');
         case 'jsonTableRightClick':
-            if (message.id === lastRequestId) {
-                console.log('Ignoring duplicate request: jsonTableRightClick in content.js');
-                return null;
-            }
-            lastRequestId = message.id;
-            console.log('jsonTableRightClick in content.js');
             return await handleJsonTableRightClick(tableSelection);
         case 'htmlTableRightClick':
-            console.log('htmlTableRightClick in content.js');
             /** @type {DocumentFragment} */
             const tableFrag = await htmlSelection.getSelectionFragment(tableSelection);
             if (tableFrag === null) {
                 return null;
             }
-            return await handleCopyRequest(tableFrag.firstChild.outerHTML);
+            const h = tableFrag.firstChild.outerHTML;
+            await htmlSelection.appendToNotepad(h);
+            return await handleCopyRequest(h);
         default:
             console.error('Unknown message category:', message.category);
             throw new Error('Unknown message category:', message.category);
@@ -254,29 +263,31 @@ async function getClickedElementId(clickedElement) {
 }
 
 /**
- * handleIconSingleClick handles a single left-click on the browser action icon.
+ * handleCopyShortcut handles a copy request from the user.
  * @returns {Promise<ContentResponse>}
  */
-async function handleIconSingleClick() {
+async function handleCopyShortcut() {
     const selection = window.getSelection();
     if (selection && selection.type === 'Range') {
-        // only allow Range (and not Caret) selections or else every icon click will
+        // only allow Range (and not Caret) selections or else every copy request will
         // count as a selection click
-        return await handleSelectionRightClick('', selection);
-    } else {
-        const markupLanguage = await getSetting('markupLanguage');
-        switch (markupLanguage) {
-            case 'markdown':
-            case 'markdown with some html':
-                const linkMd = await md.createLink(document.title, location.href);
-                return await handleCopyRequest(linkMd);
-            case 'html':
-                const anchor = `<a href="${location.href}">${document.title}</a>`;
-                return await handleCopyRequest(anchor);
-            default:
-                console.error('Unknown markup language:', markupLanguage);
-                throw new Error('Unknown markup language:', markupLanguage);
-        }
+        return await handleSelectionCopyRequest('', selection);
+    }
+
+    const markupLanguage = await getSetting('markupLanguage');
+    switch (markupLanguage) {
+        case 'markdown':
+        case 'markdown with some html':
+            const linkMd = await md.createLink(document.title, location.href);
+            await htmlSelection.appendToNotepad(linkMd);
+            return await handleCopyRequest(linkMd);
+        case 'html':
+            const anchor = `<a href="${location.href}">${document.title}</a>`;
+            await htmlSelection.appendToNotepad(anchor);
+            return await handleCopyRequest(anchor);
+        default:
+            console.error('Unknown markup language:', markupLanguage);
+            throw new Error('Unknown markup language:', markupLanguage);
     }
 }
 
@@ -293,16 +304,17 @@ async function handlePageRightClick(htmlId) {
     }
 
     const link = await md.createLink(title, url);
+    await htmlSelection.appendToNotepad(link);
     return await handleCopyRequest(link);
 }
 
 /**
- * handleSelectionRightClick handles a right-click on a selection.
+ * handleSelectionCopyRequest handles a request to copy a selection.
  * @param {string} htmlId - the ID of the HTML element that was right-clicked.
  * @param {Selection} selection - a selection object.
  * @returns {Promise<ContentResponse>}
  */
-async function handleSelectionRightClick(htmlId, selection) {
+async function handleSelectionCopyRequest(htmlId, selection) {
     let title = document.title;
     let url = removeIdAndTextFragment(location.href);
 
@@ -345,6 +357,7 @@ async function handleCsvTableRightClick(tableSelection, delimiter = ',') {
         text = await htmlTableToCsv(frag, delimiter);
     }
 
+    await htmlSelection.appendToNotepad(text);
     return await handleCopyRequest(text);
 }
 
@@ -358,24 +371,28 @@ async function handleJsonTableRightClick(tableSelection) {
     /** @type {DocumentFragment} */
     let frag = await htmlSelection.getSelectionFragment(tableSelection);
     if (frag === null) {
-        return await handleCopyRequest(tableSelection.textContent);
+        const text = tableSelection.textContent;
+        await htmlSelection.appendToNotepad(text);
+        return await handleCopyRequest(text);
     }
+
+    const tableJson = await htmlTableToJson(frag);
 
     const jsonDestination = await getSetting('jsonDestination');
     if (jsonDestination === 'clipboard') {
-        console.log('Writing JSON to clipboard');
-        const tableJson = await htmlTableToJson(frag);
+        await htmlSelection.appendToNotepad(tableJson);
         return await handleCopyRequest(tableJson);
-    } else {
-        const tableJson = await htmlTableToJson(frag);
-        // Tell the background what to download because apparently `browser.downloads`
-        // is always undefined in content scripts.
-        browser.runtime.sendMessage({
-            downloadFile: {
-                filename: 'table.json',
-                json: tableJson,
-            }
-        });
-        return null;
     }
+
+    // Tell the background what to download because apparently `browser.downloads` is
+    // always undefined in content scripts.
+    browser.runtime.sendMessage({
+        category: 'downloadFile',
+        file: {
+            name: 'table.json',
+            type: 'json',
+            json: tableJson,
+        }
+    });
+    return null;
 }

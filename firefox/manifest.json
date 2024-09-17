@@ -20,9 +20,7 @@
         "tabs",
         "downloads"
     ],
-    "options_ui": {
-        "page": "options.html"
-    },
+    "options_page": "settings.html",
     "background": {
         "scripts": [
             "background.js"
@@ -54,15 +52,37 @@
             "48": "images/icon-48.png",
             "96": "images/icon-96.png",
             "128": "images/icon-128.png"
-        }
+        },
+        "default_title": "Stardown",
+        "default_popup": "popup.html"
+    },
+    "sidebar_action": {
+        "default_title": "Stardown",
+        "default_panel": "sidebar.html",
+        "default_icon": "images/icon-16.png",
+        "open_at_install": false
     },
     "commands": {
-        "_execute_browser_action": {
+        "copy": {
             "suggested_key": {
-                "default": "Alt+C",
-                "mac": "Alt+C"
+                "default": "Alt+C"
             },
-            "description": "Copy markdown links or selections"
+            "description": "Copy selection"
+        },
+        "copyMultiple": {
+            "description": "Copy multiple tabs"
+        },
+        "_execute_sidebar_action": {
+            "suggested_key": {
+                "default": "Alt+N"
+            },
+            "description": "Toggle Stardown's notepad"
+        },
+        "openSettings": {
+            "description": "Open settings"
+        },
+        "openGithub": {
+            "description": "Open GitHub"
         }
     }
 }

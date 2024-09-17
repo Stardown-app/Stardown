@@ -28,11 +28,15 @@ Stardown shows options in the right-click menu so you can choose what to copy by
 
 Settings are stored for customizing Stardown's features.
 
+### `sidePanel`
+
+Stardown has a side panel (a.k.a. a sidebar) with a simple notepad that can optionally be used to reduce how much you have to switch windows and paste. Using Stardown's copy shortcut while the side panel is open automatically pastes into the notepad. The sidePanel permission is only required in Chromium.
+
 ## Optional permissions
 
 ### `tabs` ("Read your browsing history" or "Access browser tabs")
 
-This permission does NOT give access to existing browsing history and is only requested if and when you double-click the extension icon or double-press its keyboard shortcut to copy links for multiple tabs simultaneously. The Chromium browsers (Chrome, Edge, Arc, Brave, Vivaldi, Opera, etc.) use the scary-sounding request message "Read your browsing history" because malicious extensions that can see the titles and URLs of all tabs could start manually gathering your browsing activity. Other Chromium extensions that request immediate and complete access to browsing history, unlike Stardown, use the request message "read and change your browsing history on all signed-in devices".
+This permission does NOT give access to existing browsing history and is only requested if and when you copy links for multiple tabs simultaneously. The Chromium browsers (Chrome, Edge, Arc, Brave, Vivaldi, Opera, etc.) use the scary-sounding request message "Read your browsing history" because malicious extensions that can see the titles and URLs of all tabs could start manually gathering your browsing activity. Other Chromium extensions that request immediate and complete access to browsing history, unlike Stardown, use the request message "read and change your browsing history on all signed-in devices".
 
 ### `downloads` ("Manage your downloads" or "Download files and read and modify the browser's download history")
 

@@ -16,9 +16,8 @@
 
 <!doctype html>
 
-<!-- All links in the options page must have the ` target="_blank"` attribute in each
-<a> tag, or else Chromium will try (and fail) to load the pages in the same modal window
-as the options page. -->
+<!-- Links in the settings page should probably have the `target="_blank"` attribute in
+each anchor so that the pages they navigate to are opened in new tabs. -->
 
 <html lang="en">
 
@@ -31,24 +30,26 @@ as the options page. -->
         min-width: 350px;
         min-height: 245px;
       }
+
+      code {
+        background-color: #f0f0f0;
+        padding: 2px 4px;
+        border-radius: 4px;
+      }
     </style>
   </head>
 
   <body>
-    <h2 style="text-align: center">
+    <h2>
       <img width="30" alt="Stardown's icon" src="images/icon.svg"> Stardown
     </h2>
-    <p style="text-align: center; margin-top: -10px; margin-bottom: 0px">
+    <small style="margin-top: -10px; margin-bottom: 0px">
       v1.0.0
-    </p>
+    </small>
     <p>
       Copy the web as markdown.<br /><br />
       <a href="https://github.com/Stardown-app/Stardown/blob/main/docs/troubleshooting.md" target="_blank">
         Troubleshooting and reporting bugs
-      </a><br />
-      <a href="https://github.com/Stardown-app/Stardown?tab=readme-ov-file#how-to-change-the-keyboard-shortcut"
-        target="_blank">
-        How to change the keyboard shortcut
       </a><br />
       <a href="https://github.com/Stardown-app/Stardown/discussions" target="_blank">
         Join the discussion
@@ -60,7 +61,18 @@ as the options page. -->
       <a href="https://github.com/Stardown-app/Stardown" target="_blank">Source code</a>
     </p>
 
-    <h3 style="text-align: center">Options</h3>
+    <h3>How to change the keyboard shortcuts</h3>
+
+    <ul>
+      <li>
+        <a href="https://support.mozilla.org/en-US/kb/manage-extension-shortcuts-firefox">
+          Firefox
+        </a>
+      </li>
+      <li>Chrome, Edge, Arc, Brave, Vivaldi, or Opera: <code>chrome://extensions/shortcuts</code></li>
+    </ul>
+
+    <h3>Settings</h3>
     <form>
       <label for="markupLanguage">Output markup language:</label>
       <select id="markupLanguage" name="markupLanguage">
@@ -127,15 +139,11 @@ as the options page. -->
       </label>
       <br />
       <br />
-      <label for="doubleClickWindows">Double-pressing the copy shortcut copies links for all tabs in</label>
-      <select id="doubleClickWindows" name="doubleClickWindows">
+      <label for="copyTabsWindows">Copying links for all tabs copies from tabs in</label>
+      <select id="copyTabsWindows" name="copyTabsWindows">
         <option value="current">the current window</option>
         <option value="all">all windows</option>
       </select>
-      <br />
-      <br />
-      <label for="doubleClickInterval">Double-press interval (milliseconds):</label>
-      <input id="doubleClickInterval" type="number" min="0" max="100000" value="500" />
       <br />
       <br />
       <input id="createTextFragment" type="checkbox" checked />
@@ -169,7 +177,7 @@ as the options page. -->
       <input id="reset" type="reset" value="Reset all" />
     </form>
 
-    <script src="options.js"></script>
+    <script src="settings.js"></script>
   </body>
 
 </html>

@@ -369,7 +369,7 @@ async function showNotification(title, body) {
     }
     browser.notifications.create('', {
         type: 'basic',
-        iconUrl: 'images/icon-128.png',
+        iconUrl: 'images/stardown-128.png',
         title: title,
         message: body,
     });

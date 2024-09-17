@@ -22,7 +22,7 @@ const notepad = document.getElementById('notepad');
 
 browser.commands.getAll().then(cmds => {
     const copyShortcut = cmds.find(cmd => cmd.name === 'copy')?.shortcut || 'Alt+C';
-    notepad.placeholder = `Press ${copyShortcut} to copy to here...`;
+    notepad.placeholder = `Press ${copyShortcut} to copy and paste.`;
 });
 
 // load the notepad content when the page loads

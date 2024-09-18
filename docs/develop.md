@@ -4,7 +4,7 @@ I wrote some general extension development tips in [Making browser extensions](h
 
 ## Goals
 
-Stardown's main goal is to be so simple, fast, reliable, and flexible that people think of it as "it's like Ctrl+C but it keeps formatting". The settings page can have many settings as long as they are well organized, useful, and not so important that many users will be constantly changing them. Stardown's output should render well in at least Obsidian and GitHub, if not also other markdown renderers and converters like [Pandoc](https://boisgera.github.io/pandoc/markdown/), [Google Docs](https://workspaceupdates.googleblog.com/2024/07/import-and-export-markdown-in-google-docs.html), [VS Code](https://code.visualstudio.com/docs/languages/markdown#_markdown-preview), [Overleaf](https://www.overleaf.com/learn/how-to/Writing_Markdown_in_LaTeX_Documents), [Mattermost](https://docs.mattermost.com/collaborate/format-messages.html), Discourse, GitLab, Stack Overflow, Joplin, Reddit, Discord, etc.
+Stardown's main goal is to be so simple, fast, reliable, and flexible that people think of it as "it's like Ctrl+C but it keeps formatting". The settings page can have many settings as long as they are well organized, useful, and not so important that many users will be constantly changing them. Stardown's output should render well in at least Obsidian and GitHub, if not also other [markdown renderers and converters](./md-renderers.md).
 
 ## Installing Stardown from source for development
 

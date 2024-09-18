@@ -16,7 +16,7 @@
     You can also
     <a href="./docs/install-from-source.md">
         install from the source code</a>
-    to get updates early or customize Stardown's output more than its settings support.
+    to get updates early or <a href="./src/converters/README.md#implementation">customize Stardown's output more than its settings support</a>.
 </p>
 
 <p align="center"><img alt="demo gif" src="https://github.com/Stardown-app/assets/blob/main/Stardown.gif"></p>

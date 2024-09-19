@@ -16,7 +16,7 @@
     You can also
     <a href="./docs/install-from-source.md">
         install from the source code</a>
-    to get updates early or customize Stardown's output more than its settings support.
+    to get updates early or <a href="./src/converters/README.md#implementation">customize Stardown's output more than its settings support</a>.
 </p>
 
 <p align="center"><img alt="demo gif" src="https://github.com/Stardown-app/assets/blob/main/Stardown.gif"></p>
@@ -33,7 +33,7 @@ Stardown is free except that if you get it from Apple's App Store, there is a sm
 
 ## Privacy
 
-Stardown will never sell any data to anyone, and does not collect nor send any of your personal data anywhere. What you copy with Stardown is stored locally in your device's clipboard and/or locally in Stardown's notepad.
+Stardown will never sell any data to anyone, and does not collect nor send any of your personal data anywhere. Everything you copy or download using Stardown is stored locally.
 
 ## Permissions
 

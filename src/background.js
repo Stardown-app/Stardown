@@ -22,6 +22,12 @@ let markupLanguage = 'markdown';
 let jsonDestination = 'clipboard';
 let windowId = null;
 
+browser.runtime.onInstalled.addListener(async details => {
+    if (details.reason === browser.runtime.OnInstalledReason.INSTALL) {
+        await detectMissingShortcuts();
+    }
+});
+
 getSetting('markupLanguage').then(value => {
     markupLanguage = value;
     createContextMenus(value);
@@ -416,4 +422,44 @@ async function brieflyShowX() {
     browser.action.setBadgeBackgroundColor({ color: 'red' });
     await sleep(1000); // 1 second
     browser.action.setBadgeText({ text: '' });
+}
+
+/**
+ * detectMissingShortcuts detects whether any of Stardown's commands that should have
+ * shortcuts are missing them. If any are missing, it opens an error page. This is
+ * useful in Chromium because if another extension is already using a shortcut,
+ * Stardown's shortcut will not be set. However, this function has no effect in Firefox
+ * because Firefox allows duplicate shortcuts and no way to detect them.
+ * @returns {Promise<void>}
+ */
+async function detectMissingShortcuts() {
+    /** @type {object[]} */
+    const cmds = await browser.commands.getAll();
+
+    /** @type {string[]} */
+    let cmdsExpectingShortcut = [];
+    const manifest = await browser.runtime.getManifest();
+    const manifestCmds = manifest.commands;
+    for (let i = 0; i < cmds.length; i++) {
+        const cmd = cmds[i];
+        if (manifestCmds[cmd.name]?.suggested_key) {
+            cmdsExpectingShortcut.push(cmd.name);
+        }
+    }
+
+    /** @type {object[]} */
+    const missing = [];
+    for (let i = 0; i < cmds.length; i++) {
+        const cmd = cmds[i];
+        if (cmd.shortcut === '' && cmdsExpectingShortcut.includes(cmd.name)) {
+            missing.push(cmd);
+        }
+    }
+
+    if (missing.length > 0) {
+        console.log('Missing shortcuts:', missing);
+
+        // [tabs.create() - Mozilla | MDN](https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/API/tabs/create#url)
+        browser.tabs.create({ url: `/welcomeShortcutsMissing.html` });
+    }
 }

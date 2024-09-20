@@ -18,7 +18,7 @@ import { browser, handleCopyRequest } from './browserSpecific.js';
 import * as md from './generators/md.js';
 import * as htmlSelection from './htmlSelection.js';
 import { createTextFragmentArg } from './createTextFragmentArg.js';
-import { getSetting } from './common.js';
+import { getSetting } from './getSetting.js';
 import { removeIdAndTextFragment } from './converters/utils/urls.js';
 import { htmlTableToJson } from './converters/json.js';
 import { htmlTableToCsv } from './converters/csv.js';

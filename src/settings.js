@@ -15,7 +15,7 @@
 */
 
 import { browser, getShortcutInstructions } from './browserSpecific.js';
-import { getSetting } from './common.js';
+import { getSetting } from './getSetting.js';
 
 document.querySelector('#shortcutInstructions').innerHTML = getShortcutInstructions();
 

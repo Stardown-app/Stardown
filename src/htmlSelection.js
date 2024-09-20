@@ -15,7 +15,7 @@
 */
 
 import { browser } from './browserSpecific.js';
-import { getSetting } from './common.js';
+import { getSetting } from './getSetting.js';
 import * as md from './generators/md.js';
 import { htmlToMd, mdEncodeUri } from './converters/md.js';
 import { htmlToMdAndHtml } from './converters/mdAndHtml.js';

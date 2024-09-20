@@ -15,7 +15,7 @@
 */
 
 import { browser, sleep, createContextMenus, updateContextMenu, updateContextMenuLanguage } from './browserSpecific.js';
-import { getSetting } from './common.js';
+import { getSetting } from './getSetting.js';
 import { createTabLink } from './generators/md.js';
 
 let markupLanguage = 'markdown';

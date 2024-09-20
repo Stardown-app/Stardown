@@ -27,7 +27,7 @@ global.location = { href: 'https://example.com' };
  * @returns {Promise<number>}
  */
 export async function diffMd() {
-    const htmlInput = await fs.readFile('./test/input.html', { encoding: 'utf8' });
+    const htmlInput = await fs.readFile('./test/inputForMd.html', { encoding: 'utf8' });
     const mdExpected = await fs.readFile('./test/expected.md', { encoding: 'utf8' });
 
     global.document = new JSDOM(htmlInput).window.document;

@@ -70,9 +70,16 @@ export default [
                 // other files there and are no longer needed.
                 targets: [
                     'chrome/*', // Delete all files except the ones below.
-                    '!chrome/*.json',
-                    '!chrome/*.html',
+
                     '!chrome/images',
+
+                    '!chrome/manifest.json',
+
+                    '!chrome/popup.html',
+                    '!chrome/settings.html',
+                    '!chrome/sidebar.html',
+                    '!chrome/welcomeShortcutsMissing.html',
+
                     '!chrome/config.js',
                     '!chrome/background.js',
                     '!chrome/content.js',

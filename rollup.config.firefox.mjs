@@ -103,9 +103,16 @@ export default [
                 // other files there and are no longer needed.
                 targets: [
                     'firefox/*', // Delete all files except the ones below.
-                    '!firefox/*.json',
-                    '!firefox/*.html',
+
                     '!firefox/images',
+
+                    '!firefox/manifest.json',
+
+                    '!firefox/popup.html',
+                    '!firefox/settings.html',
+                    '!firefox/sidebar.html',
+                    '!firefox/welcomeShortcutsMissing.html',
+
                     '!firefox/config.js',
                     '!firefox/background.js',
                     '!firefox/content.js',

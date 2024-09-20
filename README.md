@@ -57,7 +57,8 @@ You can use this [bookmarklet](https://en.wikipedia.org/wiki/Bookmarklet) I made
 
 ### Integrate directly with an editor
 
-* [MarkDownload](https://github.com/deathau/markdownload) was developed by an Obsidian community moderator. While Stardown is great for copying *parts* of web pages as markdown, MarkDownload is better for downloading entire pages, especially if you want to download directly into Obsidian. I use both Stardown and MarkDownload.
+* [Obsidian Clipper](https://github.com/obsidianmd/obsidian-clipper) is the official web clipper extension for Obsidian.
+* [MarkDownload](https://github.com/deathau/markdownload) was developed by an Obsidian community moderator.
 * [Omnivore](https://omnivore.app/) can save content in a variety of formats.
 * [linkding](https://github.com/sissbruecker/linkding) is a self-hosted bookmarks manager.
 * [Zotero](https://www.zotero.org/) is one of the best tools for saving and organizing research.

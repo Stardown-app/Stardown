@@ -9,7 +9,7 @@
 5. click "Load unpacked"
 6. select Stardown's `chrome` folder
 
-In the `chrome` folder, don't make any changes unless they're to `config.js` or `manifest.json` because the other files get overwritten or deleted each time `npm run dev-chrome` runs.
+In the `chrome` folder, don't make any changes unless they're to `browserSpecific.js` or `manifest.json` because the other files get overwritten or deleted each time `npm run dev-chrome` runs.
 
 To update Stardown after you make changes or you `git pull` changes:
 
@@ -25,7 +25,7 @@ To update Stardown after you make changes or you `git pull` changes:
 4. click "Load Temporary Add-on..."
 5. select Stardown's `firefox/manifest.json` file
 
-In the `firefox` folder, don't make any changes unless they're to `config.js` or `manifest.json` because the other files get overwritten or deleted each time `npm run dev-firefox` runs.
+In the `firefox` folder, don't make any changes unless they're to `browserSpecific.js` or `manifest.json` because the other files get overwritten or deleted each time `npm run dev-firefox` runs.
 
 To update Stardown after you make changes or you `git pull` changes:
 

@@ -14,7 +14,7 @@
    limitations under the License.
 */
 
-import { browser, sleep, createContextMenus, updateContextMenu, updateContextMenuLanguage } from './config.js';
+import { browser, sleep, createContextMenus, updateContextMenu, updateContextMenuLanguage } from './browserSpecific.js';
 import { getSetting } from './common.js';
 import { createTabLink } from './generators/md.js';
 

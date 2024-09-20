@@ -14,7 +14,7 @@
    limitations under the License.
 */
 
-import { browser, getShortcutInstructions } from './config.js';
+import { browser, getShortcutInstructions } from './browserSpecific.js';
 import { getSetting } from './common.js';
 
 document.querySelector('#shortcutInstructions').innerHTML = getShortcutInstructions();

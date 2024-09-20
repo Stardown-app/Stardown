@@ -14,7 +14,7 @@
    limitations under the License.
 */
 
-import { browser } from './config.js';
+import { browser } from './browserSpecific.js';
 import { getSetting } from './common.js';
 import * as md from './generators/md.js';
 import { htmlToMd, mdEncodeUri } from './converters/md.js';

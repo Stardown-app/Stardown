@@ -14,7 +14,7 @@
    limitations under the License.
 */
 
-import { browser } from './config.js';
+import { browser } from './browserSpecific.js';
 import { mdEncodeUri } from './converters/md.js';
 
 /**

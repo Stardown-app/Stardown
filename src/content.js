@@ -14,7 +14,7 @@
    limitations under the License.
 */
 
-import { browser, handleCopyRequest } from './config.js';
+import { browser, handleCopyRequest } from './browserSpecific.js';
 import * as md from './generators/md.js';
 import * as htmlSelection from './htmlSelection.js';
 import { createTextFragmentArg } from './createTextFragmentArg.js';

@@ -41,8 +41,8 @@ function transform(contents, filename) {
     return contents
         .toString()
         .replace(
-            // Remove all `browser` imports because firefox/config.js doesn't define
-            // `browser` because Firefox already has a global `browser` variable.
+            // Remove all `browser` imports because firefox/browserSpecific.js doesn't
+            // define `browser` because Firefox already has a global `browser` variable.
             /(import \{.*?)browser,?(.*?\} from ['"])/,
             '$1$2',
         ).replace(
@@ -63,9 +63,10 @@ export default [
         },
         plugins: [
             copy({
-                // Copy all files and folders to the firefox folder except the config.js
-                // that is for testing. There are multiple targets because the tranform
-                // function must only be called on JavaScript files.
+                // Copy all files and folders to the firefox folder except the
+                // browserSpecific.js that is for testing. There are multiple targets
+                // because the tranform function must only be called on JavaScript
+                // files.
                 targets: [
                     {
                         // copy the images folder and html files
@@ -74,7 +75,7 @@ export default [
                     },
                     {
                         // copy js files and transform them
-                        src: ['src/**/*.js', '!src/config.js'],
+                        src: ['src/**/*.js', '!src/browserSpecific.js'],
                         dest: 'firefox',
                         transform: transform,
                     },
@@ -113,7 +114,7 @@ export default [
                     '!firefox/sidebar.html',
                     '!firefox/welcomeShortcutsMissing.html',
 
-                    '!firefox/config.js',
+                    '!firefox/browserSpecific.js',
                     '!firefox/background.js',
                     '!firefox/content.js',
                     '!firefox/popup.js',

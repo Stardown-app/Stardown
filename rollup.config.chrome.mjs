@@ -40,9 +40,9 @@ export default [
                     {
                         src: [
                             // Copy everything from `src` to `chrome` except the
-                            // config.js that is for testing.
+                            // browserSpecific.js that is for testing.
                             'src/*',
-                            '!src/config.js',
+                            '!src/browserSpecific.js',
                         ],
                         dest: 'chrome',
                     },
@@ -80,7 +80,7 @@ export default [
                     '!chrome/sidebar.html',
                     '!chrome/welcomeShortcutsMissing.html',
 
-                    '!chrome/config.js',
+                    '!chrome/browserSpecific.js',
                     '!chrome/background.js',
                     '!chrome/content.js',
                     '!chrome/popup.js',

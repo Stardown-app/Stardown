@@ -237,6 +237,18 @@ async function handleInteraction(tab, message, options = {}, successStatus = 1) 
     if (tab.url.endsWith('.pdf')) {
         await showStatus(0, 'Error', 'Stardown cannot run on PDFs');
         return;
+    } else if (
+        tab.url.startsWith('https://chromewebstore.google.com') ||
+        tab.url.startsWith('https://microsoftedge.microsoft.com/addons') ||
+        tab.url.startsWith('https://addons.mozilla.org')
+    ) {
+        await showStatus(0, 'Error', 'Stardown cannot run in extension stores');
+        return;
+    }
+    const prefix = tab.url.split(':')[0];
+    if (prefix && ['chrome', 'edge', 'about'].includes(prefix)) {
+        await showStatus(0, 'Error', 'Stardown cannot run in browser pages')
+        return;
     }
 
     message.id = Math.random(); // why: https://github.com/Stardown-app/Stardown/issues/98

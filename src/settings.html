@@ -41,20 +41,23 @@ each anchor so that the pages they navigate to are opened in new tabs. -->
   </head>
 
   <body>
-    <h2>
-      <img width="30" alt="Stardown's icon" src="images/stardown.svg"> Stardown
-    </h2>
+    <h1>
+      <img width="30" alt="Stardown's icon" src="images/stardown.svg">
+      Stardown
+    </h1>
     <small style="margin-top: -10px; margin-bottom: 0px">
       v1.0.0
     </small>
     <p>Copy the web as markdown.</p>
 
-    <h3>How to change the keyboard shortcuts</h3>
+    <h2>How to change the keyboard shortcuts</h2>
 
     <p id="shortcutInstructions"></p>
 
-    <h3>Settings</h3>
+    <h2>Settings</h2>
     <form>
+      <hr />
+      <h4>General</h4>
       <label for="markupLanguage">Output markup language:</label>
       <select id="markupLanguage" name="markupLanguage">
         <option value="markdown">markdown</option>
@@ -63,6 +66,45 @@ each anchor so that the pages they navigate to are opened in new tabs. -->
       </select>
       <br />
       <br />
+      <label for="copyTabsWindows">Copying links for all tabs copies from tabs in</label>
+      <select id="copyTabsWindows" name="copyTabsWindows">
+        <option value="current">the current window</option>
+        <option value="all">all windows</option>
+      </select>
+      <br />
+      <br />
+      <input id="createTextFragment" type="checkbox" checked />
+      <label for="createTextFragment">Include a
+        <a href="https://web.dev/articles/text-fragments" target="_blank">
+          text fragment</a>
+        when creating a link for a selection (sometimes impacts performance)
+      </label>
+      <br />
+      <br />
+      <input id="notifyOnWarning" type="checkbox" />
+      <label for="notifyOnWarning">Show warning notifications (warnings indicate partial success)</label>
+      <br />
+      <br />
+      <input id="notifyOnSuccess" type="checkbox" />
+      <label for="notifyOnSuccess">Show success notifications</label>
+      <br />
+      <br />
+      <hr />
+      <h4>Readability</h4>
+      <input id="omitNav" type="checkbox" checked />
+      <label for="omitNav">Omit navigation elements from source format selections</label>
+      <br />
+      <br />
+      <input id="omitFooter" type="checkbox" checked />
+      <label for="omitFooter">Omit footer elements from source format selections</label>
+      <br />
+      <br />
+      <input id="omitHidden" type="checkbox" checked />
+      <label for="omitHidden">Omit hidden elements from source format selections</label>
+      <br />
+      <br />
+      <hr />
+      <h4>Markdown</h4>
       <label for="mdSelectionFormat">When creating markdown of a selection,</label>
       <select id="mdSelectionFormat" name="mdSelectionFormat">
         <option value="source with link">try to keep the same formatting and link to the source</option>
@@ -82,10 +124,11 @@ each anchor so that the pages they navigate to are opened in new tabs. -->
       <p id="mdSelectionTemplateError" style="display: none"></p>
       <br />
       <br />
-      <label for="mdYoutube">Optimize markdown of YouTube videos for</label>
-      <select id="mdYoutube" name="mdYoutube">
-        <option value="almost everywhere">almost everywhere</option>
-        <option value="GitHub">GitHub</option>
+      <label for="mdBulletPoint">Markdown bullet point symbol:</label>
+      <select id="mdBulletPoint" name="mdBulletPoint">
+        <option value="-">-</option>
+        <option value="+">+</option>
+        <option value="*">*</option>
       </select>
       <br />
       <br />
@@ -99,12 +142,19 @@ each anchor so that the pages they navigate to are opened in new tabs. -->
       </select>
       <br />
       <br />
-      <label for="mdBulletPoint">Markdown bullet point symbol:</label>
-      <select id="mdBulletPoint" name="mdBulletPoint">
-        <option value="-">-</option>
-        <option value="+">+</option>
-        <option value="*">*</option>
+      <label for="mdYoutube">Optimize markdown of YouTube videos for</label>
+      <select id="mdYoutube" name="mdYoutube">
+        <option value="almost everywhere">almost everywhere</option>
+        <option value="GitHub">GitHub</option>
       </select>
+      <br />
+      <br />
+      <hr />
+      <h4>JSON</h4>
+      <label for="jsonEmptyCell">Empty table cells are converted to
+        <input id="jsonEmptyCell" name="jsonEmptyCell" type="text" placeholder="null" />
+        in JSON
+      </label>
       <br />
       <br />
       <label for="jsonDestination">Save JSON output to</label>
@@ -114,46 +164,7 @@ each anchor so that the pages they navigate to are opened in new tabs. -->
       </select>
       <br />
       <br />
-      <label for="jsonEmptyCell">Empty table cells are converted to
-        <input id="jsonEmptyCell" name="jsonEmptyCell" type="text" placeholder="null" />
-        in JSON
-      </label>
-      <br />
-      <br />
-      <label for="copyTabsWindows">Copying links for all tabs copies from tabs in</label>
-      <select id="copyTabsWindows" name="copyTabsWindows">
-        <option value="current">the current window</option>
-        <option value="all">all windows</option>
-      </select>
-      <br />
-      <br />
-      <input id="createTextFragment" type="checkbox" checked />
-      <label for="createTextFragment">Include a
-        <a href="https://web.dev/articles/text-fragments" target="_blank">
-          text fragment</a>
-        when creating a link for a selection (sometimes impacts performance)
-      </label>
-      <br />
-      <br />
-      <input id="omitNav" type="checkbox" checked />
-      <label for="omitNav">Omit navigation elements from source format selections</label>
-      <br />
-      <br />
-      <input id="omitFooter" type="checkbox" checked />
-      <label for="omitFooter">Omit footer elements from source format selections</label>
-      <br />
-      <br />
-      <input id="omitHidden" type="checkbox" checked />
-      <label for="omitHidden">Omit hidden elements from source format selections</label>
-      <br />
-      <br />
-      <input id="notifyOnWarning" type="checkbox" />
-      <label for="notifyOnWarning">Show warning notifications (warnings indicate partial success)</label>
-      <br />
-      <br />
-      <input id="notifyOnSuccess" type="checkbox" />
-      <label for="notifyOnSuccess">Show success notifications</label>
-      <br />
+      <hr />
       <br />
       <input id="reset" type="reset" value="Reset all" />
     </form>

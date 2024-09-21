@@ -88,7 +88,7 @@ You can use this [bookmarklet](https://en.wikipedia.org/wiki/Bookmarklet) I made
 
 * [link-to-text-fragment](https://github.com/GoogleChromeLabs/link-to-text-fragment) was made by Google itself but is cross-browser.
 
-### Why use Stardown?
+## Why use Stardown?
 
 Unlike the alternatives listed above, Stardown is:
 

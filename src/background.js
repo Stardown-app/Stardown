@@ -244,6 +244,13 @@ async function handleInteraction(tab, message, options = {}, successStatus = 1) 
     ) {
         await showStatus(0, 'Error', 'Stardown cannot run in extension stores');
         return;
+    } else if (
+        tab.url.startsWith('chrome-extension://') ||
+        tab.url.startsWith('extension://') ||
+        tab.url.startsWith('moz-extension://')
+    ) {
+        await showStatus(0, 'Error', 'Stardown cannot run in extension pages');
+        return;
     }
     const prefix = tab.url.split(':')[0];
     if (prefix && ['chrome', 'edge', 'about'].includes(prefix)) {

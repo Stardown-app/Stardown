@@ -28,11 +28,14 @@ import { mdEncodeUri, newEscape } from '../converters/md.js';
  * @returns {Promise<string>}
  */
 export async function createLink(title, uri, mdSubBrackets = null) {
+    if (!title) {
+        title = uri;
+    }
     title = await createLinkTitle(title, mdSubBrackets);
 
     uri = mdEncodeUri(uri);
 
-    return `[${title}](${uri})`;
+    return '[' + title + '](' + uri + ')';
 }
 
 /**

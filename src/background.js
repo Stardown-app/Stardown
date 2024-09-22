@@ -48,9 +48,9 @@ browser.commands.onCommand.addListener(async command => {
             // Chromium only
             browser.sidePanel.open({ windowId: windowId });
             break;
-        case 'copy':
+        case 'copySelection':
             const tabs = await browser.tabs.query({ active: true, currentWindow: true });
-            await handleInteraction(tabs[0], { category: 'copyShortcut' });
+            await handleInteraction(tabs[0], { category: 'copySelectionShortcut' });
             break;
         case 'copyMultiple':
             const tabs1 = await browser.tabs.query({ active: true, currentWindow: true });
@@ -92,9 +92,9 @@ browser.runtime.onMessage.addListener(async (message, sender, sendResponse) => {
                 await showNotification('Warning', message.warning);
             }
             break;
-        case 'copyButtonPressed':
+        case 'copySelectionButtonPressed':
             const tabs = await browser.tabs.query({ active: true, currentWindow: true });
-            await handleInteraction(tabs[0], { category: 'copyShortcut' });
+            await handleInteraction(tabs[0], { category: 'copySelectionShortcut' });
             break;
         case 'copyMultipleButtonPressed':
             const tabs1 = await browser.tabs.query({ active: true, currentWindow: true });

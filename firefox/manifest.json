@@ -63,7 +63,7 @@
         "open_at_install": false
     },
     "commands": {
-        "copy": {
+        "copySelection": {
             "suggested_key": {
                 "default": "Alt+C"
             },

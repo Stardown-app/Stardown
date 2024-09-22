@@ -190,9 +190,9 @@ async function handleRequest(message) {
             await htmlSelection.sendToNotepad(message.text);
             // write to the clipboard & return a response
             return await handleCopyRequest(message.text);
-        case 'copyShortcut':
+        case 'copySelectionShortcut':
             // respond to use of the copy keyboard shortcut or copy button
-            return await handleCopyShortcut();
+            return await handleCopySelectionShortcut();
         case 'pageRightClick':
             const id1 = await getClickedElementId(clickedElement);
             return await handlePageRightClick(id1);
@@ -263,10 +263,10 @@ async function getClickedElementId(clickedElement) {
 }
 
 /**
- * handleCopyShortcut handles a copy request from the user.
+ * handleCopySelectionShortcut handles a request from the user to copy a selection.
  * @returns {Promise<ContentResponse>}
  */
-async function handleCopyShortcut() {
+async function handleCopySelectionShortcut() {
     const selection = window.getSelection();
     if (selection && selection.type === 'Range') {
         // only allow Range (and not Caret) selections or else every copy request will

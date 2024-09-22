@@ -18,7 +18,7 @@ if (typeof browser === 'undefined') {
     var browser = chrome;
 }
 
-const copyButton = document.querySelector('#copyButton');
+const copySelectionButton = document.querySelector('#copySelectionButton');
 const copyMultipleButton = document.querySelector('#copyMultipleButton');
 const sidebarButton = document.querySelector('#sidebarButton');
 const settingsButton = document.querySelector('#settingsButton');
@@ -27,8 +27,8 @@ const requestFeatureButton = document.querySelector('#requestFeatureButton');
 const discussButton = document.querySelector('#discussButton');
 const sourceButton = document.querySelector('#sourceButton');
 
-copyButton.addEventListener('click', async () => {
-    browser.runtime.sendMessage({ category: 'copyButtonPressed' });
+copySelectionButton.addEventListener('click', async () => {
+    browser.runtime.sendMessage({ category: 'copySelectionButtonPressed' });
 });
 
 copyMultipleButton.addEventListener('click', async () => {
@@ -89,7 +89,7 @@ sourceButton.addEventListener('click', async () => {
 async function loadCommands() {
     const cmds = await browser.commands.getAll();
 
-    const copyCmd = cmds.find(cmd => cmd.name === 'copy');
+    const copyCmd = cmds.find(cmd => cmd.name === 'copySelection');
     const copyMultipleCmd = cmds.find(cmd => cmd.name === 'copyMultiple');
     const sidebarCmd = cmds.find(
         cmd => cmd.name === '_execute_sidebar_action' || cmd.name === 'openSidePanel'
@@ -101,7 +101,7 @@ async function loadCommands() {
     const sourceCmd = cmds.find(cmd => cmd.name === 'openSource');
 
     if (copyCmd) {
-        copyButton.title = copyCmd.shortcut || '(no keyboard shortcut set)';
+        copySelectionButton.title = copyCmd.shortcut || '(no keyboard shortcut set)';
     }
     if (copyMultipleCmd) {
         copyMultipleButton.title = copyMultipleCmd.shortcut || '(no keyboard shortcut set)';

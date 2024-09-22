@@ -57,7 +57,7 @@
         "default_icon": "images/stardown-16.png"
     },
     "commands": {
-        "copy": {
+        "copySelection": {
             "suggested_key": {
                 "default": "Alt+C"
             },

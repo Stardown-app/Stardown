@@ -32,6 +32,7 @@ export function createTextFragmentArg(selection) {
         return '';
     }
 
+    // https://developer.mozilla.org/en-US/docs/Web/URI/Fragment/Text_fragments
     // https://web.dev/articles/text-fragments#programmatic_text_fragment_link_generation
     let result;
     try {

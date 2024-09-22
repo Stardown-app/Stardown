@@ -234,7 +234,15 @@ browser.contextMenus.onClicked.addListener(async (info, tab) => {
  * @returns {Promise<void>}
  */
 async function handleInteraction(tab, message, options = {}, successStatus = 1) {
-    if (tab.url.endsWith('.pdf')) {
+    const uriScheme = tab.url.split(':')[0];
+    if (!['http', 'https', 'file'].includes(uriScheme)) {
+        await showStatus(
+            0,
+            'Error',
+            `Stardown cannot run on pages with a URL that starts with "${uriScheme}:"`,
+        );
+        return;
+    } else if (tab.url.endsWith('.pdf')) {
         await showStatus(0, 'Error', 'Stardown cannot run on PDFs');
         return;
     } else if (
@@ -243,18 +251,6 @@ async function handleInteraction(tab, message, options = {}, successStatus = 1) 
         tab.url.startsWith('https://addons.mozilla.org')
     ) {
         await showStatus(0, 'Error', 'Stardown cannot run in extension stores');
-        return;
-    } else if (
-        tab.url.startsWith('chrome-extension://') ||
-        tab.url.startsWith('extension://') ||
-        tab.url.startsWith('moz-extension://')
-    ) {
-        await showStatus(0, 'Error', 'Stardown cannot run in extension pages');
-        return;
-    }
-    const prefix = tab.url.split(':')[0];
-    if (prefix && ['chrome', 'edge', 'about'].includes(prefix)) {
-        await showStatus(0, 'Error', 'Stardown cannot run in browser pages')
         return;
     }
 

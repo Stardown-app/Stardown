@@ -419,12 +419,12 @@ async function showNotification(title, body) {
  * @returns {Promise<void>}
  */
 async function brieflyShowCheck(itemCount) {
+    browser.action.setBadgeBackgroundColor({ color: 'green' });
     if (!itemCount || itemCount === 1) {
         browser.action.setBadgeText({ text: '✓' });
     } else {
         browser.action.setBadgeText({ text: `${itemCount} ✓` });
     }
-    browser.action.setBadgeBackgroundColor({ color: 'green' });
     await sleep(1000); // 1 second
     browser.action.setBadgeText({ text: '' });
 }
@@ -434,8 +434,8 @@ async function brieflyShowCheck(itemCount) {
  * @returns {Promise<void>}
  */
 async function brieflyShowX() {
-    browser.action.setBadgeText({ text: '✗' });
     browser.action.setBadgeBackgroundColor({ color: 'red' });
+    browser.action.setBadgeText({ text: '✗' });
     await sleep(1000); // 1 second
     browser.action.setBadgeText({ text: '' });
 }

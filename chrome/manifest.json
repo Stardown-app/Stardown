@@ -63,7 +63,7 @@
             },
             "description": "Copy selection"
         },
-        "copyMultiple": {
+        "copyMultipleTabs": {
             "description": "Copy multiple tabs"
         },
         "openSidePanel": {

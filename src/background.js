@@ -52,9 +52,9 @@ browser.commands.onCommand.addListener(async command => {
             const tabs = await browser.tabs.query({ active: true, currentWindow: true });
             await handleInteraction(tabs[0], { category: 'copySelectionShortcut' });
             break;
-        case 'copyMultiple':
+        case 'copyMultipleTabs':
             const tabs1 = await browser.tabs.query({ active: true, currentWindow: true });
-            await handleCopyAllTabs(tabs1[0]);
+            await handleCopyMultipleTabs(tabs1[0]);
             break;
         case 'openSettings':
             browser.runtime.openOptionsPage();
@@ -96,9 +96,9 @@ browser.runtime.onMessage.addListener(async (message, sender, sendResponse) => {
             const tabs = await browser.tabs.query({ active: true, currentWindow: true });
             await handleInteraction(tabs[0], { category: 'copySelectionShortcut' });
             break;
-        case 'copyMultipleButtonPressed':
+        case 'copyMultipleTabsButtonPressed':
             const tabs1 = await browser.tabs.query({ active: true, currentWindow: true });
-            await handleCopyAllTabs(tabs1[0]);
+            await handleCopyMultipleTabs(tabs1[0]);
             break;
         case 'sidebarButtonPressed':
             // Chromium only
@@ -279,13 +279,13 @@ async function handleInteraction(tab, message, options = {}, successStatus = 1) 
 }
 
 /**
- * handleCopyAllTabs handles a request from the user to create a markdown list of links,
- * and sends it to the content script to be copied. A status indicator is then shown
- * to the user.
+ * handleCopyMultipleTabs handles a request from the user to create a markdown list of
+ * links, and sends it to the content script to be copied. A status indicator is then
+ * shown to the user.
  * @param {any} activeTab
  * @returns {Promise<void>}
  */
-async function handleCopyAllTabs(activeTab) {
+async function handleCopyMultipleTabs(activeTab) {
     // figure out which tabs to create links for
     let tabs = await browser.tabs.query({ currentWindow: true, highlighted: true });
     if (tabs.length === 1) { // if only one tab is highlighted

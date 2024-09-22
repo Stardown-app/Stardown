@@ -69,7 +69,7 @@
             },
             "description": "Copy selection"
         },
-        "copyMultiple": {
+        "copyMultipleTabs": {
             "description": "Copy multiple tabs"
         },
         "_execute_sidebar_action": {

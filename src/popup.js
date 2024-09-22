@@ -19,7 +19,7 @@ if (typeof browser === 'undefined') {
 }
 
 const copySelectionButton = document.querySelector('#copySelectionButton');
-const copyMultipleButton = document.querySelector('#copyMultipleButton');
+const copyMultipleTabsButton = document.querySelector('#copyMultipleTabsButton');
 const sidebarButton = document.querySelector('#sidebarButton');
 const settingsButton = document.querySelector('#settingsButton');
 const reportBugButton = document.querySelector('#reportBugButton');
@@ -31,7 +31,7 @@ copySelectionButton.addEventListener('click', async () => {
     browser.runtime.sendMessage({ category: 'copySelectionButtonPressed' });
 });
 
-copyMultipleButton.addEventListener('click', async () => {
+copyMultipleTabsButton.addEventListener('click', async () => {
     let havePerm;
     try {
         // The permissions request must be the first async function call in the event
@@ -53,7 +53,7 @@ copyMultipleButton.addEventListener('click', async () => {
     }
 
     console.log('User granted permission request.');
-    browser.runtime.sendMessage({ category: 'copyMultipleButtonPressed' });
+    browser.runtime.sendMessage({ category: 'copyMultipleTabsButtonPressed' });
 });
 
 sidebarButton.addEventListener('click', async () => {
@@ -90,7 +90,7 @@ async function loadCommands() {
     const cmds = await browser.commands.getAll();
 
     const copyCmd = cmds.find(cmd => cmd.name === 'copySelection');
-    const copyMultipleCmd = cmds.find(cmd => cmd.name === 'copyMultiple');
+    const copyMultipleTabsCmd = cmds.find(cmd => cmd.name === 'copyMultipleTabs');
     const sidebarCmd = cmds.find(
         cmd => cmd.name === '_execute_sidebar_action' || cmd.name === 'openSidePanel'
     );
@@ -103,8 +103,8 @@ async function loadCommands() {
     if (copyCmd) {
         copySelectionButton.title = copyCmd.shortcut || '(no keyboard shortcut set)';
     }
-    if (copyMultipleCmd) {
-        copyMultipleButton.title = copyMultipleCmd.shortcut || '(no keyboard shortcut set)';
+    if (copyMultipleTabsCmd) {
+        copyMultipleTabsButton.title = copyMultipleTabsCmd.shortcut || '(no keyboard shortcut set)';
     }
     if (sidebarCmd) {
         sidebarButton.title = sidebarCmd.shortcut || '(no keyboard shortcut set)';

@@ -248,7 +248,8 @@ async function handleInteraction(tab, message, options = {}, successStatus = 1) 
     } else if (
         tab.url.startsWith('https://chromewebstore.google.com') ||
         tab.url.startsWith('https://microsoftedge.microsoft.com/addons') ||
-        tab.url.startsWith('https://addons.mozilla.org')
+        tab.url.startsWith('https://addons.mozilla.org') ||
+        tab.url.startsWith('https://addons.opera.com')
     ) {
         await showStatus(0, 'Error', 'Stardown cannot run in extension stores');
         return;

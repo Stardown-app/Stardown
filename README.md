@@ -88,11 +88,12 @@ You can use this [bookmarklet](https://en.wikipedia.org/wiki/Bookmarklet) I made
 
 * [link-to-text-fragment](https://github.com/GoogleChromeLabs/link-to-text-fragment) was made by Google itself but is cross-browser.
 
-## Why use Stardown?
+## Why Stardown?
 
-Unlike the alternatives listed above, Stardown is:
+Stardown is:
 
-* **Flexible**. Integrates well with many workflows. Just copy part of a web page and paste anywhere.
-* **Converts more formatting**. Stardown can convert almost any table to markdown or other markup languages, and can create markdown of videos that renders well in GitHub.
+* **Flexible**. Integrates well with many workflows. Select almost anything, copy and paste anywhere.
+* **Instantly clip** into a note using Stardown's sidebar notepad to both copy and paste with `Alt+C`.
+* **Better at converting**. Stardown's custom code for converting HTML to markdown can convert more formatting than alternatives.
 * **Creates [text fragments](https://developer.mozilla.org/en-US/docs/Web/URI/Fragment/Text_fragments)** so you can link to specific parts of pages.
-* **Extensible**. Stardown's custom code for converting between markup languages is designed to be extended for more markdown flavors and other markup languages.
+* **Extensible**. Stardown is designed to be extended for more markdown flavors and other markup languages.

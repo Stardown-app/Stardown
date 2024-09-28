@@ -26,6 +26,11 @@ each anchor so that the pages they navigate to are opened in new tabs. -->
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Stardown settings</title>
     <style>
+      h1 a {
+        text-decoration: none;
+        color: black;
+      }
+
       #versionNumber {
         font-size: 12px;
         color: gray;
@@ -47,8 +52,10 @@ each anchor so that the pages they navigate to are opened in new tabs. -->
 
   <body>
     <h1>
-      <img width="30" alt="Stardown's icon" src="images/stardown.svg">
-      Stardown
+      <a href="https://github.com/Stardown-app/Stardown" target="_blank">
+        <img width="30" alt="Stardown's icon" src="images/stardown.svg">
+        Stardown
+      </a>
     </h1>
     <small id="versionNumber"></small>
     <p>Copy the web as markdown.</p>

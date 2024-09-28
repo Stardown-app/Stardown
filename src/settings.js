@@ -17,6 +17,8 @@
 import { browser, getShortcutInstructions } from './browserSpecific.js';
 import { getSetting } from './getSetting.js';
 
+document.querySelector('#versionNumber').innerHTML = 'v' + browser.runtime.getManifest().version;
+
 document.querySelector('#shortcutInstructions').innerHTML = getShortcutInstructions();
 
 const form = document.querySelector('form');

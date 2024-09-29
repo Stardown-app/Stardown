@@ -15,6 +15,7 @@
 */
 
 import { getSetting, sendToNotepad, applyTemplate } from './utils.js';
+import { preprocessFragment } from './converters/utils/html.js';
 import { absolutizeNodeUrls, removeIdAndTextFragment } from './converters/utils/urls.js';
 import * as md from './generators/md.js';
 import { htmlToMd } from './converters/md.js';
@@ -118,6 +119,8 @@ async function getSourceFormatMd(markupLanguage) {
     /** @type {DocumentFragment} */
     const frag = document.createDocumentFragment();
     frag.append(document.body.cloneNode(true));
+
+    await preprocessFragment(frag);
 
     switch (markupLanguage) {
         case 'markdown':

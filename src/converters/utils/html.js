@@ -15,6 +15,22 @@
 */
 
 /**
+ * preprocessFragment modifies a fragment to make it more suitable for conversion to
+ * other formats.
+ * @param {DocumentFragment} frag
+ * @returns {Promise<void>}
+ */
+export async function preprocessFragment(frag) {
+    if (location.href.startsWith('https://news.ycombinator.com')) {
+        // add the presentation role to each table element
+        const tables = frag.querySelectorAll('table');
+        for (let i = 0; i < tables.length; i++) {
+            tables[i].setAttribute('role', 'presentation');
+        }
+    }
+}
+
+/**
  * removeHiddenElements removes from a node any descendant elements that are hidden or
  * not displayed.
  * @param {Node} node

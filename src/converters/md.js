@@ -1176,7 +1176,7 @@ export class MdConverter {
         if (ctx.inTable) {
             return this.convertText(ctx, el);
         } else if (el.getAttribute('role') === 'presentation') {
-            return this.convertNodes(ctx, el.childNodes);
+            return '\n\n' + this.convertNodes(ctx, el.childNodes) + '\n\n';
         }
         const newCtx = { ...ctx, inTable: true, dontTrimText: true };
 
@@ -1228,7 +1228,7 @@ export class MdConverter {
 
     /** @type {ElementConverter} */
     convertTD(ctx, el) {
-        return this.convertNodes(ctx, el.childNodes);
+        return this.convertNodes(ctx, el.childNodes).trim() + ' ';
     }
 
     /** @type {ElementConverter} */
@@ -1238,7 +1238,7 @@ export class MdConverter {
 
     /** @type {ElementConverter} */
     convertTH(ctx, el) {
-        return this.convertNodes(ctx, el.childNodes);
+        return this.convertNodes(ctx, el.childNodes).trim() + ' ';
     }
 
     /** @type {ElementConverter} */
@@ -1248,7 +1248,7 @@ export class MdConverter {
 
     /** @type {ElementConverter} */
     convertTR(ctx, el) {
-        return this.convertNodes(ctx, el.childNodes);
+        return this.convertNodes(ctx, el.childNodes).trim() + '\n';
     }
 
     // form elements

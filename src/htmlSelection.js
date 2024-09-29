@@ -15,6 +15,7 @@
 */
 
 import { getSetting, sendToNotepad, applyTemplate } from './utils.js';
+import { preprocessFragment } from './converters/utils/html.js';
 import * as md from './generators/md.js';
 import { htmlToMd, mdEncodeUri } from './converters/md.js';
 import { htmlToMdAndHtml } from './converters/mdAndHtml.js';
@@ -153,6 +154,8 @@ async function getSourceFormatMd(selection, selectedText, markupLanguage) {
     if (frag === null) {
         return selectedText;
     }
+
+    await preprocessFragment(frag);
 
     switch (markupLanguage) {
         case 'markdown':

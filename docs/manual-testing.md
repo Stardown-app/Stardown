@@ -41,6 +41,7 @@ When the user right-clicks part of a web page, their browser detects the type of
 
 ### Features
 
+- [ ] **Pressing any button in the popup** should do what the button's text describes.
 - [ ] **Pressing Alt+C** copies a markdown link for the page, unless part of the page is selected in which case markdown of the selection is copied instead.
 - [ ] **Right-clicking an empty part of a page** shows the "Copy markdown link to here" option.
 - [ ] **Right-clicking a website's unselected header** shows the "Copy markdown link to here" option.

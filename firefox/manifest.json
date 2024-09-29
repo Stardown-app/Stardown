@@ -69,6 +69,9 @@
             },
             "description": "Copy selection"
         },
+        "copyEntirePage": {
+            "description": "Copy entire page"
+        },
         "copyMultipleTabs": {
             "description": "Copy multiple tabs"
         },

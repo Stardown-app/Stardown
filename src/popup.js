@@ -19,6 +19,7 @@ if (typeof browser === 'undefined') {
 }
 
 const copySelectionButton = document.querySelector('#copySelectionButton');
+const copyEntirePageButton = document.querySelector('#copyEntirePageButton');
 const copyMultipleTabsButton = document.querySelector('#copyMultipleTabsButton');
 const sidebarButton = document.querySelector('#sidebarButton');
 const settingsButton = document.querySelector('#settingsButton');
@@ -29,6 +30,10 @@ const sourceButton = document.querySelector('#sourceButton');
 
 copySelectionButton.addEventListener('click', async () => {
     browser.runtime.sendMessage({ category: 'copySelectionButtonPressed' });
+});
+
+copyEntirePageButton.addEventListener('click', async () => {
+    browser.runtime.sendMessage({ category: 'copyEntirePageButtonPressed' });
 });
 
 copyMultipleTabsButton.addEventListener('click', async () => {
@@ -90,6 +95,7 @@ async function loadCommands() {
     const cmds = await browser.commands.getAll();
 
     const copyCmd = cmds.find(cmd => cmd.name === 'copySelection');
+    const copyEntirePageCmd = cmds.find(cmd => cmd.name === 'copyEntirePage');
     const copyMultipleTabsCmd = cmds.find(cmd => cmd.name === 'copyMultipleTabs');
     const sidebarCmd = cmds.find(
         cmd => cmd.name === '_execute_sidebar_action' || cmd.name === 'openSidePanel'
@@ -102,6 +108,9 @@ async function loadCommands() {
 
     if (copyCmd) {
         copySelectionButton.title = copyCmd.shortcut || '(no keyboard shortcut set)';
+    }
+    if (copyEntirePageCmd) {
+        copyEntirePageButton.title = copyEntirePageCmd.shortcut || '(no keyboard shortcut set)';
     }
     if (copyMultipleTabsCmd) {
         copyMultipleTabsButton.title = copyMultipleTabsCmd.shortcut || '(no keyboard shortcut set)';

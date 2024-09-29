@@ -64,3 +64,43 @@ export async function getSetting(name) {
 
     return value;
 }
+
+/**
+ * sendToNotepad sends text to Stardown's sidebar notepad to be inserted.
+ * @param {string} text
+ * @returns {Promise<void>}
+ */
+export async function sendToNotepad(text) {
+    browser.runtime.sendMessage({
+        category: 'sendToNotepad',
+        text: text,
+    });
+}
+
+/**
+ * applyTemplate applies a template to a title, URL, and text.
+ * @param {string} template
+ * @param {string} title
+ * @param {string} url
+ * @param {string} text
+ * @returns {Promise<string>}
+ */
+export async function applyTemplate(template, title, url, text) {
+    const today = new Date();
+    const YYYYMMDD = today.getFullYear() + '/' + (today.getMonth() + 1) + '/' + today.getDate();
+    const templateVars = {
+        link: { title, url },
+        date: { YYYYMMDD },
+        text,
+    };
+
+    try {
+        return template.replaceAll(/{{([\w.]+)}}/g, (match, group) => {
+            return group.split('.').reduce((vars, token) => vars[token], templateVars);
+        });
+    } catch (err) {
+        // an error message should have been shown when the user changed the template
+        console.error(err);
+        throw err;
+    }
+}

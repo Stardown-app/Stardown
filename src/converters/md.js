@@ -14,7 +14,7 @@
    limitations under the License.
 */
 
-import { getSetting } from '../getSetting.js';
+import { getSetting } from '../utils.js';
 import * as tables from './utils/tables.js';
 import { absolutize } from './utils/urls.js';
 import { removeHiddenElements, isInlineText } from './utils/html.js';

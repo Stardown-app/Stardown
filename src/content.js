@@ -17,8 +17,9 @@
 import { browser, handleCopyRequest } from './browserSpecific.js';
 import * as md from './generators/md.js';
 import * as htmlSelection from './htmlSelection.js';
+import { handleCopyPageRequest } from './htmlPage.js';
 import { createTextFragmentArg } from './createTextFragmentArg.js';
-import { getSetting } from './getSetting.js';
+import { getSetting, sendToNotepad } from './utils.js';
 import { removeIdAndTextFragment } from './converters/utils/urls.js';
 import { htmlTableToJson } from './converters/json.js';
 import { htmlTableToCsv } from './converters/csv.js';
@@ -187,12 +188,14 @@ async function handleRequest(message) {
 
     switch (message.category) {
         case 'copyText':
-            await htmlSelection.sendToNotepad(message.text);
+            await sendToNotepad(message.text);
             // write to the clipboard & return a response
             return await handleCopyRequest(message.text);
         case 'copySelectionShortcut':
             // respond to use of the copy keyboard shortcut or copy button
             return await handleCopySelectionShortcut();
+        case 'copyEntirePageShortcut':
+            return await handleCopyPageRequest();
         case 'pageRightClick':
             const id1 = await getClickedElementId(clickedElement);
             return await handlePageRightClick(id1);
@@ -202,19 +205,19 @@ async function handleRequest(message) {
             return await handleSelectionCopyRequest(id2, selection1);
         case 'linkRightClick':
             const linkMd = await md.createLink(linkText, message.linkUrl);
-            await htmlSelection.sendToNotepad(linkMd);
+            await sendToNotepad(linkMd);
             return await handleCopyRequest(linkMd);
         case 'imageRightClick':
             const imageMd = await md.createImage(message.srcUrl);
-            await htmlSelection.sendToNotepad(imageMd + '\n');
+            await sendToNotepad(imageMd + '\n');
             return await handleCopyRequest(imageMd + '\n');
         case 'videoRightClick':
             const videoMd = await md.createVideo(message.srcUrl, message.pageUrl);
-            await htmlSelection.sendToNotepad(videoMd + '\n');
+            await sendToNotepad(videoMd + '\n');
             return await handleCopyRequest(videoMd + '\n');
         case 'audioRightClick':
             const audioMd = await md.createAudio(message.srcUrl, message.pageUrl);
-            await htmlSelection.sendToNotepad(audioMd + '\n');
+            await sendToNotepad(audioMd + '\n');
             return await handleCopyRequest(audioMd + '\n');
         case 'markdownTableRightClick':
             const id3 = await getClickedElementId(clickedElement);
@@ -232,7 +235,7 @@ async function handleRequest(message) {
                 return null;
             }
             const h = tableFrag.firstChild.outerHTML;
-            await htmlSelection.sendToNotepad(h);
+            await sendToNotepad(h);
             return await handleCopyRequest(h);
         default:
             console.error('Unknown message category:', message.category);
@@ -279,11 +282,11 @@ async function handleCopySelectionShortcut() {
         case 'markdown':
         case 'markdown with some html':
             const linkMd = await md.createLink(document.title, location.href);
-            await htmlSelection.sendToNotepad(linkMd);
+            await sendToNotepad(linkMd);
             return await handleCopyRequest(linkMd);
         case 'html':
             const anchor = `<a href="${location.href}">${document.title}</a>`;
-            await htmlSelection.sendToNotepad(anchor);
+            await sendToNotepad(anchor);
             return await handleCopyRequest(anchor);
         default:
             console.error('Unknown markup language:', markupLanguage);
@@ -304,7 +307,7 @@ async function handlePageRightClick(htmlId) {
     }
 
     const link = await md.createLink(title, url);
-    await htmlSelection.sendToNotepad(link);
+    await sendToNotepad(link);
     return await handleCopyRequest(link);
 }
 
@@ -357,7 +360,7 @@ async function handleCsvTableRightClick(tableSelection, delimiter = ',') {
         text = await htmlTableToCsv(frag, delimiter);
     }
 
-    await htmlSelection.sendToNotepad(text);
+    await sendToNotepad(text);
     return await handleCopyRequest(text);
 }
 
@@ -372,7 +375,7 @@ async function handleJsonTableRightClick(tableSelection) {
     let frag = await htmlSelection.getSelectionFragment(tableSelection);
     if (frag === null) {
         const text = tableSelection.textContent;
-        await htmlSelection.sendToNotepad(text);
+        await sendToNotepad(text);
         return await handleCopyRequest(text);
     }
 
@@ -380,7 +383,7 @@ async function handleJsonTableRightClick(tableSelection) {
 
     const jsonDestination = await getSetting('jsonDestination');
     if (jsonDestination === 'clipboard') {
-        await htmlSelection.sendToNotepad(tableJson);
+        await sendToNotepad(tableJson);
         return await handleCopyRequest(tableJson);
     }
 

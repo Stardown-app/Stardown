@@ -14,23 +14,10 @@
    limitations under the License.
 */
 
-import { browser } from './browserSpecific.js';
-import { getSetting } from './getSetting.js';
+import { getSetting, sendToNotepad, applyTemplate } from './utils.js';
 import * as md from './generators/md.js';
 import { htmlToMd, mdEncodeUri } from './converters/md.js';
 import { htmlToMdAndHtml } from './converters/mdAndHtml.js';
-
-/**
- * sendToNotepad sends text to Stardown's sidebar notepad to be inserted.
- * @param {string} text
- * @returns {Promise<void>}
- */
-export async function sendToNotepad(text) {
-    browser.runtime.sendMessage({
-        category: 'sendToNotepad',
-        text: text,
-    });
-}
 
 /**
  * createText creates text of the selected part of the page. The language and format are
@@ -160,20 +147,21 @@ export async function getSelectionFragment(selection) {
  * @param {string} markupLanguage - the user's chosen markup language.
  * @returns {Promise<string>}
  */
-export async function getSourceFormatMd(selection, selectedText, markupLanguage) {
+async function getSourceFormatMd(selection, selectedText, markupLanguage) {
     /** @type {DocumentFragment} */
     const frag = await getSelectionFragment(selection);
     if (frag === null) {
         return selectedText;
     }
 
-    if (markupLanguage === 'markdown') {
-        return await htmlToMd(frag);
-    } else if (markupLanguage === 'markdown with some html') {
-        return await htmlToMdAndHtml(frag);
-    } else {
-        console.error(`Unknown markupLanguage: ${markupLanguage}`);
-        throw new Error(`Unknown markupLanguage: ${markupLanguage}`);
+    switch (markupLanguage) {
+        case 'markdown':
+            return await htmlToMd(frag);
+        case 'markdown with some html':
+            return await htmlToMdAndHtml(frag);
+        default:
+            console.error(`Unknown markupLanguage: ${markupLanguage}`);
+            throw new Error(`Unknown markupLanguage: ${markupLanguage}`);
     }
 }
 
@@ -188,42 +176,13 @@ export async function getSourceFormatMd(selection, selectedText, markupLanguage)
  * @param {string} markupLanguage - the user's chosen markup language.
  * @returns {Promise<string>}
  */
-export async function getTemplatedMd(title, url, selection, selectedText, markupLanguage) {
-    const template = await getSetting('mdSelectionTemplate');
-
+async function getTemplatedMd(title, url, selection, selectedText, markupLanguage) {
     title = await md.createLinkTitle(title);
     url = mdEncodeUri(url);
+    const text = await getSourceFormatMd(selection, selectedText, markupLanguage);
+    const template = await getSetting('mdSelectionTemplate');
 
-    let text = '';
-    const frag = await getSelectionFragment(selection);
-    if (frag === null) {
-        text = selectedText;
-    } else if (markupLanguage === 'markdown') {
-        text = await htmlToMd(frag);
-    } else if (markupLanguage === 'markdown with some html') {
-        text = await htmlToMdAndHtml(frag);
-    } else {
-        console.error(`Unknown markupLanguage: ${markupLanguage}`);
-        throw new Error(`Unknown markupLanguage: ${markupLanguage}`);
-    }
-
-    const today = new Date();
-    const YYYYMMDD = today.getFullYear() + '/' + (today.getMonth() + 1) + '/' + today.getDate();
-    const templateVars = {
-        link: { title, url },
-        date: { YYYYMMDD },
-        text,
-    };
-
-    try {
-        return template.replaceAll(/{{([\w.]+)}}/g, (match, group) => {
-            return group.split('.').reduce((vars, token) => vars[token], templateVars);
-        });
-    } catch (err) {
-        // an error message should have been shown when the user changed the template
-        console.error(err);
-        throw err;
-    }
+    return await applyTemplate(template, title, url, text);
 }
 
 /**
@@ -243,22 +202,7 @@ async function getSourceFormatMdWithLink(title, url, selection, selectedText, ma
     const todayStr = today.getFullYear() + '/' + (today.getMonth() + 1) + '/' + today.getDate();
     const alert = await md.createAlert('note', `from ${link} on ${todayStr}`);
 
-    /** @type {DocumentFragment} */
-    const frag = await getSelectionFragment(selection);
-    if (frag === null) {
-        await sendToNotepad(selectedText);
-        return alert + '\n\n' + selectedText;
-    }
-
-    let text = '';
-    if (markupLanguage === 'markdown') {
-        text = await htmlToMd(frag);
-    } else if (markupLanguage === 'markdown with some html') {
-        text = await htmlToMdAndHtml(frag);
-    } else {
-        console.error(`Unknown markupLanguage: ${markupLanguage}`);
-        throw new Error(`Unknown markupLanguage: ${markupLanguage}`);
-    }
+    const text = await getSourceFormatMd(selection, selectedText, markupLanguage);
 
     await sendToNotepad(text);
     return alert + '\n\n' + text;

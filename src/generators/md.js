@@ -14,7 +14,7 @@
    limitations under the License.
 */
 
-import { getSetting } from '../getSetting.js';
+import { getSetting } from '../utils.js';
 import { mdEncodeUri, newEscape } from '../converters/md.js';
 
 /**

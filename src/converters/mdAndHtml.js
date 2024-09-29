@@ -14,7 +14,7 @@
    limitations under the License.
 */
 
-import { getSetting } from '../getSetting.js';
+import { getSetting } from '../utils.js';
 import { absolutizeElementUrls } from './utils/urls.js';
 import { removeHiddenElements, removeStyles, isInlineText } from './utils/html.js';
 import { newEscape, MdConverter } from './md.js';

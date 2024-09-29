@@ -15,7 +15,7 @@
 */
 
 import { browser, sleep, createContextMenus, updateContextMenu, updateContextMenuLanguage } from './browserSpecific.js';
-import { getSetting } from './getSetting.js';
+import { getSetting } from './utils.js';
 import { createTabLink } from './generators/md.js';
 
 let markupLanguage = 'markdown';
@@ -52,9 +52,13 @@ browser.commands.onCommand.addListener(async command => {
             const tabs = await browser.tabs.query({ active: true, currentWindow: true });
             await handleInteraction(tabs[0], { category: 'copySelectionShortcut' });
             break;
-        case 'copyMultipleTabs':
+        case 'copyEntirePage':
             const tabs1 = await browser.tabs.query({ active: true, currentWindow: true });
-            await handleCopyMultipleTabs(tabs1[0]);
+            await handleInteraction(tabs1[0], { category: 'copyEntirePageShortcut' });
+            break;
+        case 'copyMultipleTabs':
+            const tabs2 = await browser.tabs.query({ active: true, currentWindow: true });
+            await handleCopyMultipleTabs(tabs2[0]);
             break;
         case 'openSettings':
             browser.runtime.openOptionsPage();
@@ -96,9 +100,13 @@ browser.runtime.onMessage.addListener(async (message, sender, sendResponse) => {
             const tabs = await browser.tabs.query({ active: true, currentWindow: true });
             await handleInteraction(tabs[0], { category: 'copySelectionShortcut' });
             break;
-        case 'copyMultipleTabsButtonPressed':
+        case 'copyEntirePageButtonPressed':
             const tabs1 = await browser.tabs.query({ active: true, currentWindow: true });
-            await handleCopyMultipleTabs(tabs1[0]);
+            await handleInteraction(tabs1[0], { category: 'copyEntirePageShortcut' });
+            break;
+        case 'copyMultipleTabsButtonPressed':
+            const tabs2 = await browser.tabs.query({ active: true, currentWindow: true });
+            await handleCopyMultipleTabs(tabs2[0]);
             break;
         case 'sidebarButtonPressed':
             // Chromium only
@@ -133,6 +141,8 @@ browser.runtime.onMessage.addListener(async (message, sender, sendResponse) => {
             break;
         case 'jsonDestination':
             jsonDestination = message.jsonDestination;
+            break;
+        case 'sendToNotepad':
             break;
         default:
             console.error(`Unknown message category: ${message.category}`);

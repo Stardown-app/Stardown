@@ -75,6 +75,10 @@ browser.commands.onCommand.addListener(async command => {
 });
 
 browser.runtime.onMessage.addListener(async (message, sender, sendResponse) => {
+    if (message.destination !== 'background') {
+        return;
+    }
+
     switch (message.category) {
         case 'updateContextMenu':
             // These context menu updates are done with messages from the content script
@@ -141,8 +145,6 @@ browser.runtime.onMessage.addListener(async (message, sender, sendResponse) => {
             break;
         case 'jsonDestination':
             jsonDestination = message.jsonDestination;
-            break;
-        case 'sendToNotepad':
             break;
         default:
             console.error(`Unknown message category: ${message.category}`);
@@ -265,6 +267,7 @@ async function handleInteraction(tab, message, options = {}, successStatus = 1) 
         return;
     }
 
+    message.destination = 'content';
     message.id = Math.random(); // why: https://github.com/Stardown-app/Stardown/issues/98
 
     let status, notifTitle, notifBody;

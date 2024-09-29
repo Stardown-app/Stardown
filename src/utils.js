@@ -72,6 +72,7 @@ export async function getSetting(name) {
  */
 export async function sendToNotepad(text) {
     browser.runtime.sendMessage({
+        destination: 'sidebar',
         category: 'sendToNotepad',
         text: text,
     });

@@ -47,8 +47,8 @@ const resetButton = document.querySelector('#reset');
 
 // set up setting autosaving
 initAutosave('markupLanguage', markupLanguageEl, 'value', async () => {
-    // send the updated markupLanguage to the background script
     browser.runtime.sendMessage({
+        destination: 'background',
         category: 'markupLanguage',
         markupLanguage: markupLanguageEl.value,
     });
@@ -69,8 +69,8 @@ initAutosave('mdBulletPoint', mdBulletPointEl, 'value');
 
 initAutosave('jsonEmptyCell', jsonEmptyCellEl, 'value');
 initAutosave('jsonDestination', jsonDestinationEl, 'value', () => {
-    // send the updated jsonDestination to the background script
     browser.runtime.sendMessage({
+        destination: 'background',
         category: 'jsonDestination',
         jsonDestination: jsonDestinationEl.value
     });

@@ -38,6 +38,10 @@ notepad.addEventListener('input', () => {
 });
 
 browser.runtime.onMessage.addListener(message => {
+    if (message.destination !== 'sidebar') {
+        return;
+    }
+
     switch (message.category) {
         case 'sendToNotepad':
             const newText = '\n\n' + message.text.trim() + '\n\n';
@@ -47,22 +51,6 @@ browser.runtime.onMessage.addListener(message => {
 
             notepad.value = (before + newText + after).trim();
             browser.storage.sync.set({ notepadContent: notepad.value });
-            break;
-        case 'updateContextMenu':
-        case 'downloadFile':
-        case 'showStatus':
-        case 'showWarning':
-        case 'copySelectionButtonPressed':
-        case 'copyEntirePageButtonPressed':
-        case 'copyMultipleTabsButtonPressed':
-        case 'sidebarButtonPressed':
-        case 'reportBugButtonPressed':
-        case 'requestFeatureButtonPressed':
-        case 'discussButtonPressed':
-        case 'sourceButtonPressed':
-        case 'settingsButtonPressed':
-        case 'markupLanguage':
-        case 'jsonDestination':
             break;
         default:
             console.error(`Unknown message category: ${message.category}`);

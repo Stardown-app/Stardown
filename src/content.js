@@ -70,15 +70,21 @@ function setUpListeners() {
         const s = window.getSelection();
         if (s && s.type === 'Range') {
             browser.runtime.sendMessage({
-                category: 'updateContextMenu', context: { mouseover: 'selection' },
+                destination: 'background',
+                category: 'updateContextMenu',
+                context: { mouseover: 'selection' },
             });
         } else if (event.target.nodeName === 'IMG') {
             browser.runtime.sendMessage({
-                category: 'updateContextMenu', context: { mouseover: 'image' },
+                destination: 'background',
+                category: 'updateContextMenu',
+                context: { mouseover: 'image' },
             });
         } else if (event.target.nodeName === 'A') {
             browser.runtime.sendMessage({
-                category: 'updateContextMenu', context: { mouseover: 'link' },
+                destination: 'background',
+                category: 'updateContextMenu',
+                context: { mouseover: 'link' },
             });
         }
     });
@@ -98,7 +104,9 @@ function setUpListeners() {
         if (isTable) {
             tableSelection = selection;
             browser.runtime.sendMessage({
-                category: 'updateContextMenu', context: { mouseup: 'table' },
+                destination: 'background',
+                category: 'updateContextMenu',
+                context: { mouseup: 'table' },
             });
         } else {
             tableSelection = null;
@@ -110,7 +118,9 @@ function setUpListeners() {
         // message to the background script so it can load the correct context menu
         // items.
         browser.runtime.sendMessage({
-            category: 'updateContextMenu', context: { selectionchange: 'selection' },
+            destination: 'background',
+            category: 'updateContextMenu',
+            context: { selectionchange: 'selection' },
         });
     });
 
@@ -131,6 +141,10 @@ function setUpListeners() {
     });
 
     browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
+        if (message.destination !== 'content') {
+            return;
+        }
+
         // In Chromium, this listener must be synchronous and must send a response
         // immediately. True must be sent if the actual response will be sent
         // asynchronously.
@@ -390,6 +404,7 @@ async function handleJsonTableRightClick(tableSelection) {
     // Tell the background what to download because apparently `browser.downloads` is
     // always undefined in content scripts.
     browser.runtime.sendMessage({
+        destination: 'background',
         category: 'downloadFile',
         file: {
             name: 'table.json',

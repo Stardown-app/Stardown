@@ -29,11 +29,17 @@ const discussButton = document.querySelector('#discussButton');
 const sourceButton = document.querySelector('#sourceButton');
 
 copySelectionButton.addEventListener('click', async () => {
-    browser.runtime.sendMessage({ category: 'copySelectionButtonPressed' });
+    browser.runtime.sendMessage({
+        destination: 'background',
+        category: 'copySelectionButtonPressed',
+    });
 });
 
 copyEntirePageButton.addEventListener('click', async () => {
-    browser.runtime.sendMessage({ category: 'copyEntirePageButtonPressed' });
+    browser.runtime.sendMessage({
+        destination: 'background',
+        category: 'copyEntirePageButtonPressed',
+    });
 });
 
 copyMultipleTabsButton.addEventListener('click', async () => {
@@ -45,6 +51,7 @@ copyMultipleTabsButton.addEventListener('click', async () => {
     } catch (err) {
         console.error('browser.permissions.request:', err);
         browser.runtime.sendMessage({
+            destination: 'background',
             category: 'showStatus',
             status: 0,
             notifTitle: 'Error',
@@ -58,7 +65,10 @@ copyMultipleTabsButton.addEventListener('click', async () => {
     }
 
     console.log('User granted permission request.');
-    browser.runtime.sendMessage({ category: 'copyMultipleTabsButtonPressed' });
+    browser.runtime.sendMessage({
+        destination: 'background',
+        category: 'copyMultipleTabsButtonPressed',
+    });
 });
 
 sidebarButton.addEventListener('click', async () => {
@@ -67,28 +77,46 @@ sidebarButton.addEventListener('click', async () => {
         await browser.sidebarAction.toggle();
     } else {
         // Chromium only
-        browser.runtime.sendMessage({ category: 'sidebarButtonPressed' });
+        browser.runtime.sendMessage({
+            destination: 'background',
+            category: 'sidebarButtonPressed',
+        });
     }
 });
 
 settingsButton.addEventListener('click', async () => {
-    browser.runtime.sendMessage({ category: 'settingsButtonPressed' });
+    browser.runtime.sendMessage({
+        destination: 'background',
+        category: 'settingsButtonPressed',
+    });
 });
 
 reportBugButton.addEventListener('click', async () => {
-    browser.runtime.sendMessage({ category: 'reportBugButtonPressed' });
+    browser.runtime.sendMessage({
+        destination: 'background',
+        category: 'reportBugButtonPressed',
+    });
 });
 
 requestFeatureButton.addEventListener('click', async () => {
-    browser.runtime.sendMessage({ category: 'requestFeatureButtonPressed' });
+    browser.runtime.sendMessage({
+        destination: 'background',
+        category: 'requestFeatureButtonPressed',
+    });
 });
 
 discussButton.addEventListener('click', async () => {
-    browser.runtime.sendMessage({ category: 'discussButtonPressed' });
+    browser.runtime.sendMessage({
+        destination: 'background',
+        category: 'discussButtonPressed',
+    });
 });
 
 sourceButton.addEventListener('click', async () => {
-    browser.runtime.sendMessage({ category: 'sourceButtonPressed' });
+    browser.runtime.sendMessage({
+        destination: 'background',
+        category: 'sourceButtonPressed',
+    });
 });
 
 async function loadCommands() {

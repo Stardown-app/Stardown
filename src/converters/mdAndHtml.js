@@ -31,7 +31,7 @@ export async function htmlToMdAndHtml(frag) {
         removeHiddenElements(frag, document);
     }
     removeStyles(frag);
-    absolutizeElementUrls(frag, location.Href);
+    absolutizeElementUrls(frag, location.href);
 
     const ctx = {
         locationHref: location.href,

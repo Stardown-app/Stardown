@@ -48,6 +48,22 @@ browser.runtime.onMessage.addListener(message => {
             notepad.value = (before + newText + after).trim();
             browser.storage.sync.set({ notepadContent: notepad.value });
             break;
+        case 'updateContextMenu':
+        case 'downloadFile':
+        case 'showStatus':
+        case 'showWarning':
+        case 'copySelectionButtonPressed':
+        case 'copyEntirePageButtonPressed':
+        case 'copyMultipleTabsButtonPressed':
+        case 'sidebarButtonPressed':
+        case 'reportBugButtonPressed':
+        case 'requestFeatureButtonPressed':
+        case 'discussButtonPressed':
+        case 'sourceButtonPressed':
+        case 'settingsButtonPressed':
+        case 'markupLanguage':
+        case 'jsonDestination':
+            break;
         default:
             console.error(`Unknown message category: ${message.category}`);
             throw new Error(`Unknown message category: ${message.category}`);

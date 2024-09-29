@@ -56,14 +56,14 @@ export async function createText(title, url, selection) {
             await sendToNotepad(selectedText);
             return selectedText;
         }
-        // make any links absolute
-        frag.querySelectorAll('a').forEach(a => {
-            a.href = new URL(a.href, url).href;
-        });
+
+        absolutizeNodeUrls(frag, url);
+
         // convert the fragment to a string
         const div = document.createElement('div');
         div.appendChild(frag.cloneNode(true));
         const result = div.innerHTML || selectedText;
+
         await sendToNotepad(result);
         return result;
     }

@@ -15,7 +15,7 @@
 */
 
 import { getSetting, sendToNotepad, applyTemplate } from './utils.js';
-import { removeIdAndTextFragment } from './converters/utils/urls.js';
+import { absolutizeNodeUrls, removeIdAndTextFragment } from './converters/utils/urls.js';
 import * as md from './generators/md.js';
 import { htmlToMd } from './converters/md.js';
 import { htmlToMdAndHtml } from './converters/mdAndHtml.js';
@@ -37,7 +37,16 @@ export async function handleCopyPageRequest() {
 async function createPageText() {
     const markupLanguage = await getSetting('markupLanguage');
     if (markupLanguage === 'html') {
-        const html = document.documentElement.outerHTML;
+        const frag = document.createDocumentFragment();
+        frag.append(document.documentElement.cloneNode(true));
+
+        absolutizeNodeUrls(frag, location.href);
+
+        // convert the fragment to a string
+        const div = document.createElement('div');
+        div.appendChild(frag.cloneNode(true));
+        const html = div.innerHTML || selectedText;
+
         await sendToNotepad(html);
         return await handleCopyRequest(html);
     }

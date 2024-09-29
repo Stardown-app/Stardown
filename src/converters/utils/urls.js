@@ -30,18 +30,18 @@ export function absolutize(url, locationHref) {
 }
 
 /**
- * absolutizeElementUrls makes URLs in an element and its children absolute.
- * @param {Element} el
+ * absolutizeNodeUrls makes URLs in a node and its children absolute.
+ * @param {Node} node
  * @param {string} locationHref
  * @returns {void}
  */
-export function absolutizeElementUrls(el, locationHref) {
-    const hrefs = el.querySelectorAll('[href]');
+export function absolutizeNodeUrls(node, locationHref) {
+    const hrefs = node.querySelectorAll('[href]');
     for (let i = 0; i < hrefs.length; i++) {
         hrefs[i].href = absolutize(hrefs[i].href, locationHref);
     }
 
-    const srcs = el.querySelectorAll('[src]');
+    const srcs = node.querySelectorAll('[src]');
     for (let i = 0; i < srcs.length; i++) {
         srcs[i].src = absolutize(srcs[i].src, locationHref);
     }

@@ -108,8 +108,8 @@ export async function createText(title, url, selection) {
             await sendToNotepad(blockquote);
             return blockquote;
         case 'link with selection as title':
-            selectedText = selectedText.replaceAll('\r\n', ' ').replaceAll('\n', ' ');
-            const link = await md.createLink(selectedText, url);
+            const text = selectedText.replaceAll('\r\n', ' ').replaceAll('\n', ' ');
+            const link = await md.createLink(text, url);
             await sendToNotepad(link);
             return link;
         case 'link with page title as title':

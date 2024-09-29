@@ -25,6 +25,10 @@ import { handleCopyRequest } from './browserSpecific.js';
  * @typedef {import('./content.js').ContentResponse} ContentResponse
  */
 
+/**
+ * handleCopyPageRequest handles a request to copy the entire current page.
+ * @returns {Promise<ContentResponse>}
+ */
 export async function handleCopyPageRequest() {
     const text = await createPageText();
     return await handleCopyRequest(text);
@@ -32,7 +36,7 @@ export async function handleCopyPageRequest() {
 
 /**
  * createPageText creates a text representation of the entire current page.
- * @returns {Promise<ContentResponse>}
+ * @returns {Promise<string>}
  */
 async function createPageText() {
     const markupLanguage = await getSetting('markupLanguage');
@@ -48,7 +52,7 @@ async function createPageText() {
         const html = div.innerHTML || selectedText;
 
         await sendToNotepad(html);
-        return await handleCopyRequest(html);
+        return html;
     }
 
     if (markupLanguage !== 'markdown' && markupLanguage !== 'markdown with some html') {

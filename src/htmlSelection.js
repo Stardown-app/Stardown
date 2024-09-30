@@ -155,7 +155,7 @@ async function getSourceFormatMd(selection, selectedText, markupLanguage) {
         return selectedText;
     }
 
-    await preprocessFragment(frag);
+    await preprocessFragment(frag, location.hostname);
 
     switch (markupLanguage) {
         case 'markdown':

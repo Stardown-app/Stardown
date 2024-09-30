@@ -120,7 +120,7 @@ async function getSourceFormatMd(markupLanguage) {
     const frag = document.createDocumentFragment();
     frag.append(document.body.cloneNode(true));
 
-    await preprocessFragment(frag);
+    await preprocessFragment(frag, location.hostname);
 
     switch (markupLanguage) {
         case 'markdown':

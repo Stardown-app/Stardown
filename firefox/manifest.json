@@ -85,6 +85,9 @@
             "description": "Toggle Stardown's notepad"
         },
         "openSettings": {
+            "suggested_key": {
+                "default": "Alt+O"
+            },
             "description": "Open settings"
         },
         "reportBug": {

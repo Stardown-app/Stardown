@@ -120,10 +120,12 @@ export class MdAndHtmlConverter extends MdConverter {
         return '\n\n' + el.outerHTML + '\n\n';
     }
 
-    /** @type {ElementConverter} */
-    convertIFRAME(ctx, el) {
-        return '\n\n' + el.outerHTML + '\n\n';
-    }
+    // GitHub Flavored Markdown does not render iframes and Readability.js removes
+    // iframes. Sample iframe: https://www.w3schools.com/html/html_iframe.asp
+    // /** @type {ElementConverter} */
+    // convertIFRAME(ctx, el) {
+    //     return '\n\n' + el.outerHTML + '\n\n';
+    // }
 
     /** @type {ElementConverter} */
     convertOBJECT(ctx, el) {

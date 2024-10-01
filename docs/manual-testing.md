@@ -21,7 +21,6 @@ Here are a bunch of web pages with interesting features for testing.
 - [block quote](https://markdownguide.offshoot.io/basic-syntax/#blockquotes-1)
 - [image with an absolute src](https://betterexplained.com/articles/math-empathy/#post-6251:~:text=Math%20Empathy%20Checklist,different%20mental%20checklist.)
 - [images with relative srcs](https://textbundle.org/)
-- [iframe](https://www.w3schools.com/html/html_iframe.asp)
 - [YouTube video](https://www.youtube.com/watch?v=jfKfPfyJRdk)
 - [PDFs](https://haslab.github.io/SAFER/scp21.pdf) should make Stardown show an error message like "Stardown cannot run on PDFs"
 

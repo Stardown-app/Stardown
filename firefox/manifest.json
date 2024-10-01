@@ -76,6 +76,9 @@
             "description": "Copy entire page"
         },
         "copyMultipleTabs": {
+            "suggested_key": {
+                "default": "Alt+M"
+            },
             "description": "Copy multiple tabs"
         },
         "_execute_sidebar_action": {

@@ -15,10 +15,13 @@
 */
 
 import { browser } from './browserSpecific.js';
+import { Readability } from './Readability.js';
+import { isProbablyReaderable } from './Readability-readerable.js'
 
 const defaultSettings = {
     markupLanguage: 'markdown',
     createTextFragment: true,
+    readabilityJs: true,
     omitNav: true,
     omitFooter: true,
     omitHidden: true,
@@ -104,4 +107,31 @@ export async function applyTemplate(template, title, url, text) {
         console.error(err);
         throw err;
     }
+}
+
+/**
+ * readabilitize attempts to remove from a document fragment all elements that are not
+ * part of the main content.
+ * @param {DocumentFragment} frag
+ * @returns {Promise<DocumentFragment>}
+ */
+export async function readabilitize(frag) {
+    const doc = document.implementation.createHTMLDocument();
+    doc.body.append(frag);
+
+    if (!isProbablyReaderable(doc)) {
+        console.log('This page is probably not readerable');
+        return frag;
+    }
+
+    const article = new Readability(doc).parse();
+    const htmlStr = article.content;
+
+    const div = document.createElement('div');
+    div.innerHTML = htmlStr;
+
+    frag = document.createDocumentFragment();
+    frag.append(div);
+
+    return frag;
 }

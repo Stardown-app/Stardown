@@ -14,7 +14,7 @@
    limitations under the License.
 */
 
-import { getSetting, sendToNotepad, applyTemplate } from './utils.js';
+import { getSetting, sendToNotepad, applyTemplate, readabilitize } from './utils.js';
 import { preprocessFragment } from './converters/utils/html.js';
 import { absolutizeNodeUrls, removeIdAndTextFragment } from './converters/utils/urls.js';
 import * as md from './generators/md.js';
@@ -117,8 +117,13 @@ async function getSourceFormatMdWithLink(title, url, markupLanguage) {
 async function getSourceFormatMd(markupLanguage) {
     // Clone the body so we don't modify the original.
     /** @type {DocumentFragment} */
-    const frag = document.createDocumentFragment();
+    let frag = document.createDocumentFragment();
     frag.append(document.body.cloneNode(true));
+
+    const readabilityJs = await getSetting('readabilityJs');
+    if (readabilityJs) {
+        frag = await readabilitize(frag);
+    }
 
     await preprocessFragment(frag, location.hostname);
 

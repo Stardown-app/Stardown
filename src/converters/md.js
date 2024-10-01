@@ -24,10 +24,7 @@ import { removeHiddenElements, isInlineText } from './utils/html.js';
 
 /**
  * htmlToMd converts an HTML fragment to pure markdown without any HTML. This function
- * otherwise supports a superset of the CommonMark specification. In rare cases, the
- * output may contain HTML because some sites put sample HTML in code blocks created
- * without <pre> or <code> elements, such as
- * https://www.w3schools.com/html/html_iframe.asp
+ * otherwise supports a superset of the CommonMark specification.
  * @param {DocumentFragment} frag
  * @returns {Promise<string>}
  */
@@ -110,6 +107,7 @@ export function newEscape(mdSubBrackets) {
             .replaceAll('`', '\\`') // code, code fence
             .replaceAll('~', '\\~') // strikethrough, code fence
             .replaceAll(/^> /g, '\\> ') // quote
+            .replaceAll('<', '\\<') // HTML tag
             .replaceAll(/^(=+)/g, '\\$1') // setext header
             .replaceAll(/^-/g, '\\-') // bullet point, horizontal rule, setext header, YAML front matter fence
             .replaceAll(/^\+/g, '\\+') // bullet point, TOML front matter fence

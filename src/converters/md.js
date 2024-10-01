@@ -512,7 +512,14 @@ export class MdConverter {
                 child.textContent?.match(/^\s+$/)
             ) {
                 continue;
+            } else if (child.nodeName === 'UL' || child.nodeName === 'MENU') {
+                result.push(this.convertUL(newCtx, child).slice(1) + '\n');
+                continue;
+            } else if (child.nodeName === 'OL') {
+                result.push(this.convertOL(newCtx, child).slice(1) + '\n');
+                continue;
             }
+            // assume child is an LI element
 
             result.push(ctx.indent + String(liNum) + '. ');
             result.push(
@@ -652,7 +659,14 @@ export class MdConverter {
                 child.textContent?.match(/^\s+$/)
             ) {
                 continue;
+            } else if (child.nodeName === 'UL' || child.nodeName === 'MENU') {
+                result.push(this.convertUL(newCtx, child).slice(1) + '\n');
+                continue;
+            } else if (child.nodeName === 'OL') {
+                result.push(this.convertOL(newCtx, child).slice(1) + '\n');
+                continue;
             }
+            // assume child is an LI element
 
             result.push(ctx.indent + ctx.mdBulletPoint + ' ');
             result.push(

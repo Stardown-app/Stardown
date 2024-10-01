@@ -36,14 +36,20 @@ export function absolutize(url, locationHref) {
  * @returns {void}
  */
 export function absolutizeNodeUrls(node, locationHref) {
-    const hrefs = node.querySelectorAll('[href]');
-    for (let i = 0; i < hrefs.length; i++) {
-        hrefs[i].href = absolutize(hrefs[i].href, locationHref);
+    const hrefEls = node.querySelectorAll('[href]');
+    for (let i = 0; i < hrefEls.length; i++) {
+        const hrefEl = hrefEls[i];
+        if (hrefEl.href) {
+            hrefEl.href = absolutize(hrefEl.href, locationHref);
+        }
     }
 
-    const srcs = node.querySelectorAll('[src]');
-    for (let i = 0; i < srcs.length; i++) {
-        srcs[i].src = absolutize(srcs[i].src, locationHref);
+    const srcEls = node.querySelectorAll('[src]');
+    for (let i = 0; i < srcEls.length; i++) {
+        const srcEl = srcEls[i];
+        if (srcEl.src) {
+            srcEl.src = absolutize(srcEl.src, locationHref);
+        }
     }
 }
 

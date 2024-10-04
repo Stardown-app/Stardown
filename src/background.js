@@ -94,7 +94,6 @@ browser.runtime.onMessage.addListener(async (message, sender, sendResponse) => {
             await showStatus(message.status, message.notifTitle, message.notifBody);
             break;
         case 'showWarning':
-            console.warn(message.warning);
             const notifyOnWarning = await getSetting('notifyOnWarning');
             if (notifyOnWarning) {
                 await showNotification('Warning', message.warning);

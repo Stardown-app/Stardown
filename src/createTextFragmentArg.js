@@ -39,6 +39,7 @@ export function createTextFragmentArg(selection) {
         result = window.generateFragment(selection);
     } catch (err) {
         if (err.message !== 'window.generateFragment is not a function') {
+            console.warn('generateFragment: ' + err.message);
             browser.runtime.sendMessage({
                 destination: 'background',
                 category: 'showWarning',
@@ -50,31 +51,35 @@ export function createTextFragmentArg(selection) {
 
     switch (result.status) {
         case 1:
+            console.warn('The selection provided could not be used to create a text fragment');
             browser.runtime.sendMessage({
                 destination: 'background',
                 category: 'showWarning',
-                warning: 'The selection provided could not be used to create a text fragment'
+                warning: 'The selection provided could not be used to create a text fragment',
             });
             return '';
         case 2:
+            console.warn('No unique text fragment could be identified for this selection');
             browser.runtime.sendMessage({
                 destination: 'background',
                 category: 'showWarning',
-                warning: 'No unique text fragment could be identified for this selection'
+                warning: 'No unique text fragment could be identified for this selection',
             });
             return '';
         case 3:
+            console.warn('Text fragment computation could not complete in time');
             browser.runtime.sendMessage({
                 destination: 'background',
                 category: 'showWarning',
-                warning: 'Text fragment computation could not complete in time'
+                warning: 'Text fragment computation could not complete in time',
             });
             return '';
         case 4:
+            console.warn('An exception was raised during text fragment generation');
             browser.runtime.sendMessage({
                 destination: 'background',
                 category: 'showWarning',
-                warning: 'An exception was raised during text fragment generation'
+                warning: 'An exception was raised during text fragment generation',
             });
             return '';
     }

@@ -485,11 +485,16 @@ export class MdConverter {
 
     /** @type {ElementConverter} */
     convertMENU(ctx, el) {
-        return this.convertUL(ctx, el);
+        return this.convertList(ctx, el);
     }
 
     /** @type {ElementConverter} */
     convertOL(ctx, el) {
+        return this.convertList(ctx, el);
+    }
+
+    /** @type {ElementConverter} */
+    convertList(ctx, el) {
         /** @type {string[]} */
         const result = ['\n'];
         if (!ctx.inList) {
@@ -523,7 +528,11 @@ export class MdConverter {
                 continue;
             }
 
-            result.push(ctx.indent + String(liNum) + '. ');
+            if (el.nodeName === 'OL') {
+                result.push(ctx.indent + String(liNum) + '. ');
+            } else {
+                result.push(ctx.indent + ctx.mdBulletPoint + ' ');
+            }
             result.push(
                 this.convertNodes(newCtx, child.childNodes)
                     .replace(/^ /, '')
@@ -642,54 +651,7 @@ export class MdConverter {
 
     /** @type {ElementConverter} */
     convertUL(ctx, el) {
-        /** @type {string[]} */
-        const result = ['\n'];
-        if (!ctx.inList) {
-            result.push('\n');
-        }
-
-        const newCtx = {
-            ...ctx, indent: ctx.indent + '    ', inList: true, dontTrimText: true,
-        };
-
-        const children = el.childNodes;
-        for (let i = 0; i < children.length; i++) {
-            const child = children[i];
-            if (
-                child.nodeType === TEXT_NODE ||
-                child.childNodes.length === 0 ||
-                child.textContent?.match(/^\s+$/)
-            ) {
-                continue;
-            } else if (child.nodeName === 'UL' || child.nodeName === 'MENU') {
-                result.push(this.convertUL(newCtx, child).slice(1) + '\n');
-                continue;
-            } else if (child.nodeName === 'OL') {
-                result.push(this.convertOL(newCtx, child).slice(1) + '\n');
-                continue;
-            } else if (child.nodeName !== 'LI' && child.nodeType !== COMMENT_NODE) {
-                console.warn(`Ignoring unexpected ${child.nodeName} in ${el.nodeName}`);
-                continue;
-            }
-
-            result.push(ctx.indent + ctx.mdBulletPoint + ' ');
-            result.push(
-                this.convertNodes(newCtx, child.childNodes)
-                    .replace(/^ /, '')
-                    .replace(/^\n+/, '')
-                    .replace(/ \n/, '\n')
-                    .replace(/ $/, '')
-            );
-            if (!ctx.inList || i < children.length - 2) {
-                result.push('\n');
-            }
-        }
-
-        if (!ctx.inList) {
-            result.push('\n');
-        }
-
-        return result.join('');
+        return this.convertList(ctx, el);
     }
 
     // inline text semantics elements

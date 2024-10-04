@@ -518,8 +518,10 @@ export class MdConverter {
             } else if (child.nodeName === 'OL') {
                 result.push(this.convertOL(newCtx, child).slice(1) + '\n');
                 continue;
+            } else if (child.nodeName !== 'LI' && child.nodeType !== COMMENT_NODE) {
+                console.warn(`Ignoring unexpected ${child.nodeName} in ${el.nodeName}`);
+                continue;
             }
-            // assume child is an LI element
 
             result.push(ctx.indent + String(liNum) + '. ');
             result.push(
@@ -665,8 +667,10 @@ export class MdConverter {
             } else if (child.nodeName === 'OL') {
                 result.push(this.convertOL(newCtx, child).slice(1) + '\n');
                 continue;
+            } else if (child.nodeName !== 'LI' && child.nodeType !== COMMENT_NODE) {
+                console.warn(`Ignoring unexpected ${child.nodeName} in ${el.nodeName}`);
+                continue;
             }
-            // assume child is an LI element
 
             result.push(ctx.indent + ctx.mdBulletPoint + ' ');
             result.push(

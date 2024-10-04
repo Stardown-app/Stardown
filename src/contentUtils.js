@@ -18,56 +18,6 @@ import { browser } from './browserSpecific.js';
 import { Readability } from './Readability.js';
 import { isProbablyReaderable } from './Readability-readerable.js'
 
-const defaultSettings = {
-    markupLanguage: 'markdown',
-    createTextFragment: true,
-    readabilityJs: true,
-    omitNav: true,
-    omitFooter: true,
-    omitHidden: true,
-    notifyOnWarning: false,
-    notifyOnSuccess: false,
-    copyTabsWindows: 'current',
-
-    mdSelectionFormat: 'source with link',
-    mdYoutube: 'almost everywhere',
-    mdSubBrackets: 'underlined',
-    mdBulletPoint: '-',
-    mdSelectionTemplate: `> [!note]
-> from [{{link.title}}]({{link.url}}) on {{date.YYYYMMDD}}
-
-{{selection}}`,
-
-    jsonEmptyCell: 'null',
-    jsonDestination: 'clipboard',
-};
-
-/**
- * getSetting gets a setting from the browser's sync storage. If the setting does not
- * exist there, its default value is returned.
- * @param {string} name - the name of the setting.
- * @returns {Promise<any>}
- */
-export async function getSetting(name) {
-    let obj;
-    try {
-        obj = await browser.storage?.sync.get(name);
-    } catch (err) {
-        console.error(err);
-        return defaultSettings[name];
-    }
-    if (obj === undefined) {
-        return defaultSettings[name];
-    }
-
-    const value = obj[name];
-    if (value === undefined) {
-        return defaultSettings[name];
-    }
-
-    return value;
-}
-
 /**
  * sendToNotepad sends text to Stardown's sidebar notepad to be inserted.
  * @param {string} text

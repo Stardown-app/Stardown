@@ -15,7 +15,7 @@
 */
 
 import { browser, getShortcutInstructions } from './browserSpecific.js';
-import { getSetting } from './utils.js';
+import { getSetting } from './getSetting.js';
 
 document.querySelector('#versionNumber').innerHTML = 'v' + browser.runtime.getManifest().version;
 

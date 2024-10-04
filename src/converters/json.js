@@ -14,7 +14,7 @@
    limitations under the License.
 */
 
-import { getSetting } from '../utils.js';
+import { getSetting } from '../getSetting.js';
 import * as tables from './utils/tables.js';
 
 // [RFC 8259](https://www.rfc-editor.org/rfc/rfc8259)

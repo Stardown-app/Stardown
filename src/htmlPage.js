@@ -14,7 +14,8 @@
    limitations under the License.
 */
 
-import { getSetting, sendToNotepad, applyTemplate, readabilitize } from './utils.js';
+import { getSetting } from './getSetting.js';
+import { sendToNotepad, applyTemplate, readabilitize } from './contentUtils.js';
 import { preprocessFragment } from './converters/utils/html.js';
 import { absolutizeNodeUrls, removeIdAndTextFragment } from './converters/utils/urls.js';
 import * as md from './generators/md.js';

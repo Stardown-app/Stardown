@@ -338,7 +338,12 @@ async function handleSelectionCopyRequest(htmlId, selection) {
 
     let arg = ''; // the text fragment argument
     const createTextFragment = await getSetting('createTextFragment');
-    if (createTextFragment && selection && selection.type === 'Range') {
+    if (
+        createTextFragment &&
+        selection &&
+        selection.type === 'Range' &&
+        tableSelection === null // creating text frags of tables is super slow
+    ) {
         arg = createTextFragmentArg(selection);
     }
 

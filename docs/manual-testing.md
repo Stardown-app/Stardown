@@ -9,6 +9,7 @@ Here are a bunch of web pages with interesting features for testing.
 - [tiny table](https://www.markdownguide.org/extended-syntax/#tables)
 - [small table](https://developer.mozilla.org/en-US/docs/Learn/HTML/Tables/Advanced#tables_for_visually_impaired_users)
 - [complex table](https://en.wikipedia.org/wiki/English_modal_auxiliary_verbs#Modal_auxiliary_verbs_distinguished_grammatically)
+- [complex table 2](https://en.wikipedia.org/wiki/Dear_Evan_Hansen#Original_West_End_production)
 - [table with link images](https://en.wikipedia.org/wiki/1926_World_Table_Tennis_Championships)
 - [tables with spanned images](https://en.wikipedia.org/wiki/Toshimi_Kitazawa)
 - [massive table](https://www.worldometers.info/world-population/population-by-country/)

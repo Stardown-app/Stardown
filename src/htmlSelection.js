@@ -16,6 +16,7 @@
 
 import { getSetting } from './getSetting.js';
 import { sendToNotepad, applyTemplate } from './contentUtils.js';
+import { absolutizeNodeUrls } from './converters/utils/urls.js';
 import { preprocessFragment } from './converters/utils/html.js';
 import * as md from './generators/md.js';
 import { htmlToMd, mdEncodeUri } from './converters/md.js';

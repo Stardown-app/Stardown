@@ -9,6 +9,7 @@ Here are a bunch of web pages with interesting features for testing.
 - [tiny table](https://www.markdownguide.org/extended-syntax/#tables)
 - [small table](https://developer.mozilla.org/en-US/docs/Learn/HTML/Tables/Advanced#tables_for_visually_impaired_users)
 - [complex table](https://en.wikipedia.org/wiki/English_modal_auxiliary_verbs#Modal_auxiliary_verbs_distinguished_grammatically)
+- [complex table 2](https://en.wikipedia.org/wiki/Dear_Evan_Hansen#Original_West_End_production)
 - [table with link images](https://en.wikipedia.org/wiki/1926_World_Table_Tennis_Championships)
 - [tables with spanned images](https://en.wikipedia.org/wiki/Toshimi_Kitazawa)
 - [massive table](https://www.worldometers.info/world-population/population-by-country/)
@@ -21,7 +22,6 @@ Here are a bunch of web pages with interesting features for testing.
 - [block quote](https://markdownguide.offshoot.io/basic-syntax/#blockquotes-1)
 - [image with an absolute src](https://betterexplained.com/articles/math-empathy/#post-6251:~:text=Math%20Empathy%20Checklist,different%20mental%20checklist.)
 - [images with relative srcs](https://textbundle.org/)
-- [iframe](https://www.w3schools.com/html/html_iframe.asp)
 - [YouTube video](https://www.youtube.com/watch?v=jfKfPfyJRdk)
 - [PDFs](https://haslab.github.io/SAFER/scp21.pdf) should make Stardown show an error message like "Stardown cannot run on PDFs"
 
@@ -41,9 +41,10 @@ When the user right-clicks part of a web page, their browser detects the type of
 
 ### Features
 
+- [ ] **Pressing any button in the popup** should do what the button's text describes.
 - [ ] **Pressing Alt+C** copies a markdown link for the page, unless part of the page is selected in which case markdown of the selection is copied instead.
-- [ ] **Right-clicking an empty part of a page** shows the "Copy markdown link to here" option.
-- [ ] **Right-clicking a website's unselected header** shows the "Copy markdown link to here" option.
+- [ ] **Right-clicking an empty part of a page** shows the "Copy markdown link for this part of the page" option.
+- [ ] **Right-clicking a website's unselected header** shows the "Copy markdown link for this part of the page" option.
 - [ ] **Right-clicking selected text** shows the "Copy markdown of selection" option.
 - [ ] **Right-clicking an unselected image** shows the "Copy markdown of image" option.
 - [ ] **Selecting text, then right-clicking an unselected image**, due to browser limitations, shows no context menu option in Chromium and shows "Copy markdown of selection" in Firefox.
@@ -55,25 +56,10 @@ When the user right-clicks part of a web page, their browser detects the type of
 - [ ] **Right-clicking a video** shows the "Copy markdown of video" option, but may require a second right-click for the correct context menu to appear because some videos (e.g. YouTube videos) have a special context menu.
 - [ ] **Right-clicking an audio player** shows the "Copy markdown of audio" option.
 - [ ] **Selecting the contents of a table and right-clicking the selection** shows several options: "Copy markdown of table", "Copy TSV of table", "Copy CSV of table", "Copy JSON of table", and "Copy HTML of table". Each option should result in a table with everything aligned correctly, leaving some cells empty and others duplicated as necessary.
-- [ ] "Copy markdown link to here" copies a markdown link for the page with an HTML element ID from where the page was right-clicked, if one exists there.
+- [ ] "Copy markdown link for this part of the page" copies a markdown link for the page with an HTML element ID from where the page was right-clicked, if one exists there.
 - [ ] "Copy markdown of selection", by default, copies markdown of the selected text (including all of the page's formatting that markdown supports), and a markdown link containing a text fragment and possibly an HTML element ID.
 - [ ] "Copy markdown of image" copies markdown of the image using the image's URL and any alt text.
 - [ ] "Copy markdown of link" copies markdown of the link, using the same title and URL as the link in the page (except for any character escapes or encodings).
 - [ ] "Copy markdown of video" copies markdown of the video using the video source's URL.
 - [ ] "Copy markdown of audio" copies a markdown link to either an audio file or a site that plays the audio.
 - [ ] **Change settings and repeat as necessary**
-
-### Errors and warnings
-
-When something goes wrong, Stardown should still respond well.
-
-#### Text fragment timeout
-
-1. Turn on the "Show warning notifications" setting
-2. Go to https://markdownguide.offshoot.io/basic-syntax/#blockquotes-1
-3. Select the text "rendered output" (this phrase appears 32 times on this somewhat long page)
-4. Right-click the selection and choose "Copy markdown of selection"
-5. After several seconds:
-  - Stardown's icon should display a green check (✓) to indicate success.
-  - A system notification should appear that says "Warning" and explains that the fragment generator timed out.
-  - The clipboard should now have a markdown link without a text fragment.

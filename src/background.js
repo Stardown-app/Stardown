@@ -14,8 +14,8 @@
    limitations under the License.
 */
 
-import { browser, sleep, createContextMenus, updateContextMenu, updateContextMenuLanguage } from './config.js';
-import { getSetting } from './common.js';
+import { browser, sleep, createContextMenus, updateContextMenu, updateContextMenuLanguage } from './browserSpecific.js';
+import { getSetting } from './getSetting.js';
 import { createTabLink } from './generators/md.js';
 
 let markupLanguage = 'markdown';
@@ -36,9 +36,9 @@ getSetting('jsonDestination').then(value => jsonDestination = value);
 browser.tabs.query({ currentWindow: true, active: true }).then(tabs => {
     windowId = tabs[0].windowId;
 });
-browser.windows.onFocusChanged.addListener(async windowId_ => {
-    if (windowId_ !== -1) {
-        windowId = windowId_;
+browser.windows.onFocusChanged.addListener(async newWindowId => {
+    if (newWindowId !== -1) {
+        windowId = newWindowId;
     }
 });
 
@@ -48,13 +48,17 @@ browser.commands.onCommand.addListener(async command => {
             // Chromium only
             browser.sidePanel.open({ windowId: windowId });
             break;
-        case 'copy':
+        case 'copySelection':
             const tabs = await browser.tabs.query({ active: true, currentWindow: true });
-            await handleInteraction(tabs[0], { category: 'copyShortcut' });
+            await handleInteraction(tabs[0], { category: 'copySelectionShortcut' });
             break;
-        case 'copyMultiple':
+        case 'copyEntirePage':
             const tabs1 = await browser.tabs.query({ active: true, currentWindow: true });
-            await handleCopyAllTabs(tabs1[0]);
+            await handleInteraction(tabs1[0], { category: 'copyEntirePageShortcut' });
+            break;
+        case 'copyMultipleTabs':
+            const tabs2 = await browser.tabs.query({ active: true, currentWindow: true });
+            await handleCopyMultipleTabs(tabs2[0]);
             break;
         case 'openSettings':
             browser.runtime.openOptionsPage();
@@ -71,6 +75,10 @@ browser.commands.onCommand.addListener(async command => {
 });
 
 browser.runtime.onMessage.addListener(async (message, sender, sendResponse) => {
+    if (message.destination !== 'background') {
+        return;
+    }
+
     switch (message.category) {
         case 'updateContextMenu':
             // These context menu updates are done with messages from the content script
@@ -86,43 +94,26 @@ browser.runtime.onMessage.addListener(async (message, sender, sendResponse) => {
             await showStatus(message.status, message.notifTitle, message.notifBody);
             break;
         case 'showWarning':
-            console.warn(message.warning);
             const notifyOnWarning = await getSetting('notifyOnWarning');
             if (notifyOnWarning) {
                 await showNotification('Warning', message.warning);
             }
             break;
-        case 'copyButtonPressed':
+        case 'copySelectionButtonPressed':
             const tabs = await browser.tabs.query({ active: true, currentWindow: true });
-            await handleInteraction(tabs[0], { category: 'copyShortcut' });
+            await handleInteraction(tabs[0], { category: 'copySelectionShortcut' });
             break;
-        case 'copyMultipleButtonPressed':
+        case 'copyEntirePageButtonPressed':
             const tabs1 = await browser.tabs.query({ active: true, currentWindow: true });
-            await handleCopyAllTabs(tabs1[0]);
+            await handleInteraction(tabs1[0], { category: 'copyEntirePageShortcut' });
+            break;
+        case 'copyMultipleTabsButtonPressed':
+            const tabs2 = await browser.tabs.query({ active: true, currentWindow: true });
+            await handleCopyMultipleTabs(tabs2[0]);
             break;
         case 'sidebarButtonPressed':
             // Chromium only
             browser.sidePanel?.open({ windowId: windowId });
-            break;
-        case 'reportBugButtonPressed':
-            browser.tabs.create({
-                url: 'https://github.com/Stardown-app/Stardown/issues'
-            });
-            break;
-        case 'requestFeatureButtonPressed':
-            browser.tabs.create({
-                url: 'https://github.com/Stardown-app/Stardown/issues'
-            });
-            break;
-        case 'discussButtonPressed':
-            browser.tabs.create({
-                url: 'https://github.com/Stardown-app/Stardown/discussions'
-            });
-            break;
-        case 'sourceButtonPressed':
-            browser.tabs.create({
-                url: 'https://github.com/Stardown-app/Stardown'
-            });
             break;
         case 'settingsButtonPressed':
             browser.runtime.openOptionsPage();
@@ -234,11 +225,28 @@ browser.contextMenus.onClicked.addListener(async (info, tab) => {
  * @returns {Promise<void>}
  */
 async function handleInteraction(tab, message, options = {}, successStatus = 1) {
-    if (tab.url.endsWith('.pdf')) {
+    const uriScheme = tab.url.split(':')[0];
+    if (!['http', 'https', 'file'].includes(uriScheme)) {
+        await showStatus(
+            0,
+            'Error',
+            `Stardown cannot run on pages with a URL that starts with "${uriScheme}:"`,
+        );
+        return;
+    } else if (tab.url.endsWith('.pdf')) {
         await showStatus(0, 'Error', 'Stardown cannot run on PDFs');
+        return;
+    } else if (
+        tab.url.startsWith('https://chromewebstore.google.com') ||
+        tab.url.startsWith('https://microsoftedge.microsoft.com/addons') ||
+        tab.url.startsWith('https://addons.mozilla.org') ||
+        tab.url.startsWith('https://addons.opera.com')
+    ) {
+        await showStatus(0, 'Error', 'Stardown cannot run in extension stores');
         return;
     }
 
+    message.destination = 'content';
     message.id = Math.random(); // why: https://github.com/Stardown-app/Stardown/issues/98
 
     let status, notifTitle, notifBody;
@@ -267,13 +275,13 @@ async function handleInteraction(tab, message, options = {}, successStatus = 1) 
 }
 
 /**
- * handleCopyAllTabs handles a request from the user to create a markdown list of links,
- * and sends it to the content script to be copied. A status indicator is then shown
- * to the user.
+ * handleCopyMultipleTabs handles a request from the user to create a markdown list of
+ * links, and sends it to the content script to be copied. A status indicator is then
+ * shown to the user.
  * @param {any} activeTab
  * @returns {Promise<void>}
  */
-async function handleCopyAllTabs(activeTab) {
+async function handleCopyMultipleTabs(activeTab) {
     // figure out which tabs to create links for
     let tabs = await browser.tabs.query({ currentWindow: true, highlighted: true });
     if (tabs.length === 1) { // if only one tab is highlighted
@@ -403,12 +411,12 @@ async function showNotification(title, body) {
  * @returns {Promise<void>}
  */
 async function brieflyShowCheck(itemCount) {
+    browser.action.setBadgeBackgroundColor({ color: 'green' });
     if (!itemCount || itemCount === 1) {
         browser.action.setBadgeText({ text: '✓' });
     } else {
         browser.action.setBadgeText({ text: `${itemCount} ✓` });
     }
-    browser.action.setBadgeBackgroundColor({ color: 'green' });
     await sleep(1000); // 1 second
     browser.action.setBadgeText({ text: '' });
 }
@@ -418,8 +426,8 @@ async function brieflyShowCheck(itemCount) {
  * @returns {Promise<void>}
  */
 async function brieflyShowX() {
-    browser.action.setBadgeText({ text: '✗' });
     browser.action.setBadgeBackgroundColor({ color: 'red' });
+    browser.action.setBadgeText({ text: '✗' });
     await sleep(1000); // 1 second
     browser.action.setBadgeText({ text: '' });
 }

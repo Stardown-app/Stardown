@@ -1,14 +1,15 @@
 node_modules
+.DS_Store
 *.zip
 web-ext-artifacts
 .web-extension-id
 
 firefox/*
 !firefox/manifest.json
-!firefox/config.js
+!firefox/browserSpecific.js
 
 chrome/*
 !chrome/manifest.json
-!chrome/config.js
+!chrome/browserSpecific.js
 
 *.diff.html

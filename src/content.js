@@ -14,11 +14,13 @@
    limitations under the License.
 */
 
-import { browser, handleCopyRequest } from './config.js';
+import { browser, handleCopyRequest } from './browserSpecific.js';
 import * as md from './generators/md.js';
 import * as htmlSelection from './htmlSelection.js';
+import { handleCopyPageRequest } from './htmlPage.js';
 import { createTextFragmentArg } from './createTextFragmentArg.js';
-import { getSetting } from './common.js';
+import { getSetting } from './getSetting.js';
+import { sendToNotepad } from './contentUtils.js';
 import { removeIdAndTextFragment } from './converters/utils/urls.js';
 import { htmlTableToJson } from './converters/json.js';
 import { htmlTableToCsv } from './converters/csv.js';
@@ -69,15 +71,21 @@ function setUpListeners() {
         const s = window.getSelection();
         if (s && s.type === 'Range') {
             browser.runtime.sendMessage({
-                category: 'updateContextMenu', context: { mouseover: 'selection' },
+                destination: 'background',
+                category: 'updateContextMenu',
+                context: { mouseover: 'selection' },
             });
         } else if (event.target.nodeName === 'IMG') {
             browser.runtime.sendMessage({
-                category: 'updateContextMenu', context: { mouseover: 'image' },
+                destination: 'background',
+                category: 'updateContextMenu',
+                context: { mouseover: 'image' },
             });
         } else if (event.target.nodeName === 'A') {
             browser.runtime.sendMessage({
-                category: 'updateContextMenu', context: { mouseover: 'link' },
+                destination: 'background',
+                category: 'updateContextMenu',
+                context: { mouseover: 'link' },
             });
         }
     });
@@ -97,7 +105,9 @@ function setUpListeners() {
         if (isTable) {
             tableSelection = selection;
             browser.runtime.sendMessage({
-                category: 'updateContextMenu', context: { mouseup: 'table' },
+                destination: 'background',
+                category: 'updateContextMenu',
+                context: { mouseup: 'table' },
             });
         } else {
             tableSelection = null;
@@ -109,7 +119,9 @@ function setUpListeners() {
         // message to the background script so it can load the correct context menu
         // items.
         browser.runtime.sendMessage({
-            category: 'updateContextMenu', context: { selectionchange: 'selection' },
+            destination: 'background',
+            category: 'updateContextMenu',
+            context: { selectionchange: 'selection' },
         });
     });
 
@@ -130,6 +142,10 @@ function setUpListeners() {
     });
 
     browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
+        if (message.destination !== 'content') {
+            return;
+        }
+
         // In Chromium, this listener must be synchronous and must send a response
         // immediately. True must be sent if the actual response will be sent
         // asynchronously.
@@ -187,12 +203,14 @@ async function handleRequest(message) {
 
     switch (message.category) {
         case 'copyText':
-            await htmlSelection.sendToNotepad(message.text);
+            await sendToNotepad(message.text);
             // write to the clipboard & return a response
             return await handleCopyRequest(message.text);
-        case 'copyShortcut':
+        case 'copySelectionShortcut':
             // respond to use of the copy keyboard shortcut or copy button
-            return await handleCopyShortcut();
+            return await handleCopySelectionShortcut();
+        case 'copyEntirePageShortcut':
+            return await handleCopyPageRequest();
         case 'pageRightClick':
             const id1 = await getClickedElementId(clickedElement);
             return await handlePageRightClick(id1);
@@ -202,19 +220,19 @@ async function handleRequest(message) {
             return await handleSelectionCopyRequest(id2, selection1);
         case 'linkRightClick':
             const linkMd = await md.createLink(linkText, message.linkUrl);
-            await htmlSelection.sendToNotepad(linkMd);
+            await sendToNotepad(linkMd);
             return await handleCopyRequest(linkMd);
         case 'imageRightClick':
             const imageMd = await md.createImage(message.srcUrl);
-            await htmlSelection.sendToNotepad(imageMd + '\n');
+            await sendToNotepad(imageMd + '\n');
             return await handleCopyRequest(imageMd + '\n');
         case 'videoRightClick':
             const videoMd = await md.createVideo(message.srcUrl, message.pageUrl);
-            await htmlSelection.sendToNotepad(videoMd + '\n');
+            await sendToNotepad(videoMd + '\n');
             return await handleCopyRequest(videoMd + '\n');
         case 'audioRightClick':
             const audioMd = await md.createAudio(message.srcUrl, message.pageUrl);
-            await htmlSelection.sendToNotepad(audioMd + '\n');
+            await sendToNotepad(audioMd + '\n');
             return await handleCopyRequest(audioMd + '\n');
         case 'markdownTableRightClick':
             const id3 = await getClickedElementId(clickedElement);
@@ -232,7 +250,7 @@ async function handleRequest(message) {
                 return null;
             }
             const h = tableFrag.firstChild.outerHTML;
-            await htmlSelection.sendToNotepad(h);
+            await sendToNotepad(h);
             return await handleCopyRequest(h);
         default:
             console.error('Unknown message category:', message.category);
@@ -263,10 +281,10 @@ async function getClickedElementId(clickedElement) {
 }
 
 /**
- * handleCopyShortcut handles a copy request from the user.
+ * handleCopySelectionShortcut handles a request from the user to copy a selection.
  * @returns {Promise<ContentResponse>}
  */
-async function handleCopyShortcut() {
+async function handleCopySelectionShortcut() {
     const selection = window.getSelection();
     if (selection && selection.type === 'Range') {
         // only allow Range (and not Caret) selections or else every copy request will
@@ -279,11 +297,11 @@ async function handleCopyShortcut() {
         case 'markdown':
         case 'markdown with some html':
             const linkMd = await md.createLink(document.title, location.href);
-            await htmlSelection.sendToNotepad(linkMd);
+            await sendToNotepad(linkMd);
             return await handleCopyRequest(linkMd);
         case 'html':
             const anchor = `<a href="${location.href}">${document.title}</a>`;
-            await htmlSelection.sendToNotepad(anchor);
+            await sendToNotepad(anchor);
             return await handleCopyRequest(anchor);
         default:
             console.error('Unknown markup language:', markupLanguage);
@@ -304,7 +322,7 @@ async function handlePageRightClick(htmlId) {
     }
 
     const link = await md.createLink(title, url);
-    await htmlSelection.sendToNotepad(link);
+    await sendToNotepad(link);
     return await handleCopyRequest(link);
 }
 
@@ -357,7 +375,7 @@ async function handleCsvTableRightClick(tableSelection, delimiter = ',') {
         text = await htmlTableToCsv(frag, delimiter);
     }
 
-    await htmlSelection.sendToNotepad(text);
+    await sendToNotepad(text);
     return await handleCopyRequest(text);
 }
 
@@ -372,7 +390,7 @@ async function handleJsonTableRightClick(tableSelection) {
     let frag = await htmlSelection.getSelectionFragment(tableSelection);
     if (frag === null) {
         const text = tableSelection.textContent;
-        await htmlSelection.sendToNotepad(text);
+        await sendToNotepad(text);
         return await handleCopyRequest(text);
     }
 
@@ -380,13 +398,14 @@ async function handleJsonTableRightClick(tableSelection) {
 
     const jsonDestination = await getSetting('jsonDestination');
     if (jsonDestination === 'clipboard') {
-        await htmlSelection.sendToNotepad(tableJson);
+        await sendToNotepad(tableJson);
         return await handleCopyRequest(tableJson);
     }
 
     // Tell the background what to download because apparently `browser.downloads` is
     // always undefined in content scripts.
     browser.runtime.sendMessage({
+        destination: 'background',
         category: 'downloadFile',
         file: {
             name: 'table.json',

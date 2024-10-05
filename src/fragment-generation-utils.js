@@ -15,13 +15,14 @@
  */
 
 // NOTICE: this file was modified from the original (see link below) to not use
-// `import`, `export`, or `fragments`, and to put the `generateFragment` function into
-// the `window` object so that it can be used in Stardown's content script.
-// Additionally, some of the code Stardown doesn't need was removed.
+// `import`, `export`, or `fragments`, to put the `generateFragment` function into the
+// `window` object so that it can be used in Stardown's content script, and to send the
+// timeout values to the processTextFragmentDirective function. Additionally, some of
+// the code Stardown doesn't need was removed.
 //
 // Original code:
 // https://github.com/GoogleChromeLabs/text-fragments-polyfill/blob/53375fea08665bac009bb0aa01a030e065c3933d/src/fragment-generation-utils.js
-
+//
 // This file depends on ./text-fragment-utils.js
 
 const MAX_EXACT_MATCH_LENGTH = 300;
@@ -1117,7 +1118,7 @@ const BlockTextAccumulator = class {
  *     portion of the document.
  */
 const isUniquelyIdentifying = (fragment) => {
-    return processTextFragmentDirective(fragment).length === 1;
+    return processTextFragmentDirective(fragment, t0, timeoutDurationMs).length === 1;
 };
 
 /**

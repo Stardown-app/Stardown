@@ -22,6 +22,10 @@ Manual testing is often helpful too. When testing manually, see [./manual-testin
 
 Let's create feature branches with descriptive names and make pull requests as described in [Getting started with Git and GitHub](https://chriswheeler.dev/posts/getting-started-with-git-and-github/#git-workflows).
 
+## Writing import statements
+
+Stardown uses several different execution contexts as described in [./message-passing.md](./message-passing.md), and development of Stardown uses the [Rollup](https://rollupjs.org/) bundler to combine the files for each context. Rollup copies an entire file's content (and the content of all files that file imports) into another file even if the import statement only asks for specific things. For this reason, try to avoid putting functions and imports for one execution context in a file that is only for a different execution context, or else the resulting bundled code will have a lot of duplicate unused code that might go unnoticed except by extension reviewers.
+
 ## Writing documentation
 
 This project uses [JSDoc](https://en.wikipedia.org/wiki/JSDoc) to annotate types. In VS Code you can type `/**` above a function and press enter to auto-generate part of its JSDoc comment (this might require the [ESLint](https://marketplace.visualstudio.com/items?itemName=dbaeumer.vscode-eslint) extension).
@@ -40,12 +44,11 @@ Stardown converts HTML to other formats using custom code explained in [../src/c
 - Firefox [sometimes requires an add-on ID](https://extensionworkshop.com/documentation/develop/extensions-and-the-add-on-id/) in `browser_specific_settings` in manifest.json, but Chromium doesn't allow `browser_specific_settings`.
 - Based on testing I took notes on in [#11](https://github.com/Stardown-app/Stardown/issues/11), it appears Firefox manifest v2 does not allow use of the `import` and `export` keywords, and Chrome manifest v3 does not allow their use in content scripts. That's why Stardown requires using a bundler.
 - Firefox has [sidebars](https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/API/sidebarAction) and Chromium has [side panels](https://developer.chrome.com/docs/extensions/reference/api/sidePanel), which are mostly the same but have different APIs.
-- [Firefox does not support text fragments yet](https://bugzilla.mozilla.org/show_bug.cgi?id=1753933).
 - Further differences are described in comments throughout Stardown's code.
 
 ## Text fragments
 
-Text fragments and how to generate them is explained in [this web.dev article](https://web.dev/articles/text-fragments#programmatic_text_fragment_link_generation). The article mentions [a minified version of the text fragment generation code](https://unpkg.com/text-fragments-polyfill@5.7.0/dist/fragment-generation-utils.js), but Stardown doesn't use the minified version because extension stores need to be able to review the code and minifying code doesn't really help extensions.
+Text fragments and how to generate them is explained in [Text fragments | MDN](https://developer.mozilla.org/en-US/docs/Web/URI/Fragment/Text_fragments) and in [Boldly link where no one has linked before: Text Fragments | web.dev](https://web.dev/articles/text-fragments#programmatic_text_fragment_link_generation). The second article mentions [a minified version of the text fragment generation code](https://unpkg.com/text-fragments-polyfill@5.7.0/dist/fragment-generation-utils.js), but Stardown doesn't use the minified version because extension stores need to be able to review the code and minifying code doesn't really help extensions.
 
 Stardown's text fragment generation code, which was almost entirely written by Google, is in the files named `text-fragment-utils.js` and `fragment-generation-utils.js`. They probably should not be changed for anything except fixing bugs or updating to new versions of text fragments.
 

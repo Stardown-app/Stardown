@@ -57,13 +57,22 @@
         "default_icon": "images/stardown-16.png"
     },
     "commands": {
-        "copy": {
+        "copySelection": {
             "suggested_key": {
                 "default": "Alt+C"
             },
             "description": "Copy selection"
         },
-        "copyMultiple": {
+        "copyEntirePage": {
+            "suggested_key": {
+                "default": "Alt+P"
+            },
+            "description": "Copy entire page"
+        },
+        "copyMultipleTabs": {
+            "suggested_key": {
+                "default": "Alt+M"
+            },
             "description": "Copy multiple tabs"
         },
         "openSidePanel": {
@@ -74,18 +83,6 @@
         },
         "openSettings": {
             "description": "Open settings"
-        },
-        "reportBug": {
-            "description": "Report a bug"
-        },
-        "requestFeature": {
-            "description": "Request a feature"
-        },
-        "discuss": {
-            "description": "Join the discussion"
-        },
-        "openSource": {
-            "description": "See the source code"
         }
     }
 }

@@ -57,16 +57,22 @@ You can use this [bookmarklet](https://en.wikipedia.org/wiki/Bookmarklet) I made
 
 ### Integrate directly with an editor
 
-* [MarkDownload](https://github.com/deathau/markdownload) was developed by an Obsidian community moderator. While Stardown is great for copying *parts* of web pages as markdown, MarkDownload is better for downloading entire pages, especially if you want to download directly into Obsidian. I use both Stardown and MarkDownload.
+* [Obsidian Clipper](https://github.com/obsidianmd/obsidian-clipper) is the official web clipper extension for Obsidian.
+* [MarkDownload](https://github.com/deathau/markdownload) was developed by an Obsidian community moderator.
 * [Omnivore](https://omnivore.app/) can save content in a variety of formats.
 * [linkding](https://github.com/sissbruecker/linkding) is a self-hosted bookmarks manager.
 * [Zotero](https://www.zotero.org/) is one of the best tools for saving and organizing research.
 * [Joplin](https://github.com/laurent22/joplin) has an [official web clipper](https://github.com/laurent22/joplin/blob/dev/readme/apps/clipper.md) of its own.
 * [Send To Logseq](https://chromewebstore.google.com/detail/send-to-logseq/mgdccnefjlmhnfbmlnhddoogimbpmilj) is a browser extension that saves web pages to [Logseq](https://github.com/logseq/logseq?tab=readme-ov-file).
+* [github.com/jsartelle/vscode-web-clipper](https://github.com/jsartelle/vscode-web-clipper) is a VS Code extension.
 * [github.com/webclipper/web-clipper](https://github.com/webclipper/web-clipper) can integrate directly with Obsidian, Notion, OneNote, Bear, Yuque, Joplin, and more.
 * [Obsidian Web Clipper Bookmarklet](https://gist.github.com/kepano/90c05f162c37cf730abb8ff027987ca3) is a bookmarklet for saving web pages directly to Obsidian.
 * [Slurp](https://github.com/inhumantsar/slurp) is an Obsidian community plugin and bookmarklet for saving web pages directly to Obsidian.
 * [import-github-readme](https://github.com/chasebank87/import-github-readme) is an Obsidian plugin for downloading GitHub readme files directly into Obsidian.
+
+### Convert between markup languages
+
+* [Pandoc](https://pandoc.org/) offers a command-line tool and a Haskell library that can convert between almost any two markup languages.
 
 ### Scrape websites
 
@@ -83,15 +89,12 @@ You can use this [bookmarklet](https://en.wikipedia.org/wiki/Bookmarklet) I made
 * [url2clipboard](https://github.com/asamuzaK/url2clipboard) supports HTML, Markdown, BBCode, Textile, AsciiDoc, MediaWiki, Jira, reStructuredText, LaTeX, Org Mode, and text.
 * [TabCopy](https://chromewebstore.google.com/detail/tabcopy/micdllihgoppmejpecmkilggmaagfdmb) might only be on the Chrome Web Store, but supports many markup languages including HTML, Markdown, BBCode, CSV, and JSON, and lets you create custom link formats.
 
-### Copy just a URL with a text fragment
+## Why Stardown?
 
-* [link-to-text-fragment](https://github.com/GoogleChromeLabs/link-to-text-fragment) was made by Google itself but is cross-browser.
+Stardown is:
 
-### Why use Stardown?
-
-Unlike the alternatives listed above, Stardown is:
-
-* **Flexible**. Integrates well with many workflows. Just copy part of a web page and paste anywhere.
-* **Converts more formatting**. Stardown can convert almost any table to markdown or other markup languages, and can create markdown of videos that renders well in GitHub.
-* **Creates [text fragments](https://web.dev/articles/text-fragments)** so you can link to specific parts of pages.
-* **Extensible**. Stardown's custom code for converting between markup languages is designed to be extended for more markdown flavors and other markup languages.
+* **Flexible**. Integrates well with many workflows. Select almost anything, copy and paste anywhere.
+* **Instantly clip** into a note using Stardown's sidebar notepad to both copy and paste with `Alt+C`.
+* **Better at converting**. Stardown's custom code for converting HTML to markdown can convert more formatting than alternatives.
+* **Creates [text fragments](https://developer.mozilla.org/en-US/docs/Web/URI/Fragment/Text_fragments)** so you can link to specific parts of pages.
+* **Extensible**. Stardown is designed to be extended for more markdown flavors and other markup languages.

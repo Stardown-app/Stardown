@@ -14,24 +14,29 @@
    limitations under the License.
 */
 
-if (typeof browser === 'undefined') {
-    var browser = chrome;
-}
+import { browser } from './browserSpecific.js';
 
-const copyButton = document.querySelector('#copyButton');
-const copyMultipleButton = document.querySelector('#copyMultipleButton');
+const copySelectionButton = document.querySelector('#copySelectionButton');
+const copyEntirePageButton = document.querySelector('#copyEntirePageButton');
+const copyMultipleTabsButton = document.querySelector('#copyMultipleTabsButton');
 const sidebarButton = document.querySelector('#sidebarButton');
 const settingsButton = document.querySelector('#settingsButton');
-const reportBugButton = document.querySelector('#reportBugButton');
-const requestFeatureButton = document.querySelector('#requestFeatureButton');
-const discussButton = document.querySelector('#discussButton');
-const sourceButton = document.querySelector('#sourceButton');
 
-copyButton.addEventListener('click', async () => {
-    browser.runtime.sendMessage({ category: 'copyButtonPressed' });
+copySelectionButton.addEventListener('click', async () => {
+    browser.runtime.sendMessage({
+        destination: 'background',
+        category: 'copySelectionButtonPressed',
+    });
 });
 
-copyMultipleButton.addEventListener('click', async () => {
+copyEntirePageButton.addEventListener('click', async () => {
+    browser.runtime.sendMessage({
+        destination: 'background',
+        category: 'copyEntirePageButtonPressed',
+    });
+});
+
+copyMultipleTabsButton.addEventListener('click', async () => {
     let havePerm;
     try {
         // The permissions request must be the first async function call in the event
@@ -40,6 +45,7 @@ copyMultipleButton.addEventListener('click', async () => {
     } catch (err) {
         console.error('browser.permissions.request:', err);
         browser.runtime.sendMessage({
+            destination: 'background',
             category: 'showStatus',
             status: 0,
             notifTitle: 'Error',
@@ -53,7 +59,10 @@ copyMultipleButton.addEventListener('click', async () => {
     }
 
     console.log('User granted permission request.');
-    browser.runtime.sendMessage({ category: 'copyMultipleButtonPressed' });
+    browser.runtime.sendMessage({
+        destination: 'background',
+        category: 'copyMultipleTabsButtonPressed',
+    });
 });
 
 sidebarButton.addEventListener('click', async () => {
@@ -62,67 +71,45 @@ sidebarButton.addEventListener('click', async () => {
         await browser.sidebarAction.toggle();
     } else {
         // Chromium only
-        browser.runtime.sendMessage({ category: 'sidebarButtonPressed' });
+        browser.runtime.sendMessage({
+            destination: 'background',
+            category: 'sidebarButtonPressed',
+        });
     }
 });
 
 settingsButton.addEventListener('click', async () => {
-    browser.runtime.sendMessage({ category: 'settingsButtonPressed' });
-});
-
-reportBugButton.addEventListener('click', async () => {
-    browser.runtime.sendMessage({ category: 'reportBugButtonPressed' });
-});
-
-requestFeatureButton.addEventListener('click', async () => {
-    browser.runtime.sendMessage({ category: 'requestFeatureButtonPressed' });
-});
-
-discussButton.addEventListener('click', async () => {
-    browser.runtime.sendMessage({ category: 'discussButtonPressed' });
-});
-
-sourceButton.addEventListener('click', async () => {
-    browser.runtime.sendMessage({ category: 'sourceButtonPressed' });
+    browser.runtime.sendMessage({
+        destination: 'background',
+        category: 'settingsButtonPressed',
+    });
 });
 
 async function loadCommands() {
     const cmds = await browser.commands.getAll();
 
-    const copyCmd = cmds.find(cmd => cmd.name === 'copy');
-    const copyMultipleCmd = cmds.find(cmd => cmd.name === 'copyMultiple');
+    const copyCmd = cmds.find(cmd => cmd.name === 'copySelection');
+    const copyEntirePageCmd = cmds.find(cmd => cmd.name === 'copyEntirePage');
+    const copyMultipleTabsCmd = cmds.find(cmd => cmd.name === 'copyMultipleTabs');
     const sidebarCmd = cmds.find(
         cmd => cmd.name === '_execute_sidebar_action' || cmd.name === 'openSidePanel'
     );
     const settingsCmd = cmds.find(cmd => cmd.name === 'openSettings');
-    const reportBugCmd = cmds.find(cmd => cmd.name === 'reportBug');
-    const requestFeatureCmd = cmds.find(cmd => cmd.name === 'requestFeature');
-    const discussCmd = cmds.find(cmd => cmd.name === 'discuss');
-    const sourceCmd = cmds.find(cmd => cmd.name === 'openSource');
 
     if (copyCmd) {
-        copyButton.title = copyCmd.shortcut || '(no keyboard shortcut set)';
+        copySelectionButton.title = copyCmd.shortcut || '(no keyboard shortcut set)';
     }
-    if (copyMultipleCmd) {
-        copyMultipleButton.title = copyMultipleCmd.shortcut || '(no keyboard shortcut set)';
+    if (copyEntirePageCmd) {
+        copyEntirePageButton.title = copyEntirePageCmd.shortcut || '(no keyboard shortcut set)';
+    }
+    if (copyMultipleTabsCmd) {
+        copyMultipleTabsButton.title = copyMultipleTabsCmd.shortcut || '(no keyboard shortcut set)';
     }
     if (sidebarCmd) {
         sidebarButton.title = sidebarCmd.shortcut || '(no keyboard shortcut set)';
     }
     if (settingsCmd) {
         settingsButton.title = settingsCmd.shortcut || '(no keyboard shortcut set)';
-    }
-    if (reportBugCmd) {
-        reportBugButton.title = reportBugCmd.shortcut || '(no keyboard shortcut set)';
-    }
-    if (requestFeatureCmd) {
-        requestFeatureButton.title = requestFeatureCmd.shortcut || '(no keyboard shortcut set)';
-    }
-    if (discussCmd) {
-        discussButton.title = discussCmd.shortcut || '(no keyboard shortcut set)';
-    }
-    if (sourceCmd) {
-        sourceButton.title = sourceCmd.shortcut || '(no keyboard shortcut set)';
     }
 }
 

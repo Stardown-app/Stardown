@@ -128,7 +128,7 @@ export function updateContextMenuLanguage(markupLanguage) {
     }
 
     browser.contextMenus.update('page', {
-        title: `Copy ${markupLanguage} link to here`,
+        title: `Copy ${markupLanguage} link for this part of the page`,
     });
     browser.contextMenus.update('selection', {
         title: `Copy ${markupLanguage} of selection`,

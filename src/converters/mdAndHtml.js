@@ -14,8 +14,8 @@
    limitations under the License.
 */
 
-import { getSetting } from '../common.js';
-import { absolutizeElementUrls } from './utils/urls.js';
+import { getSetting } from '../getSetting.js';
+import { absolutizeNodeUrls } from './utils/urls.js';
 import { removeHiddenElements, removeStyles, isInlineText } from './utils/html.js';
 import { newEscape, MdConverter } from './md.js';
 
@@ -31,7 +31,7 @@ export async function htmlToMdAndHtml(frag) {
         removeHiddenElements(frag, document);
     }
     removeStyles(frag);
-    absolutizeElementUrls(frag, location.Href);
+    absolutizeNodeUrls(frag, location.href);
 
     const ctx = {
         locationHref: location.href,
@@ -120,10 +120,12 @@ export class MdAndHtmlConverter extends MdConverter {
         return '\n\n' + el.outerHTML + '\n\n';
     }
 
-    /** @type {ElementConverter} */
-    convertIFRAME(ctx, el) {
-        return '\n\n' + el.outerHTML + '\n\n';
-    }
+    // GitHub Flavored Markdown does not render iframes and Readability.js removes
+    // iframes. Sample iframe: https://www.w3schools.com/html/html_iframe.asp
+    // /** @type {ElementConverter} */
+    // convertIFRAME(ctx, el) {
+    //     return '\n\n' + el.outerHTML + '\n\n';
+    // }
 
     /** @type {ElementConverter} */
     convertOBJECT(ctx, el) {

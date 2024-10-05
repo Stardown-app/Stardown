@@ -40,9 +40,9 @@ export default [
                     {
                         src: [
                             // Copy everything from `src` to `chrome` except the
-                            // config.js that is for testing.
+                            // browserSpecific.js that is for testing.
                             'src/*',
-                            '!src/config.js',
+                            '!src/browserSpecific.js',
                         ],
                         dest: 'chrome',
                     },
@@ -59,6 +59,20 @@ export default [
         },
     },
     {
+        input: 'chrome/popup.js',
+        output: {
+            file: 'chrome/popup.js',
+            format: 'iife', // immediately-invoked function expression
+        },
+    },
+    {
+        input: 'chrome/sidebar.js',
+        output: {
+            file: 'chrome/sidebar.js',
+            format: 'iife', // immediately-invoked function expression
+        },
+    },
+    {
         input: 'chrome/settings.js',
         output: {
             file: 'chrome/settings.js',
@@ -70,10 +84,17 @@ export default [
                 // other files there and are no longer needed.
                 targets: [
                     'chrome/*', // Delete all files except the ones below.
-                    '!chrome/*.json',
-                    '!chrome/*.html',
+
                     '!chrome/images',
-                    '!chrome/config.js',
+
+                    '!chrome/manifest.json',
+
+                    '!chrome/popup.html',
+                    '!chrome/settings.html',
+                    '!chrome/sidebar.html',
+                    '!chrome/welcomeShortcutsMissing.html',
+
+                    '!chrome/browserSpecific.js',
                     '!chrome/background.js',
                     '!chrome/content.js',
                     '!chrome/popup.js',

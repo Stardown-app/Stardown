@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-// NOTICE: this file was modified from the original (see link below) to not use
-// `export`. Additionally, some code Stardown doesn't need was removed.
+// NOTICE: this file was modified from the original (see link below) to not use `export`
+// and to have a time limit. Additionally, some code Stardown doesn't need was removed.
 //
 // Original code:
 // https://github.com/GoogleChromeLabs/text-fragments-polyfill/blob/53375fea08665bac009bb0aa01a030e065c3933d/src/text-fragment-utils.js
@@ -75,13 +75,17 @@ const TEXT_FRAGMENT_CSS_CLASS_NAME =
  */
 
 const processTextFragmentDirective =
-    (textFragment, documentToProcess = document) => {
+    (textFragment, t0, timeoutDurationMs, documentToProcess = document) => {
         const results = [];
 
         const searchRange = documentToProcess.createRange();
         searchRange.selectNodeContents(documentToProcess.body);
 
         while (!searchRange.collapsed && results.length < 2) {
+            if (Date.now() - t0 > timeoutDurationMs) {
+                return [];
+            }
+
             let potentialMatch;
             if (textFragment.prefix) {
                 const prefixMatch = findTextInRange(textFragment.prefix, searchRange);
@@ -154,6 +158,10 @@ const processTextFragmentDirective =
                 // Search through the rest of the document to find a textEnd match.
                 // This may take multiple iterations if a suffix needs to be found.
                 while (!textEndRange.collapsed && results.length < 2) {
+                    if (Date.now() - t0 > timeoutDurationMs) {
+                        return [];
+                    }
+
                     const textEndMatch =
                         findTextInRange(textFragment.textEnd, textEndRange);
                     if (textEndMatch == null) {

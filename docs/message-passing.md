@@ -14,6 +14,7 @@ Most of Stardown's user interactions are received in the background, which then 
 
 Every ***request*** from the background to the content must have `category` and `id` properties and may optionally have other properties.
 
+- `destination`: a string of the context the message should be sent to, such as "background" or "content".
 - `category`: a string describing what is being requested.
 - `id`: a unique, pseudorandom number for detecting [duplicate requests](https://github.com/Stardown-app/Stardown/issues/98).
 

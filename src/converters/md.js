@@ -14,7 +14,7 @@
    limitations under the License.
 */
 
-import { getSetting } from '../common.js';
+import { getSetting } from '../getSetting.js';
 import * as tables from './utils/tables.js';
 import { absolutize } from './utils/urls.js';
 import { removeHiddenElements, isInlineText } from './utils/html.js';
@@ -24,10 +24,7 @@ import { removeHiddenElements, isInlineText } from './utils/html.js';
 
 /**
  * htmlToMd converts an HTML fragment to pure markdown without any HTML. This function
- * otherwise supports a superset of the CommonMark specification. In rare cases, the
- * output may contain HTML because some sites put sample HTML in code blocks created
- * without <pre> or <code> elements, such as
- * https://www.w3schools.com/html/html_iframe.asp
+ * otherwise supports a superset of the CommonMark specification.
  * @param {DocumentFragment} frag
  * @returns {Promise<string>}
  */
@@ -110,6 +107,7 @@ export function newEscape(mdSubBrackets) {
             .replaceAll('`', '\\`') // code, code fence
             .replaceAll('~', '\\~') // strikethrough, code fence
             .replaceAll(/^> /g, '\\> ') // quote
+            .replaceAll('<', '\\<') // HTML tag
             .replaceAll(/^(=+)/g, '\\$1') // setext header
             .replaceAll(/^-/g, '\\-') // bullet point, horizontal rule, setext header, YAML front matter fence
             .replaceAll(/^\+/g, '\\+') // bullet point, TOML front matter fence
@@ -148,7 +146,7 @@ export class MdConverter {
 
     /**
      * @param {object} ctx
-     * @param {Node[]|NodeList|HTMLCollection} nodes
+     * @param {Node[]|NodeList|NodeListOf<ChildNode>|HTMLCollection} nodes
      * @returns {string}
      */
     convertNodes(ctx, nodes) {
@@ -482,16 +480,24 @@ export class MdConverter {
 
     /** @type {ElementConverter} */
     convertLI(ctx, el) {
+        // List items are handled by the parent list element. The selection code should
+        // detect when the selection contains list items outside of a list and wrap them
+        // in a list element.
         return '';
     }
 
     /** @type {ElementConverter} */
     convertMENU(ctx, el) {
-        return this.convertUL(ctx, el);
+        return this.convertList(ctx, el);
     }
 
     /** @type {ElementConverter} */
     convertOL(ctx, el) {
+        return this.convertList(ctx, el);
+    }
+
+    /** @type {ElementConverter} */
+    convertList(ctx, el) {
         /** @type {string[]} */
         const result = ['\n'];
         if (!ctx.inList) {
@@ -503,20 +509,35 @@ export class MdConverter {
         };
 
         let liNum = Number(el.getAttribute('start') || 1);
-        const reversed = Boolean(el.getAttribute('reversed'));
+        const reversedAttr = el.getAttribute('reversed');
+        const reversed = reversedAttr !== null && reversedAttr === 'true';
 
         const children = el.childNodes;
         for (let i = 0; i < children.length; i++) {
             const child = children[i];
             if (
                 child.nodeType === TEXT_NODE ||
+                child.nodeType === COMMENT_NODE ||
                 child.childNodes.length === 0 ||
                 child.textContent?.match(/^\s+$/)
             ) {
                 continue;
+            } else if (child.nodeName === 'UL' || child.nodeName === 'MENU') {
+                result.push(this.convertUL(newCtx, child).slice(1) + '\n');
+                continue;
+            } else if (child.nodeName === 'OL') {
+                result.push(this.convertOL(newCtx, child).slice(1) + '\n');
+                continue;
+            } else if (child.nodeName !== 'LI') {
+                console.warn(`Ignoring unexpected ${child.nodeName} in ${el.nodeName}`);
+                continue;
             }
 
-            result.push(ctx.indent + String(liNum) + '. ');
+            if (el.nodeName === 'OL') {
+                result.push(ctx.indent + String(liNum) + '. ');
+            } else {
+                result.push(ctx.indent + ctx.mdBulletPoint + ' ');
+            }
             result.push(
                 this.convertNodes(newCtx, child.childNodes)
                     .replace(/^ /, '')
@@ -635,45 +656,7 @@ export class MdConverter {
 
     /** @type {ElementConverter} */
     convertUL(ctx, el) {
-        /** @type {string[]} */
-        const result = ['\n'];
-        if (!ctx.inList) {
-            result.push('\n');
-        }
-
-        const newCtx = {
-            ...ctx, indent: ctx.indent + '    ', inList: true, dontTrimText: true,
-        };
-
-        const children = el.childNodes;
-        for (let i = 0; i < children.length; i++) {
-            const child = children[i];
-            if (
-                child.nodeType === TEXT_NODE ||
-                child.childNodes.length === 0 ||
-                child.textContent?.match(/^\s+$/)
-            ) {
-                continue;
-            }
-
-            result.push(ctx.indent + ctx.mdBulletPoint + ' ');
-            result.push(
-                this.convertNodes(newCtx, child.childNodes)
-                    .replace(/^ /, '')
-                    .replace(/^\n+/, '')
-                    .replace(/ \n/, '\n')
-                    .replace(/ $/, '')
-            );
-            if (!ctx.inList || i < children.length - 2) {
-                result.push('\n');
-            }
-        }
-
-        if (!ctx.inList) {
-            result.push('\n');
-        }
-
-        return result.join('');
+        return this.convertList(ctx, el);
     }
 
     // inline text semantics elements
@@ -1176,7 +1159,7 @@ export class MdConverter {
         if (ctx.inTable) {
             return this.convertText(ctx, el);
         } else if (el.getAttribute('role') === 'presentation') {
-            return this.convertNodes(ctx, el.childNodes);
+            return '\n\n' + this.convertNodes(ctx, el.childNodes) + '\n\n';
         }
         const newCtx = { ...ctx, inTable: true, dontTrimText: true };
 
@@ -1228,7 +1211,7 @@ export class MdConverter {
 
     /** @type {ElementConverter} */
     convertTD(ctx, el) {
-        return this.convertNodes(ctx, el.childNodes);
+        return this.convertNodes(ctx, el.childNodes).trim() + ' ';
     }
 
     /** @type {ElementConverter} */
@@ -1238,7 +1221,7 @@ export class MdConverter {
 
     /** @type {ElementConverter} */
     convertTH(ctx, el) {
-        return this.convertNodes(ctx, el.childNodes);
+        return this.convertNodes(ctx, el.childNodes).trim() + ' ';
     }
 
     /** @type {ElementConverter} */
@@ -1248,7 +1231,7 @@ export class MdConverter {
 
     /** @type {ElementConverter} */
     convertTR(ctx, el) {
-        return this.convertNodes(ctx, el.childNodes);
+        return this.convertNodes(ctx, el.childNodes).trim() + '\n';
     }
 
     // form elements

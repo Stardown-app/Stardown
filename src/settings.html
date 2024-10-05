@@ -23,100 +23,57 @@ each anchor so that the pages they navigate to are opened in new tabs. -->
 
   <head>
     <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Stardown settings</title>
     <style>
-      body {
-        margin: 20px;
-        font-size: 16px;
-        min-width: 350px;
-        min-height: 245px;
+      h1 a {
+        text-decoration: none;
+        color: black;
       }
 
-      code {
-        background-color: #f0f0f0;
-        padding: 2px 4px;
-        border-radius: 4px;
+      #versionNumber {
+        font-size: 12px;
+        color: gray;
+      }
+
+      body {
+        font-size: 18px;
+        margin: 20px;
+      }
+
+      @media (min-width: 1000px) {
+        body {
+          margin-left: 30%;
+          margin-right: 30%;
+        }
       }
     </style>
   </head>
 
   <body>
-    <h2>
-      <img width="30" alt="Stardown's icon" src="images/stardown.svg"> Stardown
-    </h2>
-    <small style="margin-top: -10px; margin-bottom: 0px">
-      v1.0.0
-    </small>
+    <h1>
+      <a href="https://github.com/Stardown-app/Stardown" target="_blank">
+        <img width="30" alt="Stardown's icon" src="images/stardown.svg">
+        Stardown
+      </a>
+    </h1>
+    <small id="versionNumber"></small>
     <p>Copy the web as markdown.</p>
 
-    <h3>How to change the keyboard shortcuts</h3>
+    <h2>How to change the keyboard shortcuts</h2>
 
     <p id="shortcutInstructions"></p>
 
-    <h3>Settings</h3>
+    <h2>Settings</h2>
     <form>
+      <hr />
+      <h4>General</h4>
       <label for="markupLanguage">Output markup language:</label>
       <select id="markupLanguage" name="markupLanguage">
         <option value="markdown">markdown</option>
         <option value="markdown with some html">markdown with some HTML</option>
         <option value="html">HTML</option>
       </select>
-      <br />
-      <br />
-      <label for="mdSelectionFormat">When creating markdown of a selection,</label>
-      <select id="mdSelectionFormat" name="mdSelectionFormat">
-        <option value="source with link">try to keep the same formatting and link to the source</option>
-        <option value="source">try to keep the same formatting</option>
-        <option value="template">use a custom template</option>
-        <option value="blockquote with link">create a block quote and link to the source</option>
-        <option value="link with selection as title">create a link with the selected text as the title</option>
-        <option value="link with page title as title">create a link with the page title as the link title</option>
-      </select>
-      <label id="mdSelectionTemplateLabel" for="mdSelectionTemplate">Selection template:</label>
-      <textarea id="mdSelectionTemplate" name="mdSelectionTemplate" rows="5" cols="75">
-> [!note]
-> from [{{link.title}}]({{link.url}}) on {{date.YYYYMMDD}}
-
-{{selection}}
-</textarea>
-      <p id="mdSelectionTemplateError" style="display: none"></p>
-      <br />
-      <br />
-      <label for="mdYoutube">Optimize markdown of YouTube videos for</label>
-      <select id="mdYoutube" name="mdYoutube">
-        <option value="almost everywhere">almost everywhere</option>
-        <option value="GitHub">GitHub</option>
-      </select>
-      <br />
-      <br />
-      <label for="mdSubBrackets">
-        Replace square brackets in markdown link text with
-      </label>
-      <select id="mdSubBrackets" name="mdSubBrackets">
-        <option value="underlined">underlined brackets ⦋ ⦌</option>
-        <option value="escaped">escaped brackets \[ \]</option>
-        <option value="original">don't replace them [ ]</option>
-      </select>
-      <br />
-      <br />
-      <label for="mdBulletPoint">Markdown bullet point symbol:</label>
-      <select id="mdBulletPoint" name="mdBulletPoint">
-        <option value="-">-</option>
-        <option value="+">+</option>
-        <option value="*">*</option>
-      </select>
-      <br />
-      <br />
-      <label for="jsonDestination">Save JSON output to</label>
-      <select id="jsonDestination" name="jsonDestination">
-        <option value="clipboard">the clipboard</option>
-        <option value="file">a file</option>
-      </select>
-      <br />
-      <br />
-      <label for="jsonEmptyCell">Empty table cells are converted to
-        <input id="jsonEmptyCell" name="jsonEmptyCell" type="text" placeholder="null" />
-        in JSON
-      </label>
       <br />
       <br />
       <label for="copyTabsWindows">Copying links for all tabs copies from tabs in</label>
@@ -128,10 +85,27 @@ each anchor so that the pages they navigate to are opened in new tabs. -->
       <br />
       <input id="createTextFragment" type="checkbox" checked />
       <label for="createTextFragment">Include a
-        <a href="https://web.dev/articles/text-fragments" target="_blank">
+        <a href="https://developer.mozilla.org/en-US/docs/Web/URI/Fragment/Text_fragments" target="_blank">
           text fragment</a>
-        when creating a link for a selection (sometimes impacts performance)
+        when creating a link for a selection
       </label>
+      <br />
+      <br />
+      <input id="notifyOnWarning" type="checkbox" />
+      <label for="notifyOnWarning">Show warning notifications (warnings indicate partial success)</label>
+      <br />
+      <br />
+      <input id="notifyOnSuccess" type="checkbox" />
+      <label for="notifyOnSuccess">Show success notifications</label>
+      <br />
+      <br />
+      <hr />
+      <h4>Readability</h4>
+      <input id="readabilityJs" type="checkbox" checked />
+      <label for="readabilityJs">Use Mozilla's
+        <a href="https://github.com/mozilla/readability" target="_blank">
+          Readability.js</a>
+        to try to extract the main content when copying an entire page</label>
       <br />
       <br />
       <input id="omitNav" type="checkbox" checked />
@@ -146,15 +120,75 @@ each anchor so that the pages they navigate to are opened in new tabs. -->
       <label for="omitHidden">Omit hidden elements from source format selections</label>
       <br />
       <br />
-      <input id="notifyOnWarning" type="checkbox" />
-      <label for="notifyOnWarning">Show warning notifications (warnings indicate partial success)</label>
+      <hr />
+      <h4>Markdown</h4>
+      <label for="mdSelectionFormat">When creating markdown of a selection,</label>
+      <select id="mdSelectionFormat" name="mdSelectionFormat">
+        <option value="source with link">try to keep the same formatting and link to the source</option>
+        <option value="source">try to keep the same formatting</option>
+        <option value="template">use a custom template</option>
+        <option value="blockquote with link">create a block quote and link to the source</option>
+        <option value="link with selection as title">create a link with the selected text as the title</option>
+        <option value="link with page title as title">create a link with the page title as the link title</option>
+      </select>
+      <br />
+      <label id="mdSelectionTemplateLabel" for="mdSelectionTemplate">Selection template:</label>
+      <textarea id="mdSelectionTemplate" name="mdSelectionTemplate" rows="5" cols="75">
+> [!note]
+> from [{{link.title}}]({{link.url}}) on {{date.YYYYMMDD}}
+
+{{selection}}
+</textarea>
+      <p id="mdSelectionTemplateError" style="display: none"></p>
       <br />
       <br />
-      <input id="notifyOnSuccess" type="checkbox" />
-      <label for="notifyOnSuccess">Show success notifications</label>
+      <label for="mdBulletPoint">Markdown bullet point symbol:</label>
+      <select id="mdBulletPoint" name="mdBulletPoint">
+        <option value="-">-</option>
+        <option value="+">+</option>
+        <option value="*">*</option>
+      </select>
       <br />
+      <br />
+      <label for="mdSubBrackets">
+        Replace square brackets in markdown link text with
+      </label>
+      <select id="mdSubBrackets" name="mdSubBrackets">
+        <option value="underlined">underlined brackets ⦋ ⦌</option>
+        <option value="escaped">escaped brackets \[ \]</option>
+        <option value="original">don't replace them [ ]</option>
+      </select>
+      <br />
+      <br />
+      <label for="mdYoutube">Optimize markdown of YouTube videos for</label>
+      <select id="mdYoutube" name="mdYoutube">
+        <option value="almost everywhere">almost everywhere</option>
+        <option value="GitHub">GitHub</option>
+      </select>
+      <br />
+      <br />
+      <hr />
+      <h4>JSON</h4>
+      <label for="jsonEmptyCell">Empty table cells are converted to
+        <input id="jsonEmptyCell" name="jsonEmptyCell" type="text" placeholder="null" />
+        in JSON
+      </label>
+      <br />
+      <br />
+      <label for="jsonDestination">Save JSON output to</label>
+      <select id="jsonDestination" name="jsonDestination">
+        <option value="clipboard">the clipboard</option>
+        <option value="file">a file</option>
+      </select>
+      <br />
+      <br />
+      <hr />
       <br />
       <input id="reset" type="reset" value="Reset all" />
+      <br />
+      <br />
+      <br />
+      <br />
     </form>
 
     <script src="settings.js"></script>

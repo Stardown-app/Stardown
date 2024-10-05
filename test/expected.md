@@ -152,6 +152,12 @@ h.J(true, false, k);
 - borrow
     1. miscarriage
     2. trunk
+- mind
+    - tasty
+    - chair
+- treasurer
+    1. oven
+    2. double
 - [ ] unchecked
 - [x] checked
     - [ ] indented
@@ -176,32 +182,37 @@ h.J(true, false, k);
 - # header in list
 
 1. Ordered list item
-2. List item with block quote
+    1. snake
+    2. season
+2. boot
+    - costume
+    - cheek
+3. List item with block quote
 
     > Premature optimization is the root of all evil. — Donald Knuth
 
-3. List item with Python code block
+4. List item with Python code block
 
     ```python
     while True:
         print(exec(input(">>> ")))
     ```
 
-4. List item with code block without language
+5. List item with code block without language
 
     ```
     over there
     ```
 
-5. List item with image
+6. List item with image
 
     ![Orange slice](https://example.com/orange-slice.jpg)
 
-6. List item with **bold**, *italic*, and [a link](https://puter.com/app/code).
-7. [ ] List item with unchecked checkbox
-8. [x] List item with checked checkbox
+7. List item with **bold**, *italic*, and [a link](https://puter.com/app/code).
+8. [ ] List item with unchecked checkbox
+9. [x] List item with checked checkbox
     1. [ ] Indented list item with checkbox
-9. ## header in ordered list
+10. ## header in ordered list
 
 * * *
 
@@ -223,6 +234,9 @@ Click **[here](https://pairdrop.net/)** to send something to another device in y
 
 | **Bold**, *emphasis*, and [link](https://gchq.github.io/CyberChef/). |
 | --- |
+
+five six
+seven eight
 
 ~~This is stricken through.~~
 

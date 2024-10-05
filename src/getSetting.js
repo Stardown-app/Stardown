@@ -14,17 +14,19 @@
    limitations under the License.
 */
 
-import { browser } from './config.js';
+import { browser } from './browserSpecific.js';
 
 const defaultSettings = {
     markupLanguage: 'markdown',
     createTextFragment: true,
+    readabilityJs: true,
     omitNav: true,
     omitFooter: true,
     omitHidden: true,
     notifyOnWarning: false,
     notifyOnSuccess: false,
     copyTabsWindows: 'current',
+    notepadContent: '',
 
     mdSelectionFormat: 'source with link',
     mdYoutube: 'almost everywhere',

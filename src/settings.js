@@ -14,8 +14,10 @@
    limitations under the License.
 */
 
-import { browser, getShortcutInstructions } from './config.js';
-import { getSetting } from './common.js';
+import { browser, getShortcutInstructions } from './browserSpecific.js';
+import { getSetting } from './getSetting.js';
+
+document.querySelector('#versionNumber').innerHTML = 'v' + browser.runtime.getManifest().version;
 
 document.querySelector('#shortcutInstructions').innerHTML = getShortcutInstructions();
 
@@ -24,6 +26,7 @@ const form = document.querySelector('form');
 const markupLanguageEl = document.querySelector('#markupLanguage');
 const copyTabsWindowsEl = document.querySelector('#copyTabsWindows');
 const createTextFragmentEl = document.querySelector('#createTextFragment');
+const readabilityJsEl = document.querySelector('#readabilityJs');
 const omitNavEl = document.querySelector('#omitNav');
 const omitFooterEl = document.querySelector('#omitFooter');
 const omitHiddenEl = document.querySelector('#omitHidden');
@@ -45,13 +48,14 @@ const resetButton = document.querySelector('#reset');
 
 // set up setting autosaving
 initAutosave('markupLanguage', markupLanguageEl, 'value', async () => {
-    // send the updated markupLanguage to the background script
     browser.runtime.sendMessage({
+        destination: 'background',
         category: 'markupLanguage',
         markupLanguage: markupLanguageEl.value,
     });
 });
 initAutosave('createTextFragment', createTextFragmentEl, 'checked');
+initAutosave('readabilityJs', readabilityJsEl, 'checked');
 initAutosave('omitNav', omitNavEl, 'checked');
 initAutosave('omitFooter', omitFooterEl, 'checked');
 initAutosave('omitHidden', omitHiddenEl, 'checked');
@@ -67,8 +71,8 @@ initAutosave('mdBulletPoint', mdBulletPointEl, 'value');
 
 initAutosave('jsonEmptyCell', jsonEmptyCellEl, 'value');
 initAutosave('jsonDestination', jsonDestinationEl, 'value', () => {
-    // send the updated jsonDestination to the background script
     browser.runtime.sendMessage({
+        destination: 'background',
         category: 'jsonDestination',
         jsonDestination: jsonDestinationEl.value
     });
@@ -99,6 +103,7 @@ async function loadSettings() {
         markupLanguageEl.value = await getSetting('markupLanguage');
         copyTabsWindowsEl.value = await getSetting('copyTabsWindows');
         createTextFragmentEl.checked = await getSetting('createTextFragment');
+        readabilityJsEl.checked = await getSetting('readabilityJs');
         omitNavEl.checked = await getSetting('omitNav');
         omitFooterEl.checked = await getSetting('omitFooter');
         omitHiddenEl.checked = await getSetting('omitHidden');

@@ -27,7 +27,7 @@ global.location = { href: 'https://example.com' };
  * @returns {Promise<number>}
  */
 export async function diffMd() {
-    const htmlInput = await fs.readFile('./test/input.html', { encoding: 'utf8' });
+    const htmlInput = await fs.readFile('./test/inputForMd.html', { encoding: 'utf8' });
     const mdExpected = await fs.readFile('./test/expected.md', { encoding: 'utf8' });
 
     global.document = new JSDOM(htmlInput).window.document;
@@ -37,28 +37,34 @@ export async function diffMd() {
 
     const result = [];
     result.push(`
-        <style>
-            span {
-                font-size: 18px;
-            }
-            .unexpected {
-                background-color: red;
-                opacity: 0.5;
-            }
-            .missing {
-                background-color: #00ff00;
-                opacity: 0.5;
-            }
-            #countsDiv {
-                position: sticky;
-                top: 0;
-                width: 100%;
-                background-color: #d0d0d0;
-                font-size: 20px;
-            }
-        </style>
+        <!DOCTYPE html>
+        <html>
+            <head>
+                <meta charset="UTF-8">
+                <style>
+                    span {
+                        font-size: 18px;
+                    }
+                    .unexpected {
+                        background-color: red;
+                        opacity: 0.5;
+                    }
+                    .missing {
+                        background-color: #00ff00;
+                        opacity: 0.5;
+                    }
+                    #countsDiv {
+                        position: sticky;
+                        top: 0;
+                        width: 100%;
+                        background-color: #d0d0d0;
+                        font-size: 20px;
+                    }
+                </style>
+            </head>
+            <body>
+                <pre>
     `);
-    result.push('<body><pre>');
 
     // add at the top the numbers of characters that are unexpected and missing
     result.push(`<div id="countsDiv"><div style="color: red; display: inline"><div id="unexpectedCount" style="display: inline"></div> unexpected</div>   <div style="color: green; display: inline"><div id="missingCount" style="display: inline"></div> missing</div></div><br>`);
@@ -93,13 +99,19 @@ export async function diffMd() {
             result.push('<span>' + value + '</span>');
         }
     });
-    result.push('</pre></body>');
 
     result.push(`
-        <script>
-            document.getElementById('unexpectedCount').innerText = ${unexpectedCount};
-            document.getElementById('missingCount').innerText = ${missingCount};
-        </script>
+                </pre>
+                <script>
+                    document.getElementById('unexpectedCount').innerText = ${unexpectedCount};
+                    document.getElementById('missingCount').innerText = ${missingCount};
+
+                    const title = document.createElement('title');
+                    title.innerText = ${unexpectedCount} + ' unexpected, ' + ${missingCount} + ' missing';
+                    document.head.appendChild(title);
+                </script>
+            </body>
+        </html>
     `);
 
     await fs.writeFile('./test/md.diff.html', result.join(''));

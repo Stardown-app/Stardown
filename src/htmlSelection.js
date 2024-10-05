@@ -14,23 +14,13 @@
    limitations under the License.
 */
 
-import { browser } from './config.js';
-import { getSetting } from './common.js';
+import { getSetting } from './getSetting.js';
+import { sendToNotepad, applyTemplate } from './contentUtils.js';
+import { absolutizeNodeUrls } from './converters/utils/urls.js';
+import { preprocessFragment } from './converters/utils/html.js';
 import * as md from './generators/md.js';
 import { htmlToMd, mdEncodeUri } from './converters/md.js';
 import { htmlToMdAndHtml } from './converters/mdAndHtml.js';
-
-/**
- * sendToNotepad sends text to Stardown's sidebar notepad to be inserted.
- * @param {string} text
- * @returns {Promise<void>}
- */
-export async function sendToNotepad(text) {
-    browser.runtime.sendMessage({
-        category: 'sendToNotepad',
-        text: text,
-    });
-}
 
 /**
  * createText creates text of the selected part of the page. The language and format are
@@ -69,14 +59,14 @@ export async function createText(title, url, selection) {
             await sendToNotepad(selectedText);
             return selectedText;
         }
-        // make any links absolute
-        frag.querySelectorAll('a').forEach(a => {
-            a.href = new URL(a.href, url).href;
-        });
+
+        absolutizeNodeUrls(frag, url);
+
         // convert the fragment to a string
         const div = document.createElement('div');
         div.appendChild(frag.cloneNode(true));
         const result = div.innerHTML || selectedText;
+
         await sendToNotepad(result);
         return result;
     }
@@ -108,8 +98,8 @@ export async function createText(title, url, selection) {
             await sendToNotepad(blockquote);
             return blockquote;
         case 'link with selection as title':
-            selectedText = selectedText.replaceAll('\r\n', ' ').replaceAll('\n', ' ');
-            const link = await md.createLink(selectedText, url);
+            const text = selectedText.replaceAll('\r\n', ' ').replaceAll('\n', ' ');
+            const link = await md.createLink(text, url);
             await sendToNotepad(link);
             return link;
         case 'link with page title as title':
@@ -144,9 +134,22 @@ export async function getSelectionFragment(selection) {
     }
 
     /** @type {DocumentFragment} */
-    const frag = document.createDocumentFragment();
+    let frag = document.createDocumentFragment();
     const startRange = getStartRange(selection);
     frag.appendChild(startRange.cloneContents());
+
+    if (isSelectionInList(frag)) {
+        // The fragment is used to detect a list because the fragment of a range of part
+        // of a list tends to start with an LI, unlike that range. However, the range
+        // must then be used to get the list because the fragment contains no ancestors
+        // of the LI elements.
+
+        /** @type {Element|null} */
+        const list = getList(startRange); // either an OL, UL, or MENU element
+        if (list !== null) {
+            frag = wrapFragmentWithList(frag, list, startRange);
+        }
+    }
 
     return frag;
 }
@@ -160,20 +163,23 @@ export async function getSelectionFragment(selection) {
  * @param {string} markupLanguage - the user's chosen markup language.
  * @returns {Promise<string>}
  */
-export async function getSourceFormatMd(selection, selectedText, markupLanguage) {
+async function getSourceFormatMd(selection, selectedText, markupLanguage) {
     /** @type {DocumentFragment} */
     const frag = await getSelectionFragment(selection);
     if (frag === null) {
         return selectedText;
     }
 
-    if (markupLanguage === 'markdown') {
-        return await htmlToMd(frag);
-    } else if (markupLanguage === 'markdown with some html') {
-        return await htmlToMdAndHtml(frag);
-    } else {
-        console.error(`Unknown markupLanguage: ${markupLanguage}`);
-        throw new Error(`Unknown markupLanguage: ${markupLanguage}`);
+    await preprocessFragment(frag, location.hostname);
+
+    switch (markupLanguage) {
+        case 'markdown':
+            return await htmlToMd(frag);
+        case 'markdown with some html':
+            return await htmlToMdAndHtml(frag);
+        default:
+            console.error(`Unknown markupLanguage: ${markupLanguage}`);
+            throw new Error(`Unknown markupLanguage: ${markupLanguage}`);
     }
 }
 
@@ -188,42 +194,13 @@ export async function getSourceFormatMd(selection, selectedText, markupLanguage)
  * @param {string} markupLanguage - the user's chosen markup language.
  * @returns {Promise<string>}
  */
-export async function getTemplatedMd(title, url, selection, selectedText, markupLanguage) {
-    const template = await getSetting('mdSelectionTemplate');
-
+async function getTemplatedMd(title, url, selection, selectedText, markupLanguage) {
     title = await md.createLinkTitle(title);
     url = mdEncodeUri(url);
+    const text = await getSourceFormatMd(selection, selectedText, markupLanguage);
+    const template = await getSetting('mdSelectionTemplate');
 
-    let text = '';
-    const frag = await getSelectionFragment(selection);
-    if (frag === null) {
-        text = selectedText;
-    } else if (markupLanguage === 'markdown') {
-        text = await htmlToMd(frag);
-    } else if (markupLanguage === 'markdown with some html') {
-        text = await htmlToMdAndHtml(frag);
-    } else {
-        console.error(`Unknown markupLanguage: ${markupLanguage}`);
-        throw new Error(`Unknown markupLanguage: ${markupLanguage}`);
-    }
-
-    const today = new Date();
-    const YYYYMMDD = today.getFullYear() + '/' + (today.getMonth() + 1) + '/' + today.getDate();
-    const templateVars = {
-        link: { title, url },
-        date: { YYYYMMDD },
-        text,
-    };
-
-    try {
-        return template.replaceAll(/{{([\w.]+)}}/g, (match, group) => {
-            return group.split('.').reduce((vars, token) => vars[token], templateVars);
-        });
-    } catch (err) {
-        // an error message should have been shown when the user changed the template
-        console.error(err);
-        throw err;
-    }
+    return await applyTemplate(template, title, url, text);
 }
 
 /**
@@ -243,22 +220,7 @@ async function getSourceFormatMdWithLink(title, url, selection, selectedText, ma
     const todayStr = today.getFullYear() + '/' + (today.getMonth() + 1) + '/' + today.getDate();
     const alert = await md.createAlert('note', `from ${link} on ${todayStr}`);
 
-    /** @type {DocumentFragment} */
-    const frag = await getSelectionFragment(selection);
-    if (frag === null) {
-        await sendToNotepad(selectedText);
-        return alert + '\n\n' + selectedText;
-    }
-
-    let text = '';
-    if (markupLanguage === 'markdown') {
-        text = await htmlToMd(frag);
-    } else if (markupLanguage === 'markdown with some html') {
-        text = await htmlToMdAndHtml(frag);
-    } else {
-        console.error(`Unknown markupLanguage: ${markupLanguage}`);
-        throw new Error(`Unknown markupLanguage: ${markupLanguage}`);
-    }
+    const text = await getSourceFormatMd(selection, selectedText, markupLanguage);
 
     await sendToNotepad(text);
     return alert + '\n\n' + text;
@@ -374,13 +336,13 @@ function startBeforeAncestorHeader(startRange, startNode) {
  * @returns {Node} - the new start node.
  */
 function startBeforeAncestorTable(startRange, startNode) {
-    const tags = ['TABLE', 'THEAD', 'TBODY', 'TR', 'TH', 'TD'];
+    const tableTags = ['TABLE', 'THEAD', 'TBODY', 'TR', 'TH', 'TD'];
 
     // While there is a parent node and it's a table tag...
     while (
         startNode.nodeName !== 'TABLE' &&
         startNode.parentNode &&
-        tags.includes(startNode.parentNode.nodeName)
+        tableTags.includes(startNode.parentNode.nodeName)
     ) {
         // ...expand the start of the selection to include the table tag. This makes
         // tables easier to copy.
@@ -436,4 +398,101 @@ function startBeforeParentPre(startRange, startNode) {
     }
 
     return startNode;
+}
+
+/**
+ * isSelectionInList checks if the fragment of a selection is in a list. False is
+ * returned if the selection is entirely in one LI element.
+ * @param {DocumentFragment} frag
+ * @returns {boolean}
+ */
+function isSelectionInList(frag) {
+    const COMMENT_NODE = 8;
+    for (let i = 0; i < frag.childNodes.length; i++) {
+        const node = frag.childNodes[i];
+
+        if (node.nodeType === COMMENT_NODE) {
+            continue;
+        } else if (node.nodeName === 'LI') {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+/**
+ * getList attempts to get the list element that contains the selected text. This
+ * function assumes the selected text is in a list element. If the selection starts in a
+ * node that is nested too deeply away from the list element, null is returned.
+ * @param {Range} startRange
+ * @returns {Element|null}
+ */
+function getList(startRange) {
+    /** @type {Element} */
+    let list = startRange.startContainer.parentNode;
+    for (let i = 0; i < 10 && list && !['OL', 'UL', 'MENU'].includes(list.nodeName); i++) {
+        list = list.parentNode;
+    }
+    if (!['OL', 'UL', 'MENU'].includes(list.nodeName)) {
+        return null;
+    }
+    return list;
+}
+
+/**
+ * wrapFragmentWithList wraps the selection fragment with a new list element based on
+ * the existing one the fragment is in.
+ * @param {DocumentFragment} frag
+ * @param {HTMLOListElement|HTMLUListElement|HTMLMenuElement} list
+ * @param {Range} startRange
+ * @returns {DocumentFragment}
+ */
+function wrapFragmentWithList(frag, list, startRange) {
+    const ELEMENT_NODE = 1;
+
+    let newList;
+    if (list.nodeName === 'OL') {
+        newList = document.createElement('ol');
+
+        /** @type {Element} */
+        let firstSelectedLi = startRange.startContainer;
+        while (firstSelectedLi.nodeName !== 'LI') {
+            firstSelectedLi = firstSelectedLi.parentNode;
+        }
+
+        const originalId = firstSelectedLi.getAttribute('id');
+        firstSelectedLi.setAttribute('id', 'list-selection-start');
+
+        let startAttr = list.getAttribute('start') || '1';
+        for (let i = 0; i < list.children.length; i++) {
+            const child = list.children[i];
+            if (
+                child.nodeType === ELEMENT_NODE &&
+                child.getAttribute('id') === 'list-selection-start'
+            ) {
+                startAttr = String(i + 1);
+                break;
+            }
+        }
+        if (originalId !== null) {
+            firstSelectedLi.setAttribute('id', originalId);
+        } else {
+            firstSelectedLi.removeAttribute('id');
+        }
+
+        newList.setAttribute('start', startAttr);
+        newList.setAttribute('reversed', list.getAttribute('reversed') || 'false');
+        newList.setAttribute('type', list.getAttribute('type') || '1');
+    } else if (list.nodeName === 'UL') {
+        newList = document.createElement('ul');
+    } else { // if (list.nodeName === 'MENU')
+        newList = document.createElement('menu');
+    }
+
+    newList.appendChild(startRange.cloneContents());
+    frag = document.createDocumentFragment();
+    frag.appendChild(newList);
+
+    return frag;
 }

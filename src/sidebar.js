@@ -14,15 +14,16 @@
    limitations under the License.
 */
 
-if (typeof browser === 'undefined') {
-    var browser = chrome;
-}
+import { browser } from './browserSpecific.js';
+import { getSetting } from './getSetting.js';
 
 const notepad = document.getElementById('notepad');
 
 browser.commands.getAll().then(cmds => {
-    const copyShortcut = cmds.find(cmd => cmd.name === 'copy')?.shortcut || 'Alt+C';
-    notepad.placeholder = `Press ${copyShortcut} to copy and paste.`;
+    const copySelectionShortcut = cmds.find(
+        cmd => cmd.name === 'copySelection'
+    )?.shortcut || 'Alt+C';
+    notepad.placeholder = `Press ${copySelectionShortcut} to copy and paste.`;
 });
 
 // load the notepad content when the page loads
@@ -36,6 +37,10 @@ notepad.addEventListener('input', () => {
 });
 
 browser.runtime.onMessage.addListener(message => {
+    if (message.destination !== 'sidebar') {
+        return;
+    }
+
     switch (message.category) {
         case 'sendToNotepad':
             const newText = '\n\n' + message.text.trim() + '\n\n';
@@ -51,33 +56,3 @@ browser.runtime.onMessage.addListener(message => {
             throw new Error(`Unknown message category: ${message.category}`);
     }
 });
-
-const defaultSettings = {
-    notepadContent: '',
-};
-
-/**
- * getSetting gets a setting from the browser's sync storage. If the setting does not
- * exist there, its default value is returned.
- * @param {string} name - the name of the setting.
- * @returns {Promise<any>}
- */
-async function getSetting(name) {
-    let obj;
-    try {
-        obj = await browser.storage?.sync.get(name);
-    } catch (err) {
-        console.error(err);
-        return defaultSettings[name];
-    }
-    if (obj === undefined) {
-        return defaultSettings[name];
-    }
-
-    const value = obj[name];
-    if (value === undefined) {
-        return defaultSettings[name];
-    }
-
-    return value;
-}

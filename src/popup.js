@@ -21,10 +21,6 @@ const copyEntirePageButton = document.querySelector('#copyEntirePageButton');
 const copyMultipleTabsButton = document.querySelector('#copyMultipleTabsButton');
 const sidebarButton = document.querySelector('#sidebarButton');
 const settingsButton = document.querySelector('#settingsButton');
-const reportBugButton = document.querySelector('#reportBugButton');
-const requestFeatureButton = document.querySelector('#requestFeatureButton');
-const discussButton = document.querySelector('#discussButton');
-const sourceButton = document.querySelector('#sourceButton');
 
 copySelectionButton.addEventListener('click', async () => {
     browser.runtime.sendMessage({
@@ -89,34 +85,6 @@ settingsButton.addEventListener('click', async () => {
     });
 });
 
-reportBugButton.addEventListener('click', async () => {
-    browser.runtime.sendMessage({
-        destination: 'background',
-        category: 'reportBugButtonPressed',
-    });
-});
-
-requestFeatureButton.addEventListener('click', async () => {
-    browser.runtime.sendMessage({
-        destination: 'background',
-        category: 'requestFeatureButtonPressed',
-    });
-});
-
-discussButton.addEventListener('click', async () => {
-    browser.runtime.sendMessage({
-        destination: 'background',
-        category: 'discussButtonPressed',
-    });
-});
-
-sourceButton.addEventListener('click', async () => {
-    browser.runtime.sendMessage({
-        destination: 'background',
-        category: 'sourceButtonPressed',
-    });
-});
-
 async function loadCommands() {
     const cmds = await browser.commands.getAll();
 
@@ -127,10 +95,6 @@ async function loadCommands() {
         cmd => cmd.name === '_execute_sidebar_action' || cmd.name === 'openSidePanel'
     );
     const settingsCmd = cmds.find(cmd => cmd.name === 'openSettings');
-    const reportBugCmd = cmds.find(cmd => cmd.name === 'reportBug');
-    const requestFeatureCmd = cmds.find(cmd => cmd.name === 'requestFeature');
-    const discussCmd = cmds.find(cmd => cmd.name === 'discuss');
-    const sourceCmd = cmds.find(cmd => cmd.name === 'openSource');
 
     if (copyCmd) {
         copySelectionButton.title = copyCmd.shortcut || '(no keyboard shortcut set)';
@@ -146,18 +110,6 @@ async function loadCommands() {
     }
     if (settingsCmd) {
         settingsButton.title = settingsCmd.shortcut || '(no keyboard shortcut set)';
-    }
-    if (reportBugCmd) {
-        reportBugButton.title = reportBugCmd.shortcut || '(no keyboard shortcut set)';
-    }
-    if (requestFeatureCmd) {
-        requestFeatureButton.title = requestFeatureCmd.shortcut || '(no keyboard shortcut set)';
-    }
-    if (discussCmd) {
-        discussButton.title = discussCmd.shortcut || '(no keyboard shortcut set)';
-    }
-    if (sourceCmd) {
-        sourceButton.title = sourceCmd.shortcut || '(no keyboard shortcut set)';
     }
 }
 

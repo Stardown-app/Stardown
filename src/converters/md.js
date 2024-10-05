@@ -506,7 +506,8 @@ export class MdConverter {
         };
 
         let liNum = Number(el.getAttribute('start') || 1);
-        const reversed = Boolean(el.getAttribute('reversed'));
+        const reversedAttr = el.getAttribute('reversed');
+        const reversed = reversedAttr !== null && reversedAttr === 'true';
 
         const children = el.childNodes;
         for (let i = 0; i < children.length; i++) {

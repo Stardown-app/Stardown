@@ -3,7 +3,7 @@
 - [Obsidian](https://help.obsidian.md/Editing+and+formatting/Basic+formatting+syntax)
 - [GitHub](https://docs.github.com/en/get-started/writing-on-github/getting-started-with-writing-and-formatting-on-github)
 - [GitLab](https://docs.gitlab.com/ee/user/markdown.html)
-- [Pandoc](https://boisgera.github.io/pandoc/markdown/)
+- [Pandoc](https://pandoc.org/MANUAL.html) (related: [Pandoc Python library](https://boisgera.github.io/pandoc/markdown/))
 - [VS Code](https://code.visualstudio.com/docs/languages/markdown#_markdown-preview)
 - [Zettlr](https://docs.zettlr.com/en/core/writing-markdown/)
 - [SilverBullet](https://silverbullet.md/Markdown/Extensions)

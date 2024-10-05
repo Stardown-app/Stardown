@@ -480,6 +480,9 @@ export class MdConverter {
 
     /** @type {ElementConverter} */
     convertLI(ctx, el) {
+        // List items are handled by the parent list element. The selection code should
+        // detect when the selection contains list items outside of a list and wrap them
+        // in a list element.
         return '';
     }
 

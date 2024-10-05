@@ -14,9 +14,7 @@
    limitations under the License.
 */
 
-if (typeof browser === 'undefined') {
-    var browser = chrome;
-}
+import { browser } from './browserSpecific.js';
 
 const copySelectionButton = document.querySelector('#copySelectionButton');
 const copyEntirePageButton = document.querySelector('#copyEntirePageButton');

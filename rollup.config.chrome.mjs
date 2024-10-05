@@ -59,6 +59,20 @@ export default [
         },
     },
     {
+        input: 'chrome/popup.js',
+        output: {
+            file: 'chrome/popup.js',
+            format: 'iife', // immediately-invoked function expression
+        },
+    },
+    {
+        input: 'chrome/sidebar.js',
+        output: {
+            file: 'chrome/sidebar.js',
+            format: 'iife', // immediately-invoked function expression
+        },
+    },
+    {
         input: 'chrome/settings.js',
         output: {
             file: 'chrome/settings.js',

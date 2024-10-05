@@ -93,6 +93,20 @@ export default [
         },
     },
     {
+        input: 'firefox/popup.js',
+        output: {
+            file: 'firefox/popup.js',
+            format: 'iife', // immediately-invoked function expression
+        },
+    },
+    {
+        input: 'firefox/sidebar.js',
+        output: {
+            file: 'firefox/sidebar.js',
+            format: 'iife', // immediately-invoked function expression
+        },
+    },
+    {
         input: 'firefox/settings.js',
         output: {
             file: 'firefox/settings.js',

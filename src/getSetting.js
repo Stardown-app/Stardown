@@ -26,6 +26,7 @@ const defaultSettings = {
     notifyOnWarning: false,
     notifyOnSuccess: false,
     copyTabsWindows: 'current',
+    notepadContent: '',
 
     mdSelectionFormat: 'source with link',
     mdYoutube: 'almost everywhere',

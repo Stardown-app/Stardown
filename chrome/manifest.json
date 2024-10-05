@@ -80,6 +80,9 @@
                 "default": "Alt+N"
             },
             "description": "Open Stardown's notepad"
+        },
+        "openSettings": {
+            "description": "Open settings"
         }
     }
 }

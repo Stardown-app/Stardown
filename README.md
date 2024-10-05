@@ -55,6 +55,10 @@ You can use this [bookmarklet](https://en.wikipedia.org/wiki/Bookmarklet) I made
 
 `javascript: navigator.clipboard.writeText('[' + document.title + '](' + location.href + ')');`
 
+### Convert between markup languages
+
+* [Pandoc](https://pandoc.org/) offers a command-line tool and a Haskell library that can convert between almost any two markup languages.
+
 ### Integrate directly with an editor
 
 * [Obsidian Clipper](https://github.com/obsidianmd/obsidian-clipper) is the official web clipper extension for Obsidian.

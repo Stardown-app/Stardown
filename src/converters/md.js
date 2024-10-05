@@ -514,6 +514,7 @@ export class MdConverter {
             const child = children[i];
             if (
                 child.nodeType === TEXT_NODE ||
+                child.nodeType === COMMENT_NODE ||
                 child.childNodes.length === 0 ||
                 child.textContent?.match(/^\s+$/)
             ) {
@@ -524,7 +525,7 @@ export class MdConverter {
             } else if (child.nodeName === 'OL') {
                 result.push(this.convertOL(newCtx, child).slice(1) + '\n');
                 continue;
-            } else if (child.nodeName !== 'LI' && child.nodeType !== COMMENT_NODE) {
+            } else if (child.nodeName !== 'LI') {
                 console.warn(`Ignoring unexpected ${child.nodeName} in ${el.nodeName}`);
                 continue;
             }

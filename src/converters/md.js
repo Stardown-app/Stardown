@@ -146,7 +146,7 @@ export class MdConverter {
 
     /**
      * @param {object} ctx
-     * @param {Node[]|NodeList|HTMLCollection} nodes
+     * @param {Node[]|NodeList|NodeListOf<ChildNode>|HTMLCollection} nodes
      * @returns {string}
      */
     convertNodes(ctx, nodes) {

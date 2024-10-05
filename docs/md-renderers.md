@@ -5,6 +5,7 @@
 - [GitLab](https://docs.gitlab.com/ee/user/markdown.html)
 - [Pandoc](https://pandoc.org/MANUAL.html) (related: [Pandoc Python library](https://boisgera.github.io/pandoc/markdown/))
 - [VS Code](https://code.visualstudio.com/docs/languages/markdown#_markdown-preview)
+- [Foam](https://github.com/foambubble/foam)
 - [Zettlr](https://docs.zettlr.com/en/core/writing-markdown/)
 - [SilverBullet](https://silverbullet.md/Markdown/Extensions)
 - [Joplin](https://joplinapp.org/help/apps/markdown/)

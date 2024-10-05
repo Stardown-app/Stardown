@@ -89,10 +89,6 @@ You can use this [bookmarklet](https://en.wikipedia.org/wiki/Bookmarklet) I made
 * [url2clipboard](https://github.com/asamuzaK/url2clipboard) supports HTML, Markdown, BBCode, Textile, AsciiDoc, MediaWiki, Jira, reStructuredText, LaTeX, Org Mode, and text.
 * [TabCopy](https://chromewebstore.google.com/detail/tabcopy/micdllihgoppmejpecmkilggmaagfdmb) might only be on the Chrome Web Store, but supports many markup languages including HTML, Markdown, BBCode, CSV, and JSON, and lets you create custom link formats.
 
-### Copy just a URL with a text fragment
-
-* [link-to-text-fragment](https://github.com/GoogleChromeLabs/link-to-text-fragment) was made by Google itself but is cross-browser.
-
 ## Why Stardown?
 
 Stardown is:

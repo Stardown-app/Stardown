@@ -38,11 +38,13 @@ export async function preprocessFragment(frag, hostname) {
  * or not displayed.
  * @param {DocumentFragment} frag
  * @param {Document} doc
+ * @returns {void}
  */
 export function removeHiddenElements(frag, doc) {
-    const ELEMENT_NODE = 1;
+    const SHOW_ELEMENT = 1;
+    const iterator = doc.createNodeIterator(frag, SHOW_ELEMENT);
 
-    const iterator = doc.createNodeIterator(frag, NodeFilter.SHOW_ELEMENT);
+    const ELEMENT_NODE = 1;
     let currentNode = iterator.nextNode();
     while (currentNode) {
         if (currentNode.nodeType === ELEMENT_NODE) {
@@ -63,9 +65,11 @@ export function removeHiddenElements(frag, doc) {
  * removeStyles removes style-related attributes from each element in the given
  * fragment.
  * @param {DocumentFragment} frag
+ * @returns {void}
  */
 export function removeStyles(frag) {
-    const iterator = document.createNodeIterator(frag, NodeFilter.SHOW_ELEMENT);
+    const SHOW_ELEMENT = 1;
+    const iterator = document.createNodeIterator(frag, SHOW_ELEMENT);
     let currentNode = iterator.nextNode();
     while (currentNode) {
         currentNode.removeAttribute('style');

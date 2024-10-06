@@ -521,6 +521,7 @@ export class MdConverter {
             } else if (
                 child.nodeType === TEXT_NODE ||
                 child.nodeType === COMMENT_NODE ||
+                child.nodeName === 'TEMPLATE' ||
                 child.childNodes.length === 0 ||
                 child.textContent?.match(/^\s+$/)
             ) {

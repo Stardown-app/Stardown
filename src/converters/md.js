@@ -515,9 +515,13 @@ export class MdConverter {
         const children = el.childNodes;
         for (let i = 0; i < children.length; i++) {
             const child = children[i];
-            if (
+            if (child.nodeName === 'HR') {
+                result.push(this.convertHR(newCtx, child));
+                continue;
+            } else if (
                 child.nodeType === TEXT_NODE ||
                 child.nodeType === COMMENT_NODE ||
+                child.nodeName === 'TEMPLATE' ||
                 child.childNodes.length === 0 ||
                 child.textContent?.match(/^\s+$/)
             ) {

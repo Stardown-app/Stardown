@@ -34,21 +34,23 @@ export async function preprocessFragment(frag, hostname) {
 }
 
 /**
- * removeHiddenElements removes from a node any descendant elements that are hidden or
- * not displayed.
- * @param {Node} node
+ * removeHiddenElements removes from a fragment any descendant elements that are hidden
+ * or not displayed.
+ * @param {DocumentFragment} frag
  * @param {Document} doc
  */
-export function removeHiddenElements(node, doc) {
-    const SHOW_ELEMENT = 1;
-    const iterator = doc.createNodeIterator(node, SHOW_ELEMENT);
-
+export function removeHiddenElements(frag, doc) {
     const ELEMENT_NODE = 1;
+
+    const iterator = doc.createNodeIterator(frag, NodeFilter.SHOW_ELEMENT);
     let currentNode = iterator.nextNode();
     while (currentNode) {
         if (currentNode.nodeType === ELEMENT_NODE) {
             const style = doc.defaultView.getComputedStyle(currentNode);
-            if (style.display === 'none' || style.visibility === 'hidden') {
+            if (
+                style.getPropertyValue('display') === 'none' ||
+                style.getPropertyValue('visibility') === 'hidden'
+            ) {
                 currentNode.parentNode.removeChild(currentNode);
             }
         }

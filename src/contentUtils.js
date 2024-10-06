@@ -67,10 +67,12 @@ export async function applyTemplate(template, title, url, text) {
  */
 export async function readabilitize(frag) {
     const doc = document.implementation.createHTMLDocument();
-    doc.body.append(frag);
+    doc.body.append(frag); // this empties frag
 
     if (!isProbablyReaderable(doc)) {
-        console.log('This page is probably not readerable');
+        console.log('This page is probably not readerable, so Readability.js will not be used.');
+        frag = doc.createDocumentFragment();
+        frag.append(doc.body);
         return frag;
     }
 

@@ -129,9 +129,7 @@ export async function getSelectionFragment(selection) {
         return null;
     }
 
-    if (selection.rangeCount > 1) {
-        combineRanges(selection);
-    }
+    combineRanges(selection);
 
     /** @type {DocumentFragment} */
     let frag = document.createDocumentFragment();
@@ -147,7 +145,7 @@ export async function getSelectionFragment(selection) {
         /** @type {Element|null} */
         const list = getList(startRange); // either an OL, UL, or MENU element
         if (list !== null) {
-            frag = wrapFragmentWithList(frag, list, startRange);
+            frag = wrapRangeContentWithList(startRange, list);
         }
     }
 
@@ -228,11 +226,18 @@ async function getSourceFormatMdWithLink(title, url, selection, selectedText, ma
 
 /**
  * combineRanges combines the ranges of a selection into one range, modifying the
- * selection in place.
+ * selection in place. This function has no effect on selections with 0 or 1 ranges.
+ * Most browsers put only one range in each selection, but Firefox's selections usually
+ * have multiple ranges. These ranges tend to overlap, and working with multiple ranges
+ * is more difficult than working with one range.
  * @param {Selection} selection
  * @returns {void}
  */
 function combineRanges(selection) {
+    if (selection.rangeCount <= 1) {
+        return;
+    }
+
     const combinedRange = document.createRange();
     const originalRanges = [];
     for (let i = 0; i < selection.rangeCount; i++) {
@@ -441,14 +446,13 @@ function getList(startRange) {
 }
 
 /**
- * wrapFragmentWithList wraps the selection fragment with a new list element based on
- * the existing one the fragment is in.
- * @param {DocumentFragment} frag
- * @param {HTMLOListElement|HTMLUListElement|HTMLMenuElement} list
+ * wrapRangeContentWithList wraps the selection range with a new list element based on
+ * the existing one. This function assumes the given range is in a list element.
  * @param {Range} startRange
+ * @param {HTMLOListElement|HTMLUListElement|HTMLMenuElement} list
  * @returns {DocumentFragment}
  */
-function wrapFragmentWithList(frag, list, startRange) {
+function wrapRangeContentWithList(startRange, list) {
     const ELEMENT_NODE = 1;
 
     let newList;
@@ -486,12 +490,14 @@ function wrapFragmentWithList(frag, list, startRange) {
         newList.setAttribute('type', list.getAttribute('type') || '1');
     } else if (list.nodeName === 'UL') {
         newList = document.createElement('ul');
-    } else { // if (list.nodeName === 'MENU')
+    } else if (list.nodeName === 'MENU') {
         newList = document.createElement('menu');
+    } else {
+        throw new Error('Unknown list type');
     }
 
     newList.appendChild(startRange.cloneContents());
-    frag = document.createDocumentFragment();
+    const frag = document.createDocumentFragment();
     frag.appendChild(newList);
 
     return frag;

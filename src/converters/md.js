@@ -324,8 +324,13 @@ export class MdConverter {
         return this.convertBlockElement(ctx, el);
     }
 
-    /** @type {ElementConverter} */
-    newConvertH_(ctx, el) {
+    /**
+     * @param {object} ctx
+     * @param {Element} el
+     * @param {number} headerLevel
+     * @returns {string}
+     */
+    newConvertH_(ctx, el, headerLevel) {
         if (ctx.inTable) {
             return this.convertText(ctx, el);
         }
@@ -334,7 +339,7 @@ export class MdConverter {
 
         /** @type {string[]} */
         const result = ['\n\n'];
-        for (let i = 0; i < ctx.hn; i++) {
+        for (let i = 0; i < headerLevel; i++) {
             result.push('#');
         }
         const text = this.convertNodes(newCtx, el.childNodes).trim();
@@ -349,38 +354,32 @@ export class MdConverter {
 
     /** @type {ElementConverter} */
     convertH1(ctx, el) {
-        const newCtx = { ...ctx, hn: 1 };
-        return this.newConvertH_(newCtx, el);
+        return this.newConvertH_(ctx, el, 1);
     }
 
     /** @type {ElementConverter} */
     convertH2(ctx, el) {
-        const newCtx = { ...ctx, hn: 2 };
-        return this.newConvertH_(newCtx, el);
+        return this.newConvertH_(ctx, el, 2);
     }
 
     /** @type {ElementConverter} */
     convertH3(ctx, el) {
-        const newCtx = { ...ctx, hn: 3 };
-        return this.newConvertH_(newCtx, el);
+        return this.newConvertH_(ctx, el, 3);
     }
 
     /** @type {ElementConverter} */
     convertH4(ctx, el) {
-        const newCtx = { ...ctx, hn: 4 };
-        return this.newConvertH_(newCtx, el);
+        return this.newConvertH_(ctx, el, 4);
     }
 
     /** @type {ElementConverter} */
     convertH5(ctx, el) {
-        const newCtx = { ...ctx, hn: 5 };
-        return this.newConvertH_(newCtx, el);
+        return this.newConvertH_(ctx, el, 5);
     }
 
     /** @type {ElementConverter} */
     convertH6(ctx, el) {
-        const newCtx = { ...ctx, hn: 6 };
-        return this.newConvertH_(newCtx, el);
+        return this.newConvertH_(ctx, el, 6);
     }
 
     /** @type {ElementConverter} */

@@ -1276,7 +1276,7 @@ export class MdConverter {
         const result = [];
 
         if (!ctx.inList) {
-            result.push(ctx.mdBulletPoint + ' ');
+            result.push('\n' + ctx.mdBulletPoint + ' ');
         }
         if (checked) {
             result.push('[x] ');

@@ -69,6 +69,10 @@ anchor with no href
 
 - [ ] Checkbox with label
 
+- [ ] feel
+- [ ] seek
+- [ ] authority
+
 Press `Alt+C` to copy.
 
 ``Code elements can contain `backticks`.``

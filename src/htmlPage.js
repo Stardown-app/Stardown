@@ -15,9 +15,9 @@
 */
 
 import { getSetting } from './getSetting.js';
-import { sendToNotepad, applyTemplate, readabilitize } from './contentUtils.js';
+import { sendToNotepad, applyTemplate, readabilitize, removeIdAndTextFragment } from './contentUtils.js';
 import { preprocessFragment } from './converters/utils/html.js';
-import { absolutizeNodeUrls, removeIdAndTextFragment } from './converters/utils/urls.js';
+import { absolutizeNodeUrls } from './converters/utils/urls.js';
 import * as md from './generators/md.js';
 import { htmlToMd } from './converters/md.js';
 import { htmlToMdAndHtml } from './converters/mdAndHtml.js';

@@ -19,16 +19,15 @@ import { mdEncodeUri } from './converters/md.js';
 
 /**
  * createTextFragmentArg creates for a markdown link a text fragment argument (the part
- * after the `#:~:text=`). Only selection objects with type 'Range' are used; all other
- * selections result in an empty string because this extension needs to also allow
- * creating links that do not include text fragments. All parentheses are replaced with
- * their URL-encoded equivalents. This function may adjust what part of the document is
- * selected, such as to include the entirety of partially selected words.
- * @param {Selection} selection - A Selection object; the result of window.getSelection.
+ * after the `#:~:text=`). If the selection object has type 'None', an empty string is
+ * returned. All parentheses are replaced with their URL-encoded equivalents. This
+ * function may adjust what part of the document is selected, such as to include the
+ * entirety of partially selected words.
+ * @param {Selection} selection
  * @returns {string}
  */
 export function createTextFragmentArg(selection) {
-    if (selection.type !== 'Range') {
+    if (selection.type === 'None') {
         return '';
     }
 

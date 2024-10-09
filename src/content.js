@@ -18,10 +18,8 @@ import { browser, handleCopyRequest } from './browserSpecific.js';
 import * as md from './generators/md.js';
 import * as htmlSelection from './htmlSelection.js';
 import { handleCopyPageRequest } from './htmlPage.js';
-import { createTextFragmentArg } from './createTextFragmentArg.js';
 import { getSetting } from './getSetting.js';
-import { sendToNotepad } from './contentUtils.js';
-import { removeIdAndTextFragment } from './converters/utils/urls.js';
+import { sendToNotepad, addIdAndTextFragment } from './contentUtils.js';
 import { htmlTableToJson } from './converters/json.js';
 import { htmlTableToCsv } from './converters/csv.js';
 
@@ -212,8 +210,9 @@ async function handleRequest(message) {
         case 'copyEntirePageShortcut':
             return await handleCopyPageRequest();
         case 'pageSectionRightClick':
+            const selection = window.getSelection();
             const id1 = await getClickedElementId(clickedElement);
-            return await handlePageSectionRightClick(id1);
+            return await handlePageSectionRightClick(id1, selection);
         case 'selectionRightClick':
             const selection1 = window.getSelection();
             const id2 = await getClickedElementId(clickedElement);
@@ -260,8 +259,8 @@ async function handleRequest(message) {
 
 /**
  * getClickedElementId gets the ID of the element that was right-clicked. If the element
- * doesn't have an ID, it looks at its older siblings and parent elements until it finds
- * an ID or the root of the DOM is reached.
+ * doesn't have an ID, this function looks at the element's older siblings and parent
+ * elements until an ID is found or the root of the DOM is reached.
  * @param {EventTarget|null} clickedElement - the element that was right-clicked.
  * @returns {Promise<string>} - the ID of the element that was right-clicked. If no
  * element with an ID was found, an empty string is returned.
@@ -281,18 +280,20 @@ async function getClickedElementId(clickedElement) {
 }
 
 /**
- * handleCopySelectionShortcut handles a request from the user to copy a selection.
+ * handleCopySelectionShortcut handles a request from the user to copy a Selection or a
+ * link for the current tab.
  * @returns {Promise<ContentResponse>}
  */
 async function handleCopySelectionShortcut() {
     const selection = window.getSelection();
     if (selection && selection.type === 'Range') {
-        // only allow Range (and not Caret) selections or else every copy request will
-        // count as a selection click
+        // Only allow Range (and not Caret) Selections because the copy selection
+        // shortcut must copy a link for the current tab when there is no Range
+        // Selection (when none of the page is highlighted).
         return await handleSelectionCopyRequest('', selection);
     }
 
-    // there is no selection, so create a link instead
+    // none of the page is highlighted, so create a link for the page instead
     const markupLanguage = await getSetting('markupLanguage');
     switch (markupLanguage) {
         case 'markdown':
@@ -311,19 +312,20 @@ async function handleCopySelectionShortcut() {
 }
 
 /**
- * handlePageSectionRightClick handles a right-click on a page that is for a specific
- * part of the page.
+ * handlePageSectionRightClick handles a right-click on a page for copying a link for
+ * the right-clicked part of the page.
  * @param {string} htmlId - the ID of the HTML element that was right-clicked.
+ * @param {Selection} selection - since this function is for right-clicks on an
+ * unselected part of a page, this selection object is expected to have the "Caret"
+ * type.
  * @returns {Promise<ContentResponse>}
  */
-async function handlePageSectionRightClick(htmlId) {
-    let title = document.title;
-    let url = removeIdAndTextFragment(location.href);
-    if (htmlId) {
-        url += '#' + htmlId;
-    }
+async function handlePageSectionRightClick(htmlId, selection) {
+    const title = document.title;
+    const url = await addIdAndTextFragment(location.href, htmlId, selection);
 
     const link = await md.createLink(title, url);
+
     await sendToNotepad(link);
     return await handleCopyRequest(link);
 }
@@ -335,24 +337,8 @@ async function handlePageSectionRightClick(htmlId) {
  * @returns {Promise<ContentResponse>}
  */
 async function handleSelectionCopyRequest(htmlId, selection) {
-    let title = document.title;
-    let url = removeIdAndTextFragment(location.href);
-
-    let arg = ''; // the text fragment argument
-    const createTextFragment = await getSetting('createTextFragment');
-    if (createTextFragment && selection && selection.type === 'Range') {
-        arg = createTextFragmentArg(selection);
-    }
-
-    if (htmlId || arg) {
-        url += '#';
-        if (htmlId) {
-            url += htmlId;
-        }
-        if (arg) {
-            url += `:~:text=${arg}`;
-        }
-    }
+    const title = document.title;
+    const url = await addIdAndTextFragment(location.href, htmlId, selection);
 
     const text = await htmlSelection.createText(title, url, selection);
 

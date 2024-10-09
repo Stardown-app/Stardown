@@ -292,6 +292,7 @@ async function handleCopySelectionShortcut() {
         return await handleSelectionCopyRequest('', selection);
     }
 
+    // there is no selection, so create a link instead
     const markupLanguage = await getSetting('markupLanguage');
     switch (markupLanguage) {
         case 'markdown':

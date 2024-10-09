@@ -56,7 +56,7 @@ When the user right-clicks part of a web page, their browser detects the type of
 - [ ] **Right-clicking a video** shows the "Copy markdown of video" option, but may require a second right-click for the correct context menu to appear because some videos (e.g. YouTube videos) have a special context menu.
 - [ ] **Right-clicking an audio player** shows the "Copy markdown of audio" option.
 - [ ] **Selecting the contents of a table and right-clicking the selection** shows several options: "Copy markdown of table", "Copy TSV of table", "Copy CSV of table", "Copy JSON of table", and "Copy HTML of table". Each option should result in a table with everything aligned correctly, leaving some cells empty and others duplicated as necessary.
-- [ ] "Copy markdown link for this section" copies a markdown link for the page with an HTML element ID from where the page was right-clicked, if one exists there.
+- [ ] "Copy markdown link for this section" copies a markdown link for the page with the nearest HTML element ID above (*above* in the HTML element tree sense) where the page was right-clicked.
 - [ ] "Copy markdown of selection", by default, copies markdown of the selected text (including all of the page's formatting that markdown supports), and a markdown link containing a text fragment and possibly an HTML element ID.
 - [ ] "Copy markdown of image" copies markdown of the image using the image's URL and any alt text.
 - [ ] "Copy markdown of link" copies markdown of the link, using the same title and URL as the link in the page (except for any character escapes or encodings).

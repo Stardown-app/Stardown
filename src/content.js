@@ -260,23 +260,23 @@ async function handleRequest(message) {
 
 /**
  * getClickedElementId gets the ID of the element that was right-clicked. If the element
- * doesn't have an ID, it looks at its parent element. This repeats until an element
- * with an ID is found, or until the root of the DOM is reached.
+ * doesn't have an ID, it looks at its older siblings and parent elements until it finds
+ * an ID or the root of the DOM is reached.
  * @param {EventTarget|null} clickedElement - the element that was right-clicked.
  * @returns {Promise<string>} - the ID of the element that was right-clicked. If no
  * element with an ID was found, an empty string is returned.
  */
 async function getClickedElementId(clickedElement) {
-    // if clickedElement doesn't have an id, look at its parent
-    while (clickedElement && !clickedElement.id) {
-        clickedElement = clickedElement.parentElement;
-    }
-
-    if (clickedElement && clickedElement.id) {
-        return clickedElement.id;
-    } else {
-        console.log('No HTML element with an ID was found in the clicked path');
-        return '';
+    while (true) {
+        if (!clickedElement) {
+            return '';
+        } else if (clickedElement.id) {
+            return clickedElement.id;
+        } else if (clickedElement.previousElementSibling) {
+            clickedElement = clickedElement.previousElementSibling;
+        } else {
+            clickedElement = clickedElement.parentElement;
+        }
     }
 }
 

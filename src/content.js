@@ -211,9 +211,9 @@ async function handleRequest(message) {
             return await handleCopySelectionShortcut();
         case 'copyEntirePageShortcut':
             return await handleCopyPageRequest();
-        case 'pageRightClick':
+        case 'pageSectionRightClick':
             const id1 = await getClickedElementId(clickedElement);
-            return await handlePageRightClick(id1);
+            return await handlePageSectionRightClick(id1);
         case 'selectionRightClick':
             const selection1 = window.getSelection();
             const id2 = await getClickedElementId(clickedElement);
@@ -310,11 +310,12 @@ async function handleCopySelectionShortcut() {
 }
 
 /**
- * handlePageRightClick handles a right-click on a page.
+ * handlePageSectionRightClick handles a right-click on a page that is for a specific
+ * part of the page.
  * @param {string} htmlId - the ID of the HTML element that was right-clicked.
  * @returns {Promise<ContentResponse>}
  */
-async function handlePageRightClick(htmlId) {
+async function handlePageSectionRightClick(htmlId) {
     let title = document.title;
     let url = removeIdAndTextFragment(location.href);
     if (htmlId) {

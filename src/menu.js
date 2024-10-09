@@ -18,9 +18,9 @@
 // functions in the browserSpecific.js files. If you change the titles here, you should
 // probably also update the titles in those functions.
 
-export const pageItem = {
-    id: 'page',
-    title: 'Copy markdown link for this part of the page',
+export const pageSectionItem = {
+    id: 'pageSection',
+    title: 'Copy markdown link for this section',
     contexts: ['page', 'editable'],
 };
 

@@ -45,6 +45,7 @@ export function getShortcutInstructions() {
  */
 export function createContextMenus(markupLanguage) {
     browser.runtime.onInstalled.addListener(() => {
+        browser.contextMenus.create(menu.pageItem);
         browser.contextMenus.create(menu.pageSectionItem);
         browser.contextMenus.create(menu.selectionItem);
         browser.contextMenus.create(menu.linkItem);
@@ -127,6 +128,9 @@ export function updateContextMenuLanguage(markupLanguage) {
         markupLanguage = 'markdown';
     }
 
+    browser.contextMenus.update('page', {
+        title: `Copy ${markupLanguage} link for this page`,
+    });
     browser.contextMenus.update('pageSection', {
         title: `Copy ${markupLanguage} link for this section`,
     });

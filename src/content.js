@@ -209,6 +209,10 @@ async function handleRequest(message) {
             return await handleCopySelectionShortcut();
         case 'copyEntirePageShortcut':
             return await handleCopyPageRequest();
+        case 'pageRightClick':
+            const linkMd2 = await md.createLink(document.title, location.href);
+            await sendToNotepad(linkMd2);
+            return await handleCopyRequest(linkMd2);
         case 'pageSectionRightClick':
             const selection = window.getSelection();
             const id1 = await getClickedElementId(clickedElement);

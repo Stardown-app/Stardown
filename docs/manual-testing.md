@@ -6,16 +6,20 @@ When fully manually testing Stardown, use the descriptions here in each of the o
 
 Here are a bunch of web pages with interesting features for testing.
 
+- [short Wikipedia page](https://en.wikipedia.org/wiki/Harjant_Gill)
+- [short Wikipedia page with many references](https://en.wikipedia.org/wiki/Shanti_Kumar_Morarjee)
+- [long Wikipedia page](https://en.wikipedia.org/wiki/Cold_War)
+- [insanely long Wikipedia page](https://en.wikipedia.org/wiki/Scythians)
+- [Wikipedia location map](https://en.wikipedia.org/wiki/Bush_Kill_%28Pepacton_Reservoir_tributary%29) cannot render well as markdown because two images overlap on the website
 - [tiny table](https://www.markdownguide.org/extended-syntax/#tables)
 - [small table](https://developer.mozilla.org/en-US/docs/Learn/HTML/Tables/Advanced#tables_for_visually_impaired_users)
 - [complex table](https://en.wikipedia.org/wiki/English_modal_auxiliary_verbs#Modal_auxiliary_verbs_distinguished_grammatically)
 - [complex table 2](https://en.wikipedia.org/wiki/Dear_Evan_Hansen#Original_West_End_production)
 - [table with link images](https://en.wikipedia.org/wiki/1926_World_Table_Tennis_Championships)
-- [tables with spanned images](https://en.wikipedia.org/wiki/Toshimi_Kitazawa)
+- [table with horizontally spanned image](https://en.wikipedia.org/wiki/Toshimi_Kitazawa)
+- [table with vertically spanned image](https://en.wikipedia.org/wiki/Gabiadji)
 - [massive table](https://www.worldometers.info/world-population/population-by-country/)
 - [tables used for presentation without the presentation role](https://news.ycombinator.com/)
-- [Wikipedia references](https://en.wikipedia.org/wiki/Shanti_Kumar_Morarjee)
-- [Wikipedia location map](https://en.wikipedia.org/wiki/Bush_Kill_%28Pepacton_Reservoir_tributary%29) cannot render well because two images have to overlap
 - [code blocks that use `<pre>` but not `<code>`](https://www.cnblogs.com/unity2018/p/8492463.html)
 - [code blocks with inline element headers](https://developer.mozilla.org/en-US/docs/Learn/HTML/Tables/Advanced#the_scope_attribute)
 - [MS doc code blocks](https://devblogs.microsoft.com/dotnet/csharp-13-explore-preview-features/)

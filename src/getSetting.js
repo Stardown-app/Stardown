@@ -19,7 +19,7 @@ import { browser } from './browserSpecific.js';
 const defaultSettings = {
     markupLanguage: 'markdown',
     createTextFragment: true,
-    readabilityJs: true,
+    extractMainContent: true,
     omitNav: true,
     omitFooter: true,
     omitHidden: true,

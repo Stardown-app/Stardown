@@ -26,7 +26,7 @@ const form = document.querySelector('form');
 const markupLanguageEl = document.querySelector('#markupLanguage');
 const copyTabsWindowsEl = document.querySelector('#copyTabsWindows');
 const createTextFragmentEl = document.querySelector('#createTextFragment');
-const readabilityJsEl = document.querySelector('#readabilityJs');
+const extractMainContentEl = document.querySelector('#extractMainContent');
 const omitNavEl = document.querySelector('#omitNav');
 const omitFooterEl = document.querySelector('#omitFooter');
 const omitHiddenEl = document.querySelector('#omitHidden');
@@ -55,7 +55,7 @@ initAutosave('markupLanguage', markupLanguageEl, 'value', async () => {
     });
 });
 initAutosave('createTextFragment', createTextFragmentEl, 'checked');
-initAutosave('readabilityJs', readabilityJsEl, 'checked');
+initAutosave('extractMainContent', extractMainContentEl, 'checked');
 initAutosave('omitNav', omitNavEl, 'checked');
 initAutosave('omitFooter', omitFooterEl, 'checked');
 initAutosave('omitHidden', omitHiddenEl, 'checked');
@@ -103,7 +103,7 @@ async function loadSettings() {
         markupLanguageEl.value = await getSetting('markupLanguage');
         copyTabsWindowsEl.value = await getSetting('copyTabsWindows');
         createTextFragmentEl.checked = await getSetting('createTextFragment');
-        readabilityJsEl.checked = await getSetting('readabilityJs');
+        extractMainContentEl.checked = await getSetting('extractMainContent');
         omitNavEl.checked = await getSetting('omitNav');
         omitFooterEl.checked = await getSetting('omitFooter');
         omitHiddenEl.checked = await getSetting('omitHidden');

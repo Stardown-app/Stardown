@@ -15,7 +15,7 @@
 */
 
 import { getSetting } from './getSetting.js';
-import { sendToNotepad, applyTemplate, readabilitize, removeIdAndTextFragment } from './contentUtils.js';
+import { sendToNotepad, applyTemplate, extractMainContent, removeIdAndTextFragment } from './contentUtils.js';
 import { preprocessFragment } from './converters/utils/html.js';
 import { absolutizeNodeUrls } from './converters/utils/urls.js';
 import * as md from './generators/md.js';
@@ -112,7 +112,7 @@ async function getSourceFormatMdWithLink(title, url, markupLanguage) {
 /**
  * getSourceFormatMd returns source-formatted markdown of the current page in the user's
  * chosen markup language.
- * @param {string} markupLanguage - the user's chosen markup language.
+ * @param {string} markupLanguage
  * @returns {Promise<string>}
  */
 async function getSourceFormatMd(markupLanguage) {
@@ -121,9 +121,8 @@ async function getSourceFormatMd(markupLanguage) {
     let frag = document.createDocumentFragment();
     frag.append(document.body.cloneNode(true));
 
-    const readabilityJs = await getSetting('readabilityJs');
-    if (readabilityJs) {
-        frag = await readabilitize(frag);
+    if (await getSetting('extractMainContent')) {
+        frag = await extractMainContent(frag);
     }
 
     await preprocessFragment(frag, location.hostname);

@@ -62,31 +62,31 @@ export async function applyTemplate(template, title, url, text) {
 }
 
 /**
- * readabilitize attempts to remove from a document fragment all elements that are not
- * part of the main content.
+ * extractMainContent attempts to remove from a document fragment all elements that are
+ * not part of the main content.
  * @param {DocumentFragment} frag
  * @returns {Promise<DocumentFragment>}
  */
-export async function readabilitize(frag) {
+export async function extractMainContent(frag) {
     const doc = document.implementation.createHTMLDocument();
     doc.body.append(frag); // this empties frag
 
-    if (!isProbablyReaderable(doc)) {
-        console.log('This page is probably not readerable, so Readability.js will not be used.');
-        frag = doc.createDocumentFragment();
-        frag.append(doc.body);
+    // https://github.com/mozilla/readability
+    if (isProbablyReaderable(doc)) {
+        console.log('Using Readability.js to extract the main content of the page');
+
+        const article = new Readability(doc).parse();
+        const htmlStr = article.content;
+
+        const div = document.createElement('div');
+        div.innerHTML = htmlStr;
+
+        frag.append(div);
         return frag;
     }
 
-    const article = new Readability(doc).parse();
-    const htmlStr = article.content;
-
-    const div = document.createElement('div');
-    div.innerHTML = htmlStr;
-
-    frag = document.createDocumentFragment();
-    frag.append(div);
-
+    console.log('Not attempting to extract the main content of the page');
+    frag.append(doc.body);
     return frag;
 }
 

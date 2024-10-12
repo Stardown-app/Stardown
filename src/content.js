@@ -19,7 +19,7 @@ import { createLink, createImage, createVideo, createAudio } from './generators/
 import * as htmlSelection from './htmlSelection.js';
 import { handleCopyPageRequest } from './htmlPage.js';
 import { getSetting } from './getSetting.js';
-import { sendToNotepad, addIdAndTextFragment } from './contentUtils.js';
+import { sendToNotepad, addIdAndTextFragment, removeIdAndTextFragment } from './contentUtils.js';
 import { htmlTableToJson } from './converters/json.js';
 import { htmlTableToCsv } from './converters/csv.js';
 
@@ -385,6 +385,7 @@ async function handleJsonTableRightClick(tableSelection) {
  * @returns {Promise<ContentResponse>}
  */
 async function handleCreateLink(title, url) {
+    url = removeIdAndTextFragment(url);
     const markupLanguage = await getSetting('markupLanguage');
     const link = await createLink(title, url, markupLanguage);
     await sendToNotepad(link);

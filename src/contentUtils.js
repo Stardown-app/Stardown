@@ -65,9 +65,25 @@ export async function applyTemplate(template, title, url, text) {
  * extractMainContent attempts to remove from a document fragment all elements that are
  * not part of the main content.
  * @param {DocumentFragment} frag
+ * @param {Location} location
  * @returns {Promise<DocumentFragment>}
  */
-export async function extractMainContent(frag) {
+export async function extractMainContent(frag, location) {
+    if (location.href.match(/^https:\/\/(?:[^\.]+\.)?wikipedia\.org\/wiki\/.*/)) {
+        console.log('Extracting the main content of the Wikipedia page');
+        const firstHeading = frag.querySelector('#firstHeading');
+        const content = frag.querySelector('#mw-content-text');
+        if (firstHeading && content) {
+            const navbox = content.querySelector('.navbox');
+            if (navbox) {
+                navbox.remove();
+            }
+            frag = new DocumentFragment();
+            frag.append(firstHeading, content);
+            return frag;
+        }
+    }
+
     const doc = document.implementation.createHTMLDocument();
     doc.body.append(frag); // this empties frag
 

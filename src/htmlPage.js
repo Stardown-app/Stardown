@@ -124,7 +124,7 @@ async function getSourceFormatMd(markupLanguage) {
     frag.append(document.body.cloneNode(true));
 
     if (await getSetting('extractMainContent')) {
-        frag = await extractMainContent(frag);
+        frag = await extractMainContent(frag, location);
     }
 
     await improveConvertibility(frag, location.hostname);

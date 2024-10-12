@@ -50,6 +50,7 @@ export function removeHiddenElements(frag, doc) {
         if (currentNode.nodeType === ELEMENT_NODE) {
             const style = doc.defaultView.getComputedStyle(currentNode);
             if (
+                currentNode.hasAttribute('hidden') ||
                 style.getPropertyValue('display') === 'none' ||
                 style.getPropertyValue('visibility') === 'hidden'
             ) {

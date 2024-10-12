@@ -27,15 +27,32 @@ export async function createLink(title, url, markupLanguage) {
     switch (markupLanguage) {
         case 'markdown':
         case 'markdown with some html':
-            const mdLink = await md.createLink(title, url);
-            return mdLink;
+            return await md.createLink(title, url);
         case 'html':
             title = htmlEncodeText(title);
-            const htmlLink = `<a href="${url}">${title}</a>`;
-            return htmlLink;
+            return `<a href="${url}">${title}</a>`;
         default:
             console.error(`Unknown markupLanguage: ${markupLanguage}`);
             throw new Error(`Unknown markupLanguage: ${markupLanguage}`);
+    }
+}
+
+/**
+ * createImage creates an image in the given markup language.
+ * @param {string} url
+ * @param {string} markupLanguage
+ * @returns {Promise<string>}
+ */
+export async function createImage(url, markupLanguage) {
+    switch (markupLanguage) {
+        case 'markdown':
+        case 'markdown with some html':
+            return await md.createImage(url) + '\n';
+        case 'html':
+            return `<img src="${url}">`;
+        default:
+            console.error('Unknown markup language:', markupLanguage);
+            throw new Error('Unknown markup language:', markupLanguage);
     }
 }
 

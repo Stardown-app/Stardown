@@ -15,7 +15,7 @@
 */
 
 import { browser, handleCopyRequest } from './browserSpecific.js';
-import { createLink } from './generators/all.js';
+import { createLink, createImage } from './generators/all.js';
 import * as md from './generators/md.js';
 import * as htmlSelection from './htmlSelection.js';
 import { handleCopyPageRequest } from './htmlPage.js';
@@ -402,20 +402,9 @@ async function handleCreateLink(title, url) {
  */
 async function handleCreateImage(url) {
     const markupLanguage = await getSetting('markupLanguage');
-    switch (markupLanguage) {
-        case 'markdown':
-        case 'markdown with some html':
-            const imageMd = await md.createImage(url);
-            await sendToNotepad(imageMd + '\n');
-            return await handleCopyRequest(imageMd + '\n');
-        case 'html':
-            const img = `<img src="${url}">`;
-            await sendToNotepad(img);
-            return await handleCopyRequest(img);
-        default:
-            console.error('Unknown markup language:', markupLanguage);
-            throw new Error('Unknown markup language:', markupLanguage);
-    }
+    const image = await createImage(url, markupLanguage);
+    await sendToNotepad(image);
+    return await handleCopyRequest(image);
 }
 
 /**

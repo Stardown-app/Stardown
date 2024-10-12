@@ -30,10 +30,8 @@ export async function extractMainContent(frag, location) {
         const firstHeading = frag.querySelector('#firstHeading');
         const content = frag.querySelector('#mw-content-text');
         if (firstHeading && content) {
-            const navbox = content.querySelector('.navbox');
-            if (navbox) {
-                navbox.remove();
-            }
+            content.querySelector('.navbox')?.remove();
+
             frag = new DocumentFragment();
             frag.append(firstHeading, content);
             return frag;

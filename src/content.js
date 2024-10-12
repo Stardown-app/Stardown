@@ -15,7 +15,7 @@
 */
 
 import { browser, handleCopyRequest } from './browserSpecific.js';
-import { createLink, createImage } from './generators/all.js';
+import { createLink, createImage, createVideo } from './generators/all.js';
 import * as md from './generators/md.js';
 import * as htmlSelection from './htmlSelection.js';
 import { handleCopyPageRequest } from './htmlPage.js';
@@ -416,22 +416,9 @@ async function handleCreateImage(url) {
  */
 async function handleCreateVideo(srcUrl, pageUrl) {
     const markupLanguage = await getSetting('markupLanguage');
-    switch (markupLanguage) {
-        case 'markdown':
-        case 'markdown with some html':
-            const videoMd = await md.createVideo(srcUrl, pageUrl);
-            await sendToNotepad(videoMd + '\n');
-            return await handleCopyRequest(videoMd + '\n');
-        case 'html':
-            const usingSrcUrl = srcUrl && !srcUrl.startsWith('blob:');
-            const url = usingSrcUrl ? srcUrl : pageUrl;
-            const videoHtml = `<video src="${url}">`;
-            await sendToNotepad(videoHtml);
-            return await handleCopyRequest(videoHtml);
-        default:
-            console.error('Unknown markup language:', markupLanguage);
-            throw new Error('Unknown markup language:', markupLanguage);
-    }
+    const video = await createVideo(srcUrl, pageUrl, markupLanguage);
+    await sendToNotepad(video);
+    return await handleCopyRequest(video);
 }
 
 /**

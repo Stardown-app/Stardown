@@ -57,6 +57,28 @@ export async function createImage(url, markupLanguage) {
 }
 
 /**
+ * createVideo creates a video in the given markup language.
+ * @param {string} srcUrl
+ * @param {string} pageUrl
+ * @param {string} markupLanguage
+ * @returns {Promise<string>}
+ */
+export async function createVideo(srcUrl, pageUrl, markupLanguage) {
+    switch (markupLanguage) {
+        case 'markdown':
+        case 'markdown with some html':
+            return await md.createVideo(srcUrl, pageUrl) + '\n';
+        case 'html':
+            const usingSrcUrl = srcUrl && !srcUrl.startsWith('blob:');
+            const url = usingSrcUrl ? srcUrl : pageUrl;
+            return `<video src="${url}">`;
+        default:
+            console.error('Unknown markup language:', markupLanguage);
+            throw new Error('Unknown markup language:', markupLanguage);
+    }
+}
+
+/**
  * htmlEncodeText encodes a string for use in HTML text content.
  * @param {string} str
  * @returns {string}

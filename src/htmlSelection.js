@@ -18,6 +18,7 @@ import { getSetting } from './getSetting.js';
 import { sendToNotepad, applyTemplate } from './contentUtils.js';
 import { absolutizeNodeUrls } from './converters/utils/urls.js';
 import { improveConvertibility } from './converters/utils/html.js';
+import { createLink } from './generators/all.js';
 import * as md from './generators/md.js';
 import { htmlToMd, mdEncodeUri } from './converters/md.js';
 import { htmlToMdAndHtml } from './converters/mdAndHtml.js';
@@ -34,22 +35,11 @@ import { htmlToMdAndHtml } from './converters/mdAndHtml.js';
 export async function createText(title, url, selection) {
     const markupLanguage = await getSetting('markupLanguage');
 
-    const selectedText = selection?.toString().trim() || '';
+    const selectedText = selection?.toString().trim();
     if (!selectedText) {
-        switch (markupLanguage) {
-            case 'markdown':
-            case 'markdown with some html':
-                const mdLink = await md.createLink(title, url);
-                await sendToNotepad(mdLink);
-                return mdLink;
-            case 'html':
-                const htmlLink = `<a href="${url}">${title}</a>`;
-                await sendToNotepad(htmlLink);
-                return htmlLink;
-            default:
-                console.error(`Unknown markupLanguage: ${markupLanguage}`);
-                throw new Error(`Unknown markupLanguage: ${markupLanguage}`);
-        }
+        const link = await createLink(title, url, markupLanguage);
+        await sendToNotepad(link);
+        return link;
     }
 
     if (markupLanguage === 'html') {

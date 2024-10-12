@@ -15,6 +15,7 @@
 */
 
 import { browser, handleCopyRequest } from './browserSpecific.js';
+import { createLink } from './generators/all.js';
 import * as md from './generators/md.js';
 import * as htmlSelection from './htmlSelection.js';
 import { handleCopyPageRequest } from './htmlPage.js';
@@ -388,20 +389,9 @@ async function handleJsonTableRightClick(tableSelection) {
  */
 async function handleCreateLink(title, url) {
     const markupLanguage = await getSetting('markupLanguage');
-    switch (markupLanguage) {
-        case 'markdown':
-        case 'markdown with some html':
-            const linkMd = await md.createLink(title, url);
-            await sendToNotepad(linkMd);
-            return await handleCopyRequest(linkMd);
-        case 'html':
-            const anchor = `<a href="${url}">${title}</a>`;
-            await sendToNotepad(anchor);
-            return await handleCopyRequest(anchor);
-        default:
-            console.error('Unknown markup language:', markupLanguage);
-            throw new Error('Unknown markup language:', markupLanguage);
-    }
+    const link = await createLink(title, url, markupLanguage);
+    await sendToNotepad(link);
+    return await handleCopyRequest(link);
 }
 
 /**

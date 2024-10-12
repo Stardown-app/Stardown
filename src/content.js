@@ -15,8 +15,7 @@
 */
 
 import { browser, handleCopyRequest } from './browserSpecific.js';
-import { createLink, createImage, createVideo } from './generators/all.js';
-import * as md from './generators/md.js';
+import { createLink, createImage, createVideo, createAudio } from './generators/all.js';
 import * as htmlSelection from './htmlSelection.js';
 import { handleCopyPageRequest } from './htmlPage.js';
 import { getSetting } from './getSetting.js';
@@ -315,9 +314,7 @@ async function handlePageSectionRightClick(htmlId, selection) {
 async function handleSelectionCopyRequest(htmlId, selection) {
     const title = document.title;
     const url = await addIdAndTextFragment(location.href, htmlId, selection);
-
     const text = await htmlSelection.createText(title, url, selection);
-
     return await handleCopyRequest(text);
 }
 
@@ -430,20 +427,7 @@ async function handleCreateVideo(srcUrl, pageUrl) {
  */
 async function handleCreateAudio(srcUrl, pageUrl) {
     const markupLanguage = await getSetting('markupLanguage');
-    switch (markupLanguage) {
-        case 'markdown':
-        case 'markdown with some html':
-            const audioMd = await md.createAudio(srcUrl, pageUrl);
-            await sendToNotepad(audioMd + '\n');
-            return await handleCopyRequest(audioMd + '\n');
-        case 'html':
-            const usingSrcUrl = srcUrl && !srcUrl.startsWith('blob:');
-            const url = usingSrcUrl ? srcUrl : pageUrl;
-            const audioHtml = `<audio controls src="${url}">`;
-            await sendToNotepad(audioHtml);
-            return await handleCopyRequest(audioHtml);
-        default:
-            console.error('Unknown markup language:', markupLanguage);
-            throw new Error('Unknown markup language:', markupLanguage);
-    }
+    const audio = await createAudio(srcUrl, pageUrl, markupLanguage);
+    await sendToNotepad(audio);
+    return await handleCopyRequest(audio);
 }

@@ -15,13 +15,13 @@
 */
 
 /**
- * preprocessFragment modifies a document fragment from certain websites to make it more
- * suitable for conversion to other formats.
+ * improveConvertibility may modify a document fragment depending on the website to make
+ * it more likely to convert to other markup languages well.
  * @param {DocumentFragment} frag
  * @param {string} hostname
  * @returns {Promise<void>}
  */
-export async function preprocessFragment(frag, hostname) {
+export async function improveConvertibility(frag, hostname) {
     switch (hostname) {
         case 'news.ycombinator.com':
             // add the presentation role to every table

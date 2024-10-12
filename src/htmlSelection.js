@@ -17,7 +17,7 @@
 import { getSetting } from './getSetting.js';
 import { sendToNotepad, applyTemplate } from './contentUtils.js';
 import { absolutizeNodeUrls } from './converters/utils/urls.js';
-import { preprocessFragment } from './converters/utils/html.js';
+import { improveConvertibility } from './converters/utils/html.js';
 import * as md from './generators/md.js';
 import { htmlToMd, mdEncodeUri } from './converters/md.js';
 import { htmlToMdAndHtml } from './converters/mdAndHtml.js';
@@ -168,7 +168,7 @@ async function getSourceFormatMd(selection, selectedText, markupLanguage) {
         return selectedText;
     }
 
-    await preprocessFragment(frag, location.hostname);
+    await improveConvertibility(frag, location.hostname);
 
     switch (markupLanguage) {
         case 'markdown':

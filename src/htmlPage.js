@@ -15,8 +15,10 @@
 */
 
 import { getSetting } from './getSetting.js';
-import { sendToNotepad, applyTemplate, extractMainContent, removeIdAndTextFragment } from './contentUtils.js';
-import { preprocessFragment } from './converters/utils/html.js';
+import {
+    sendToNotepad, applyTemplate, extractMainContent, removeIdAndTextFragment,
+} from './contentUtils.js';
+import { improveConvertibility } from './converters/utils/html.js';
 import { absolutizeNodeUrls } from './converters/utils/urls.js';
 import * as md from './generators/md.js';
 import { htmlToMd } from './converters/md.js';
@@ -125,7 +127,7 @@ async function getSourceFormatMd(markupLanguage) {
         frag = await extractMainContent(frag);
     }
 
-    await preprocessFragment(frag, location.hostname);
+    await improveConvertibility(frag, location.hostname);
 
     switch (markupLanguage) {
         case 'markdown':

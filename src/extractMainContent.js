@@ -25,16 +25,14 @@ import { isProbablyReaderable } from './Readability-readerable.js'
  * @returns {Promise<DocumentFragment>}
  */
 export async function extractMainContent(frag, location) {
+    let newFrag = null;
     if (location.href.match(/^https:\/\/(?:[^\.]+\.)?wikipedia\.org\/wiki\/.*/)) {
-        const newFrag = extractWikipediaArticle(frag);
-        if (newFrag) {
-            return newFrag;
-        }
+        newFrag = extractWikipediaArticle(frag);
     } else if (location.href.match(/^https:\/\/github\.com\/[^/]+\/[^/]+\/issues\/\d+/)) {
-        const newFrag = extractGithubIssue(frag);
-        if (newFrag) {
-            return newFrag;
-        }
+        newFrag = extractGithubIssue(frag);
+    }
+    if (newFrag) {
+        return newFrag;
     }
 
     const doc = document.implementation.createHTMLDocument();
@@ -59,59 +57,67 @@ export async function extractMainContent(frag, location) {
     return frag;
 }
 
+/**
+ * @param {DocumentFragment} frag
+ * @returns {DocumentFragment|null}
+ */
 function extractWikipediaArticle(frag) {
     console.log('Extracting Wikipedia article');
     const firstHeading = frag.querySelector('#firstHeading');
     const content = frag.querySelector('#mw-content-text');
-    if (firstHeading && content) {
-        content.querySelectorAll('.navbox,.mw-editsection').forEach(el => el.remove());
-
-        const newFrag = new DocumentFragment();
-        newFrag.append(firstHeading, content);
-        return newFrag;
+    if (!firstHeading || !content) {
+        console.error('Wikipedia article extractor outdated');
+        return null;
     }
 
-    console.error('Wikipedia article extractor outdated');
-    return null;
+    content.querySelectorAll('.navbox,.mw-editsection').forEach(el => el.remove());
+
+    const newFrag = new DocumentFragment();
+    newFrag.append(firstHeading, content);
+    return newFrag;
 }
 
+/**
+ * @param {DocumentFragment} frag
+ * @returns {DocumentFragment|null}
+ */
 function extractGithubIssue(frag) {
     console.log('Extracting GitHub issue');
     const title = frag.querySelector('.gh-header-title');
     const content = frag.querySelector('.js-quote-selection-container');
-    if (title && content) {
-        const toRemove = [
-            'img',
-            'form',
-            'button',
-            'reactions-menu',
-            '.js-minimize-comment',
-            'tool-tip',
-            '.tooltipped',
-            'dialog',
-            'dialog-helper',
-            '.js-comment-edit-history',
-            '.Details-content--hidden',
-            '.discussion-timeline-actions',
-            'div.text-right code',
-        ];
-        content.querySelectorAll(toRemove.join(',')).forEach(el => el.remove());
-
-        content.querySelectorAll('table.d-block').forEach(table => {
-            table.setAttribute('role', 'presentation');
-        });
-        content.querySelectorAll('code a').forEach(a => {
-            const code = a.parentElement;
-            const p = document.createElement('p');
-            p.append(a);
-            code.replaceWith(p);
-        });
-
-        const newFrag = new DocumentFragment();
-        newFrag.append(title, content);
-        return newFrag;
+    if (!title || !content) {
+        console.error('GitHub issue extractor outdated');
+        return null;
     }
 
-    console.error('GitHub issue extractor outdated');
-    return null;
+    const toRemove = [
+        'img',
+        'form',
+        'button',
+        'reactions-menu',
+        '.js-minimize-comment',
+        'tool-tip',
+        '.tooltipped',
+        'dialog',
+        'dialog-helper',
+        '.js-comment-edit-history',
+        '.Details-content--hidden',
+        '.discussion-timeline-actions',
+        'div.text-right code',
+    ];
+    content.querySelectorAll(toRemove.join(',')).forEach(el => el.remove());
+
+    content.querySelectorAll('table.d-block').forEach(table => {
+        table.setAttribute('role', 'presentation');
+    });
+    content.querySelectorAll('code a').forEach(a => {
+        const code = a.parentElement;
+        const p = document.createElement('p');
+        p.append(a);
+        code.replaceWith(p);
+    });
+
+    const newFrag = new DocumentFragment();
+    newFrag.append(title, content);
+    return newFrag;
 }

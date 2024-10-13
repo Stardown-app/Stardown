@@ -64,7 +64,7 @@ function extractWikipediaArticle(frag) {
     const firstHeading = frag.querySelector('#firstHeading');
     const content = frag.querySelector('#mw-content-text');
     if (firstHeading && content) {
-        content.querySelector('.navbox')?.remove();
+        content.querySelectorAll('.navbox,.mw-editsection').forEach(el => el.remove());
 
         const newFrag = new DocumentFragment();
         newFrag.append(firstHeading, content);

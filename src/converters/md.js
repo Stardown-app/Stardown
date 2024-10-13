@@ -679,7 +679,9 @@ export class MdConverter {
             text = '\\^' + text.slice(1);
         }
 
-        const title = ctx.escape(el.getAttribute('title') || '').replaceAll('"', '\\"');
+        const title = ctx.escape(el.getAttribute('title') || '')
+            .replaceAll('"', '\\"')
+            .replaceAll('\n', ' ');
 
         if (title) {
             return '[' + text + '](' + href + ' "' + title + '")';

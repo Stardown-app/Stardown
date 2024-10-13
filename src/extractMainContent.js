@@ -26,54 +26,15 @@ import { isProbablyReaderable } from './Readability-readerable.js'
  */
 export async function extractMainContent(frag, location) {
     if (location.href.match(/^https:\/\/(?:[^\.]+\.)?wikipedia\.org\/wiki\/.*/)) {
-        console.log('Extracting Wikipedia article');
-        const firstHeading = frag.querySelector('#firstHeading');
-        const content = frag.querySelector('#mw-content-text');
-        if (firstHeading && content) {
-            content.querySelector('.navbox')?.remove();
-
-            frag = new DocumentFragment();
-            frag.append(firstHeading, content);
-            return frag;
+        const newFrag = extractWikipediaArticle(frag);
+        if (newFrag) {
+            return newFrag;
         }
-        console.error('Wikipedia article extractor outdated');
     } else if (location.href.match(/^https:\/\/github\.com\/[^/]+\/[^/]+\/issues\/\d+/)) {
-        console.log('Extracting GitHub issue');
-        const title = frag.querySelector('.gh-header-title');
-        const content = frag.querySelector('.js-quote-selection-container');
-        if (title && content) {
-            const toRemove = [
-                'img',
-                'form',
-                'button',
-                'reactions-menu',
-                '.js-minimize-comment',
-                'tool-tip',
-                '.tooltipped',
-                'dialog',
-                'dialog-helper',
-                '.js-comment-edit-history',
-                '.Details-content--hidden',
-                '.discussion-timeline-actions',
-                'div.text-right code',
-            ];
-            content.querySelectorAll(toRemove.join(',')).forEach(el => el.remove());
-
-            content.querySelectorAll('table.d-block').forEach(table => {
-                table.setAttribute('role', 'presentation');
-            });
-            content.querySelectorAll('code a').forEach(a => {
-                const code = a.parentElement;
-                const p = document.createElement('p');
-                p.append(a);
-                code.replaceWith(p);
-            });
-
-            frag = new DocumentFragment();
-            frag.append(title, content);
-            return frag;
+        const newFrag = extractGithubIssue(frag);
+        if (newFrag) {
+            return newFrag;
         }
-        console.error('GitHub issue extractor outdated');
     }
 
     const doc = document.implementation.createHTMLDocument();
@@ -96,4 +57,61 @@ export async function extractMainContent(frag, location) {
     console.error('Failed to extract the main content of the page');
     frag.append(doc.body);
     return frag;
+}
+
+function extractWikipediaArticle(frag) {
+    console.log('Extracting Wikipedia article');
+    const firstHeading = frag.querySelector('#firstHeading');
+    const content = frag.querySelector('#mw-content-text');
+    if (firstHeading && content) {
+        content.querySelector('.navbox')?.remove();
+
+        const newFrag = new DocumentFragment();
+        newFrag.append(firstHeading, content);
+        return newFrag;
+    }
+
+    console.error('Wikipedia article extractor outdated');
+    return null;
+}
+
+function extractGithubIssue(frag) {
+    console.log('Extracting GitHub issue');
+    const title = frag.querySelector('.gh-header-title');
+    const content = frag.querySelector('.js-quote-selection-container');
+    if (title && content) {
+        const toRemove = [
+            'img',
+            'form',
+            'button',
+            'reactions-menu',
+            '.js-minimize-comment',
+            'tool-tip',
+            '.tooltipped',
+            'dialog',
+            'dialog-helper',
+            '.js-comment-edit-history',
+            '.Details-content--hidden',
+            '.discussion-timeline-actions',
+            'div.text-right code',
+        ];
+        content.querySelectorAll(toRemove.join(',')).forEach(el => el.remove());
+
+        content.querySelectorAll('table.d-block').forEach(table => {
+            table.setAttribute('role', 'presentation');
+        });
+        content.querySelectorAll('code a').forEach(a => {
+            const code = a.parentElement;
+            const p = document.createElement('p');
+            p.append(a);
+            code.replaceWith(p);
+        });
+
+        const newFrag = new DocumentFragment();
+        newFrag.append(title, content);
+        return newFrag;
+    }
+
+    console.error('GitHub issue extractor outdated');
+    return null;
 }

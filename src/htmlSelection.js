@@ -445,15 +445,15 @@ function getList(startRange) {
 function wrapRangeContentWithList(startRange, list) {
     const ELEMENT_NODE = 1;
 
+    /** @type {Element} */
+    let firstSelectedLi = startRange.startContainer;
+    while (firstSelectedLi.nodeName !== 'LI') {
+        firstSelectedLi = firstSelectedLi.parentNode;
+    }
+
     let newList;
     if (list.nodeName === 'OL') {
         newList = document.createElement('ol');
-
-        /** @type {Element} */
-        let firstSelectedLi = startRange.startContainer;
-        while (firstSelectedLi.nodeName !== 'LI') {
-            firstSelectedLi = firstSelectedLi.parentNode;
-        }
 
         const originalId = firstSelectedLi.getAttribute('id');
         firstSelectedLi.setAttribute('id', 'list-selection-start');
@@ -486,6 +486,7 @@ function wrapRangeContentWithList(startRange, list) {
         throw new Error('Unknown list type');
     }
 
+    startRange.setStartBefore(firstSelectedLi);
     newList.appendChild(startRange.cloneContents());
     const frag = document.createDocumentFragment();
     frag.appendChild(newList);

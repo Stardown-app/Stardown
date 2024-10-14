@@ -52,7 +52,7 @@ const tests = [
                     </th>
                 </tr>
             </table>`,
-        csvExpected: `a
+        csvExpected: `a\r
 `,
     },
     {
@@ -67,7 +67,7 @@ const tests = [
                     </th>
                 </tr>
             </table>`,
-        csvExpected: `a,b
+        csvExpected: `a,b\r
 `
     },
     {
@@ -84,8 +84,8 @@ const tests = [
                     </td>
                 </tr>
             </table>`,
-        csvExpected: `a
-c
+        csvExpected: `a\r
+c\r
 `
     },
     {
@@ -108,8 +108,8 @@ c
                     </td>
                 </tr>
             </table>`,
-        csvExpected: `a,b
-c,d
+        csvExpected: `a,b\r
+c,d\r
 `
     },
     {
@@ -140,9 +140,9 @@ c,d
                     </td>
                 </tr>
             </table>`,
-        csvExpected: `a,b
-d,e
-g,h
+        csvExpected: `a,b\r
+d,e\r
+g,h\r
 `
     },
     {
@@ -171,8 +171,8 @@ g,h
                     </td>
                 </tr>
             </table>`,
-        csvExpected: `a,b,c
-d,e,f
+        csvExpected: `a,b,c\r
+d,e,f\r
 `
     },
     {
@@ -212,9 +212,9 @@ d,e,f
                     </td>
                 </tr>
             </table>`,
-        csvExpected: `a,b,c
-d,e,f
-g,h,i
+        csvExpected: `a,b,c\r
+d,e,f\r
+g,h,i\r
 `
     },
     {
@@ -251,9 +251,9 @@ g,h,i
                     </td>
                 </tr>
             </table>`,
-        csvExpected: `a,b,c
-d,e,f
-g,h,
+        csvExpected: `a,b,c\r
+d,e,f\r
+g,h,\r
 `
     },
     {
@@ -290,9 +290,9 @@ g,h,
                     </td>
                 </tr>
             </table>`,
-        csvExpected: `a,b,c
-d,e,
-g,h,i
+        csvExpected: `a,b,c\r
+d,e,\r
+g,h,i\r
 `
     },
     {
@@ -329,9 +329,9 @@ g,h,i
                     </td>
                 </tr>
             </table>`,
-        csvExpected: `a,b,
-d,e,f
-g,h,i
+        csvExpected: `a,b,\r
+d,e,f\r
+g,h,i\r
 `
     },
     {
@@ -365,9 +365,9 @@ g,h,i
                     </td>
                 </tr>
             </table>`,
-        csvExpected: `a,,
-d,e,f
-g,h,i
+        csvExpected: `a,,\r
+d,e,f\r
+g,h,i\r
 `
     },
     {
@@ -387,7 +387,7 @@ g,h,i
                     </tr>
                 </thead>
             </table>`,
-        csvExpected: `a,b,c
+        csvExpected: `a,b,c\r
 `
     },
     {
@@ -431,9 +431,9 @@ g,h,i
                     </tr>
                 </tbody>
             </table>`,
-        csvExpected: `a,b,c
-d,e,f
-g,h,i
+        csvExpected: `a,b,c\r
+d,e,f\r
+g,h,i\r
 `
     },
     {
@@ -479,9 +479,9 @@ g,h,i
                     </tr>
                 </tbody>
             </table>`,
-        csvExpected: `a,b,c
-d,e,f
-g,h,i
+        csvExpected: `a,b,c\r
+d,e,f\r
+g,h,i\r
 `
     },
     {
@@ -527,9 +527,9 @@ g,h,i
                     </tr>
                 </tbody>
             </table>`,
-        csvExpected: `a,b,c
-d,e,f
-g,h,i
+        csvExpected: `a,b,c\r
+d,e,f\r
+g,h,i\r
 `
     },
     {
@@ -560,8 +560,8 @@ g,h,i
                     </tr>
                 </tbody>
             </table>`,
-        csvExpected: `a,b,c
-d,e,f
+        csvExpected: `a,b,c\r
+d,e,f\r
 `
     },
     {
@@ -616,10 +616,10 @@ d,e,f
                     </tr>
                 </tbody>
             </table>`,
-        csvExpected: `a,b,c
-d,e,f
-g,h,i
-j,k,l
+        csvExpected: `a,b,c\r
+d,e,f\r
+g,h,i\r
+j,k,l\r
 `
     },
     {
@@ -645,9 +645,9 @@ j,k,l
                     </tr>
                 </tbody>
             </table>`,
-        csvExpected: `a
-b
-c
+        csvExpected: `a\r
+b\r
+c\r
 `
     },
     {
@@ -668,8 +668,8 @@ c
                     </tr>
                 </tfoot>
             </table>`,
-        csvExpected: `a
-b
+        csvExpected: `a\r
+b\r
 `
     },
     {
@@ -700,10 +700,10 @@ b
                     </tr>
                 </tfoot>
             </table>`,
-        csvExpected: `a
-b
-c
-d
+        csvExpected: `a\r
+b\r
+c\r
+d\r
 `
     },
     {
@@ -722,8 +722,8 @@ d
                     </td>
                 </tr>
             </table>`,
-        csvExpected: `a
-b
+        csvExpected: `a\r
+b\r
 `
     },
     {
@@ -742,8 +742,8 @@ b
                     </tr>
                 </tfoot>
             </table>`,
-        csvExpected: `a
-b
+        csvExpected: `a\r
+b\r
 `
     },
     {
@@ -766,8 +766,8 @@ b
                     </td>
                 </tr>
             </table>`,
-        csvExpected: `a,b
-c,d
+        csvExpected: `a,b\r
+c,d\r
 `
     },
     {
@@ -796,8 +796,8 @@ c,d
                         </td>
                     </tr>
                 </table>`,
-        csvExpected: `a b,c d
-e f,g h
+        csvExpected: `a b,c d\r
+e f,g h\r
 `
     },
     {
@@ -814,8 +814,8 @@ e f,g h
                     </td>
                 </tr>
             </table>`,
-        csvExpected: `a
-b
+        csvExpected: `a\r
+b\r
 `
     },
     {
@@ -854,8 +854,8 @@ b
                     </td>
                 </tr>
             </table>`,
-        csvExpected: `a b
-c d
+        csvExpected: `a b\r
+c d\r
 `
     },
     {
@@ -877,8 +877,8 @@ c d
                     </tr>
                 </tbody>
             </table>`,
-        csvExpected: `a
-b
+        csvExpected: `a\r
+b\r
 `
     },
     {
@@ -904,8 +904,8 @@ b
                     </td>
                 </tr>
             </table>`,
-        csvExpected: `a,a,b
-c,d,e
+        csvExpected: `a,a,b\r
+c,d,e\r
 `
     },
     {
@@ -933,9 +933,9 @@ c,d,e
                     </td>
                 </tr>
             </table>`,
-        csvExpected: `a,b
-a,c
-d,e
+        csvExpected: `a,b\r
+a,c\r
+d,e\r
 `
     },
     {
@@ -960,9 +960,9 @@ d,e
                     </td>
                 </tr>
             </table>`,
-        csvExpected: `a,a
-b,c
-d,d
+        csvExpected: `a,a\r
+b,c\r
+d,d\r
 `
     },
     {
@@ -985,8 +985,8 @@ d,d
                     </td>
                 </tr>
             </table>`,
-        csvExpected: `a,b,c
-a,d,c
+        csvExpected: `a,b,c\r
+a,d,c\r
 `
     },
     {
@@ -1017,9 +1017,9 @@ a,d,c
                     </td>
                 </tr>
             </table>`,
-        csvExpected: `a,b,c
-d,e,e
-f,e,e
+        csvExpected: `a,b,c\r
+d,e,e\r
+f,e,e\r
 `
     },
     {
@@ -1049,9 +1049,9 @@ f,e,e
                     </td>
                 </tr>
             </table>`,
-        csvExpected: `,,a
-,,b
-c,d,e
+        csvExpected: `,,a\r
+,,b\r
+c,d,e\r
 `
     },
     {
@@ -1068,8 +1068,8 @@ c,d,e
                     </td>
                 </tr>
             </table>`,
-        csvExpected: `"a,b"
-"c,d"
+        csvExpected: `"a,b"\r
+"c,d"\r
 `
     },
     {
@@ -1086,8 +1086,8 @@ c,d,e
                     </td>
                 </tr>
             </table>`,
-        csvExpected: `"""a"""
-"They said ""wow"" twice."
+        csvExpected: `"""a"""\r
+"They said ""wow"" twice."\r
 `
     },
     {
@@ -1109,8 +1109,8 @@ c,d,e
                     </td>
                 </tr>
             </table>`,
-        csvExpected: `a b
-This has four lines.
+        csvExpected: `a b\r
+This has four lines.\r
 `
     },
 ];

@@ -52,7 +52,7 @@ const tests = [
                     </th>
                 </tr>
             </table>`,
-        csvExpected: `a
+        csvExpected: `a\r
 `,
     },
     {
@@ -67,7 +67,7 @@ const tests = [
                     </th>
                 </tr>
             </table>`,
-        csvExpected: `a\tb
+        csvExpected: `a\tb\r
 `
     },
     {
@@ -84,8 +84,8 @@ const tests = [
                     </td>
                 </tr>
             </table>`,
-        csvExpected: `a
-c
+        csvExpected: `a\r
+c\r
 `
     },
     {
@@ -108,8 +108,8 @@ c
                     </td>
                 </tr>
             </table>`,
-        csvExpected: `a\tb
-c\td
+        csvExpected: `a\tb\r
+c\td\r
 `
     },
     {
@@ -131,8 +131,8 @@ c\td
                     </tr>
                 </tbody>
             </table>`,
-        csvExpected: `a
-b
+        csvExpected: `a\r
+b\r
 `
     },
     {
@@ -158,8 +158,8 @@ b
                     </td>
                 </tr>
             </table>`,
-        csvExpected: `a\ta\tb
-c\td\te
+        csvExpected: `a\ta\tb\r
+c\td\te\r
 `
     },
     {
@@ -187,9 +187,9 @@ c\td\te
                     </td>
                 </tr>
             </table>`,
-        csvExpected: `a\tb
-a\tc
-d\te
+        csvExpected: `a\tb\r
+a\tc\r
+d\te\r
 `
     },
     {
@@ -214,9 +214,9 @@ d\te
                     </td>
                 </tr>
             </table>`,
-        csvExpected: `a\ta
-b\tc
-d\td
+        csvExpected: `a\ta\r
+b\tc\r
+d\td\r
 `
     },
     {
@@ -239,8 +239,8 @@ d\td
                     </td>
                 </tr>
             </table>`,
-        csvExpected: `a\tb\tc
-a\td\tc
+        csvExpected: `a\tb\tc\r
+a\td\tc\r
 `
     },
     {
@@ -271,9 +271,9 @@ a\td\tc
                     </td>
                 </tr>
             </table>`,
-        csvExpected: `a\tb\tc
-d\te\te
-f\te\te
+        csvExpected: `a\tb\tc\r
+d\te\te\r
+f\te\te\r
 `
     },
     {
@@ -303,9 +303,9 @@ f\te\te
                     </td>
                 </tr>
             </table>`,
-        csvExpected: `\t\ta
-\t\tb
-c\td\te
+        csvExpected: `\t\ta\r
+\t\tb\r
+c\td\te\r
 `
     },
     {
@@ -335,9 +335,9 @@ c\td\te
                     </td>
                 </tr>
             </table>`,
-        csvExpected: `a\tb\tc
-d\t\t
-e\t\t
+        csvExpected: `a\tb\tc\r
+d\t\t\r
+e\t\t\r
 `
     },
 ];

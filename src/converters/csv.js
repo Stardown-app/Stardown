@@ -31,10 +31,10 @@ export async function htmlTableToCsv(frag, delimiter = ',') {
 
     const ctx = {
         document: document,
-        delimiter: delimiter, // what to separate fields with
-        encapsulator: '"',    // what to encapsulate fields with
-        escaper: '"',         // what to escape the encapsulator within fields with
-        lineTerminator: '\n', // what to separate rows with
+        delimiter: delimiter,   // what to separate fields with
+        encapsulator: '"',      // what to encapsulate fields with
+        escaper: '"',           // what to escape the encapsulator within fields with
+        lineTerminator: '\r\n', // what to separate rows with
     };
 
     return convertTable(ctx, table);

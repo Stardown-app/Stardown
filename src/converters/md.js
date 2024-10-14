@@ -729,19 +729,15 @@ export class MdConverter {
 
         const result = [];
 
-        let backtickCount = 1;
-        const match = text.match(/(`+)/);
-        if (match) {
-            backtickCount = match[1].length + 1;
+        let backticks = '`';
+        const backtickCount = el.textContent?.match(/(`+)/)?.[1].length || 0;
+        for (let i = 0; i < backtickCount; i++) {
+            backticks += '`';
         }
 
-        for (let i = 0; i < backtickCount; i++) {
-            result.push('`');
-        }
-        result.push(text);
-        for (let i = 0; i < backtickCount; i++) {
-            result.push('`');
-        }
+        result.push(backticks);
+        result.push(el.textContent.replaceAll('\n', ' '));
+        result.push(backticks);
 
         return result.join('');
     }

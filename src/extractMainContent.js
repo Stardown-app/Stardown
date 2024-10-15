@@ -26,7 +26,7 @@ import { isProbablyReaderable } from './Readability-readerable.js'
  */
 export async function extractMainContent(frag, location) {
     let newFrag = null;
-    if (location.href.match(/^https:\/\/(?:[^\.]+\.)?wikipedia\.org\/wiki\/.*/)) {
+    if (location.href.match(/^https:\/\/(?:[^\/]+\.)?wikipedia\.org\/wiki\/.*/)) {
         newFrag = extractWikipediaArticle(frag);
     } else if (location.href.match(/^https:\/\/github\.com\/[^/]+\/[^/]+\/issues\/\d+/)) {
         newFrag = extractGithubIssue(frag);

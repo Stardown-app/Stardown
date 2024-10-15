@@ -210,7 +210,8 @@ async function handleRequest(message) {
         case 'copyEntirePageShortcut':
             return await handleCopyPageRequest();
         case 'pageRightClick':
-            return await handleCreateLink(document.title, location.href);
+            const url = removeIdAndTextFragment(location.href);
+            return await handleCreateLink(document.title, url);
         case 'pageSectionRightClick':
             const selection = window.getSelection();
             const id1 = await getClickedElementId(clickedElement);
@@ -288,7 +289,8 @@ async function handleCopySelectionShortcut() {
     }
 
     // none of the page is highlighted, so create a link for the page instead
-    return await handleCreateLink(document.title, location.href);
+    const url = removeIdAndTextFragment(location.href);
+    return await handleCreateLink(document.title, url);
 }
 
 /**
@@ -385,7 +387,6 @@ async function handleJsonTableRightClick(tableSelection) {
  * @returns {Promise<ContentResponse>}
  */
 async function handleCreateLink(title, url) {
-    url = removeIdAndTextFragment(url);
     const markupLanguage = await getSetting('markupLanguage');
     const link = await createLink(title, url, markupLanguage);
     await sendToNotepad(link);

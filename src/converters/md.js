@@ -229,9 +229,7 @@ export class MdConverter {
         if (!ctx.dontTrimText) {
             content = content.trim();
         }
-        if (!ctx.dontMinimizeWhitespace) {
-            content = content.replaceAll(/\s+/g, ' ');
-        }
+        content = content.replaceAll(/\s+/g, ' ');
 
         return content;
     }
@@ -568,7 +566,7 @@ export class MdConverter {
 
     /** @type {ElementConverter} */
     convertP(ctx, el) {
-        const newCtx = { ...ctx, dontTrimText: true, dontMinimizeWhitespace: true };
+        const newCtx = { ...ctx, dontTrimText: true };
 
         /** @type {string[]} */
         const result = ['\n\n'];

@@ -50,6 +50,8 @@ export async function createText(title, url, selection) {
             return selectedText;
         }
 
+        await improveConvertibility(frag, location.hostname);
+
         absolutizeNodeUrls(frag, url);
 
         // convert the fragment to a string

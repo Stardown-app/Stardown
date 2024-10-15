@@ -44,8 +44,14 @@ export async function handleCopyPageRequest() {
 async function createPageText() {
     const markupLanguage = await getSetting('markupLanguage');
     if (markupLanguage === 'html') {
-        const frag = document.createDocumentFragment();
+        let frag = document.createDocumentFragment();
         frag.append(document.documentElement.cloneNode(true));
+
+        if (await getSetting('extractMainContent')) {
+            frag = await extractMainContent(frag, location);
+        }
+
+        await improveConvertibility(frag, location.hostname);
 
         absolutizeNodeUrls(frag, location.href);
 

@@ -110,12 +110,6 @@ function extractGithubIssue(frag) {
     content.querySelectorAll('table.d-block').forEach(table => {
         table.setAttribute('role', 'presentation');
     });
-    content.querySelectorAll('code a').forEach(a => {
-        const code = a.parentElement;
-        const p = document.createElement('p');
-        p.append(a);
-        code.replaceWith(p);
-    });
 
     const newFrag = new DocumentFragment();
     newFrag.append(title, content);

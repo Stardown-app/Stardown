@@ -721,16 +721,25 @@ export class MdConverter {
 
     /** @type {ElementConverter} */
     convertCODE(ctx, el) {
-        let text = el.textContent;
-        if (!text) {
+        if (!el.textContent) {
             return '';
         }
-        text = text.replaceAll('\n', ' ');
+
+        let textOnly = true;
+        for (let i = 0; i < el.childNodes.length; i++) {
+            if (el.childNodes[i].nodeType !== TEXT_NODE) {
+                textOnly = false;
+                break;
+            }
+        }
+        if (!textOnly) {
+            return this.convertNodes(ctx, el.childNodes).trim();
+        }
 
         const result = [];
 
         let backticks = '`';
-        const backtickCount = el.textContent?.match(/(`+)/)?.[1].length || 0;
+        const backtickCount = el.textContent.match(/(`+)/)?.[1].length || 0;
         for (let i = 0; i < backtickCount; i++) {
             backticks += '`';
         }

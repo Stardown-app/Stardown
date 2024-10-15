@@ -79,6 +79,8 @@ Press `Alt+C` to copy.
 
 `````and even ````tons of backticks````.`````
 
+[Anchor in a code element](https://example.com)
+
 ```
   .
  ...

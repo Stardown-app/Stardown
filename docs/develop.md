@@ -30,6 +30,17 @@ Stardown uses several different execution contexts as described in [./message-pa
 
 This project uses [JSDoc](https://en.wikipedia.org/wiki/JSDoc) to annotate types. In VS Code you can type `/**` above a function and press enter to auto-generate part of its JSDoc comment (this might require the [ESLint](https://marketplace.visualstudio.com/items?itemName=dbaeumer.vscode-eslint) extension).
 
+## Improving Stardown's output
+
+If changes to improve the output can apply to:
+
+- **all/many sites**:
+    - **converting HTML to another language**: the changes should probably be made in a converter (see [../src/converters/README.md](../src/converters/README.md))
+    - **what HTML to include in selections**: the changes should probably be made somewhere in [../src/htmlSelection.js](../src/htmlSelection.js)
+- **specific sites**:
+    - **both selections and entire pages**: the changes should probably be made in the `improveConvertibility` function
+    - **only entire pages**: the changes should probably be made in [../src/extractMainContent.js](../src/extractMainContent.js)
+
 ## How Stardown works
 
 If you want to read a broad overview of Stardown's components and how they communicate with each other, see [./message-passing.md](./message-passing.md).

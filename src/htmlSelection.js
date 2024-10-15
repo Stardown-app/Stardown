@@ -294,7 +294,7 @@ function getStartRange(selection) {
     startNode = startBeforeAncestorHeader(startRange, startNode);
     startNode = startBeforeAncestorTable(startRange, startNode);
     startNode = startBeforeAncestorCode(startRange, startNode);
-    startNode = startBeforeParentPre(startRange, startNode);
+    startNode = startBeforeAncestorPre(startRange, startNode);
 
     return startRange;
 }
@@ -379,17 +379,29 @@ function startBeforeAncestorCode(startRange, startNode) {
 }
 
 /**
- * startBeforeParentPre expands a selection to include pre elements that are the parent
- * of the start of the selection.
+ * startBeforeAncestorPre expands a selection to include code and pre elements that are
+ * ancestors to the start of the selection.
  * @param {Range} startRange - a selection's index 0 range.
  * @param {Node} startNode - a selection's index 0 range's start container.
  * @returns {Node} - the new start node.
  */
-function startBeforeParentPre(startRange, startNode) {
-    // If the parent is a pre tag, expand the start of the selection to include the pre
-    // tag. This makes preformatted text including code blocks easier to copy.
-    const parent = startNode.parentNode;
-    if (parent && parent.nodeName === 'PRE') {
+function startBeforeAncestorPre(startRange, startNode) {
+    let parent = startNode.parentNode;
+    if (!parent) {
+        return startNode;
+    }
+
+    if (parent.nodeName === 'CODE') {
+        startNode = parent;
+        startRange.setStartBefore(startNode);
+    }
+
+    parent = startNode.parentNode;
+    if (!parent) {
+        return startNode;
+    }
+
+    if (parent.nodeName === 'PRE') {
         startNode = parent;
         startRange.setStartBefore(startNode);
     }

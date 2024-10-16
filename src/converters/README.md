@@ -76,7 +76,7 @@ A few elements like `<br>` and `<hr>` are simple to convert, and some elements i
 5. newline characters are removed because markdown renderers don't allow bold elements to span multiple lines
 6. the result is wrapped with asterisks and returned
 
-The `MdConverter` class should have a method for each HTML element, but any element without a corresponding method will be skipped and its child nodes will be processed. The markdown converter is implemented as a class so that it can be subclassed, such as to add support for other markdown flavors.
+The `MdConverter` class should have a method for each of [the standard HTML elements](https://developer.mozilla.org/en-US/docs/Web/HTML/Element). Any element without a corresponding method will be skipped and its child nodes will be processed. The markdown converter is implemented as a class so that it can be subclassed, such as to add support for other markdown flavors.
 
 In HTML, every element is a node but not all nodes are elements. Each node encountered requires first checking its type to determine whether the node is an element or something else like text.
 

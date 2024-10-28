@@ -71,6 +71,10 @@ You can use this [bookmarklet](https://en.wikipedia.org/wiki/Bookmarklet) I made
 * [Slurp](https://github.com/inhumantsar/slurp) is an Obsidian community plugin and bookmarklet for saving web pages directly to Obsidian.
 * [import-github-readme](https://github.com/chasebank87/import-github-readme) is an Obsidian plugin for downloading GitHub readme files directly into Obsidian.
 
+### Mobile-only
+
+* [obsidian-markdownr](https://github.com/IAmStoxe/obsidian-markdownr) is an Android app that converts a URL to markdown to share into your favorite notes app.
+
 ### Convert between markup languages
 
 * [Pandoc](https://pandoc.org/) offers a command-line tool and a Haskell library that can convert between almost any two markup languages.
@@ -78,6 +82,8 @@ You can use this [bookmarklet](https://en.wikipedia.org/wiki/Bookmarklet) I made
 ### Scrape websites
 
 * [Firecrawl](https://github.com/mendableai/firecrawl) is an API and SDKs for scraping websites and saving them as markdown or structured data.
+* [Mealie](https://github.com/mealie-recipes/mealie) is a self hosted recipe manager and meal planner.
+* [you-get](https://github.com/soimort/you-get) is a tiny command-line utility to download media contents (videos, audios, images) from the Web.
 * [Reader-LM](https://jina.ai/news/reader-lm-small-language-models-for-cleaning-and-converting-html-to-markdown/?nocache=1) is small language models that convert HTML to markdown.
 
 ### Paste structured data

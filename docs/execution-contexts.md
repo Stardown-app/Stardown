@@ -1,6 +1,6 @@
-# Stardown's message passing
+# Stardown's execution contexts
 
-[Message passing](https://developer.chrome.com/docs/extensions/develop/concepts/messaging) allows the different parts of a browser extension to communicate with each other. Extensions can have multiple **execution contexts** such as:
+Extensions can have multiple **execution contexts** such as:
 
 - popup
 - content
@@ -8,7 +8,7 @@
 - options page
 - sidebar (a.k.a. side panel)
 
-Each of these components generally doesn't have direct access to anything in the others and must use message passing to communicate. The *popup*, *options page*, and *sidebar* are each an HTML file that may or may not use JavaScript and are loaded when the user opens them. *Content scripts* are injected into each web page visited (for sites the extension's manifest specifies). *Background scripts* run for a while but may pause when the user hasn't interacted with the extension for a while.
+Each of these components generally doesn't have direct access to data in the others and must use [message passing](https://developer.chrome.com/docs/extensions/develop/concepts/messaging) to communicate. The *popup*, *options page*, and *sidebar* are each an HTML file that may or may not use JavaScript and are loaded when the user opens them. *Content scripts* are injected into each web page visited (for sites the extension's manifest specifies). *Background scripts* run for a while but may pause when the user hasn't interacted with the extension for a while.
 
 Most of Stardown's user interactions are received in the background, which then sends a request to the content and receives a response. You can think of it like client-server architecture where the background is the client and the content is the server.
 

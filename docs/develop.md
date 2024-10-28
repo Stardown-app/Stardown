@@ -24,7 +24,7 @@ Let's create feature branches with descriptive names and make pull requests as d
 
 ## Writing import statements
 
-Stardown uses several different execution contexts as described in [./message-passing.md](./message-passing.md), and development of Stardown uses the [Rollup](https://rollupjs.org/) bundler to combine the files for each context. Rollup copies an entire file's content (and the content of all files that file imports) into another file even if the import statement only asks for specific things. For this reason, try to avoid putting functions and imports for one execution context in a file that is only for a different execution context, or else the resulting bundled code will have a lot of duplicate unused code that might go unnoticed except by extension reviewers.
+Stardown uses several different execution contexts as described in [./execution-contexts.md](./execution-contexts.md), and development of Stardown uses the [Rollup](https://rollupjs.org/) bundler to combine the files for each context. Rollup copies an entire file's content (and the content of all files that file imports) into another file even if the import statement only asks for specific things. For this reason, try to avoid putting functions and imports for one execution context in a file that is only for a different execution context, or else the resulting bundled code will have a lot of duplicate unused code that might go unnoticed except by extension reviewers.
 
 ## Writing documentation
 
@@ -43,7 +43,7 @@ If changes to improve the output can apply to:
 
 ## How Stardown works
 
-If you want to read a broad overview of Stardown's components and how they communicate with each other, see [./message-passing.md](./message-passing.md).
+If you want to read a broad overview of Stardown's components and how they communicate with each other, see [./execution-contexts.md](./execution-contexts.md).
 
 Stardown converts HTML to other formats using custom code explained in [../src/converters/README.md](../src/converters/README.md).
 

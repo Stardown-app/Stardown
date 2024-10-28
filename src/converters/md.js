@@ -1052,6 +1052,10 @@ export class MdConverter {
 
     /** @type {ElementConverter} */
     convertIFRAME(ctx, el) {
+        console.log(`iframe.childNodes.length: ${el.childNodes.length}`); // always 0?
+        console.log(`iframe.contentDocument: ${el.contentDocument}`); // always null?
+        console.log(`iframe.contentWindow: ${el.contentWindow}`); // always null?
+
         const srcdoc = el.getAttribute('srcdoc');
         if (srcdoc && DOMParser) {
             const doc = new DOMParser().parseFromString(srcdoc, 'text/html');

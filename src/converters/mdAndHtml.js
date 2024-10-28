@@ -16,7 +16,7 @@
 
 import { getSetting } from '../getSetting.js';
 import { absolutizeNodeUrls } from './utils/urls.js';
-import { removeHiddenElements, removeStyles, isInlineText } from './utils/html.js';
+import { removeHiddenElements, removeStyles, isInlineNodes } from './utils/html.js';
 import { newEscape, MdConverter } from './md.js';
 
 /**
@@ -48,7 +48,7 @@ export async function htmlToMdAndHtml(frag) {
     /** @type {function(string): string} */
     ctx.escape = newEscape(ctx.mdSubBrackets);
 
-    if (isInlineText(frag.childNodes)) {
+    if (isInlineNodes(frag.childNodes)) {
         ctx.dontTrimText = true;
     }
 

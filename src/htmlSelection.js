@@ -17,7 +17,7 @@
 import { getSetting } from './getSetting.js';
 import { sendToNotepad, applyTemplate } from './contentUtils.js';
 import { absolutizeNodeUrls } from './converters/utils/urls.js';
-import { improveConvertibility } from './converters/utils/html.js';
+import { nodeTypes, improveConvertibility } from './converters/utils/html.js';
 import { createLink } from './generators/all.js';
 import * as md from './generators/md.js';
 import { htmlToMd, mdEncodeUri } from './converters/md.js';
@@ -416,11 +416,10 @@ function startBeforeAncestorPre(startRange, startNode) {
  * @returns {boolean}
  */
 function isSelectionInList(frag) {
-    const COMMENT_NODE = 8;
     for (let i = 0; i < frag.childNodes.length; i++) {
         const node = frag.childNodes[i];
 
-        if (node.nodeType === COMMENT_NODE) {
+        if (node.nodeType === nodeTypes.COMMENT_NODE) {
             continue;
         } else if (node.nodeName === 'LI') {
             return true;
@@ -457,8 +456,6 @@ function getList(startRange) {
  * @returns {DocumentFragment}
  */
 function wrapRangeContentWithList(startRange, list) {
-    const ELEMENT_NODE = 1;
-
     /** @type {Element} */
     let firstSelectedLi = startRange.startContainer;
     while (firstSelectedLi.nodeName !== 'LI') {
@@ -476,7 +473,7 @@ function wrapRangeContentWithList(startRange, list) {
         for (let i = 0; i < list.children.length; i++) {
             const child = list.children[i];
             if (
-                child.nodeType === ELEMENT_NODE &&
+                child.nodeType === nodeTypes.ELEMENT_NODE &&
                 child.getAttribute('id') === 'list-selection-start'
             ) {
                 startAttr = String(i + 1);

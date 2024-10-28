@@ -33,7 +33,7 @@ Stardown is free except that if you get it from Apple's App Store, there is a sm
 
 ## Privacy
 
-Stardown will never sell any data to anyone, and does not collect nor send any of your personal data anywhere. Everything you copy or download using Stardown is stored locally.
+Stardown will never sell any data to anyone, and does not collect nor send any of your personal data anywhere. Everything you copy with Stardown is stored in your clipboard, local files, and/or your browser's settings depending on which features you use. Stardown's notepad saves to your browser's settings.
 
 ## Permissions
 

@@ -20,7 +20,7 @@ import { extractMainContent } from './extractMainContent.js';
 import { improveConvertibility } from './converters/utils/html.js';
 import { absolutizeNodeUrls } from './converters/utils/urls.js';
 import * as md from './generators/md.js';
-import { htmlToMd } from './converters/md.js';
+import { htmlToMd, mdEncodeUri } from './converters/md.js';
 import { htmlToMdAndHtml } from './converters/mdAndHtml.js';
 import { handleCopyRequest } from './browserSpecific.js';
 

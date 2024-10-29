@@ -58,7 +58,7 @@ async function createPageText() {
         // convert the fragment to a string
         const div = document.createElement('div');
         div.appendChild(frag.cloneNode(true));
-        const html = div.innerHTML || selectedText;
+        const html = div.innerHTML;
 
         await sendToNotepad(html);
         return html;
@@ -90,7 +90,8 @@ async function createPageText() {
             await sendToNotepad(blockquote);
             return blockquote;
         case 'link with selection as title':
-            const text = document.textContent.trim().replaceAll('\r\n', ' ').replaceAll('\n', ' ');
+            let text = window.getSelection()?.toString() || 'link';
+            text = text.trim().replaceAll('\r\n', ' ').replaceAll('\n', ' ');
             const link = await md.createLink(text, url);
             await sendToNotepad(link);
             return link;
@@ -156,7 +157,7 @@ async function getSourceFormatMd(markupLanguage) {
 async function getTemplateMd(title, url, markupLanguage) {
     title = await md.createLinkTitle(title);
     url = mdEncodeUri(url);
-    const text = getSourceFormatMd(markupLanguage);
+    const text = await getSourceFormatMd(markupLanguage);
     const template = await getSetting('mdSelectionTemplate');
 
     return await applyTemplate(template, title, url, text);

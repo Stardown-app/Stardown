@@ -35,7 +35,7 @@ const defaultSettings = {
     mdSelectionTemplate: `> [!note]
 > from [{{link.title}}]({{link.url}}) on {{date.YYYYMMDD}}
 
-{{selection}}`,
+{{text}}`,
 
     jsonEmptyCell: 'null',
     jsonDestination: 'clipboard',

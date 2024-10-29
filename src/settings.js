@@ -152,11 +152,11 @@ async function validateTemplateVariables() {
     const title = 'page title';
     const url = 'https://example.com';
     const YYYYMMDD = '2024-01-01';
-    const selection = 'selected text';
+    const text = 'converted text';
     const templateVars = {
         link: { title, url },
         date: { YYYYMMDD },
-        selection,
+        text,
     };
 
     const matches = mdSelectionTemplateEl.value.matchAll(/{{([^{}]+)}}/g);

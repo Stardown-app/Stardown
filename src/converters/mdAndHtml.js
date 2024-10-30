@@ -96,8 +96,13 @@ export class MdAndHtmlConverter extends MdConverter {
     }
 
     /** @type {ElementConverter} */
-    convertU(ctx, el) {
+    convertINS(ctx, el) {
         return el.outerHTML;
+    }
+
+    /** @type {ElementConverter} */
+    convertU(ctx, el) {
+        return '<ins>' + el.innerHTML + '</ins>';
     }
 
     /** @type {ElementConverter} */

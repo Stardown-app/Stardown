@@ -33,6 +33,8 @@ You can use this [bookmarklet](https://en.wikipedia.org/wiki/Bookmarklet) I made
 ## Convert between markup languages
 
 * [Pandoc](https://pandoc.org/) offers a command-line tool and a Haskell library that can convert between almost any two markup languages.
+* [Marker](https://github.com/vikparuchuri/marker) converts PDF to markdown, optionally using OCRmyPDF.
+* [MinerU](https://github.com/opendatalab/MinerU) converts PDF to markdown or JSON, optionally using PaddleOCR.
 
 ## Scrape websites
 

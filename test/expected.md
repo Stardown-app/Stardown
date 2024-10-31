@@ -257,3 +257,5 @@ seven eight
 ### **[chizuo](https://github.com/chizuo)** commented [May 29, 2024](https://github.com/Stardown-app/Stardown/issues/44#issue-2324194921)
 
 This is a comment.
+
+The font element is still used sometimes even though it's deprecated.

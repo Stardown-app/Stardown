@@ -1405,7 +1405,7 @@ export class MdConverter {
 
     /** @type {ElementConverter} */
     convertFONT(ctx, el) {
-        return '';
+        return this.convertNodes(ctx, el.childNodes);
     }
 
     /** @type {ElementConverter} */

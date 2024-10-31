@@ -43,6 +43,8 @@ boldAndEmphasizedLetters***Within***String
 
 *Emphasis* in citation.
 
+**Bold element -**with space inside instead of after.
+
 > To make all your unknowns known, you must make all your knowns unknown. — Unknown
 
 > When a measure becomes a target, it ceases to be a good measure. — Goodhart's Law

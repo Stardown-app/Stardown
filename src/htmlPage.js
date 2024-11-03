@@ -15,11 +15,12 @@
 */
 
 import { getSetting } from './getSetting.js';
-import { sendToNotepad, applyTemplate, readabilitize } from './contentUtils.js';
-import { preprocessFragment } from './converters/utils/html.js';
-import { absolutizeNodeUrls, removeIdAndTextFragment } from './converters/utils/urls.js';
+import { sendToNotepad, applyTemplate, removeIdAndTextFragment } from './contentUtils.js';
+import { extractMainContent } from './extractMainContent.js';
+import { improveConvertibility } from './converters/utils/html.js';
+import { absolutizeNodeUrls } from './converters/utils/urls.js';
 import * as md from './generators/md.js';
-import { htmlToMd } from './converters/md.js';
+import { htmlToMd, mdEncodeUri } from './converters/md.js';
 import { htmlToMdAndHtml } from './converters/mdAndHtml.js';
 import { handleCopyRequest } from './browserSpecific.js';
 
@@ -43,15 +44,21 @@ export async function handleCopyPageRequest() {
 async function createPageText() {
     const markupLanguage = await getSetting('markupLanguage');
     if (markupLanguage === 'html') {
-        const frag = document.createDocumentFragment();
+        let frag = document.createDocumentFragment();
         frag.append(document.documentElement.cloneNode(true));
+
+        if (await getSetting('extractMainContent')) {
+            frag = await extractMainContent(frag, location);
+        }
+
+        await improveConvertibility(frag, location.hostname);
 
         absolutizeNodeUrls(frag, location.href);
 
         // convert the fragment to a string
         const div = document.createElement('div');
         div.appendChild(frag.cloneNode(true));
-        const html = div.innerHTML || selectedText;
+        const html = div.innerHTML;
 
         await sendToNotepad(html);
         return html;
@@ -83,7 +90,8 @@ async function createPageText() {
             await sendToNotepad(blockquote);
             return blockquote;
         case 'link with selection as title':
-            const text = document.textContent.trim().replaceAll('\r\n', ' ').replaceAll('\n', ' ');
+            let text = window.getSelection()?.toString() || 'link';
+            text = text.trim().replaceAll('\r\n', ' ').replaceAll('\n', ' ');
             const link = await md.createLink(text, url);
             await sendToNotepad(link);
             return link;
@@ -112,7 +120,7 @@ async function getSourceFormatMdWithLink(title, url, markupLanguage) {
 /**
  * getSourceFormatMd returns source-formatted markdown of the current page in the user's
  * chosen markup language.
- * @param {string} markupLanguage - the user's chosen markup language.
+ * @param {string} markupLanguage
  * @returns {Promise<string>}
  */
 async function getSourceFormatMd(markupLanguage) {
@@ -121,12 +129,11 @@ async function getSourceFormatMd(markupLanguage) {
     let frag = document.createDocumentFragment();
     frag.append(document.body.cloneNode(true));
 
-    const readabilityJs = await getSetting('readabilityJs');
-    if (readabilityJs) {
-        frag = await readabilitize(frag);
+    if (await getSetting('extractMainContent')) {
+        frag = await extractMainContent(frag, location);
     }
 
-    await preprocessFragment(frag, location.hostname);
+    await improveConvertibility(frag, location.hostname);
 
     switch (markupLanguage) {
         case 'markdown':
@@ -150,7 +157,7 @@ async function getSourceFormatMd(markupLanguage) {
 async function getTemplateMd(title, url, markupLanguage) {
     title = await md.createLinkTitle(title);
     url = mdEncodeUri(url);
-    const text = getSourceFormatMd(markupLanguage);
+    const text = await getSourceFormatMd(markupLanguage);
     const template = await getSetting('mdSelectionTemplate');
 
     return await applyTemplate(template, title, url, text);

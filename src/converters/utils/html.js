@@ -14,14 +14,103 @@
    limitations under the License.
 */
 
+// [Node: nodeType property | MDN](https://developer.mozilla.org/en-US/docs/Web/API/Node/nodeType)
+export const nodeTypes = {
+    ELEMENT_NODE: 1,
+    ATTRIBUTE_NODE: 2,
+    TEXT_NODE: 3,
+    CDATA_SECTION_NODE: 4,
+    ENTITY_REFERENCE_NODE: 5,
+    ENTITY_NODE: 6,
+    PROCESSING_INSTRUCTION_NODE: 7,
+    COMMENT_NODE: 8,
+    DOCUMENT_NODE: 9,
+    DOCUMENT_TYPE_NODE: 10,
+    DOCUMENT_FRAGMENT_NODE: 11,
+    NOTATION_NODE: 12,
+    // `Node.ELEMENT_NODE`, `Node.ATTRIBUTE_NODE`, etc. are not used in Stardown because
+    // `Node` is not defined by Node.js, which is used when running tests.
+};
+
 /**
- * preprocessFragment modifies a document fragment from certain websites to make it more
- * suitable for conversion to other formats.
+ * isInlineNodes reports whether the given nodes are only text nodes and inline
+ * elements.
+ * @param {Node[]|NodeList|NodeListOf<ChildNode>|HTMLCollection} nodes
+ * @returns {boolean}
+ */
+export function isInlineNodes(nodes) {
+    let i = 0;
+    while (nodes[i]?.nodeType === nodeTypes.TEXT_NODE) {
+        i++;
+    }
+
+    return nodes[i] && isInlineElement(nodes[i]);
+}
+
+/**
+ * isBlockFomattingContext reports whether nodes are in a block formatting context.
+ * Introduction to formatting contexts:
+ * https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_flow_layout/Introduction_to_formatting_contexts
+ * @param {Node[]|NodeList|NodeListOf<ChildNode>|HTMLCollection} nodes
+ * @returns {boolean}
+ */
+export function isBlockFomattingContext(nodes) {
+    for (let i = 0; i < nodes.length; i++) {
+        if (isBlockElement(nodes[i])) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+/**
+ * isBlockElement reports whether a node is a block element.
+ * @param {Node} node
+ * @returns {boolean}
+ */
+export function isBlockElement(node) {
+    return (
+        node.nodeType === nodeTypes.ELEMENT_NODE &&
+        blockElementNames.includes(node.nodeName)
+    );
+}
+
+/**
+ * isInlineElement reports whether a node is an inline element.
+ * @param {Node} node
+ * @returns {boolean}
+ */
+export function isInlineElement(node) {
+    return (
+        node.nodeType === nodeTypes.ELEMENT_NODE &&
+        inlineElementNames.includes(node.nodeName)
+    );
+}
+
+// [HTML Block and Inline Elements | W3docs](https://www.w3docs.com/learn-html/html-block-and-inline-elements.html)
+const blockElementNames = [
+    'ADDRESS', 'ARTICLE', 'ASIDE', 'BLOCKQUOTE', 'CANVAS', 'DD', 'DIV', 'DL', 'DT',
+    'FIELDSET', 'FIGCAPTION', 'FIGURE', 'FOOTER', 'FORM', 'H1', 'H2', 'H3', 'H4', 'H5',
+    'H6', 'HEADER', 'HR', 'LI', 'MAIN', 'NAV', 'NOSCRIPT', 'OL', 'P', 'PRE', 'SECTION',
+    'TABLE', 'TFOOT', 'UL', 'VIDEO',
+];
+
+const inlineElementNames = [
+    'A', 'ABBR', 'ACRONYM', 'B', 'BDO', 'BIG', 'BR', 'BUTTON', 'CITE', 'CODE',
+    'DEL', 'DFN', 'EM', 'I', 'IMG', 'INPUT', 'INS', 'KBD', 'LABEL', 'MARK', 'MAP',
+    'OBJECT', 'OUTPUT', 'Q', 'S', 'SAMP', 'SCRIPT', 'SELECT', 'SMALL', 'SPAN',
+    'STRONG', 'SUB', 'SUP', 'TEXTAREA', 'TIME', 'TT', 'VAR',
+];
+
+/**
+ * improveConvertibility may modify a document fragment depending on the website to make
+ * it more likely to convert to other markup languages well.
  * @param {DocumentFragment} frag
  * @param {string} hostname
  * @returns {Promise<void>}
  */
-export async function preprocessFragment(frag, hostname) {
+export async function improveConvertibility(frag, hostname) {
     switch (hostname) {
         case 'news.ycombinator.com':
             // add the presentation role to every table
@@ -44,12 +133,12 @@ export function removeHiddenElements(frag, doc) {
     const SHOW_ELEMENT = 1;
     const iterator = doc.createNodeIterator(frag, SHOW_ELEMENT);
 
-    const ELEMENT_NODE = 1;
     let currentNode = iterator.nextNode();
     while (currentNode) {
-        if (currentNode.nodeType === ELEMENT_NODE) {
+        if (currentNode.nodeType === nodeTypes.ELEMENT_NODE) {
             const style = doc.defaultView.getComputedStyle(currentNode);
             if (
+                currentNode.hasAttribute('hidden') ||
                 style.getPropertyValue('display') === 'none' ||
                 style.getPropertyValue('visibility') === 'hidden'
             ) {
@@ -77,25 +166,4 @@ export function removeStyles(frag) {
 
         currentNode = iterator.nextNode();
     }
-}
-
-/**
- * isInlineText reports whether the given nodes are only text nodes and inline text
- * elements.
- * @param {Node[]|NodeList|HTMLCollection} nodes
- * @returns {boolean}
- */
-export function isInlineText(nodes) {
-    let i = 0;
-    const TEXT_NODE = 3;
-    while (nodes[i]?.nodeType === TEXT_NODE) {
-        i++;
-    }
-
-    const inlineTextElems = [
-        'EM', 'STRONG', 'B', 'I', 'A', 'LABEL', 'CODE', 'S', 'INS', 'DEL', 'MARK',
-        'SUB', 'SUP', 'TIME', 'Q', 'BIG', 'SMALL', 'CITE', 'DFN', 'VAR', 'SAMP', 'KBD',
-    ];
-
-    return nodes[i] && inlineTextElems.includes(nodes[i].nodeName);
 }

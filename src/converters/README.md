@@ -2,6 +2,8 @@
 
 This package converts HTML to other markup languages such as markdown. It depends on `document` and `location`, and may occasionally benefit from `DOMParser` if it's available. It also depends on Stardown's `getSetting` function.
 
+Also see [../../docs/develop.md](../../docs/develop.md) for general Stardown development info.
+
 ## Usage
 
 To convert HTML to markdown:
@@ -28,7 +30,7 @@ console.log(csv);
 
 ## Implementation
 
-Stardown-converters' markdown converter is implemented with a class named `MdConverter` that has many methods, including one method for each [HTML element](https://developer.mozilla.org/en-US/docs/Web/HTML/Element). These have names that start with `convert` and end with the element's uppercase tag name. A few examples are below. They each take a context object named `ctx` (details in the next section) and an [element](https://developer.mozilla.org/en-US/docs/Web/API/Element), and return a string.
+Stardown-converters' markdown converter is implemented with a class named `MdConverter` that has many methods, including one method for each [HTML element](https://developer.mozilla.org/en-US/docs/Web/HTML/Element). These have names that start with `convert` and end with the element's uppercase tag name. A few examples are below. They each take a context object named `ctx` (details in the [context objects](#context-objects) section below) and an [element](https://developer.mozilla.org/en-US/docs/Web/API/Element), and return a string.
 
 ```js
 export class MdConverter {
@@ -65,7 +67,7 @@ export class MdConverter {
 }
 ```
 
-A few elements including `<br>` and `<hr>` are simple to convert, and some elements like `<script>` are always converted to empty strings so that they are ignored. Some elements like `<li>` are set to be converted to empty strings because they are expected to only appear within other elements that are handled as a group (in this case, either `<ul>`, `<ol>`, or `<menu>`). However, most are more complicated like `<strong>`. The `convertSTRONG` example above shows:
+A few elements like `<br>` and `<hr>` are simple to convert, and some elements including `<script>` are always converted to empty strings so that they are ignored. Some elements like `<li>` are converted to empty strings because they are handled as a group with another element (in this case, either `<ul>`, `<ol>`, or `<menu>`). However, most are more complicated like `<strong>`. The `convertSTRONG` example above shows:
 
 1. `<strong>` element nesting is detected to avoid adding extra asterisks
 2. all of the `<strong>` element's child nodes are converted to a string of markdown
@@ -74,9 +76,15 @@ A few elements including `<br>` and `<hr>` are simple to convert, and some eleme
 5. newline characters are removed because markdown renderers don't allow bold elements to span multiple lines
 6. the result is wrapped with asterisks and returned
 
-The `MdConverter` class should have a method for each HTML element, but any element without a corresponding method will be skipped and its child nodes will be processed. The markdown converter is implemented as a class so that it can be subclassed, such as to add support for other markdown flavors.
+The `MdConverter` class should have a method for each of [the standard HTML elements](https://developer.mozilla.org/en-US/docs/Web/HTML/Element). Any element without a corresponding method will be skipped and its child nodes will be processed. The markdown converter is implemented as a class so that it can be subclassed, such as to add support for other markdown flavors.
 
 In HTML, every element is a node but not all nodes are elements. Each node encountered requires first checking its type to determine whether the node is an element or something else like text.
+
+## Testing
+
+To see live test output as you change the code, use `npm run md-diff` (requires [nodemon](https://www.npmjs.com/package/nodemon); `npm install -g nodemon`) and open [../../test/md.diff.html](../../test/md.diff.html) with VS Code's [Live Server](https://marketplace.visualstudio.com/items?itemName=ritwickdey.LiveServer) extension or an alternative. The file md.diff.html is created by comparing [../../test/expected.md](../../test/expected.md) to the result of converting [../../test/inputForMd.html](../../test/inputForMd.html). Note that VS Code may sometimes make automatic changes to markdown files while they're being edited that could mess up expected.md, such as changing table column widths or ordered list numbers. If you edit expected.md in VS Code, please fix any automatic changes before committing. The line endings in expected.md should be LF, not CRLF.
+
+## Design
 
 Stardown previously used [Turndown](https://github.com/mixmark-io/turndown) to convert HTML to markdown but eventually outgrew it. Turndown is better than Stardown-converters when any customization needed is relatively simple, or when the functionality must work in different environments such as with ActiveX. Stardown-converters is specially made for Stardown but is easy to separate from it and may someday be turned into a separate, imported package.
 
@@ -95,7 +103,7 @@ Almost all of the functions in this package are synchronous because:
 - so far, most of them don't need to be async
 - async function calls run a little slower, which adds up with tons of function calls like in this package
 
-### Context objects
+## Context objects
 
 Most of the functions in Stardown-converters have a parameter named `ctx`, which is short for context. A `ctx` is an ordinary JavaScript object that may be empty or may have whatever attributes and methods would be useful.
 

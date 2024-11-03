@@ -20,7 +20,13 @@
 
 export const pageItem = {
     id: 'page',
-    title: 'Copy markdown link for this part of the page',
+    title: 'Copy markdown link for this page',
+    contexts: ['page', 'editable'],
+};
+
+export const pageSectionItem = {
+    id: 'pageSection',
+    title: 'Copy markdown link for this section',
     contexts: ['page', 'editable'],
 };
 

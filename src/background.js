@@ -138,6 +138,11 @@ browser.contextMenus.onClicked.addListener(async (info, tab) => {
                 tab, { category: 'pageRightClick' }, { frameId: info.frameId },
             );
             break;
+        case 'pageSection':
+            await handleInteraction(
+                tab, { category: 'pageSectionRightClick' }, { frameId: info.frameId },
+            );
+            break;
         case 'selection':
             await handleInteraction(
                 tab, { category: 'selectionRightClick' }, { frameId: info.frameId },

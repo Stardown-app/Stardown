@@ -5,10 +5,12 @@
 - [GitLab](https://docs.gitlab.com/ee/user/markdown.html)
 - [Pandoc](https://pandoc.org/MANUAL.html) (related: [Pandoc Python library](https://boisgera.github.io/pandoc/markdown/))
 - [VS Code](https://code.visualstudio.com/docs/languages/markdown#_markdown-preview)
+- [Edna](https://edna.arslexis.io/), which was created by Krzysztof Kowalczyk, the creator of SumatraPDF
 - [Foam](https://github.com/foambubble/foam)
 - [Zettlr](https://docs.zettlr.com/en/core/writing-markdown/)
 - [SilverBullet](https://silverbullet.md/Markdown/Extensions)
 - [Joplin](https://joplinapp.org/help/apps/markdown/)
+- [SiYuan](https://github.com/siyuan-note/siyuan)
 - [Logseq](https://facedragons.com/foss/logseq-markdown-cheat-sheet/)
 - [Bear](https://bear.app/faq/how-to-use-markdown-in-bear/)
 - [Taio](https://docs.taio.app/#/quick-start/editor)
@@ -21,3 +23,5 @@
 - [Discourse](https://meta.discourse.org/t/formatting-posts-using-markdown-bbcode-and-html/239348)
 - [Reddit](https://support.reddithelp.com/hc/en-us/articles/360043033952-Formatting-Guide)
 - [Discord](https://support.discord.com/hc/en-us/articles/210298617-Markdown-Text-101-Chat-Formatting-Bold-Italic-Underline)
+- [obsidian-markdownr](https://github.com/IAmStoxe/obsidian-markdownr)
+- [Markdeep](https://casual-effects.com/markdeep/)

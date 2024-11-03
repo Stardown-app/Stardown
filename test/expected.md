@@ -12,18 +12,18 @@
 
 # another header
 
+# Hello World!
+
 paragraph
 
 another paragraph
 
-Multi-line
-paragraph.
+Multi-line paragraph.
 
 Paragraph with 
 line break.
 
-**bold**
-*emphasis*
+**bold** *emphasis*
 
 ***both bold and emphasis***
 
@@ -42,6 +42,8 @@ emphasizedLetters*Within*String
 boldAndEmphasizedLetters***Within***String
 
 *Emphasis* in citation.
+
+**Bold element -**with space inside instead of after.
 
 > To make all your unknowns known, you must make all your knowns unknown. — Unknown
 
@@ -69,11 +71,23 @@ anchor with no href
 
 - [ ] Checkbox with label
 
+- [ ] feel
+
+- [ ] seek
+
+- [ ] authority
+
 Press `Alt+C` to copy.
 
 ``Code elements can contain `backticks`.``
 
 `````and even ````tons of backticks````.`````
+
+[Anchor in a code element](https://example.com)
+
+[wheelercj](https://example.com/wheelercj) added the [enhancement](https://example.com/Stardown-app/Stardown/labels/enhancement) label [May 29, 2024](https://example.com/#event-12345971759)
+
+This is a sentence.
 
 ```
   .
@@ -241,3 +255,9 @@ seven eight
 ~~This is stricken through.~~
 
 ==This is highlighted.==
+
+### **[chizuo](https://github.com/chizuo)** commented [May 29, 2024](https://github.com/Stardown-app/Stardown/issues/44#issue-2324194921)
+
+This is a comment.
+
+The font element is still used sometimes even though it's deprecated.

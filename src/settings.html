@@ -47,6 +47,41 @@ each anchor so that the pages they navigate to are opened in new tabs. -->
           margin-right: 30%;
         }
       }
+
+      @media (prefers-color-scheme: dark) {
+        body {
+          background-color: #333;
+          color: snow;
+        }
+
+        a {
+          color: rgb(0, 191, 255);
+        }
+
+        h1 a {
+          color: #00ddff;
+        }
+
+        select {
+          background-color: #444;
+          color: snow;
+        }
+
+        input[type="checkbox"] {
+          background-color: #444;
+          color: snow;
+        }
+
+        input[type="text"] {
+          background-color: #444;
+          color: snow;
+        }
+
+        textarea {
+          background-color: #444;
+          color: snow;
+        }
+      }
     </style>
   </head>
 
@@ -101,11 +136,8 @@ each anchor so that the pages they navigate to are opened in new tabs. -->
       <br />
       <hr />
       <h4>Readability</h4>
-      <input id="readabilityJs" type="checkbox" checked />
-      <label for="readabilityJs">Use Mozilla's
-        <a href="https://github.com/mozilla/readability" target="_blank">
-          Readability.js</a>
-        to try to extract the main content when copying an entire page</label>
+      <input id="extractMainContent" type="checkbox" checked />
+      <label for="extractMainContent">When copying an entire page, try to extract the main content of the page</label>
       <br />
       <br />
       <input id="omitNav" type="checkbox" checked />

@@ -17,7 +17,8 @@
 import { getSetting } from './getSetting.js';
 import { sendToNotepad, applyTemplate } from './contentUtils.js';
 import { absolutizeNodeUrls } from './converters/utils/urls.js';
-import { preprocessFragment } from './converters/utils/html.js';
+import { nodeTypes, improveConvertibility } from './converters/utils/html.js';
+import { createLink } from './generators/all.js';
 import * as md from './generators/md.js';
 import { htmlToMd, mdEncodeUri } from './converters/md.js';
 import { htmlToMdAndHtml } from './converters/mdAndHtml.js';
@@ -34,22 +35,11 @@ import { htmlToMdAndHtml } from './converters/mdAndHtml.js';
 export async function createText(title, url, selection) {
     const markupLanguage = await getSetting('markupLanguage');
 
-    const selectedText = selection?.toString().trim() || '';
+    const selectedText = selection?.toString().trim();
     if (!selectedText) {
-        switch (markupLanguage) {
-            case 'markdown':
-            case 'markdown with some html':
-                const mdLink = await md.createLink(title, url);
-                await sendToNotepad(mdLink);
-                return mdLink;
-            case 'html':
-                const htmlLink = `<a href="${url}">${title}</a>`;
-                await sendToNotepad(htmlLink);
-                return htmlLink;
-            default:
-                console.error(`Unknown markupLanguage: ${markupLanguage}`);
-                throw new Error(`Unknown markupLanguage: ${markupLanguage}`);
-        }
+        const link = await createLink(title, url, markupLanguage);
+        await sendToNotepad(link);
+        return link;
     }
 
     if (markupLanguage === 'html') {
@@ -59,6 +49,8 @@ export async function createText(title, url, selection) {
             await sendToNotepad(selectedText);
             return selectedText;
         }
+
+        await improveConvertibility(frag, location.hostname);
 
         absolutizeNodeUrls(frag, url);
 
@@ -129,9 +121,7 @@ export async function getSelectionFragment(selection) {
         return null;
     }
 
-    if (selection.rangeCount > 1) {
-        combineRanges(selection);
-    }
+    combineRanges(selection);
 
     /** @type {DocumentFragment} */
     let frag = document.createDocumentFragment();
@@ -147,7 +137,7 @@ export async function getSelectionFragment(selection) {
         /** @type {Element|null} */
         const list = getList(startRange); // either an OL, UL, or MENU element
         if (list !== null) {
-            frag = wrapFragmentWithList(frag, list, startRange);
+            frag = wrapRangeContentWithList(startRange, list);
         }
     }
 
@@ -170,7 +160,7 @@ async function getSourceFormatMd(selection, selectedText, markupLanguage) {
         return selectedText;
     }
 
-    await preprocessFragment(frag, location.hostname);
+    await improveConvertibility(frag, location.hostname);
 
     switch (markupLanguage) {
         case 'markdown':
@@ -228,11 +218,18 @@ async function getSourceFormatMdWithLink(title, url, selection, selectedText, ma
 
 /**
  * combineRanges combines the ranges of a selection into one range, modifying the
- * selection in place.
+ * selection in place. This function has no effect on selections with 0 or 1 ranges.
+ * Most browsers put only one range in each selection, but Firefox's selections usually
+ * have multiple ranges. These ranges tend to overlap, and working with multiple ranges
+ * is more difficult than working with one range.
  * @param {Selection} selection
  * @returns {void}
  */
 function combineRanges(selection) {
+    if (selection.rangeCount <= 1) {
+        return;
+    }
+
     const combinedRange = document.createRange();
     const originalRanges = [];
     for (let i = 0; i < selection.rangeCount; i++) {
@@ -297,7 +294,7 @@ function getStartRange(selection) {
     startNode = startBeforeAncestorHeader(startRange, startNode);
     startNode = startBeforeAncestorTable(startRange, startNode);
     startNode = startBeforeAncestorCode(startRange, startNode);
-    startNode = startBeforeParentPre(startRange, startNode);
+    startNode = startBeforeAncestorPre(startRange, startNode);
 
     return startRange;
 }
@@ -382,17 +379,29 @@ function startBeforeAncestorCode(startRange, startNode) {
 }
 
 /**
- * startBeforeParentPre expands a selection to include pre elements that are the parent
- * of the start of the selection.
+ * startBeforeAncestorPre expands a selection to include code and pre elements that are
+ * ancestors to the start of the selection.
  * @param {Range} startRange - a selection's index 0 range.
  * @param {Node} startNode - a selection's index 0 range's start container.
  * @returns {Node} - the new start node.
  */
-function startBeforeParentPre(startRange, startNode) {
-    // If the parent is a pre tag, expand the start of the selection to include the pre
-    // tag. This makes preformatted text including code blocks easier to copy.
-    const parent = startNode.parentNode;
-    if (parent && parent.nodeName === 'PRE') {
+function startBeforeAncestorPre(startRange, startNode) {
+    let parent = startNode.parentNode;
+    if (!parent) {
+        return startNode;
+    }
+
+    if (parent.nodeName === 'CODE') {
+        startNode = parent;
+        startRange.setStartBefore(startNode);
+    }
+
+    parent = startNode.parentNode;
+    if (!parent) {
+        return startNode;
+    }
+
+    if (parent.nodeName === 'PRE') {
         startNode = parent;
         startRange.setStartBefore(startNode);
     }
@@ -407,11 +416,10 @@ function startBeforeParentPre(startRange, startNode) {
  * @returns {boolean}
  */
 function isSelectionInList(frag) {
-    const COMMENT_NODE = 8;
     for (let i = 0; i < frag.childNodes.length; i++) {
         const node = frag.childNodes[i];
 
-        if (node.nodeType === COMMENT_NODE) {
+        if (node.nodeType === nodeTypes.COMMENT_NODE) {
             continue;
         } else if (node.nodeName === 'LI') {
             return true;
@@ -441,25 +449,22 @@ function getList(startRange) {
 }
 
 /**
- * wrapFragmentWithList wraps the selection fragment with a new list element based on
- * the existing one the fragment is in.
- * @param {DocumentFragment} frag
- * @param {HTMLOListElement|HTMLUListElement|HTMLMenuElement} list
+ * wrapRangeContentWithList wraps the selection range with a new list element based on
+ * the existing one. This function assumes the given range is in a list element.
  * @param {Range} startRange
+ * @param {HTMLOListElement|HTMLUListElement|HTMLMenuElement} list
  * @returns {DocumentFragment}
  */
-function wrapFragmentWithList(frag, list, startRange) {
-    const ELEMENT_NODE = 1;
+function wrapRangeContentWithList(startRange, list) {
+    /** @type {Element} */
+    let firstSelectedLi = startRange.startContainer;
+    while (firstSelectedLi.nodeName !== 'LI') {
+        firstSelectedLi = firstSelectedLi.parentNode;
+    }
 
     let newList;
     if (list.nodeName === 'OL') {
         newList = document.createElement('ol');
-
-        /** @type {Element} */
-        let firstSelectedLi = startRange.startContainer;
-        while (firstSelectedLi.nodeName !== 'LI') {
-            firstSelectedLi = firstSelectedLi.parentNode;
-        }
 
         const originalId = firstSelectedLi.getAttribute('id');
         firstSelectedLi.setAttribute('id', 'list-selection-start');
@@ -468,7 +473,7 @@ function wrapFragmentWithList(frag, list, startRange) {
         for (let i = 0; i < list.children.length; i++) {
             const child = list.children[i];
             if (
-                child.nodeType === ELEMENT_NODE &&
+                child.nodeType === nodeTypes.ELEMENT_NODE &&
                 child.getAttribute('id') === 'list-selection-start'
             ) {
                 startAttr = String(i + 1);
@@ -486,12 +491,15 @@ function wrapFragmentWithList(frag, list, startRange) {
         newList.setAttribute('type', list.getAttribute('type') || '1');
     } else if (list.nodeName === 'UL') {
         newList = document.createElement('ul');
-    } else { // if (list.nodeName === 'MENU')
+    } else if (list.nodeName === 'MENU') {
         newList = document.createElement('menu');
+    } else {
+        throw new Error('Unknown list type');
     }
 
+    startRange.setStartBefore(firstSelectedLi);
     newList.appendChild(startRange.cloneContents());
-    frag = document.createDocumentFragment();
+    const frag = document.createDocumentFragment();
     frag.appendChild(newList);
 
     return frag;

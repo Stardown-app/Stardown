@@ -89,6 +89,7 @@ export async function updateContextMenu(context, markupLanguage) {
 
             browser.contextMenus.create(menu.selectionItem);
             browser.contextMenus.create(menu.pageItem);
+            browser.contextMenus.create(menu.pageSectionItem);
             browser.contextMenus.create(menu.videoItem);
             browser.contextMenus.create(menu.audioItem);
         }
@@ -111,7 +112,10 @@ export function updateContextMenuLanguage(markupLanguage) {
     }
 
     browser.contextMenus.update('page', {
-        title: `Copy ${markupLanguage} link for this part of the page`,
+        title: `Copy ${markupLanguage} link for this page`,
+    }, () => { if (browser.runtime.lastError) return; });
+    browser.contextMenus.update('pageSection', {
+        title: `Copy ${markupLanguage} link for this section`,
     }, () => { if (browser.runtime.lastError) return; });
     browser.contextMenus.update('selection', {
         title: `Copy ${markupLanguage} of selection`,

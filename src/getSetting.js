@@ -19,7 +19,7 @@ import { browser } from './browserSpecific.js';
 const defaultSettings = {
     markupLanguage: 'markdown',
     createTextFragment: true,
-    readabilityJs: true,
+    extractMainContent: true,
     omitNav: true,
     omitFooter: true,
     omitHidden: true,
@@ -35,7 +35,7 @@ const defaultSettings = {
     mdSelectionTemplate: `> [!note]
 > from [{{link.title}}]({{link.url}}) on {{date.YYYYMMDD}}
 
-{{selection}}`,
+{{text}}`,
 
     jsonEmptyCell: 'null',
     jsonDestination: 'clipboard',

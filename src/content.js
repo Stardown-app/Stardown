@@ -15,13 +15,11 @@
 */
 
 import { browser, handleCopyRequest } from './browserSpecific.js';
-import * as md from './generators/md.js';
+import { createLink, createImage, createVideo, createAudio } from './generators/all.js';
 import * as htmlSelection from './htmlSelection.js';
 import { handleCopyPageRequest } from './htmlPage.js';
-import { createTextFragmentArg } from './createTextFragmentArg.js';
 import { getSetting } from './getSetting.js';
-import { sendToNotepad } from './contentUtils.js';
-import { removeIdAndTextFragment } from './converters/utils/urls.js';
+import { sendToNotepad, addIdAndTextFragment, removeIdAndTextFragment } from './contentUtils.js';
 import { htmlTableToJson } from './converters/json.js';
 import { htmlTableToCsv } from './converters/csv.js';
 
@@ -212,28 +210,24 @@ async function handleRequest(message) {
         case 'copyEntirePageShortcut':
             return await handleCopyPageRequest();
         case 'pageRightClick':
+            const url = removeIdAndTextFragment(location.href);
+            return await handleCreateLink(document.title, url);
+        case 'pageSectionRightClick':
+            const selection = window.getSelection();
             const id1 = await getClickedElementId(clickedElement);
-            return await handlePageRightClick(id1);
+            return await handlePageSectionRightClick(id1, selection);
         case 'selectionRightClick':
             const selection1 = window.getSelection();
             const id2 = await getClickedElementId(clickedElement);
             return await handleSelectionCopyRequest(id2, selection1);
         case 'linkRightClick':
-            const linkMd = await md.createLink(linkText, message.linkUrl);
-            await sendToNotepad(linkMd);
-            return await handleCopyRequest(linkMd);
+            return await handleCreateLink(linkText, message.linkUrl);
         case 'imageRightClick':
-            const imageMd = await md.createImage(message.srcUrl);
-            await sendToNotepad(imageMd + '\n');
-            return await handleCopyRequest(imageMd + '\n');
+            return await handleCreateImage(message.srcUrl);
         case 'videoRightClick':
-            const videoMd = await md.createVideo(message.srcUrl, message.pageUrl);
-            await sendToNotepad(videoMd + '\n');
-            return await handleCopyRequest(videoMd + '\n');
+            return await handleCreateVideo(message.srcUrl, message.pageUrl);
         case 'audioRightClick':
-            const audioMd = await md.createAudio(message.srcUrl, message.pageUrl);
-            await sendToNotepad(audioMd + '\n');
-            return await handleCopyRequest(audioMd + '\n');
+            return await handleCreateAudio(message.srcUrl, message.pageUrl);
         case 'markdownTableRightClick':
             const id3 = await getClickedElementId(clickedElement);
             return await handleSelectionCopyRequest(id3, tableSelection);
@@ -260,70 +254,57 @@ async function handleRequest(message) {
 
 /**
  * getClickedElementId gets the ID of the element that was right-clicked. If the element
- * doesn't have an ID, it looks at its parent element. This repeats until an element
- * with an ID is found, or until the root of the DOM is reached.
+ * doesn't have an ID, this function looks at the element's older siblings and parent
+ * elements until an ID is found or the root of the DOM is reached.
  * @param {EventTarget|null} clickedElement - the element that was right-clicked.
  * @returns {Promise<string>} - the ID of the element that was right-clicked. If no
  * element with an ID was found, an empty string is returned.
  */
 async function getClickedElementId(clickedElement) {
-    // if clickedElement doesn't have an id, look at its parent
-    while (clickedElement && !clickedElement.id) {
-        clickedElement = clickedElement.parentElement;
-    }
-
-    if (clickedElement && clickedElement.id) {
-        return clickedElement.id;
-    } else {
-        console.log('No HTML element with an ID was found in the clicked path');
-        return '';
+    while (true) {
+        if (!clickedElement) {
+            return '';
+        } else if (clickedElement.id) {
+            return clickedElement.id;
+        } else if (clickedElement.previousElementSibling) {
+            clickedElement = clickedElement.previousElementSibling;
+        } else {
+            clickedElement = clickedElement.parentElement;
+        }
     }
 }
 
 /**
- * handleCopySelectionShortcut handles a request from the user to copy a selection.
+ * handleCopySelectionShortcut handles a request from the user to copy a Selection or a
+ * link for the current tab.
  * @returns {Promise<ContentResponse>}
  */
 async function handleCopySelectionShortcut() {
     const selection = window.getSelection();
     if (selection && selection.type === 'Range') {
-        // only allow Range (and not Caret) selections or else every copy request will
-        // count as a selection click
+        // Only allow Range (and not Caret) Selections because the copy selection
+        // shortcut must copy a link for the current tab when there is no Range
+        // Selection (when none of the page is highlighted).
         return await handleSelectionCopyRequest('', selection);
     }
 
-    const markupLanguage = await getSetting('markupLanguage');
-    switch (markupLanguage) {
-        case 'markdown':
-        case 'markdown with some html':
-            const linkMd = await md.createLink(document.title, location.href);
-            await sendToNotepad(linkMd);
-            return await handleCopyRequest(linkMd);
-        case 'html':
-            const anchor = `<a href="${location.href}">${document.title}</a>`;
-            await sendToNotepad(anchor);
-            return await handleCopyRequest(anchor);
-        default:
-            console.error('Unknown markup language:', markupLanguage);
-            throw new Error('Unknown markup language:', markupLanguage);
-    }
+    // none of the page is highlighted, so create a link for the page instead
+    const url = removeIdAndTextFragment(location.href);
+    return await handleCreateLink(document.title, url);
 }
 
 /**
- * handlePageRightClick handles a right-click on a page.
+ * handlePageSectionRightClick handles a right-click on a page for copying a link for
+ * the right-clicked part of the page.
  * @param {string} htmlId - the ID of the HTML element that was right-clicked.
+ * @param {Selection} selection - since this function is for right-clicks on an
+ * unselected part of a page, this selection object is expected to have the "Caret"
+ * type.
  * @returns {Promise<ContentResponse>}
  */
-async function handlePageRightClick(htmlId) {
-    let title = document.title;
-    let url = removeIdAndTextFragment(location.href);
-    if (htmlId) {
-        url += '#' + htmlId;
-    }
-
-    const link = await md.createLink(title, url);
-    await sendToNotepad(link);
-    return await handleCopyRequest(link);
+async function handlePageSectionRightClick(htmlId, selection) {
+    const url = await addIdAndTextFragment(location.href, htmlId, selection);
+    return await handleCreateLink(document.title, url);
 }
 
 /**
@@ -333,27 +314,9 @@ async function handlePageRightClick(htmlId) {
  * @returns {Promise<ContentResponse>}
  */
 async function handleSelectionCopyRequest(htmlId, selection) {
-    let title = document.title;
-    let url = removeIdAndTextFragment(location.href);
-
-    let arg = ''; // the text fragment argument
-    const createTextFragment = await getSetting('createTextFragment');
-    if (createTextFragment && selection && selection.type === 'Range') {
-        arg = createTextFragmentArg(selection);
-    }
-
-    if (htmlId || arg) {
-        url += '#';
-        if (htmlId) {
-            url += htmlId;
-        }
-        if (arg) {
-            url += `:~:text=${arg}`;
-        }
-    }
-
+    const title = document.title;
+    const url = await addIdAndTextFragment(location.href, htmlId, selection);
     const text = await htmlSelection.createText(title, url, selection);
-
     return await handleCopyRequest(text);
 }
 
@@ -414,4 +377,59 @@ async function handleJsonTableRightClick(tableSelection) {
         }
     });
     return null;
+}
+
+/**
+ * handleCreateLink creates a link in the markup language chosen in settings, sends it
+ * to the notepad, and writes it to the clipboard.
+ * @param {string} title
+ * @param {string} url
+ * @returns {Promise<ContentResponse>}
+ */
+async function handleCreateLink(title, url) {
+    const markupLanguage = await getSetting('markupLanguage');
+    const link = await createLink(title, url, markupLanguage);
+    await sendToNotepad(link);
+    return await handleCopyRequest(link);
+}
+
+/**
+ * handleCreateImage creates an image in the markup language chosen in settings, sends
+ * it to the notepad, and writes it to the clipboard.
+ * @param {string} url
+ * @returns {Promise<ContentResponse>}
+ */
+async function handleCreateImage(url) {
+    const markupLanguage = await getSetting('markupLanguage');
+    const image = await createImage(url, markupLanguage);
+    await sendToNotepad(image);
+    return await handleCopyRequest(image);
+}
+
+/**
+ * handleCreateVideo creates a video in the markup language chosen in settings, sends it
+ * to the notepad, and writes it to the clipboard.
+ * @param {string} srcUrl
+ * @param {string} pageUrl
+ * @returns {Promise<ContentResponse>}
+ */
+async function handleCreateVideo(srcUrl, pageUrl) {
+    const markupLanguage = await getSetting('markupLanguage');
+    const video = await createVideo(srcUrl, pageUrl, markupLanguage);
+    await sendToNotepad(video);
+    return await handleCopyRequest(video);
+}
+
+/**
+ * handleCreateAudio creates an audio player in the markup language chosen in settings,
+ * sends it to the notepad, and writes it to the clipboard.
+ * @param {string} srcUrl
+ * @param {string} pageUrl
+ * @returns {Promise<ContentResponse>}
+ */
+async function handleCreateAudio(srcUrl, pageUrl) {
+    const markupLanguage = await getSetting('markupLanguage');
+    const audio = await createAudio(srcUrl, pageUrl, markupLanguage);
+    await sendToNotepad(audio);
+    return await handleCopyRequest(audio);
 }

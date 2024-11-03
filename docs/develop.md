@@ -14,7 +14,7 @@ See [./dev-install-from-source.md](./dev-install-from-source.md)
 
 Run the tests with `npm run test`.
 
-If a certain test fails, its error message will tell you to run `npm run md-diff` (requires [nodemon](https://www.npmjs.com/package/nodemon); `npm install -g nodemon`) and open a file named `md.diff.html` that displays the differences between the markdown converter's actual output and its expected output. Any text with a green background is missing from the actual output, and any text with a red background is unexpected. You may want to use VS Code's [Live Server](https://marketplace.visualstudio.com/items?itemName=ritwickdey.LiveServer) extension to automatically reload `md.diff.html` when nodemon changes it. Note that VS Code sometimes makes automatic changes to markdown files while they're being edited that could mess up `expected.md`, such as changing table column widths or ordered list numbers. If you edit `expected.md` in VS Code, please fix any changes VS Code automatically makes before committing. The line endings in `expected.md` should be LF, not CRLF.
+If a certain test fails, its error message will tell you to run `npm run md-diff`. See [../src/converters/README.md#testing](../src/converters/README.md#testing) for more details.
 
 Manual testing is often helpful too. When testing manually, see [./manual-testing.md](./manual-testing.md).
 
@@ -24,15 +24,26 @@ Let's create feature branches with descriptive names and make pull requests as d
 
 ## Writing import statements
 
-Stardown uses several different execution contexts as described in [./message-passing.md](./message-passing.md), and development of Stardown uses the [Rollup](https://rollupjs.org/) bundler to combine the files for each context. Rollup copies an entire file's content (and the content of all files that file imports) into another file even if the import statement only asks for specific things. For this reason, try to avoid putting functions and imports for one execution context in a file that is only for a different execution context, or else the resulting bundled code will have a lot of duplicate unused code that might go unnoticed except by extension reviewers.
+Stardown uses several different execution contexts as described in [./execution-contexts.md](./execution-contexts.md), and development of Stardown uses the [Rollup](https://rollupjs.org/) bundler to combine the files for each context. Rollup copies an entire file's content (and the content of all files that file imports) into another file even if the import statement only asks for specific things. For this reason, try to avoid putting functions and imports for one execution context in a file that is only for a different execution context, or else the resulting bundled code will have a lot of duplicate unused code that might go unnoticed except by extension reviewers.
 
 ## Writing documentation
 
 This project uses [JSDoc](https://en.wikipedia.org/wiki/JSDoc) to annotate types. In VS Code you can type `/**` above a function and press enter to auto-generate part of its JSDoc comment (this might require the [ESLint](https://marketplace.visualstudio.com/items?itemName=dbaeumer.vscode-eslint) extension).
 
+## Improving Stardown's output
+
+If changes to improve the output can apply to:
+
+- **all/many sites**:
+    - **converting HTML to another language**: the changes should probably be made in a converter (see [../src/converters/README.md](../src/converters/README.md))
+    - **what HTML to include in selections**: the changes should probably be made somewhere in [../src/htmlSelection.js](../src/htmlSelection.js)
+- **specific sites**:
+    - **both selections and entire pages**: the changes should probably be made in the `improveConvertibility` function
+    - **only entire pages**: the changes should probably be made in [../src/extractMainContent.js](../src/extractMainContent.js)
+
 ## How Stardown works
 
-If you want to read a broad overview of Stardown's components and how they communicate with each other, see [./message-passing.md](./message-passing.md).
+If you want to read a broad overview of Stardown's components and how they communicate with each other, see [./execution-contexts.md](./execution-contexts.md).
 
 Stardown converts HTML to other formats using custom code explained in [../src/converters/README.md](../src/converters/README.md).
 

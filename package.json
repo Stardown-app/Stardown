@@ -12,7 +12,7 @@
     "dev-chrome": "rollup --config rollup.config.chrome.mjs",
     "build-chrome": "npm install && npm run dev-chrome && npm run assert-clean && rm -r src && rm -r firefox",
     "update-chrome": "git restore . && git pull && npm run build-chrome",
-    "assert-clean": "git update-index --refresh && git diff-index --quiet HEAD --"
+    "assert-clean": "git status --porcelain | grep -q . && exit 1"
   },
   "devDependencies": {
     "diff": "^6.0.0-beta",

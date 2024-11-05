@@ -16,8 +16,10 @@ You can use this [bookmarklet](https://en.wikipedia.org/wiki/Bookmarklet) I made
 * [linkding](https://github.com/sissbruecker/linkding) is a self-hosted bookmarks manager.
 * [Raindrop.io](https://raindrop.io/) is an online bookmarks manager.
 * [Readwise](https://readwise.io/) can sync highlights from websites, Kindles, iBooks, and more.
+* [Roam Highlighter](https://chromewebstore.google.com/detail/roam-highlighter/hponfflfgcjikmehlcdcnpapicnljkkc?pli=1)
 * [Zotero](https://www.zotero.org/) is one of the best tools for saving and organizing research.
 * [Joplin](https://github.com/laurent22/joplin) has an [official web clipper](https://github.com/laurent22/joplin/blob/dev/readme/apps/clipper.md) of its own.
+* [HTML to React & Figma by Magic Patterns](https://chromewebstore.google.com/detail/html-to-react-figma-by-ma/chgehghmhgihgmpmdjpolhkcnhkokdfp)
 * [SiYuan](https://github.com/siyuan-note/siyuan) also has an [official web clipper](https://github.com/siyuan-note/siyuan-chrome).
 * [Send To Logseq](https://chromewebstore.google.com/detail/send-to-logseq/mgdccnefjlmhnfbmlnhddoogimbpmilj) is a browser extension that saves web pages to [Logseq](https://github.com/logseq/logseq?tab=readme-ov-file).
 * [github.com/jsartelle/vscode-web-clipper](https://github.com/jsartelle/vscode-web-clipper) is a VS Code extension.
@@ -42,6 +44,8 @@ You can use this [bookmarklet](https://en.wikipedia.org/wiki/Bookmarklet) I made
 * [Mealie](https://github.com/mealie-recipes/mealie) is a self hosted recipe manager and meal planner.
 * [you-get](https://github.com/soimort/you-get) is a tiny command-line utility to download media contents (videos, audios, images) from the Web.
 * [Reader-LM](https://jina.ai/news/reader-lm-small-language-models-for-cleaning-and-converting-html-to-markdown/?nocache=1) is small language models that convert HTML to markdown.
+* [Epublifier](https://github.com/maoserr/epublifier) converts some webnovels to epub format.
+* [FanFicFare](https://github.com/JimmXinu/FanFicFare) is a tool for making eBooks from stories on fanfiction and other web sites.
 
 ## Paste structured data
 

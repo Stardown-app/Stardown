@@ -41,6 +41,9 @@ You can use this [bookmarklet](https://en.wikipedia.org/wiki/Bookmarklet) I made
 ## Scrape websites
 
 * [Firecrawl](https://github.com/mendableai/firecrawl) is an API and SDKs for scraping websites and saving them as markdown or structured data.
+* [HTML-to-Markdown](https://news.ycombinator.com/item?id=42093511) a REST API, command line tool, and Go library for converting HTML or entire websites to markdown.
+* [UrlToMarkdown.com](https://urltomarkdown.com/)
+* [RedditToMarkdown](https://farnots.github.io/RedditToMarkdown/) export reddit posts to markdown.
 * [Mealie](https://github.com/mealie-recipes/mealie) is a self hosted recipe manager and meal planner.
 * [you-get](https://github.com/soimort/you-get) is a tiny command-line utility to download media contents (videos, audios, images) from the Web.
 * [Reader-LM](https://jina.ai/news/reader-lm-small-language-models-for-cleaning-and-converting-html-to-markdown/?nocache=1) is small language models that convert HTML to markdown.

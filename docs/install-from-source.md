@@ -1,6 +1,6 @@
 # Install from source
 
-Follow these steps to install Stardown using the source code. If you also want to change Stardown's code, instead follow the directions in [Installing Stardown from source for development](./dev-install-from-source.md).
+Follow these steps to install Stardown using the source code. If you might also want to change your copy of Stardown's code, instead follow the directions in [Installing Stardown from source for development](./dev-install-from-source.md).
 
 ## Chrome, Edge, Arc, Brave, Vivaldi, Opera
 

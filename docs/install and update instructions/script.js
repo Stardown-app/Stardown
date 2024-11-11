@@ -94,11 +94,14 @@ function install(instructions) {
     installedWithEl.setAttribute('hidden', 'hidden');
 
     if (willInstallWithStoreEl.checked) {
+        installedWithStoreEl.checked = true;
         navigateToStore();
     } else if (willInstallWithZipEl.checked) {
+        installedWithZipEl.checked = true;
         hasNodeV14PlusEl.setAttribute('hidden', 'hidden');
         installWithZip(instructions);
     } else if (willInstallWithTerminalEl.checked) {
+        installedWithTerminalEl.checked = true;
         hasNodeV14PlusEl.removeAttribute('hidden');
         installWithTerminal(instructions);
     } else {
@@ -112,10 +115,13 @@ function update(instructions) {
     hasNodeV14PlusEl.setAttribute('hidden', 'hidden');
 
     if (installedWithStoreEl.checked) {
+        willInstallWithStoreEl.checked = true;
         updateWithStore(instructions);
     } else if (installedWithZipEl.checked) {
+        willInstallWithZipEl.checked = true;
         updateWithZip(instructions);
     } else if (installedWithTerminalEl.checked) {
+        willInstallWithTerminalEl.checked = true;
         updateWithTerminal(instructions);
     } else {
         return;

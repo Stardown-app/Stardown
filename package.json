@@ -7,12 +7,7 @@
     "test": "node --test",
     "md-diff": "echo Open md.diff.html to see test output && nodemon ./test/diffMd.js --ext * --ignore *.diff.html",
     "dev-firefox": "rollup --config rollup.config.firefox.mjs",
-    "build-firefox": "npm install && npm run dev-firefox && npm run assert-clean && rm -r src && rm -r chrome",
-    "update-firefox": "git restore . && git pull && npm run build-firefox",
-    "dev-chrome": "rollup --config rollup.config.chrome.mjs",
-    "build-chrome": "npm install && npm run dev-chrome && npm run assert-clean && rm -r src && rm -r firefox",
-    "update-chrome": "git restore . && git pull && npm run build-chrome",
-    "assert-clean": "git status --porcelain | grep -q . && exit 1"
+    "dev-chrome": "rollup --config rollup.config.chrome.mjs"
   },
   "devDependencies": {
     "diff": "^6.0.0-beta",

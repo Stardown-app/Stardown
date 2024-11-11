@@ -86,6 +86,8 @@ function install(instructions) {
         stardownStoreLinkEl.setAttribute('href', 'https://chrome.google.com/webstore/detail/clicknohlhfdlfjfkaeongkbdgbmkbhb');
     } else if (firefoxEl.checked) {
         stardownStoreLinkEl.setAttribute('href', 'https://addons.mozilla.org/en-US/firefox/addon/stardown/');
+    } else {
+        throw new Error(`Unknown browser`);
     }
 
     willInstallWithEl.removeAttribute('hidden');

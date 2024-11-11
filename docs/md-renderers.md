@@ -10,6 +10,7 @@
 - [Zettlr](https://docs.zettlr.com/en/core/writing-markdown/)
 - [SilverBullet](https://silverbullet.md/Markdown/Extensions)
 - [Joplin](https://joplinapp.org/help/apps/markdown/)
+- [Memos](https://github.com/usememos/memos)
 - [SiYuan](https://github.com/siyuan-note/siyuan)
 - [Logseq](https://facedragons.com/foss/logseq-markdown-cheat-sheet/)
 - [Bear](https://bear.app/faq/how-to-use-markdown-in-bear/)

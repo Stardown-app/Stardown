@@ -30,7 +30,7 @@ const installedWithZipEl = document.querySelector('#installedWithZip');
 const installedWithTerminalEl = document.querySelector('#installedWithTerminal');
 const willInstallWithStoreEl = document.querySelector('#willInstallWithStore');
 const willInstallWithZipEl = document.querySelector('#willInstallWithZip');
-const willinstallWithTerminalEl = document.querySelector('#willinstallWithTerminal');
+const willInstallWithTerminalEl = document.querySelector('#willInstallWithTerminal');
 const yesNodeV14PlusEl = document.querySelector('#yesNodeV14Plus');
 const noNodeV14PlusEl = document.querySelector('#noNodeV14Plus');
 
@@ -50,7 +50,7 @@ installedWithZipEl.addEventListener('change', main);
 installedWithTerminalEl.addEventListener('change', main);
 willInstallWithStoreEl.addEventListener('change', main);
 willInstallWithZipEl.addEventListener('change', main);
-willinstallWithTerminalEl.addEventListener('change', main);
+willInstallWithTerminalEl.addEventListener('change', main);
 yesNodeV14PlusEl.addEventListener('change', main);
 noNodeV14PlusEl.addEventListener('change', main);
 
@@ -96,7 +96,7 @@ function install(instructions) {
     } else if (willInstallWithZipEl.checked) {
         hasNodeV14PlusEl.setAttribute('hidden', 'hidden');
         installWithZip(instructions);
-    } else if (willinstallWithTerminalEl.checked) {
+    } else if (willInstallWithTerminalEl.checked) {
         hasNodeV14PlusEl.removeAttribute('hidden');
         installWithTerminal(instructions);
     } else {

@@ -249,6 +249,8 @@ async function handleInteraction(tab, message, options = {}, successStatus = 1) 
     ) {
         await showStatus(0, 'Error', 'Stardown cannot run in extension stores');
         return;
+    } else if (tab.url.startsWith('https://support.mozilla.org')) {
+        await showStatus(0, 'Error', 'Stardown cannot run on Mozilla support pages');
     }
 
     message.destination = 'content';

@@ -19,6 +19,12 @@ html {
     font-size: 16pt;
 }
 
+h1 a {
+    text-decoration: none;
+    color: black;
+    margin-left: 20px;
+}
+
 code {
     font-family: monospace;
     background-color: rgb(199, 199, 199);
@@ -47,7 +53,8 @@ li {
         color-scheme: dark;
     }
 
-    body {
+    body,
+    h1 a {
         background-color: #181a1b;
         color: rgb(232, 230, 226);
     }

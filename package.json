@@ -6,8 +6,8 @@
   "scripts": {
     "test": "node --test",
     "md-diff": "echo Open md.diff.html to see test output && nodemon ./test/diffMd.js --ext * --ignore *.diff.html",
-    "dev-firefox": "rollup --config rollup.config.firefox.mjs",
-    "dev-chrome": "rollup --config rollup.config.chrome.mjs"
+    "build-firefox": "rollup --config rollup.config.firefox.mjs",
+    "build-chrome": "rollup --config rollup.config.chrome.mjs"
   },
   "devDependencies": {
     "diff": "^6.0.0-beta",

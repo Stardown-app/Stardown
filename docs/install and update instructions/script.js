@@ -190,7 +190,7 @@ function installWithTerminal(instructions) {
 
     if (isChromium) {
         instructions.steps.push(
-            'Then run <code>npm install && npm run dev-chrome</code>',
+            'Then run <code>npm install && npm run build-chrome</code>',
             'In your browser, open <code>chrome://extensions/</code>',
             'Turn on developer mode',
             'Click "Load unpacked"',
@@ -198,7 +198,7 @@ function installWithTerminal(instructions) {
         );
     } else if (isFirefox) {
         instructions.steps.push(
-            'Then run <code>npm install && npm run dev-firefox</code>',
+            'Then run <code>npm install && npm run build-firefox</code>',
             'In your browser, open <code>about:debugging#/runtime/this-firefox</code>',
             'Click "Load Temporary Add-on..."',
             'Select Stardown\'s <code>firefox/manifest.json</code> file',
@@ -256,14 +256,14 @@ function updateWithTerminal(instructions) {
     if (isChromium) {
         instructions.steps.push(
             'In a terminal, navigate into Stardown\'s folder',
-            'Run <code>git pull && npm install && npm run dev-chrome</code>',
+            'Run <code>git pull && npm install && npm run build-chrome</code>',
             'In your browser, open <code>chrome://extensions/</code>',
             'Click Stardown\'s reload button',
         );
     } else if (isFirefox) {
         instructions.steps.push(
             'In a terminal, navigate into Stardown\'s folder',
-            'Run <code>git pull && npm install && npm run dev-firefox</code>',
+            'Run <code>git pull && npm install && npm run build-firefox</code>',
             'In your browser, open <code>about:debugging#/runtime/this-firefox</code>',
             'Click Stardown\'s reload button',
         );

@@ -1,5 +1,3 @@
-# Stardown docs
-
 - [Install and update instructions](./install%20and%20update%20instructions)
 - [Alternatives to Stardown](./alternatives.md)
 - [Development of Stardown](./develop.md)

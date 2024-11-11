@@ -281,7 +281,10 @@ function showInstructions(instructions) {
         html.push('<ol><li>' + instructions.steps.join('</li><li>') + '</li></ol>');
     }
 
-    instructionsEl.innerHTML = html.join('');
+    instructionsEl.innerHTML = html.join('') + `
+        <br />
+        <a href="https://github.com/Stardown-app/Stardown">Return to GitHub</a>
+    `;
 }
 
 main();

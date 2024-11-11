@@ -251,6 +251,7 @@ async function handleInteraction(tab, message, options = {}, successStatus = 1) 
         return;
     } else if (tab.url.startsWith('https://support.mozilla.org')) {
         await showStatus(0, 'Error', 'Stardown cannot run on Mozilla support pages');
+        return;
     }
 
     message.destination = 'content';

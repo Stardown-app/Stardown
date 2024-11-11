@@ -14,7 +14,7 @@
 </p>
 <p align="center">
     You can also
-    <a href="./docs/install-from-source.md">
+    <a href="https://stardown-app.github.io/Stardown/docs/install%20and%20update%20instructions/">
         install from the source code</a>
     to get updates early or <a href="./docs/develop.md#improving-stardowns-output">customize Stardown's output more than its settings support</a>.
 </p>

@@ -30,7 +30,7 @@ const installedWithZipEl = document.querySelector('#installedWithZip');
 const installedWithTerminalEl = document.querySelector('#installedWithTerminal');
 const willInstallWithStoreEl = document.querySelector('#willInstallWithStore');
 const willInstallWithZipEl = document.querySelector('#willInstallWithZip');
-const willinstallWithTerminalEl = document.querySelector('#willinstallWithTerminal');
+const willInstallWithTerminalEl = document.querySelector('#willInstallWithTerminal');
 const yesNodeV14PlusEl = document.querySelector('#yesNodeV14Plus');
 const noNodeV14PlusEl = document.querySelector('#noNodeV14Plus');
 
@@ -50,7 +50,7 @@ installedWithZipEl.addEventListener('change', main);
 installedWithTerminalEl.addEventListener('change', main);
 willInstallWithStoreEl.addEventListener('change', main);
 willInstallWithZipEl.addEventListener('change', main);
-willinstallWithTerminalEl.addEventListener('change', main);
+willInstallWithTerminalEl.addEventListener('change', main);
 yesNodeV14PlusEl.addEventListener('change', main);
 noNodeV14PlusEl.addEventListener('change', main);
 
@@ -86,17 +86,22 @@ function install(instructions) {
         stardownStoreLinkEl.setAttribute('href', 'https://chrome.google.com/webstore/detail/clicknohlhfdlfjfkaeongkbdgbmkbhb');
     } else if (firefoxEl.checked) {
         stardownStoreLinkEl.setAttribute('href', 'https://addons.mozilla.org/en-US/firefox/addon/stardown/');
+    } else {
+        throw new Error(`Unknown browser`);
     }
 
     willInstallWithEl.removeAttribute('hidden');
     installedWithEl.setAttribute('hidden', 'hidden');
 
     if (willInstallWithStoreEl.checked) {
+        installedWithStoreEl.checked = true;
         navigateToStore();
     } else if (willInstallWithZipEl.checked) {
+        installedWithZipEl.checked = true;
         hasNodeV14PlusEl.setAttribute('hidden', 'hidden');
         installWithZip(instructions);
-    } else if (willinstallWithTerminalEl.checked) {
+    } else if (willInstallWithTerminalEl.checked) {
+        installedWithTerminalEl.checked = true;
         hasNodeV14PlusEl.removeAttribute('hidden');
         installWithTerminal(instructions);
     } else {
@@ -110,10 +115,13 @@ function update(instructions) {
     hasNodeV14PlusEl.setAttribute('hidden', 'hidden');
 
     if (installedWithStoreEl.checked) {
+        willInstallWithStoreEl.checked = true;
         updateWithStore(instructions);
     } else if (installedWithZipEl.checked) {
+        willInstallWithZipEl.checked = true;
         updateWithZip(instructions);
     } else if (installedWithTerminalEl.checked) {
+        willInstallWithTerminalEl.checked = true;
         updateWithTerminal(instructions);
     } else {
         return;
@@ -156,13 +164,10 @@ function installWithZip(instructions) {
 }
 
 function installWithTerminal(instructions) {
-    if (navigator.userAgent.indexOf('Windows') >= 0) {
-        instructions.steps.push('<a href="https://git-scm.com">Install Git</a> if you haven\'t already');
+    if (!yesNodeV14PlusEl.checked && !noNodeV14PlusEl.checked) {
+        return;
     }
-    instructions.steps.push(
-        `In a terminal, run <code>git clone https://github.com/Stardown-app/Stardown.git
-        && cd Stardown</code>`
-    );
+
     if (noNodeV14PlusEl.checked) {
         instructions.steps.push(`
             Install Node v14+ from <a href="https://nodejs.org">nodejs.org</a> or with
@@ -172,6 +177,15 @@ function installWithTerminal(instructions) {
         // v14+ because Stardown uses Rollup for bundling, and Rollup uses features only
         // available in Node v14+.
     }
+    if (navigator.userAgent.indexOf('Windows') >= 0) {
+        instructions.steps.push(
+            '<a href="https://git-scm.com">Install Git</a> if you haven\'t already'
+        );
+    }
+    instructions.steps.push(
+        `In a terminal, run <code>git clone https://github.com/Stardown-app/Stardown.git
+        && cd Stardown</code>`
+    );
 
     if (chromiumEl.checked) {
         instructions.steps.push(

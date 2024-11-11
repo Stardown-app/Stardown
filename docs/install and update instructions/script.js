@@ -80,6 +80,8 @@ function main() {
 
     if (instructions.text || instructions.steps.length > 0) {
         showInstructions(instructions);
+    } else {
+        instructionsEl.setAttribute('hidden', 'hidden');
     }
 }
 

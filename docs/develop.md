@@ -6,10 +6,6 @@ I wrote some general extension development tips in [Making browser extensions](h
 
 Stardown's main goal is to be so simple, fast, reliable, and flexible that people think of it as "it's like Ctrl+C but it keeps formatting". The settings page can have many settings as long as they are well organized, useful, and not so important that many users will be constantly changing them. Stardown's output should render well in at least Obsidian and GitHub, if not also other [markdown renderers and converters](./md-renderers.md).
 
-## Installing Stardown from source for development
-
-See [./dev-install-from-source.md](./dev-install-from-source.md)
-
 ## Tests
 
 Run the tests with `npm run test`.

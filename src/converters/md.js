@@ -109,6 +109,7 @@ export function newEscape(mdSubBrackets) {
             .replaceAll('*', '\\*') // bullet point, bold, italic, horizontal rule
             .replaceAll('`', '\\`') // code, code fence
             .replaceAll('~', '\\~') // strikethrough, code fence
+            .replaceAll('|', '\\|') // tables
             .replaceAll(/^> /g, '\\> ') // quote
             .replaceAll('<', '\\<') // HTML tag
             .replaceAll(/^(=+)/g, '\\$1') // setext header
@@ -1203,7 +1204,7 @@ export class MdConverter {
             for (let x = 0; x < row.length; x++) {
                 const cell = row[x]; // a `<th>` or `<td>` element
                 const cellStr = this.convertNodes(newCtx, cell.childNodes)
-                    .trim().replaceAll(/\s+/g, ' ').replaceAll('|', '\\|');
+                    .trim().replaceAll(/\s+/g, ' ');
                 result.push(` ${cellStr} |`);
             }
 

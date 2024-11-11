@@ -156,6 +156,10 @@ function installWithZip(instructions) {
 }
 
 function installWithTerminal(instructions) {
+    if (!yesNodeV14PlusEl.checked && !noNodeV14PlusEl.checked) {
+        return;
+    }
+
     if (navigator.userAgent.indexOf('Windows') >= 0) {
         instructions.steps.push('<a href="https://git-scm.com">Install Git</a> if you haven\'t already');
     }

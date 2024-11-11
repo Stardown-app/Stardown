@@ -64,7 +64,10 @@ class Instructions {
 function main() {
     const instructions = new Instructions();
 
-    if (isSafari) {
+    if (!isChromium && !isFirefox && !isSafari) {
+        instructions.text = `Unknown browser: ${navigator.userAgent}`;
+        formEl.setAttribute('hidden', 'hidden');
+    } else if (isSafari) {
         instructions.text = 'Safari support coming soon!';
         formEl.setAttribute('hidden', 'hidden');
     } else if (installingEl.checked) {

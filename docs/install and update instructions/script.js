@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+const isWindows = navigator.userAgent.includes('Windows');
+
 const isChromium = navigator.userAgent.includes('Chrome'); // https://developer.mozilla.org/en-US/docs/Web/API/Window/navigator#example_1_browser_detect_and_return_a_string
 const isFirefox = navigator.userAgent.includes('Firefox');
 const isSafari = navigator.userAgent.includes('Safari');
@@ -179,7 +181,7 @@ function installWithTerminal(instructions) {
         // v14+ because Stardown uses Rollup for bundling, and Rollup uses features only
         // available in Node v14+.
     }
-    if (navigator.userAgent.indexOf('Windows') >= 0) {
+    if (isWindows) {
         instructions.steps.push(
             '<a href="https://git-scm.com">Install Git</a> if you haven\'t already'
         );

@@ -38,8 +38,6 @@ const willInstallWithTerminalEl = document.querySelector('#willInstallWithTermin
 const yesNodeV14PlusEl = document.querySelector('#yesNodeV14Plus');
 const noNodeV14PlusEl = document.querySelector('#noNodeV14Plus');
 
-const stardownStoreLinkEl = document.querySelector('#stardownStoreLink');
-
 instructionsEl.setAttribute('hidden', 'hidden');
 installedWithEl.setAttribute('hidden', 'hidden');
 willInstallWithEl.setAttribute('hidden', 'hidden');
@@ -86,20 +84,13 @@ function main() {
 }
 
 function install(instructions) {
-    if (isChromium) {
-        stardownStoreLinkEl.setAttribute('href', 'https://chrome.google.com/webstore/detail/clicknohlhfdlfjfkaeongkbdgbmkbhb');
-    } else if (isFirefox) {
-        stardownStoreLinkEl.setAttribute('href', 'https://addons.mozilla.org/en-US/firefox/addon/stardown/');
-    } else {
-        throw new Error(`Unknown browser`);
-    }
-
     willInstallWithEl.removeAttribute('hidden');
     installedWithEl.setAttribute('hidden', 'hidden');
 
     if (willInstallWithStoreEl.checked) {
         installedWithStoreEl.checked = true;
-        navigateToStore();
+        hasNodeV14PlusEl.setAttribute('hidden', 'hidden');
+        installWithStore(instructions);
     } else if (willInstallWithZipEl.checked) {
         installedWithZipEl.checked = true;
         hasNodeV14PlusEl.setAttribute('hidden', 'hidden');
@@ -132,11 +123,17 @@ function update(instructions) {
     }
 }
 
-function navigateToStore() {
+function installWithStore(instructions) {
     if (isChromium) {
-        location.href = 'https://chrome.google.com/webstore/detail/clicknohlhfdlfjfkaeongkbdgbmkbhb';
+        instructions.text = `
+            <a href="https://chrome.google.com/webstore/detail/clicknohlhfdlfjfkaeongkbdgbmkbhb" target="_blank">
+                Install Stardown from the Chrome Web Store</a>
+        `;
     } else if (isFirefox) {
-        location.href = 'https://addons.mozilla.org/en-US/firefox/addon/stardown/';
+        instructions.text = `
+            <a href="https://addons.mozilla.org/en-US/firefox/addon/stardown/" target="_blank">
+                Install Stardown from Add-ons for Firefox</a>
+        `;
     } else {
         throw new Error(`Unknown browser`);
     }

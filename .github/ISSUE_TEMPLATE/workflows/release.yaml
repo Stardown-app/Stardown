@@ -1,0 +1,47 @@
+name: Build and release .zip files
+
+# [softprops/action-gh-release: GitHub Action for creating GitHub Releases](https://github.com/softprops/action-gh-release)
+# [GitHub Actions](https://github.com/actions)
+# [Store information in variables - GitHub Docs](https://docs.github.com/en/actions/writing-workflows/choosing-what-your-workflow-does/store-information-in-variables#default-environment-variables:~:text=feature%2Dbranch%2D1.-,github_ref_name,-The%20short%20ref)
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: 'npm'
+      - name: Install dependencies
+        run: npm install
+      - name: Build for Firefox
+        run: |
+          npm run build-firefox
+          cp README.md LICENSE firefox
+          cp docs firefox/docs
+          zip -r "stardown-$GITHUB_REF_NAME-firefox.zip" firefox
+      - name: Build for Chrome
+        run: |
+          npm run build-chrome
+          cp README.md LICENSE chrome
+          cp docs chrome/docs
+          zip -r "stardown-$GITHUB_REF_NAME-chrome.zip" chrome
+      - name: Release
+        uses: softprops/action-gh-release@v2
+        if: startsWith(github.ref, 'refs/tags/')
+        with:
+          generate_release_notes: true
+          files: |
+            stardown-$GITHUB_REF_NAME-firefox.zip
+            stardown-$GITHUB_REF_NAME-chrome.zip

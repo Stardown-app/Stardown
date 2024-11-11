@@ -44,5 +44,5 @@ By default, Stardown's output goes to the clipboard. However, you can optionally
 
 ## Developer documentation
 
-- [Permissions | Chrome for Developers](https://developer.chrome.com/docs/extensions/reference/permissions-list)
-- [Request the right permissions | Firefox Extension Workshop](https://extensionworkshop.com/documentation/develop/request-the-right-permissions/)
+- [Permissions \| Chrome for Developers](https://developer.chrome.com/docs/extensions/reference/permissions-list)
+- [Request the right permissions \| Firefox Extension Workshop](https://extensionworkshop.com/documentation/develop/request-the-right-permissions/)

@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+const isWindows = navigator.userAgent.includes('Windows');
+
 const isChromium = navigator.userAgent.includes('Chrome'); // https://developer.mozilla.org/en-US/docs/Web/API/Window/navigator#example_1_browser_detect_and_return_a_string
 const isFirefox = navigator.userAgent.includes('Firefox');
 const isSafari = navigator.userAgent.includes('Safari');
@@ -35,8 +37,6 @@ const willInstallWithZipEl = document.querySelector('#willInstallWithZip');
 const willInstallWithTerminalEl = document.querySelector('#willInstallWithTerminal');
 const yesNodeV14PlusEl = document.querySelector('#yesNodeV14Plus');
 const noNodeV14PlusEl = document.querySelector('#noNodeV14Plus');
-
-const stardownStoreLinkEl = document.querySelector('#stardownStoreLink');
 
 instructionsEl.setAttribute('hidden', 'hidden');
 installedWithEl.setAttribute('hidden', 'hidden');
@@ -64,7 +64,10 @@ class Instructions {
 function main() {
     const instructions = new Instructions();
 
-    if (isSafari) {
+    if (!isChromium && !isFirefox && !isSafari) {
+        instructions.text = `Unknown browser: ${navigator.userAgent}`;
+        formEl.setAttribute('hidden', 'hidden');
+    } else if (isSafari) {
         instructions.text = 'Safari support coming soon!';
         formEl.setAttribute('hidden', 'hidden');
     } else if (installingEl.checked) {
@@ -77,24 +80,19 @@ function main() {
 
     if (instructions.text || instructions.steps.length > 0) {
         showInstructions(instructions);
+    } else {
+        instructionsEl.setAttribute('hidden', 'hidden');
     }
 }
 
 function install(instructions) {
-    if (isChromium) {
-        stardownStoreLinkEl.setAttribute('href', 'https://chrome.google.com/webstore/detail/clicknohlhfdlfjfkaeongkbdgbmkbhb');
-    } else if (isFirefox) {
-        stardownStoreLinkEl.setAttribute('href', 'https://addons.mozilla.org/en-US/firefox/addon/stardown/');
-    } else {
-        throw new Error(`Unknown browser`);
-    }
-
     willInstallWithEl.removeAttribute('hidden');
     installedWithEl.setAttribute('hidden', 'hidden');
 
     if (willInstallWithStoreEl.checked) {
         installedWithStoreEl.checked = true;
-        navigateToStore();
+        hasNodeV14PlusEl.setAttribute('hidden', 'hidden');
+        installWithStore(instructions);
     } else if (willInstallWithZipEl.checked) {
         installedWithZipEl.checked = true;
         hasNodeV14PlusEl.setAttribute('hidden', 'hidden');
@@ -127,11 +125,17 @@ function update(instructions) {
     }
 }
 
-function navigateToStore() {
+function installWithStore(instructions) {
     if (isChromium) {
-        location.href = 'https://chrome.google.com/webstore/detail/clicknohlhfdlfjfkaeongkbdgbmkbhb';
+        instructions.text = `
+            <a href="https://chrome.google.com/webstore/detail/clicknohlhfdlfjfkaeongkbdgbmkbhb" target="_blank">
+                Install Stardown from the Chrome Web Store</a>
+        `;
     } else if (isFirefox) {
-        location.href = 'https://addons.mozilla.org/en-US/firefox/addon/stardown/';
+        instructions.text = `
+            <a href="https://addons.mozilla.org/en-US/firefox/addon/stardown/" target="_blank">
+                Install Stardown from Add-ons for Firefox</a>
+        `;
     } else {
         throw new Error(`Unknown browser`);
     }
@@ -176,7 +180,7 @@ function installWithTerminal(instructions) {
         // v14+ because Stardown uses Rollup for bundling, and Rollup uses features only
         // available in Node v14+.
     }
-    if (navigator.userAgent.indexOf('Windows') >= 0) {
+    if (isWindows) {
         instructions.steps.push(
             '<a href="https://git-scm.com">Install Git</a> if you haven\'t already'
         );
@@ -188,7 +192,7 @@ function installWithTerminal(instructions) {
 
     if (isChromium) {
         instructions.steps.push(
-            'Then run <code>npm install && npm run dev-chrome</code>',
+            'Then run <code>npm install && npm run build-chrome</code>',
             'In your browser, open <code>chrome://extensions/</code>',
             'Turn on developer mode',
             'Click "Load unpacked"',
@@ -196,7 +200,7 @@ function installWithTerminal(instructions) {
         );
     } else if (isFirefox) {
         instructions.steps.push(
-            'Then run <code>npm install && npm run dev-firefox</code>',
+            'Then run <code>npm install && npm run build-firefox</code>',
             'In your browser, open <code>about:debugging#/runtime/this-firefox</code>',
             'Click "Load Temporary Add-on..."',
             'Select Stardown\'s <code>firefox/manifest.json</code> file',
@@ -254,14 +258,14 @@ function updateWithTerminal(instructions) {
     if (isChromium) {
         instructions.steps.push(
             'In a terminal, navigate into Stardown\'s folder',
-            'Run <code>git pull && npm install && npm run dev-chrome</code>',
+            'Run <code>git pull && npm install && npm run build-chrome</code>',
             'In your browser, open <code>chrome://extensions/</code>',
             'Click Stardown\'s reload button',
         );
     } else if (isFirefox) {
         instructions.steps.push(
             'In a terminal, navigate into Stardown\'s folder',
-            'Run <code>git pull && npm install && npm run dev-firefox</code>',
+            'Run <code>git pull && npm install && npm run build-firefox</code>',
             'In your browser, open <code>about:debugging#/runtime/this-firefox</code>',
             'Click Stardown\'s reload button',
         );
@@ -281,7 +285,10 @@ function showInstructions(instructions) {
         html.push('<ol><li>' + instructions.steps.join('</li><li>') + '</li></ol>');
     }
 
-    instructionsEl.innerHTML = html.join('');
+    instructionsEl.innerHTML = html.join('') + `
+        <br />
+        <a href="https://github.com/Stardown-app/Stardown">Return to GitHub</a>
+    `;
 }
 
 main();

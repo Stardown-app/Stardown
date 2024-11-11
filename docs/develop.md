@@ -55,7 +55,7 @@ Stardown converts HTML to other formats using custom code explained in [../src/c
 
 ## Text fragments
 
-Text fragments and how to generate them is explained in [Text fragments | MDN](https://developer.mozilla.org/en-US/docs/Web/URI/Fragment/Text_fragments) and in [Boldly link where no one has linked before: Text Fragments | web.dev](https://web.dev/articles/text-fragments#programmatic_text_fragment_link_generation). The second article mentions [a minified version of the text fragment generation code](https://unpkg.com/text-fragments-polyfill@5.7.0/dist/fragment-generation-utils.js), but Stardown doesn't use the minified version because extension stores need to be able to review the code and minifying code doesn't really help extensions.
+Text fragments and how to generate them is explained in [Text fragments \| MDN](https://developer.mozilla.org/en-US/docs/Web/URI/Fragment/Text_fragments) and in [Boldly link where no one has linked before: Text Fragments \| web.dev](https://web.dev/articles/text-fragments#programmatic_text_fragment_link_generation). The second article mentions [a minified version of the text fragment generation code](https://unpkg.com/text-fragments-polyfill@5.7.0/dist/fragment-generation-utils.js), but Stardown doesn't use the minified version because extension stores need to be able to review the code and minifying code doesn't really help extensions.
 
 Stardown's text fragment generation code, which was almost entirely written by Google, is in the files named `text-fragment-utils.js` and `fragment-generation-utils.js`. They probably should not be changed for anything except fixing bugs or updating to new versions of text fragments.
 

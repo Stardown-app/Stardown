@@ -34,7 +34,7 @@ jobs:
           cp -r docs firefox/docs
           cd firefox
           echo "Zipping folder into stardown-${{ github.ref_name }}-firefox.zip"
-          zip -r "stardown-${{ github.ref_name }}-firefox.zip" firefox
+          zip -r "stardown-${{ github.ref_name }}-firefox.zip" .
       - name: Build for Chrome
         run: |
           npm run build-chrome

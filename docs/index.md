@@ -1,4 +1,4 @@
-- [Install and update instructions](./install%20and%20update%20instructions)
+- [Install-and-update-instructions](./install-and-update-instructions)
 - [Alternatives to Stardown](./alternatives.md)
 - [Development of Stardown](./develop.md)
 - [Execution contexts](./execution-contexts.md)

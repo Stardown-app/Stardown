@@ -96,6 +96,8 @@ function main() {
     } else {
         instructionsEl.setAttribute('hidden', 'hidden');
     }
+
+    window.scrollTo(0, document.body.scrollHeight);
 }
 
 function install(instructions) {

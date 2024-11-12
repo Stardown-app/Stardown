@@ -157,8 +157,8 @@ function installWithStore(instructions) {
 function installWithZip(instructions) {
     if (chromiumEl.checked) {
         instructions.steps.push(
-            // TODO: link to the zip file of the built code
-            `<a href="">Click here to download the .zip file</a>`,
+            `<a href="https://github.com/Stardown-app/Stardown/releases/latest" target="_blank">
+                Download the chrome.zip file</a>`,
             'Unzip the .zip file',
             'In your browser, open <code>chrome://extensions/</code>',
             'Turn on developer mode',
@@ -167,8 +167,8 @@ function installWithZip(instructions) {
         );
     } else if (firefoxEl.checked) {
         instructions.steps.push(
-            // TODO: link to the zip file of the built code
-            `<a href="">Click here to download the .zip file</a>`,
+            `<a href="https://github.com/Stardown-app/Stardown/releases/latest" target="_blank">
+                Download the firefox.zip file</a>`,
             'Unzip the .zip file',
             'In your browser, open <code>about:debugging#/runtime/this-firefox</code>',
             'Click "Load Temporary Add-on..."',
@@ -244,8 +244,8 @@ function updateWithStore(instructions) {
 function updateWithZip(instructions) {
     if (chromiumEl.checked) {
         instructions.steps.push(
-            // TODO: link to the zip file of the built code
-            `<a href="">Click here to download a new .zip file</a>`,
+            `<a href="https://github.com/Stardown-app/Stardown/releases/latest" target="_blank">
+                Download a new chrome.zip file</a>`,
             'Unzip the .zip file',
             'In your browser, open <code>chrome://extensions/</code>',
             'Remove Stardown',
@@ -254,8 +254,8 @@ function updateWithZip(instructions) {
         );
     } else if (firefoxEl.checked) {
         instructions.steps.push(
-            // TODO: link to the zip file of the built code
-            `<a href="">Click here to download a new .zip file</a>`,
+            `<a href="https://github.com/Stardown-app/Stardown/releases/latest" target="_blank">
+                Download a new firefox.zip file</a>`,
             'Unzip the .zip file',
             'In your browser, open <code>about:debugging#/runtime/this-firefox</code>',
             'Remove Stardown',

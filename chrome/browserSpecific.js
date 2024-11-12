@@ -155,7 +155,7 @@ export async function handleCopyRequest(text) {
     try {
         await navigator.clipboard.writeText(text);
     } catch (err) {
-        console.error('navigator.clipboard.writeText:', err);
+        console.error('navigator.clipboard.writeText:', err.message);
         console.log('Using fallback method to write text to the clipboard.');
 
         const textarea = document.createElement('textarea');

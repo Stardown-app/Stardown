@@ -35,6 +35,59 @@
     </header>
 
     <main>
+      <noscript>
+        <p>
+          You can install Stardown from
+          <a href="https://chrome.google.com/webstore/detail/clicknohlhfdlfjfkaeongkbdgbmkbhb" target="_blank">
+            the Chrome Web Store</a>
+          or from
+          <a href="https://addons.mozilla.org/en-US/firefox/addon/stardown/" target="_blank">
+            Add-ons for Firefox</a>.
+        </p>
+        <p>If you would prefer to install from source, there are two methods:</p>
+        <h2>
+          Install with <a href="https://git-scm.com">Git</a>
+          and <a href="https://nodejs.org">Node v14+</a>
+        </h2>
+        <ol>
+          <li>
+            Run <code>git clone https://github.com/Stardown-app/Stardown.git && cd stardown</code>
+          </li>
+          <li>
+            Run <code>npm install</code>
+          </li>
+          <li>
+            Then run <code>npm run build-firefox</code> for Firefox or <code>npm run
+              build-chrome</code> for a Chromium browser (Chrome, Edge, Brave, Vivaldi, Opera, Arc, etc.)
+          </li>
+          <li>
+            In your browser, open <code>about:debugging#/runtime/this-firefox</code>
+            in Firefox or <code>chrome://extensions/</code> in a Chromium browser
+          </li>
+          <li>If you're using a Chromium browser, turn on developer mode</li>
+          <li>Click "Load Temporary Add-on..." or "Load unpacked"</li>
+          <li>
+            If in Firefox, select Stardown's <code>firefox/manifest.json</code> file.
+            If in a Chromium browser, select Stardown's <code>chrome</code> folder.
+          </li>
+        </ol>
+        <h2>Install with a .zip file</h2>
+        <ol>
+          <li>
+            <a href="https://github.com/Stardown-app/Stardown/releases/latest" target="_blank">
+              Download the .zip file</a> named after your browser
+          </li>
+          <li>Unzip the .zip file</li>
+          <li>
+            If in Firefox, select the <code>manifest.json</code> file.
+            If in a Chromium browser, select the folder.
+          </li>
+        </ol>
+        <hr />
+        <p>The form below only works when JavaScript is enabled.</p>
+        <hr />
+      </noscript>
+
       <form>
         <fieldset>
           <div class="option">
@@ -45,6 +98,25 @@
           <div class="option">
             <input type="radio" id="updating" name="installingOrUpdating" value="updating" />
             <label for="updating">Update Stardown</label>
+          </div>
+        </fieldset>
+
+        <fieldset>
+          <legend>Browser</legend>
+
+          <div class="option">
+            <input type="radio" id="chromium" name="browser" value="chromium" checked />
+            <label for="chromium">Chromium (Chrome, Edge, Brave, Vivaldi, Opera, Arc, etc.)</label>
+          </div>
+
+          <div class="option">
+            <input type="radio" id="firefox" name="browser" value="firefox" />
+            <label for="firefox">Firefox</label>
+          </div>
+
+          <div class="option">
+            <input type="radio" id="safari" name="browser" value="safari" />
+            <label for="safari">Safari</label>
           </div>
         </fieldset>
 

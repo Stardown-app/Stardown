@@ -28,14 +28,24 @@ jobs:
       - name: Build for Firefox
         run: |
           npm run build-firefox
+          echo "Copying readme and license into folder"
           cp README.md LICENSE firefox
+          echo "Copying docs into folder"
           cp -r docs firefox/docs
+          echo "$GITHUB_REF_NAME"
+          echo "${{ github.ref_name }}"
+          echo "stardown-$GITHUB_REF_NAME-firefox.zip"
+          echo "stardown-${{ github.ref_name }}-firefox.zip"
+          echo "Zipping folder"
           zip -r "stardown-$GITHUB_REF_NAME-firefox.zip" firefox
       - name: Build for Chrome
         run: |
           npm run build-chrome
+          echo "Copying readme and license into folder"
           cp README.md LICENSE chrome
+          echo "Copying docs into folder"
           cp -r docs chrome/docs
+          echo "Zipping folder"
           zip -r "stardown-$GITHUB_REF_NAME-chrome.zip" chrome
       - name: Release
         uses: softprops/action-gh-release@v2

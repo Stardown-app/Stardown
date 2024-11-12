@@ -29,13 +29,13 @@ jobs:
         run: |
           npm run build-firefox
           cp README.md LICENSE firefox
-          cp docs firefox/docs
+          cp -r docs firefox/docs
           zip -r "stardown-$GITHUB_REF_NAME-firefox.zip" firefox
       - name: Build for Chrome
         run: |
           npm run build-chrome
           cp README.md LICENSE chrome
-          cp docs chrome/docs
+          cp -r docs chrome/docs
           zip -r "stardown-$GITHUB_REF_NAME-chrome.zip" chrome
       - name: Release
         uses: softprops/action-gh-release@v2

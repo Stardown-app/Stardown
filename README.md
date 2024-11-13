@@ -21,8 +21,8 @@
 
 <p align="center"><img alt="demo gif" src="https://github.com/Stardown-app/assets/blob/main/Stardown.gif"></p>
 
-* Press `Alt+C` to copy a selection or a page's link.
-* Press `Alt+N` to open a notepad that copying with `Alt+C` automatically pastes into.
+* Press `Alt+C` (Mac: `⌥+C`) to copy a selection or a page's link.
+* Press `Alt+N` (Mac: `⌥+N`) to open a notepad that copying with Stardown automatically pastes into.
 * Right-click part of a page to copy it as markdown. Select before right-clicking to copy multiple parts.
 * Copy links for all tabs. Select tabs first to copy links for only those tabs.
 * Customize these features including keyboard shortcuts in Stardown's settings.
@@ -54,7 +54,7 @@ Also, please read [./docs/develop.md](docs/develop.md).
 Stardown is:
 
 * **Flexible**. Integrates well with many workflows. Select almost anything, copy and paste anywhere.
-* **Instantly clip** into a note using Stardown's sidebar notepad to both copy and paste with `Alt+C`.
+* **Instantly clip** into a note using Stardown's sidebar notepad to both copy and paste with `Alt+C` (Mac: `⌥+C`).
 * **Better at converting**. Stardown's custom code for converting HTML to markdown can convert more formatting than alternatives.
 * **Creates [text fragments](https://developer.mozilla.org/en-US/docs/Web/URI/Fragment/Text_fragments)** so you can link to specific parts of pages.
 * **Extensible**. Stardown is designed to be extended for more markdown flavors and other markup languages.

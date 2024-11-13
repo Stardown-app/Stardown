@@ -18,6 +18,8 @@ You can use this [bookmarklet](https://en.wikipedia.org/wiki/Bookmarklet) I made
 * [Readwise](https://readwise.io/) can sync highlights from websites, Kindles, iBooks, and more.
 * [Roam Highlighter](https://chromewebstore.google.com/detail/roam-highlighter/hponfflfgcjikmehlcdcnpapicnljkkc?pli=1)
 * [Zotero](https://www.zotero.org/) is one of the best tools for saving and organizing research.
+* [Notion Web Clipper](https://www.notion.so/web-clipper)
+* [Evernote Web Clipper](https://evernote.com/features/webclipper)
 * [Joplin](https://github.com/laurent22/joplin) has an [official web clipper](https://github.com/laurent22/joplin/blob/dev/readme/apps/clipper.md) of its own.
 * [HTML to React & Figma by Magic Patterns](https://chromewebstore.google.com/detail/html-to-react-figma-by-ma/chgehghmhgihgmpmdjpolhkcnhkokdfp)
 * [SiYuan](https://github.com/siyuan-note/siyuan) also has an [official web clipper](https://github.com/siyuan-note/siyuan-chrome).

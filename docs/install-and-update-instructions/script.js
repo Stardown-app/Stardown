@@ -51,6 +51,9 @@ safariEl.checked = (
     !chromiumEl.checked &&
     !firefoxEl.checked
 );
+if (!chromiumEl.checked && !firefoxEl.checked && !safariEl.checked) {
+    chromiumEl.checked = true;
+}
 
 chromiumEl.addEventListener('change', main);
 firefoxEl.addEventListener('change', main);
@@ -76,19 +79,17 @@ class Instructions {
 function main() {
     const instructions = new Instructions();
 
-    if (chromiumEl.checked || firefoxEl.checked || safariEl.checked) {
-        if (safariEl.checked) {
-            instructions.text = 'Safari support coming soon!';
-            willInstallWithEl.setAttribute('hidden', 'hidden');
-            installedWithEl.setAttribute('hidden', 'hidden');
-            hasNodeV14PlusEl.setAttribute('hidden', 'hidden');
-        } else if (installingEl.checked) {
-            install(instructions);
-        } else if (updatingEl.checked) {
-            update(instructions);
-        } else {
-            throw new Error('Neither installing nor updating');
-        }
+    if (safariEl.checked) {
+        instructions.text = 'Safari support coming soon!';
+        willInstallWithEl.setAttribute('hidden', 'hidden');
+        installedWithEl.setAttribute('hidden', 'hidden');
+        hasNodeV14PlusEl.setAttribute('hidden', 'hidden');
+    } else if (installingEl.checked) {
+        install(instructions);
+    } else if (updatingEl.checked) {
+        update(instructions);
+    } else {
+        throw new Error('Neither installing nor updating');
     }
 
     if (instructions.text || instructions.steps.length > 0) {

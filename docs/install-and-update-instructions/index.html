@@ -90,74 +90,72 @@
 
       <form>
         <fieldset>
-          <div class="option">
-            <input type="radio" id="installing" name="installingOrUpdating" value="installing" checked />
-            <label for="installing">Install Stardown</label>
-          </div>
-
-          <div class="option">
-            <input type="radio" id="updating" name="installingOrUpdating" value="updating" />
-            <label for="updating">Update Stardown</label>
-          </div>
+          <ul>
+            <li>
+              <input type="radio" id="installing" name="installingOrUpdating" value="installing" checked />
+              <label for="installing">Install Stardown</label>
+            </li>
+            <li>
+              <input type="radio" id="updating" name="installingOrUpdating" value="updating" />
+              <label for="updating">Update Stardown</label>
+            </li>
+          </ul>
         </fieldset>
 
         <fieldset>
           <legend>Browser</legend>
-
-          <div class="option">
-            <input type="radio" id="chromium" name="browser" value="chromium" checked />
-            <label for="chromium">Chromium (Chrome, Edge, Brave, Vivaldi, Opera, Arc, etc.)</label>
-          </div>
-
-          <div class="option">
-            <input type="radio" id="firefox" name="browser" value="firefox" />
-            <label for="firefox">Firefox</label>
-          </div>
-
-          <div class="option">
-            <input type="radio" id="safari" name="browser" value="safari" />
-            <label for="safari">Safari</label>
-          </div>
+          <ul>
+            <li>
+              <input type="radio" id="chromium" name="browser" value="chromium" checked />
+              <label for="chromium">Chromium (Chrome, Edge, Brave, Vivaldi, Opera, Arc, etc.)</label>
+            </li>
+            <li>
+              <input type="radio" id="firefox" name="browser" value="firefox" />
+              <label for="firefox">Firefox</label>
+            </li>
+            <li>
+              <input type="radio" id="safari" name="browser" value="safari" />
+              <label for="safari">Safari</label>
+            </li>
+          </ul>
         </fieldset>
 
         <!-- if updating -->
         <fieldset id="installedWith">
           <legend>How did you install Stardown?</legend>
-
-          <div class="option">
-            <input type="radio" id="installedWithStore" name="installedWith" value="installedWithStore" />
-            <label for="installedWithStore">extension store</label>
-          </div>
-
-          <div class="option">
-            <input type="radio" id="installedWithZip" name="installedWith" value="installedWithZip" />
-            <label for="installedWithZip">with a .zip file</label>
-          </div>
-
-          <div class="option">
-            <input type="radio" id="installedWithTerminal" name="installedWith" value="installedWithTerminal" />
-            <label for="installedWithTerminal">with a terminal</label>
-          </div>
+          <ul>
+            <li>
+              <input type="radio" id="installedWithStore" name="installedWith" value="installedWithStore" />
+              <label for="installedWithStore">extension store</label>
+            </li>
+            <li>
+              <input type="radio" id="installedWithZip" name="installedWith" value="installedWithZip" />
+              <label for="installedWithZip">with a .zip file</label>
+            </li>
+            <li>
+              <input type="radio" id="installedWithTerminal" name="installedWith" value="installedWithTerminal" />
+              <label for="installedWithTerminal">with a terminal</label>
+            </li>
+          </ul>
         </fieldset>
 
         <!-- if installing -->
         <fieldset id="willInstallWith">
           <legend>How would you like to install Stardown?</legend>
-
-          <div class="option">
-            <input type="radio" id="willInstallWithStore" name="willInstallWith" value="willInstallWithStore" />
-            <label for="willInstallWithStore">extension store</label>
-          </div>
-
-          <div class="option">
-            <input type="radio" id="willInstallWithZip" name="willInstallWith" value="willInstallWithZip" />
-            <label for="willInstallWithZip">with a .zip file</label>
-          </div>
-
-          <div class="option">
-            <input type="radio" id="willInstallWithTerminal" name="willInstallWith" value="willInstallWithTerminal" />
-            <label for="willInstallWithTerminal">with a terminal</label>
-          </div>
+          <ul>
+            <li>
+              <input type="radio" id="willInstallWithStore" name="willInstallWith" value="willInstallWithStore" />
+              <label for="willInstallWithStore">extension store</label>
+            </li>
+            <li>
+              <input type="radio" id="willInstallWithZip" name="willInstallWith" value="willInstallWithZip" />
+              <label for="willInstallWithZip">with a .zip file</label>
+            </li>
+            <li>
+              <input type="radio" id="willInstallWithTerminal" name="willInstallWith" value="willInstallWithTerminal" />
+              <label for="willInstallWithTerminal">with a terminal</label>
+            </li>
+          </ul>
         </fieldset>
 
         <!-- if installing and using a terminal -->
@@ -165,16 +163,16 @@
           <legend>Do you have Node v14+ installed? You can check with <code>node --version</code></legend>
           <!-- v14+ because Stardown uses Rollup for bundling, and Rollup uses features
           only available in Node v14+. -->
-
-          <div class="option">
-            <input type="radio" id="yesNodeV14Plus" name="hasNodeV14Plus" value="yesNodeV14Plus" />
-            <label for="yesNodeV14Plus">yes</label>
-          </div>
-
-          <div class="option">
-            <input type="radio" id="noNodeV14Plus" name="hasNodeV14Plus" value="noNodeV14Plus" />
-            <label for="noNodeV14Plus">no</label>
-          </div>
+          <ul>
+            <li>
+              <input type="radio" id="yesNodeV14Plus" name="hasNodeV14Plus" value="yesNodeV14Plus" />
+              <label for="yesNodeV14Plus">yes</label>
+            </li>
+            <li>
+              <input type="radio" id="noNodeV14Plus" name="hasNodeV14Plus" value="noNodeV14Plus" />
+              <label for="noNodeV14Plus">no</label>
+            </li>
+          </ul>
         </fieldset>
       </form>
 

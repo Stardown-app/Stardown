@@ -18,13 +18,14 @@ You can use this [bookmarklet](https://en.wikipedia.org/wiki/Bookmarklet) I made
 * [Readwise](https://readwise.io/) can sync highlights from websites, Kindles, iBooks, and more.
 * [Roam Highlighter](https://chromewebstore.google.com/detail/roam-highlighter/hponfflfgcjikmehlcdcnpapicnljkkc?pli=1)
 * [Zotero](https://www.zotero.org/) is one of the best tools for saving and organizing research.
-* [Joplin](https://github.com/laurent22/joplin) has an [official web clipper](https://github.com/laurent22/joplin/blob/dev/readme/apps/clipper.md) of its own.
+* [Notion Web Clipper](https://www.notion.so/web-clipper)
+* [Evernote Web Clipper](https://evernote.com/features/webclipper)
+* [Joplin web clipper](https://github.com/laurent22/joplin/blob/dev/readme/apps/clipper.md)
 * [HTML to React & Figma by Magic Patterns](https://chromewebstore.google.com/detail/html-to-react-figma-by-ma/chgehghmhgihgmpmdjpolhkcnhkokdfp)
-* [SiYuan](https://github.com/siyuan-note/siyuan) also has an [official web clipper](https://github.com/siyuan-note/siyuan-chrome).
+* [SiYuan web clipper](https://github.com/siyuan-note/siyuan-chrome)
 * [Send To Logseq](https://chromewebstore.google.com/detail/send-to-logseq/mgdccnefjlmhnfbmlnhddoogimbpmilj) is a browser extension that saves web pages to [Logseq](https://github.com/logseq/logseq?tab=readme-ov-file).
 * [github.com/jsartelle/vscode-web-clipper](https://github.com/jsartelle/vscode-web-clipper) is a VS Code extension.
 * [github.com/webclipper/web-clipper](https://github.com/webclipper/web-clipper) can integrate directly with Obsidian, Notion, OneNote, Bear, Yuque, Joplin, and more.
-* [Obsidian Web Clipper Bookmarklet](https://gist.github.com/kepano/90c05f162c37cf730abb8ff027987ca3) is a bookmarklet for saving web pages directly to Obsidian.
 * [Slurp](https://github.com/inhumantsar/slurp) is an Obsidian community plugin and bookmarklet for saving web pages directly to Obsidian.
 * [import-github-readme](https://github.com/chasebank87/import-github-readme) is an Obsidian plugin for downloading GitHub readme files directly into Obsidian.
 

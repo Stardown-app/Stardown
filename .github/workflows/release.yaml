@@ -1,4 +1,4 @@
-name: Build and release .zip files
+name: Build and release zip files
 
 # [softprops/action-gh-release: GitHub Action for creating GitHub Releases](https://github.com/softprops/action-gh-release)
 # [GitHub Actions](https://github.com/actions)

@@ -11,7 +11,7 @@
   },
   "devDependencies": {
     "diff": "^6.0.0-beta",
-    "jsdom": "^24.1.0",
+    "jsdom": "^25.0.1",
     "rollup": "^4.18.0",
     "rollup-plugin-copy": "^3.5.0",
     "rollup-plugin-delete": "^2.0.0"

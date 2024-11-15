@@ -1293,15 +1293,13 @@ export class MdConverter {
             return '';
         }
 
-        const checked = el.getAttribute('checked') !== null;
-
         /** @type {string[]} */
         const result = [];
 
         if (!ctx.inList) {
             result.push('\n' + ctx.mdBulletPoint + ' ');
         }
-        if (checked) {
+        if (el.checked) {
             result.push('[x] ');
         } else {
             result.push('[ ] ');

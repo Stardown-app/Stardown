@@ -217,7 +217,10 @@ export class MdConverter {
         /** @type {string[]} */
         const result = ['\n\n'];
         result.push(
-            this.convertNodes(newCtx, el.childNodes).trim().replaceAll(/\n\s*\n\s*/g, '\n\n')
+            this.convertNodes(newCtx, el.childNodes)
+                .trim()
+                .replaceAll(/\n\s*\n\s*/g, '\n\n')
+                .replace(/^([-+*] \[[xX ]\] ) /, '$1')
         );
         if (!ctx.inList) {
             result.push('\n\n');
@@ -552,6 +555,7 @@ export class MdConverter {
                     .replace(/^\n+/, '')
                     .replace(/ \n/, '\n')
                     .replace(/ $/, '')
+                    .replace(/^(\[[xX ]\] ) /, '$1')
             );
             if (!ctx.inList || i < children.length - 2) {
                 result.push('\n');
@@ -578,7 +582,10 @@ export class MdConverter {
         /** @type {string[]} */
         const result = ['\n\n'];
         result.push(
-            this.convertNodes(newCtx, el.childNodes).trim().replaceAll(/\n\s+/g, '\n')
+            this.convertNodes(newCtx, el.childNodes)
+                .trim()
+                .replaceAll(/\n\s+/g, '\n')
+                .replace(/^([-+*] \[[xX ]\] ) /, '$1')
         );
         if (!ctx.inList) {
             result.push('\n\n');
@@ -1278,7 +1285,7 @@ export class MdConverter {
     /** @type {ElementConverter} */
     convertINPUT(ctx, el) {
         const type = el.getAttribute('type');
-        if (type !== 'checkbox') {
+        if (type !== 'checkbox' && type !== 'radio') {
             return '';
         }
         const ariaHasPopup = el.getAttribute('aria-haspopup');

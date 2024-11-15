@@ -52,6 +52,10 @@
   <p><input type="checkbox">Checkbox on its own</p>
   <p><input type="checkbox" checked>Checked checkbox on its own</p>
   <p><input id="confirm" type="checkbox"><label for="confirm">Checkbox with label</label></p>
+  <p>
+    <input id="confirm2" type="checkbox">
+    <label for="confirm2">Checkbox with label on following line</label>
+  </p>
   <p><input type="checkbox" aria-haspopup="true"></p>
   <p>
     <div><input type="checkbox">feel</div>
@@ -299,4 +303,21 @@ int main() {
         <td>
             <p>This is a comment.</p></td></tr></tbody></table></task-lists></div>
   <font face="Verdana">The font element is still used sometimes even though it's deprecated.</font>
+  <ul>
+    <li>
+      <input id="option-a" type="radio" name="options" value="option-a" checked />
+      <label for="option-a">Option A</label>
+    </li>
+    <li>
+      <input id="option-b" type="radio" name="options" value="option-b" />
+      <label for="option-b">Option B</label>
+    </li>
+  </ul>
+  <div>
+    <input id="option-1" type="radio" name="options" value="option-1" />
+    <label for="option-1">Choice 1</label>
+  </div>
+  <div>
+    <input id="option-2" type="radio" name="options" value="option-2" checked /><label for="option-2">Choice 2</label>
+  </div>
 </body>

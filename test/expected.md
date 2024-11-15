@@ -71,6 +71,8 @@ anchor with no href
 
 - [ ] Checkbox with label
 
+- [ ] Checkbox with label on following line
+
 - [ ] feel
 
 - [ ] seek
@@ -261,3 +263,10 @@ seven eight
 This is a comment.
 
 The font element is still used sometimes even though it's deprecated.
+
+- [x] Option A
+- [ ] Option B
+
+- [ ] Choice 1
+
+- [x] Choice 2

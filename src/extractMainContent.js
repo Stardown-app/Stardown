@@ -30,6 +30,9 @@ export async function extractMainContent(frag, location) {
         newFrag = extractWikipediaArticle(frag);
     } else if (location.href.match(/^https:\/\/github\.com\/[^/]+\/[^/]+\/issues\/\d+/)) {
         newFrag = extractGithubIssue(frag);
+    } else if (location.hostname === 'news.ycombinator.com') {
+        // Running Readability.js on HN removes all comments, so prevent that.
+        return frag;
     }
     if (newFrag) {
         return newFrag;

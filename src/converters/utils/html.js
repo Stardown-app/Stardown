@@ -113,10 +113,19 @@ const inlineElementNames = [
 export async function improveConvertibility(frag, location) {
     if (location.hostname === 'news.ycombinator.com') {
         // add the presentation role to every table
-        const tables = frag.querySelectorAll('table');
-        for (let i = 0; i < tables.length; i++) {
-            tables[i].setAttribute('role', 'presentation');
-        }
+        frag.querySelectorAll('table').forEach(
+            table => table.setAttribute('role', 'presentation')
+        );
+    } else if (location.hostname.match(/^(.+\.)?wikipedia\.org/)) {
+        // remove each image of math and unhide its corresponding math element
+        frag.querySelectorAll(
+            'img.mwe-math-fallback-image-display,img.mwe-math-fallback-image-inline'
+        ).forEach(
+            img => img.remove()
+        );
+        frag.querySelectorAll('span.mwe-math-mathml-display').forEach(span => {
+            span.setAttribute('style', 'display: block');
+        });
     }
 }
 

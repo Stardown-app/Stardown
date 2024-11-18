@@ -201,9 +201,11 @@ export class MdConverter {
     /** @type {ElementConverter} */
     convertElement(ctx, el) {
         // [Element: tagName property | MDN](https://developer.mozilla.org/en-US/docs/Web/API/Element/tagName)
+        // Some of the documentation is incorrect; the value of tagName is sometimes
+        // lowercase in HTML documents!
 
         /** @type {ElementConverter} */
-        const convert = this['convert' + el.tagName];
+        const convert = this['convert' + el.tagName.toUpperCase()];
         if (convert === undefined) {
             return this.convertNodes(ctx, el.childNodes);
         }
@@ -1131,7 +1133,16 @@ export class MdConverter {
 
     /** @type {ElementConverter} */
     convertMATH(ctx, el) {
-        return '';
+        const alttext = el.getAttribute('alttext') || '';
+        if (!alttext) {
+            return '';
+        }
+
+        const display = el.getAttribute('display') || '';
+        if (display === 'block') {
+            return '\n\n$$\n' + alttext + '\n$$\n\n';
+        }
+        return '$' + alttext + '$';
     }
 
     // scripting elements

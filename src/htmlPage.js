@@ -51,7 +51,7 @@ async function createPageText() {
             frag = await extractMainContent(frag, location);
         }
 
-        await improveConvertibility(frag, location.hostname);
+        await improveConvertibility(frag, location);
 
         absolutizeNodeUrls(frag, location.href);
 
@@ -133,7 +133,7 @@ async function getSourceFormatMd(markupLanguage) {
         frag = await extractMainContent(frag, location);
     }
 
-    await improveConvertibility(frag, location.hostname);
+    await improveConvertibility(frag, location);
 
     switch (markupLanguage) {
         case 'markdown':

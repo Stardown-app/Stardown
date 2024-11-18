@@ -107,18 +107,16 @@ const inlineElementNames = [
  * improveConvertibility may modify a document fragment depending on the website to make
  * it more likely to convert to other markup languages well.
  * @param {DocumentFragment} frag
- * @param {string} hostname
+ * @param {Location} location
  * @returns {Promise<void>}
  */
-export async function improveConvertibility(frag, hostname) {
-    switch (hostname) {
-        case 'news.ycombinator.com':
-            // add the presentation role to every table
-            const tables = frag.querySelectorAll('table');
-            for (let i = 0; i < tables.length; i++) {
-                tables[i].setAttribute('role', 'presentation');
-            }
-            break;
+export async function improveConvertibility(frag, location) {
+    if (location.hostname === 'news.ycombinator.com') {
+        // add the presentation role to every table
+        const tables = frag.querySelectorAll('table');
+        for (let i = 0; i < tables.length; i++) {
+            tables[i].setAttribute('role', 'presentation');
+        }
     }
 }
 

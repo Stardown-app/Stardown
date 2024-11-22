@@ -15,17 +15,18 @@
 */
 
 import { getSetting } from './getSetting.js';
-import { sendToNotepad, applyTemplate, removeIdAndTextFragment } from './contentUtils.js';
+import {
+    sendToNotepad, handleCopyRequest, applyTemplate, removeIdAndTextFragment,
+} from './contentUtils.js';
 import { extractMainContent } from './extractMainContent.js';
 import { improveConvertibility } from './converters/utils/html.js';
 import { absolutizeNodeUrls } from './converters/utils/urls.js';
 import * as md from './generators/md.js';
 import { htmlToMd, mdEncodeUri } from './converters/md.js';
 import { htmlToMdAndHtml } from './converters/mdAndHtml.js';
-import { handleCopyRequest } from './browserSpecific.js';
 
 /**
- * @typedef {import('./content.js').ContentResponse} ContentResponse
+ * @typedef {import('./contentUtils.js').ContentResponse} ContentResponse
  */
 
 /**

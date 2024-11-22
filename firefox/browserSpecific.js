@@ -150,30 +150,3 @@ export function updateContextMenuLanguage(markupLanguage) {
         title: `Copy ${markupLanguage} of audio`,
     });
 }
-
-/**
- * @typedef {import('../src/content.js').ContentResponse} ContentResponse
- */
-
-/**
- * handleCopyRequest writes text to the clipboard and returns a content response object.
- * @param {string} text - the text to copy to the clipboard.
- * @returns {Promise<ContentResponse>}
- */
-export async function handleCopyRequest(text) {
-    try {
-        await navigator.clipboard.writeText(text);
-    } catch (err) {
-        console.error(err);
-        return {
-            status: 0, // failure
-            notifTitle: 'Failed to copy text',
-            notifBody: err.message,
-        };
-    }
-    return {
-        status: 1, // successfully copied one item
-        notifTitle: 'Text copied',
-        notifBody: 'Your text can now be pasted',
-    };
-}

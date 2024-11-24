@@ -10,7 +10,8 @@ You can use this [bookmarklet](https://en.wikipedia.org/wiki/Bookmarklet) I made
 
 ## Integrate directly with an editor
 
-* [Obsidian Clipper](https://github.com/obsidianmd/obsidian-clipper) is the official web clipper extension for Obsidian.
+* Some editors like Word and Obsidian try to convert pasted HTML automatically, but the result often has formatting errors and important parts missing because they can only see what's in the clipboard. Converting correctly often requires seeing more than just what was selected, which browser extensions can do.
+* [Obsidian Clipper](https://github.com/obsidianmd/obsidian-clipper)
 * [Notion Web Clipper](https://www.notion.so/web-clipper)
 * [Evernote Web Clipper](https://evernote.com/features/webclipper)
 * [Joplin web clipper](https://github.com/laurent22/joplin/blob/dev/readme/apps/clipper.md)
@@ -21,7 +22,7 @@ You can use this [bookmarklet](https://en.wikipedia.org/wiki/Bookmarklet) I made
 * [linkding](https://github.com/sissbruecker/linkding) is a self-hosted bookmarks manager.
 * [Raindrop.io](https://raindrop.io/) is an online bookmarks manager.
 * [Readwise](https://readwise.io/) can sync highlights from websites, Kindles, iBooks, and more.
-* [Zotero](https://www.zotero.org/) is one of the best tools for saving and organizing research.
+* [Zotero](https://www.zotero.org/) is one of the best tools for saving and organizing research articles and citations.
 * [HTML to React & Figma by Magic Patterns](https://chromewebstore.google.com/detail/html-to-react-figma-by-ma/chgehghmhgihgmpmdjpolhkcnhkokdfp)
 * [Send To Logseq](https://chromewebstore.google.com/detail/send-to-logseq/mgdccnefjlmhnfbmlnhddoogimbpmilj) is a browser extension that saves web pages to [Logseq](https://github.com/logseq/logseq?tab=readme-ov-file).
 * [github.com/jsartelle/vscode-web-clipper](https://github.com/jsartelle/vscode-web-clipper) is a VS Code extension.
@@ -49,7 +50,7 @@ You can use this [bookmarklet](https://en.wikipedia.org/wiki/Bookmarklet) I made
 * [you-get](https://github.com/soimort/you-get) is a tiny command-line utility to download media contents (videos, audios, images) from the Web.
 * [Reader-LM](https://jina.ai/news/reader-lm-small-language-models-for-cleaning-and-converting-html-to-markdown/?nocache=1) is small language models that convert HTML to markdown.
 * [Epublifier](https://github.com/maoserr/epublifier) converts some webnovels to epub format.
-* [FanFicFare](https://github.com/JimmXinu/FanFicFare) is a tool for making eBooks from stories on fanfiction and other web sites.
+* [FanFicFare](https://github.com/JimmXinu/FanFicFare) is a tool for making eBooks from stories on fanfiction and other websites.
 
 ## Paste structured data
 

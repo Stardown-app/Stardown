@@ -244,15 +244,16 @@ async function handleInteraction(tab, message, options = {}, successStatus = 1) 
         await showStatus(0, 'Error', 'Stardown cannot run on PDFs');
         return;
     } else if (
+        // it's an extension store
         tab.url.startsWith('https://chromewebstore.google.com') ||
         tab.url.startsWith('https://microsoftedge.microsoft.com/addons') ||
         tab.url.startsWith('https://addons.mozilla.org') ||
         tab.url.startsWith('https://addons.opera.com')
     ) {
-        await showStatus(0, 'Error', 'Stardown cannot run in extension stores');
+        await showStatus(0, 'Error', 'This page is protected by the browser');
         return;
     } else if (tab.url.startsWith('https://support.mozilla.org')) {
-        await showStatus(0, 'Error', 'Stardown cannot run on Mozilla support pages');
+        await showStatus(0, 'Error', 'This page is protected by the browser');
         return;
     }
 

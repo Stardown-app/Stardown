@@ -141,7 +141,7 @@ async function validateTemplateVariables() {
     const YYYYMMDD = '2024-01-01';
     const text = 'converted text';
     const templateVars = {
-        link: { title, url },
+        page: { title, url },
         date: { YYYYMMDD },
         text,
     };

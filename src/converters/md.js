@@ -201,9 +201,11 @@ export class MdConverter {
     /** @type {ElementConverter} */
     convertElement(ctx, el) {
         // [Element: tagName property | MDN](https://developer.mozilla.org/en-US/docs/Web/API/Element/tagName)
+        // Some of the documentation is incorrect; the value of tagName is sometimes
+        // lowercase in HTML documents!
 
         /** @type {ElementConverter} */
-        const convert = this['convert' + el.tagName];
+        const convert = this['convert' + el.tagName.toUpperCase()];
         if (convert === undefined) {
             return this.convertNodes(ctx, el.childNodes);
         }
@@ -217,7 +219,10 @@ export class MdConverter {
         /** @type {string[]} */
         const result = ['\n\n'];
         result.push(
-            this.convertNodes(newCtx, el.childNodes).trim().replaceAll(/\n\s*\n\s*/g, '\n\n')
+            this.convertNodes(newCtx, el.childNodes)
+                .trim()
+                .replaceAll(/\n\s*\n\s*/g, '\n\n')
+                .replace(/^([-+*] \[[xX ]\] ) /, '$1')
         );
         if (!ctx.inList) {
             result.push('\n\n');
@@ -552,6 +557,7 @@ export class MdConverter {
                     .replace(/^\n+/, '')
                     .replace(/ \n/, '\n')
                     .replace(/ $/, '')
+                    .replace(/^(\[[xX ]\] ) /, '$1')
             );
             if (!ctx.inList || i < children.length - 2) {
                 result.push('\n');
@@ -578,7 +584,10 @@ export class MdConverter {
         /** @type {string[]} */
         const result = ['\n\n'];
         result.push(
-            this.convertNodes(newCtx, el.childNodes).trim().replaceAll(/\n\s+/g, '\n')
+            this.convertNodes(newCtx, el.childNodes)
+                .trim()
+                .replaceAll(/\n\s+/g, '\n')
+                .replace(/^([-+*] \[[xX ]\] ) /, '$1')
         );
         if (!ctx.inList) {
             result.push('\n\n');
@@ -1124,7 +1133,16 @@ export class MdConverter {
 
     /** @type {ElementConverter} */
     convertMATH(ctx, el) {
-        return '';
+        const alttext = el.getAttribute('alttext') || '';
+        if (!alttext) {
+            return '';
+        }
+
+        const display = el.getAttribute('display') || '';
+        if (display === 'block') {
+            return '\n\n$$\n' + alttext + '\n$$\n\n';
+        }
+        return '$' + alttext + '$';
     }
 
     // scripting elements
@@ -1278,7 +1296,7 @@ export class MdConverter {
     /** @type {ElementConverter} */
     convertINPUT(ctx, el) {
         const type = el.getAttribute('type');
-        if (type !== 'checkbox') {
+        if (type !== 'checkbox' && type !== 'radio') {
             return '';
         }
         const ariaHasPopup = el.getAttribute('aria-haspopup');
@@ -1286,15 +1304,13 @@ export class MdConverter {
             return '';
         }
 
-        const checked = el.getAttribute('checked') !== null;
-
         /** @type {string[]} */
         const result = [];
 
         if (!ctx.inList) {
             result.push('\n' + ctx.mdBulletPoint + ' ');
         }
-        if (checked) {
+        if (el.checked) {
             result.push('[x] ');
         } else {
             result.push('[ ] ');

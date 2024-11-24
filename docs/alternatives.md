@@ -11,18 +11,18 @@ You can use this [bookmarklet](https://en.wikipedia.org/wiki/Bookmarklet) I made
 ## Integrate directly with an editor
 
 * [Obsidian Clipper](https://github.com/obsidianmd/obsidian-clipper) is the official web clipper extension for Obsidian.
+* [Notion Web Clipper](https://www.notion.so/web-clipper)
+* [Evernote Web Clipper](https://evernote.com/features/webclipper)
+* [Joplin web clipper](https://github.com/laurent22/joplin/blob/dev/readme/apps/clipper.md)
+* [SiYuan web clipper](https://github.com/siyuan-note/siyuan-chrome)
+* [Roam Highlighter](https://chromewebstore.google.com/detail/roam-highlighter/hponfflfgcjikmehlcdcnpapicnljkkc?pli=1)
 * [MarkDownload](https://github.com/deathau/markdownload) was developed by an Obsidian community moderator.
 * [Omnivore](https://omnivore.app/) can save content in a variety of formats.
 * [linkding](https://github.com/sissbruecker/linkding) is a self-hosted bookmarks manager.
 * [Raindrop.io](https://raindrop.io/) is an online bookmarks manager.
 * [Readwise](https://readwise.io/) can sync highlights from websites, Kindles, iBooks, and more.
-* [Roam Highlighter](https://chromewebstore.google.com/detail/roam-highlighter/hponfflfgcjikmehlcdcnpapicnljkkc?pli=1)
 * [Zotero](https://www.zotero.org/) is one of the best tools for saving and organizing research.
-* [Notion Web Clipper](https://www.notion.so/web-clipper)
-* [Evernote Web Clipper](https://evernote.com/features/webclipper)
-* [Joplin web clipper](https://github.com/laurent22/joplin/blob/dev/readme/apps/clipper.md)
 * [HTML to React & Figma by Magic Patterns](https://chromewebstore.google.com/detail/html-to-react-figma-by-ma/chgehghmhgihgmpmdjpolhkcnhkokdfp)
-* [SiYuan web clipper](https://github.com/siyuan-note/siyuan-chrome)
 * [Send To Logseq](https://chromewebstore.google.com/detail/send-to-logseq/mgdccnefjlmhnfbmlnhddoogimbpmilj) is a browser extension that saves web pages to [Logseq](https://github.com/logseq/logseq?tab=readme-ov-file).
 * [github.com/jsartelle/vscode-web-clipper](https://github.com/jsartelle/vscode-web-clipper) is a VS Code extension.
 * [github.com/webclipper/web-clipper](https://github.com/webclipper/web-clipper) can integrate directly with Obsidian, Notion, OneNote, Bear, Yuque, Joplin, and more.

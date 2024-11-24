@@ -50,7 +50,7 @@ export async function createText(title, url, selection) {
             return selectedText;
         }
 
-        await improveConvertibility(frag, location.hostname);
+        await improveConvertibility(frag, location);
 
         absolutizeNodeUrls(frag, url);
 
@@ -160,7 +160,7 @@ async function getSourceFormatMd(selection, selectedText, markupLanguage) {
         return selectedText;
     }
 
-    await improveConvertibility(frag, location.hostname);
+    await improveConvertibility(frag, location);
 
     switch (markupLanguage) {
         case 'markdown':

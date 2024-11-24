@@ -14,7 +14,7 @@ Stardown puts markdown into the clipboard for you to paste anywhere.
 
 ### `notifications` ("Display notifications")
 
-Notifications are needed to show important error messages. We expect many users to prefer using Stardown's keyboard shortcuts, so showing error messages in the popup is often not an option.
+Notifications are needed to show important error messages. We have [a plan to eventually make this permission optional](https://github.com/Stardown-app/Stardown/issues/157).
 
 ### `activeTab`
 

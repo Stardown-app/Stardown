@@ -14,22 +14,19 @@
    limitations under the License.
 */
 
-import { browser, handleCopyRequest } from './browserSpecific.js';
+import { browser } from './browserSpecific.js';
 import { createLink, createImage, createVideo, createAudio } from './generators/all.js';
 import * as htmlSelection from './htmlSelection.js';
 import { handleCopyPageRequest } from './htmlPage.js';
 import { getSetting } from './getSetting.js';
-import { sendToNotepad, addIdAndTextFragment, removeIdAndTextFragment } from './contentUtils.js';
+import {
+    sendToNotepad, handleCopyRequest, addIdAndTextFragment, removeIdAndTextFragment,
+} from './contentUtils.js';
 import { htmlTableToJson } from './converters/json.js';
 import { htmlTableToCsv } from './converters/csv.js';
 
 /**
- * A response object sent from a content script to a background script.
- * @typedef {object} ContentResponse
- * @property {number} status - the number of markdown items successfully created and
- * written to the clipboard. Zero means failure, and one or above means success.
- * @property {string} notifTitle - the title of the notification to show to the user.
- * @property {string} notifBody - the body of the notification to show to the user.
+ * @typedef {import('./contentUtils.js').ContentResponse} ContentResponse
  */
 
 /**

@@ -19,6 +19,15 @@ import { getSetting } from './getSetting.js';
 import { createTextFragmentArg } from './createTextFragmentArg.js';
 
 /**
+ * A response object sent from a content script to a background script.
+ * @typedef {object} ContentResponse
+ * @property {number} status - the number of markdown items successfully created and
+ * written to the clipboard. Zero means failure, and one or above means success.
+ * @property {string} notifTitle - the title of the notification to show to the user.
+ * @property {string} notifBody - the body of the notification to show to the user.
+ */
+
+/**
  * sendToNotepad sends text to Stardown's sidebar notepad to be inserted.
  * @param {string} text
  * @returns {Promise<void>}
@@ -29,6 +38,58 @@ export async function sendToNotepad(text) {
         category: 'sendToNotepad',
         text: text,
     });
+}
+
+/**
+ * handleCopyRequest writes text to the clipboard and returns a content response object.
+ * @param {string} text - the text to copy to the clipboard.
+ * @returns {Promise<ContentResponse>}
+ */
+export async function handleCopyRequest(text) {
+    // `navigator.clipboard.writeText` only works in Chromium if the document is
+    // focused. Probably for security reasons, focus functions like
+    // `document.body.focus()`, `window.focus()`, `document.documentElement.focus()`,
+    // and `document.activeElement.focus()` don't appear to work here. Interacting with
+    // Stardown's popup or sidebar causes the document to lose focus. Whether the
+    // document is focused doesn't seem to be an issue in Firefox. However,
+    // `navigator.clipboard` is sometimes undefined (at least in Firefox, probably in
+    // all browsers) on `http:` pages, so the fallback method for writing to the
+    // clipboard is sometimes useful for all browsers.
+
+    try {
+        await navigator.clipboard.writeText(text);
+    } catch (err) {
+        console.warn('navigator.clipboard.writeText:', err.message);
+        console.log('Using fallback method to write text to the clipboard.');
+
+        const textarea = document.createElement('textarea');
+        textarea.value = text;
+        document.body.appendChild(textarea);
+        textarea.select();
+
+        try {
+            document.execCommand('copy');
+        } catch (fallbackError) {
+            console.error(
+                'Failed to write text to the clipboard using fallback method because:',
+                fallbackError
+            );
+            return {
+                status: 0, // failure
+                notifTitle: 'Failed to copy text',
+                notifBody: fallbackError.message,
+            };
+        } finally {
+            document.body.removeChild(textarea);
+        }
+    }
+
+    console.log('Successfully wrote text to the clipboard.');
+    return {
+        status: 1, // successfully copied one item
+        notifTitle: 'Text copied',
+        notifBody: 'Your text can now be pasted',
+    };
 }
 
 /**

@@ -5,13 +5,13 @@
   "type": "module",
   "scripts": {
     "test": "node --test",
-    "md-diff": "echo Open md.diff.html to see test output && nodemon ./test/diffMd.js --ext * --ignore *.diff.html",
+    "md-diff": "echo Open md.diff.html to see test output && nodemon ./test/diffMd.js --ext html,md,js --ignore *.diff.html",
     "build-firefox": "rollup --config rollup.config.firefox.mjs",
     "build-chrome": "rollup --config rollup.config.chrome.mjs"
   },
   "devDependencies": {
     "diff": "^6.0.0-beta",
-    "jsdom": "^24.1.0",
+    "jsdom": "^25.0.1",
     "rollup": "^4.18.0",
     "rollup-plugin-copy": "^3.5.0",
     "rollup-plugin-delete": "^2.0.0"

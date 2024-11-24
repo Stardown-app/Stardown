@@ -10,6 +10,7 @@ Here are a bunch of web pages with interesting features for testing.
 - [short Wikipedia page with many references](https://en.wikipedia.org/wiki/Shanti_Kumar_Morarjee)
 - [long Wikipedia page](https://en.wikipedia.org/wiki/Cold_War)
 - [insanely long Wikipedia page](https://en.wikipedia.org/wiki/Scythians)
+- [Wikipedia article with math elements](https://en.wikipedia.org/wiki/Kinematics)
 - [Wikipedia location map](https://en.wikipedia.org/wiki/Bush_Kill_%28Pepacton_Reservoir_tributary%29) cannot render well as markdown because two images overlap on the website
 - [tiny table](https://www.markdownguide.org/extended-syntax/#tables)
 - [small table](https://developer.mozilla.org/en-US/docs/Learn/HTML/Tables/Advanced#tables_for_visually_impaired_users)

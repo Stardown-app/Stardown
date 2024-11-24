@@ -38,10 +38,9 @@ export function getShortcutInstructions() {
 
 /**
  * createContextMenus creates the context menu options.
- * @param {string} markupLanguage - the markup language the user chose.
  * @returns {void}
  */
-export function createContextMenus(markupLanguage) {
+export function createContextMenus() {
     // This function should do nothing. It needs to exist because the Firefox extension
     // uses a function by the same name that is imported into the background script.
 }
@@ -57,10 +56,9 @@ let isTableSelected = false;
  * of HTML element the mouse is interacting with. This only has an effect if the context
  * menu is not currently visible.
  * @param {string} context - info about the element the mouse is interacting with.
- * @param {string} markupLanguage - the markup language the user chose.
  * @returns {Promise<void>}
  */
-export async function updateContextMenu(context, markupLanguage) {
+export async function updateContextMenu(context) {
     // The `browser.contextMenus.update` method doesn't work well in Chromium because
     // when it's used to hide all but one context menu option, the one remaining would
     // appear under a "Stardown" parent menu option instead of being in the root of the
@@ -88,48 +86,12 @@ export async function updateContextMenu(context, markupLanguage) {
             }
 
             browser.contextMenus.create(menu.selectionItem);
+            browser.contextMenus.create(menu.selectionWithSourceItem);
+            browser.contextMenus.create(menu.selectionQuoteItem);
             browser.contextMenus.create(menu.pageItem);
             browser.contextMenus.create(menu.pageSectionItem);
             browser.contextMenus.create(menu.videoItem);
             browser.contextMenus.create(menu.audioItem);
         }
-
-        updateContextMenuLanguage(markupLanguage);
     }
-}
-
-/**
- * updateContextMenuLanguage changes the context menu options to reflect the user's
- * chosen markup language.
- * @param {string} markupLanguage - the markup language the user chose.
- * @returns {void}
- */
-export function updateContextMenuLanguage(markupLanguage) {
-    if (markupLanguage === 'html') {
-        markupLanguage = 'HTML';
-    } else if (markupLanguage === 'markdown with some html') {
-        markupLanguage = 'markdown';
-    }
-
-    browser.contextMenus.update('page', {
-        title: `Copy ${markupLanguage} link for this page`,
-    }, () => { if (browser.runtime.lastError) return; });
-    browser.contextMenus.update('pageSection', {
-        title: `Copy ${markupLanguage} link for this section`,
-    }, () => { if (browser.runtime.lastError) return; });
-    browser.contextMenus.update('selection', {
-        title: `Copy ${markupLanguage} of selection`,
-    }, () => { if (browser.runtime.lastError) return; });
-    browser.contextMenus.update('link', {
-        title: `Copy ${markupLanguage} of link`,
-    }, () => { if (browser.runtime.lastError) return; });
-    browser.contextMenus.update('image', {
-        title: `Copy ${markupLanguage} of image`,
-    }, () => { if (browser.runtime.lastError) return; });
-    browser.contextMenus.update('video', {
-        title: `Copy ${markupLanguage} of video`,
-    }, () => { if (browser.runtime.lastError) return; });
-    browser.contextMenus.update('audio', {
-        title: `Copy ${markupLanguage} of audio`,
-    }, () => { if (browser.runtime.lastError) return; });
 }

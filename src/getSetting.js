@@ -28,14 +28,14 @@ const defaultSettings = {
     copyTabsWindows: 'current',
     notepadContent: '',
 
-    mdSelectionFormat: 'source with link',
     mdYoutube: 'almost everywhere',
     mdSubBrackets: 'underlined',
     mdBulletPoint: '-',
-    mdSelectionTemplate: `> [!note]
+    mdSelectionWithSourceTemplate: `> [!note]
 > from [{{link.title}}]({{link.url}}) on {{date.YYYYMMDD}}
 
-{{text}}`,
+{{text}}
+`,
 
     jsonEmptyCell: 'null',
     jsonDestination: 'clipboard',

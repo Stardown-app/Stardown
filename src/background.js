@@ -14,11 +14,10 @@
    limitations under the License.
 */
 
-import { browser, sleep, createContextMenus, updateContextMenu, updateContextMenuLanguage } from './browserSpecific.js';
+import { browser, sleep, createContextMenus, updateContextMenu } from './browserSpecific.js';
 import { getSetting } from './getSetting.js';
 import { createTabLink } from './generators/md.js';
 
-let markupLanguage = 'markdown';
 let jsonDestination = 'clipboard';
 let windowId = null;
 
@@ -28,10 +27,7 @@ browser.runtime.onInstalled.addListener(async details => {
     }
 });
 
-getSetting('markupLanguage').then(value => {
-    markupLanguage = value;
-    createContextMenus(value);
-});
+createContextMenus();
 getSetting('jsonDestination').then(value => jsonDestination = value);
 browser.tabs.query({ currentWindow: true, active: true }).then(tabs => {
     windowId = tabs[0].windowId;
@@ -85,7 +81,7 @@ browser.runtime.onMessage.addListener(async (message, sender, sendResponse) => {
             // because the contextMenus.update method cannot update a context menu that
             // is already open. The content script listens for mouseover and mouseup
             // events.
-            await updateContextMenu(message.context, markupLanguage);
+            await updateContextMenu(message.context);
             break;
         case 'downloadFile':
             await downloadFile(message.file);
@@ -118,10 +114,6 @@ browser.runtime.onMessage.addListener(async (message, sender, sendResponse) => {
         case 'settingsButtonPressed':
             browser.runtime.openOptionsPage();
             break;
-        case 'markupLanguage':
-            markupLanguage = message.markupLanguage;
-            updateContextMenuLanguage(markupLanguage);
-            break;
         case 'jsonDestination':
             jsonDestination = message.jsonDestination;
             break;
@@ -146,6 +138,16 @@ browser.contextMenus.onClicked.addListener(async (info, tab) => {
         case 'selection':
             await handleInteraction(
                 tab, { category: 'selectionRightClick' }, { frameId: info.frameId },
+            );
+            break;
+        case 'selectionWithSource':
+            await handleInteraction(
+                tab, { category: 'selectionWithSourceRightClick' }, { frameId: info.frameId },
+            );
+            break;
+        case 'selectionQuote':
+            await handleInteraction(
+                tab, { category: 'selectionQuoteRightClick' }, { frameId: info.frameId },
             );
             break;
         case 'link':
@@ -304,6 +306,7 @@ async function handleCopyMultipleTabs(activeTab) {
 
     // create the links
     let text = '';
+    const markupLanguage = await getSetting('markupLanguage');
     switch (markupLanguage) {
         case 'html':
             const result = ['<ul>'];

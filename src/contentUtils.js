@@ -106,7 +106,7 @@ export async function applyTemplate(template, title, url, text) {
     const templateVars = {
         link: { title, url },
         date: { YYYYMMDD },
-        text,
+        text: text.trim(),
     };
 
     try {

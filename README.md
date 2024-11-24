@@ -23,7 +23,7 @@
 
 Copy and paste like you're used to. Press `Alt+C` to copy (Mac: `⌥+C`).
 
-- Copy almost anything as markdown, including links, images, videos, lists, bold, italics, quotes, code blocks, etc.
+- Copy almost anything as markdown including links, images, videos, lists, bold, italics, quotes, code blocks, etc.
 - Copy tables as markdown, CSV, JSON, and more.
 - Automatically extract the main content of pages.
 - Copy links for the current tab or all tabs. Select tabs to copy links for those tabs.

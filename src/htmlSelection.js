@@ -24,15 +24,16 @@ import { htmlToMd, mdEncodeUri } from './converters/md.js';
 import { htmlToMdAndHtml } from './converters/mdAndHtml.js';
 
 /**
- * createText creates text of the selected part of the page. The language and format are
- * determined by the user's settings. If there is no selection, a link to the page is
+ * createText creates text of the selected part of the page. The output markup language
+ * is determined by the user's settings. If there is no selection, a link to the page is
  * created.
  * @param {string} title - the title of the page.
  * @param {string} url - the URL of the page.
  * @param {Selection|null} selection - a selection object.
+ * @param {string} messageCategory
  * @returns {Promise<string>}
  */
-export async function createText(title, url, selection) {
+export async function createText(title, url, selection, messageCategory) {
     const markupLanguage = await getSetting('markupLanguage');
 
     const selectedText = selection?.toString().trim();
@@ -68,39 +69,27 @@ export async function createText(title, url, selection) {
         throw new Error(`Unknown markupLanguage: ${markupLanguage}`);
     }
 
-    const mdSelectionFormat = await getSetting('mdSelectionFormat');
-    switch (mdSelectionFormat) {
-        case 'source with link':
-            return await getSourceFormatMdWithLink(
-                title, url, selection, selectedText, markupLanguage,
-            ) + '\n';
-        case 'source':
+    switch (messageCategory) {
+        case 'copySelectionShortcut':
+        case 'selectionRightClick':
+        case 'markdownTableRightClick':
             const srcMd = await getSourceFormatMd(selection, selectedText, markupLanguage);
             await sendToNotepad(srcMd);
             return srcMd;
-        case 'template':
+        case 'selectionWithSourceRightClick':
             const templateMd = await getTemplatedMd(
                 title, url, selection, selectedText, markupLanguage,
             );
             await sendToNotepad(templateMd);
             return templateMd;
-        case 'blockquote with link':
+        case 'selectionQuoteRightClick':
             const body = await getSourceFormatMd(selection, selectedText, markupLanguage);
             const blockquote = await md.createBlockquote(body, title, url) + '\n';
             await sendToNotepad(blockquote);
             return blockquote;
-        case 'link with selection as title':
-            const text = selectedText.replaceAll('\r\n', ' ').replaceAll('\n', ' ');
-            const link = await md.createLink(text, url);
-            await sendToNotepad(link);
-            return link;
-        case 'link with page title as title':
-            const link2 = await md.createLink(title, url);
-            await sendToNotepad(link2);
-            return link2;
         default:
-            console.error(`Unknown mdSelectionFormat: ${mdSelectionFormat}`);
-            throw new Error(`Unknown mdSelectionFormat: ${mdSelectionFormat}`);
+            console.error(`Unknown messageCategory: ${messageCategory}`);
+            throw new Error(`Unknown messageCategory: ${messageCategory}`);
     }
 }
 
@@ -188,32 +177,9 @@ async function getTemplatedMd(title, url, selection, selectedText, markupLanguag
     title = await md.createLinkTitle(title);
     url = mdEncodeUri(url);
     const text = await getSourceFormatMd(selection, selectedText, markupLanguage);
-    const template = await getSetting('mdSelectionTemplate');
+    const template = await getSetting('mdSelectionWithSourceTemplate');
 
     return await applyTemplate(template, title, url, text);
-}
-
-/**
- * getSourceFormatMdWithLink gets markdown of the selected part of the document,
- * attempts to keep the source formatting, and adds a link to the page. The selected
- * text is used as a fallback if the source formatting cannot be obtained.
- * @param {string} title - the page's title.
- * @param {string} url - the page's URL.
- * @param {Selection|null} selection - a selection object.
- * @param {string} selectedText - the selected text.
- * @param {string} markupLanguage - the user's chosen markup language.
- * @returns {Promise<string>}
- */
-async function getSourceFormatMdWithLink(title, url, selection, selectedText, markupLanguage) {
-    const link = await md.createLink(title, url);
-    const today = new Date();
-    const todayStr = today.getFullYear() + '/' + (today.getMonth() + 1) + '/' + today.getDate();
-    const alert = await md.createAlert('note', `from ${link} on ${todayStr}`);
-
-    const text = await getSourceFormatMd(selection, selectedText, markupLanguage);
-
-    await sendToNotepad(text);
-    return alert + '\n\n' + text;
 }
 
 /**

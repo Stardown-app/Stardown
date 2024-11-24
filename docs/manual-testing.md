@@ -49,24 +49,22 @@ When the user right-clicks part of a web page, their browser detects the type of
 
 - [ ] **Pressing any button in the popup** should do what the button's text describes.
 - [ ] **Pressing Alt+C (Mac: ⌥+C)** copies a markdown link for the page, unless part of the page is selected in which case markdown of the selection is copied instead.
-- [ ] **Right-clicking an empty part of a page** shows the "Copy markdown link for this page" and "Copy markdown link for this section" options.
-- [ ] **Right-clicking a website's unselected header** shows the "Copy markdown link for this page" and "Copy markdown link for this section" options.
-- [ ] **Right-clicking selected text** shows the "Copy markdown of selection" option.
-- [ ] **Right-clicking an unselected image** shows the "Copy markdown of image" option.
-- [ ] **Selecting text, then right-clicking an unselected image**, due to browser limitations, shows no context menu option in Chromium and shows "Copy markdown of selection" in Firefox.
-- [ ] **Selecting text and image(s), then right-clicking the selected text** shows the "Copy markdown of selection" option.
-- [ ] **Selecting text and image(s), then right-clicking a selected image** shows the "Copy markdown of selection" option.
-- [ ] **Selecting text and link(s), then right-clicking a selected link** shows the "Copy markdown of selection" option.
-- [ ] **Right-clicking a link that is not an image** shows the "Copy markdown of link" option.
-- [ ] **Right-clicking a link that is an image** might not show any context menu options due to browser limitations. If a context menu option appears, it should be "Copy markdown of image".
-- [ ] **Right-clicking a video** shows the "Copy markdown of video" option, but may require a second right-click for the correct context menu to appear because some videos (e.g. YouTube videos) have a special context menu.
-- [ ] **Right-clicking an audio player** shows the "Copy markdown of audio" option.
+- [ ] **Right-clicking an unselected part of a page** shows the "Copy link for this page" and "Copy link for this section" options.
+- [ ] **Right-clicking an unselected image** shows the "Copy image" option.
+- [ ] **Selecting text and/or image(s), then right-clicking the selection** shows the options "Copy selection", "Copy selection with source", and "Copy selection quote".
+- [ ] **Right-clicking a link that is not an image** shows the "Copy link" option.
+- [ ] **Right-clicking a link that is an image** might not show any context menu options due to browser limitations. If a context menu option appears, it should be "Copy image".
+- [ ] **Right-clicking a video** shows the "Copy video" option, but may require a second right-click for the correct context menu to appear because some videos (e.g. YouTube videos) have a special context menu.
+- [ ] **Right-clicking an audio player** shows the "Copy audio" option.
 - [ ] **Selecting the contents of a table and right-clicking the selection** shows several options: "Copy markdown of table", "Copy TSV of table", "Copy CSV of table", "Copy JSON of table", and "Copy HTML of table". Each option should result in a table with everything aligned correctly, leaving some cells empty and others duplicated as necessary.
-- [ ] "Copy markdown link for this page" copies a markdown link for the page. The link is guaranteed to not have an HTML element ID nor a text fragment.
-- [ ] "Copy markdown link for this section" copies a markdown link for the page with the nearest HTML element ID above (*above* in the HTML element tree sense) where the page was right-clicked.
-- [ ] "Copy markdown of selection", by default, copies markdown of the selected text (including all of the page's formatting that markdown supports), and a markdown link containing a text fragment and possibly an HTML element ID.
-- [ ] "Copy markdown of image" copies markdown of the image using the image's URL and any alt text.
-- [ ] "Copy markdown of link" copies markdown of the link, using the same title and URL as the link in the page (except for any character escapes or encodings).
-- [ ] "Copy markdown of video" copies markdown of the video using the video source's URL.
-- [ ] "Copy markdown of audio" copies a markdown link to either an audio file or a site that plays the audio.
+- [ ] Context menu options
+  - [ ] "Copy link for this page" copies a markdown link for the page. The link is guaranteed to not have an HTML element ID nor a text fragment.
+  - [ ] "Copy link for this section" copies a markdown link for the page with the nearest HTML element ID above (*above* in the HTML element tree sense) where the page was right-clicked.
+  - [ ] "Copy selection" copies markdown of the selection (including all of the page's formatting that markdown supports).
+  - [ ] "Copy selection with source" does the same as "Copy selection" but also includes a markdown link containing a text fragment and possibly an HTML element ID.
+  - [ ] "Copy selection quote" does the same as "Copy selection with source" but formats the output as a markdown block quote.
+  - [ ] "Copy image" copies markdown of the image using the image's URL and any alt text.
+  - [ ] "Copy link" copies markdown of the link, using the same title and URL as the link in the page (except for any character escapes or encodings).
+  - [ ] "Copy video" copies markdown of the video using the video source's URL.
+  - [ ] "Copy audio" copies a markdown link to either an audio file or a site that plays the audio.
 - [ ] **Change settings and repeat as necessary**

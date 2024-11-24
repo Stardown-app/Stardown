@@ -33,11 +33,9 @@ const omitHiddenEl = document.querySelector('#omitHidden');
 const notifyOnWarningEl = document.querySelector('#notifyOnWarning');
 const notifyOnSuccessEl = document.querySelector('#notifyOnSuccess');
 
-const mdSelectionFormatEl = document.querySelector('#mdSelectionFormat');
 const mdYoutubeEl = document.querySelector('#mdYoutube');
-const mdSelectionTemplateEl = document.querySelector('#mdSelectionTemplate');
-const mdSelectionTemplateLabelEl = document.querySelector('#mdSelectionTemplateLabel');
-const mdSelectionTemplateErrorEl = document.querySelector('#mdSelectionTemplateError');
+const mdSelectionWithSourceTemplateEl = document.querySelector('#mdSelectionWithSourceTemplate');
+const mdSelectionWithSourceTemplateErrorEl = document.querySelector('#mdSelectionWithSourceTemplateError');
 const mdSubBracketsEl = document.querySelector('#mdSubBrackets');
 const mdBulletPointEl = document.querySelector('#mdBulletPoint');
 
@@ -47,13 +45,7 @@ const jsonDestinationEl = document.querySelector('#jsonDestination');
 const resetButton = document.querySelector('#reset');
 
 // set up setting autosaving
-initAutosave('markupLanguage', markupLanguageEl, 'value', async () => {
-    browser.runtime.sendMessage({
-        destination: 'background',
-        category: 'markupLanguage',
-        markupLanguage: markupLanguageEl.value,
-    });
-});
+initAutosave('markupLanguage', markupLanguageEl, 'value');
 initAutosave('createTextFragment', createTextFragmentEl, 'checked');
 initAutosave('extractMainContent', extractMainContentEl, 'checked');
 initAutosave('omitNav', omitNavEl, 'checked');
@@ -63,9 +55,8 @@ initAutosave('notifyOnWarning', notifyOnWarningEl, 'checked');
 initAutosave('notifyOnSuccess', notifyOnSuccessEl, 'checked');
 initAutosave('copyTabsWindows', copyTabsWindowsEl, 'value');
 
-initAutosave('mdSelectionFormat', mdSelectionFormatEl, 'value');
 initAutosave('mdYoutube', mdYoutubeEl, 'value');
-initAutosave('mdSelectionTemplate', mdSelectionTemplateEl, 'value');
+initAutosave('mdSelectionWithSourceTemplate', mdSelectionWithSourceTemplateEl, 'value');
 initAutosave('mdSubBrackets', mdSubBracketsEl, 'value');
 initAutosave('mdBulletPoint', mdBulletPointEl, 'value');
 
@@ -110,9 +101,8 @@ async function loadSettings() {
         notifyOnWarningEl.checked = await getSetting('notifyOnWarning');
         notifyOnSuccessEl.checked = await getSetting('notifyOnSuccess');
 
-        mdSelectionFormatEl.value = await getSetting('mdSelectionFormat');
         mdYoutubeEl.value = await getSetting('mdYoutube');
-        mdSelectionTemplateEl.value = await getSetting('mdSelectionTemplate');
+        mdSelectionWithSourceTemplateEl.value = await getSetting('mdSelectionWithSourceTemplate');
         mdSubBracketsEl.value = await getSetting('mdSubBrackets');
         mdBulletPointEl.value = await getSetting('mdBulletPoint');
 
@@ -131,9 +121,6 @@ async function loadSettings() {
  */
 async function resetSettings() {
     await browser.storage.sync.clear();
-
-    mdSelectionTemplateEl.style.display = 'none';
-    mdSelectionTemplateLabelEl.style.display = 'none';
 
     resetButton.value = 'Reset all ✔';
     resetButton.style.backgroundColor = '#aadafa';
@@ -159,7 +146,7 @@ async function validateTemplateVariables() {
         text,
     };
 
-    const matches = mdSelectionTemplateEl.value.matchAll(/{{([^{}]+)}}/g);
+    const matches = mdSelectionWithSourceTemplateEl.value.matchAll(/{{([^{}]+)}}/g);
     if (!matches) {
         return;
     }
@@ -181,32 +168,17 @@ async function validateTemplateVariables() {
         }
 
         if (value === undefined) {
-            mdSelectionTemplateErrorEl.textContent = `Unknown variable "${group}"`;
-            mdSelectionTemplateErrorEl.style.color = 'red';
-            mdSelectionTemplateErrorEl.style.display = 'inline-block';
+            mdSelectionWithSourceTemplateErrorEl.textContent = `Unknown variable "${group}"`;
+            mdSelectionWithSourceTemplateErrorEl.style.display = 'inline-block';
             return;
         }
     }
 
-    mdSelectionTemplateErrorEl.textContent = '';
-    mdSelectionTemplateErrorEl.style.display = 'none';
+    mdSelectionWithSourceTemplateErrorEl.textContent = '';
+    mdSelectionWithSourceTemplateErrorEl.style.display = 'none';
 }
 
-mdSelectionFormatEl.addEventListener('change', function () {
-    // hide or show the selection template setting based on the selection format
-    if (mdSelectionFormatEl.value === 'template') {
-        mdSelectionTemplateEl.style.display = 'block';
-        mdSelectionTemplateLabelEl.style.display = 'block';
-    } else {
-        mdSelectionTemplateEl.style.display = 'none';
-        mdSelectionTemplateLabelEl.style.display = 'none';
-    }
-});
-new Promise(resolve => setTimeout(resolve, 50)).then(() => {
-    mdSelectionFormatEl.dispatchEvent(new Event('change'));
-});
-
-mdSelectionTemplateEl.addEventListener('input', async function () {
+mdSelectionWithSourceTemplateEl.addEventListener('input', async function () {
     await validateTemplateVariables();
 });
 

@@ -203,7 +203,7 @@ async function handleRequest(message) {
             return await handleCopyRequest(message.text);
         case 'copySelectionShortcut':
             // respond to use of the copy keyboard shortcut or copy button
-            return await handleCopySelectionShortcut();
+            return await handleCopySelectionShortcut(message.category);
         case 'copyEntirePageShortcut':
             return await handleCopyPageRequest();
         case 'pageRightClick':
@@ -214,9 +214,11 @@ async function handleRequest(message) {
             const id1 = await getClickedElementId(clickedElement);
             return await handlePageSectionRightClick(id1, selection);
         case 'selectionRightClick':
+        case 'selectionWithSourceRightClick':
+        case 'selectionQuoteRightClick':
             const selection1 = window.getSelection();
             const id2 = await getClickedElementId(clickedElement);
-            return await handleSelectionCopyRequest(id2, selection1);
+            return await handleSelectionCopyRequest(id2, selection1, message.category);
         case 'linkRightClick':
             return await handleCreateLink(linkText, message.linkUrl);
         case 'imageRightClick':
@@ -227,7 +229,7 @@ async function handleRequest(message) {
             return await handleCreateAudio(message.srcUrl, message.pageUrl);
         case 'markdownTableRightClick':
             const id3 = await getClickedElementId(clickedElement);
-            return await handleSelectionCopyRequest(id3, tableSelection);
+            return await handleSelectionCopyRequest(id3, tableSelection, message.category);
         case 'tsvTableRightClick':
             return await handleCsvTableRightClick(tableSelection, '\t');
         case 'csvTableRightClick':
@@ -274,15 +276,16 @@ async function getClickedElementId(clickedElement) {
 /**
  * handleCopySelectionShortcut handles a request from the user to copy a Selection or a
  * link for the current tab.
+ * @param {string} messageCategory
  * @returns {Promise<ContentResponse>}
  */
-async function handleCopySelectionShortcut() {
+async function handleCopySelectionShortcut(messageCategory) {
     const selection = window.getSelection();
     if (selection && selection.type === 'Range') {
         // Only allow Range (and not Caret) Selections because the copy selection
         // shortcut must copy a link for the current tab when there is no Range
         // Selection (when none of the page is highlighted).
-        return await handleSelectionCopyRequest('', selection);
+        return await handleSelectionCopyRequest('', selection, messageCategory);
     }
 
     // none of the page is highlighted, so create a link for the page instead
@@ -308,12 +311,13 @@ async function handlePageSectionRightClick(htmlId, selection) {
  * handleSelectionCopyRequest handles a request to copy a selection.
  * @param {string} htmlId - the ID of the HTML element that was right-clicked.
  * @param {Selection} selection - a selection object.
+ * @param {string} messageCategory
  * @returns {Promise<ContentResponse>}
  */
-async function handleSelectionCopyRequest(htmlId, selection) {
+async function handleSelectionCopyRequest(htmlId, selection, messageCategory) {
     const title = document.title;
     const url = await addIdAndTextFragment(location.href, htmlId, selection);
-    const text = await htmlSelection.createText(title, url, selection);
+    const text = await htmlSelection.createText(title, url, selection, messageCategory);
     return await handleCopyRequest(text);
 }
 

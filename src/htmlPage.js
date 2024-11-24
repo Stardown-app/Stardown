@@ -15,14 +15,11 @@
 */
 
 import { getSetting } from './getSetting.js';
-import {
-    sendToNotepad, handleCopyRequest, applyTemplate, removeIdAndTextFragment,
-} from './contentUtils.js';
+import { sendToNotepad, handleCopyRequest } from './contentUtils.js';
 import { extractMainContent } from './extractMainContent.js';
 import { improveConvertibility } from './converters/utils/html.js';
 import { absolutizeNodeUrls } from './converters/utils/urls.js';
-import * as md from './generators/md.js';
-import { htmlToMd, mdEncodeUri } from './converters/md.js';
+import { htmlToMd } from './converters/md.js';
 import { htmlToMdAndHtml } from './converters/mdAndHtml.js';
 
 /**
@@ -70,52 +67,9 @@ async function createPageText() {
         throw new Error(`Unknown markupLanguage: ${markupLanguage}`);
     }
 
-    const title = document.title;
-    const url = removeIdAndTextFragment(location.href);
-
-    const mdSelectionFormat = await getSetting('mdSelectionFormat');
-    switch (mdSelectionFormat) {
-        case 'source with link':
-            return await getSourceFormatMdWithLink(title, url, markupLanguage) + '\n';
-        case 'source':
-            const srcMd = await getSourceFormatMd(markupLanguage);
-            await sendToNotepad(srcMd);
-            return srcMd;
-        case 'template':
-            const templateMd = await getTemplateMd(title, url, markupLanguage);
-            await sendToNotepad(templateMd);
-            return templateMd;
-        case 'blockquote with link':
-            const body = await getSourceFormatMd(markupLanguage);
-            const blockquote = await md.createBlockquote(body, title, url) + '\n';
-            await sendToNotepad(blockquote);
-            return blockquote;
-        case 'link with selection as title':
-            let text = window.getSelection()?.toString() || 'link';
-            text = text.trim().replaceAll('\r\n', ' ').replaceAll('\n', ' ');
-            const link = await md.createLink(text, url);
-            await sendToNotepad(link);
-            return link;
-        case 'link with page title as title':
-            const link2 = await md.createLink(title, url);
-            await sendToNotepad(link2);
-            return link2;
-        default:
-            console.error(`Unknown mdSelectionFormat: ${mdSelectionFormat}`);
-            throw new Error(`Unknown mdSelectionFormat: ${mdSelectionFormat}`);
-    }
-}
-
-async function getSourceFormatMdWithLink(title, url, markupLanguage) {
-    const link = await md.createLink(title, url);
-    const today = new Date();
-    const todayStr = today.getFullYear() + '/' + (today.getMonth() + 1) + '/' + today.getDate();
-    const alert = await md.createAlert('note', `from ${link} on ${todayStr}`);
-
-    const text = await getSourceFormatMd(markupLanguage);
-
-    await sendToNotepad(text);
-    return alert + '\n\n' + text;
+    const srcMd = await getSourceFormatMd(markupLanguage);
+    await sendToNotepad(srcMd);
+    return srcMd;
 }
 
 /**
@@ -145,21 +99,4 @@ async function getSourceFormatMd(markupLanguage) {
             console.error(`Unknown markupLanguage: ${markupLanguage}`);
             throw new Error(`Unknown markupLanguage: ${markupLanguage}`);
     }
-}
-
-/**
- * getTemplateMd gets markdown of the current page in the user's chosen markup language
- * and uses a template to format it.
- * @param {string} title - the title of the page.
- * @param {string} url - the URL of the page.
- * @param {string} markupLanguage - the user's chosen markup language.
- * @returns {Promise<string>}
- */
-async function getTemplateMd(title, url, markupLanguage) {
-    title = await md.createLinkTitle(title);
-    url = mdEncodeUri(url);
-    const text = await getSourceFormatMd(markupLanguage);
-    const template = await getSetting('mdSelectionTemplate');
-
-    return await applyTemplate(template, title, url, text);
 }

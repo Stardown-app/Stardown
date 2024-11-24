@@ -14,49 +14,57 @@
    limitations under the License.
 */
 
-// The context menu item titles are also defined in the updateContextMenuLanguage
-// functions in the browserSpecific.js files. If you change the titles here, you should
-// probably also update the titles in those functions.
-
 export const pageItem = {
     id: 'page',
-    title: 'Copy markdown link for this page',
+    title: 'Copy link for this page',
     contexts: ['page', 'editable'],
 };
 
 export const pageSectionItem = {
     id: 'pageSection',
-    title: 'Copy markdown link for this section',
+    title: 'Copy link for this section',
     contexts: ['page', 'editable'],
 };
 
 export const selectionItem = {
     id: 'selection',
-    title: 'Copy markdown of selection',
+    title: 'Copy selection',
+    contexts: ['selection'],
+};
+
+export const selectionWithSourceItem = {
+    id: 'selectionWithSource',
+    title: 'Copy selection with source',
+    contexts: ['selection'],
+};
+
+export const selectionQuoteItem = {
+    id: 'selectionQuote',
+    title: 'Copy selection quote',
     contexts: ['selection'],
 };
 
 export const linkItem = {
     id: 'link',
-    title: 'Copy markdown of link',
+    title: 'Copy link',
     contexts: ['link'],
 };
 
 export const imageItem = {
     id: 'image',
-    title: 'Copy markdown of image',
+    title: 'Copy image',
     contexts: ['image'],
 };
 
 export const videoItem = {
     id: 'video',
-    title: 'Copy markdown of video',
+    title: 'Copy video',
     contexts: ['video'],
 };
 
 export const audioItem = {
     id: 'audio',
-    title: 'Copy markdown of audio',
+    title: 'Copy audio',
     contexts: ['audio'],
 };
 

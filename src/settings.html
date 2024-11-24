@@ -158,26 +158,6 @@ each anchor so that the pages they navigate to are opened in new tabs. -->
       <br />
       <hr />
       <h4>Markdown</h4>
-      <label for="mdSelectionFormat">When creating markdown of a selection,</label>
-      <select id="mdSelectionFormat" name="mdSelectionFormat">
-        <option value="source with link">try to keep the same formatting and link to the source</option>
-        <option value="source">try to keep the same formatting</option>
-        <option value="template">use a custom template</option>
-        <option value="blockquote with link">create a block quote and link to the source</option>
-        <option value="link with selection as title">create a link with the selected text as the title</option>
-        <option value="link with page title as title">create a link with the page title as the link title</option>
-      </select>
-      <br />
-      <label id="mdSelectionTemplateLabel" for="mdSelectionTemplate">Selection template:</label>
-      <textarea id="mdSelectionTemplate" name="mdSelectionTemplate" rows="5" cols="75">
-> [!note]
-> from [{{link.title}}]({{link.url}}) on {{date.YYYYMMDD}}
-
-{{selection}}
-</textarea>
-      <p id="mdSelectionTemplateError" style="display: none"></p>
-      <br />
-      <br />
       <label for="mdBulletPoint">Markdown bullet point symbol:</label>
       <select id="mdBulletPoint" name="mdBulletPoint">
         <option value="-">-</option>
@@ -201,6 +181,17 @@ each anchor so that the pages they navigate to are opened in new tabs. -->
         <option value="almost everywhere">almost everywhere</option>
         <option value="GitHub">GitHub</option>
       </select>
+      <br />
+      <br />
+      <label id="mdSelectionWithSourceTemplateLabel" for="mdSelectionWithSourceTemplate">
+        "Copy selection with source" template:</label>
+      <textarea id="mdSelectionWithSourceTemplate" name="mdSelectionWithSourceTemplate" rows="5" cols="75">
+> [!note]
+> from [{{link.title}}]({{link.url}}) on {{date.YYYYMMDD}}
+
+{{text}}
+</textarea>
+      <p id="mdSelectionWithSourceTemplateError" style="display: none; color: red;"></p>
       <br />
       <br />
       <hr />

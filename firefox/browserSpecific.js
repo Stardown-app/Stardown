@@ -40,14 +40,15 @@ export function getShortcutInstructions() {
 
 /**
  * createContextMenus creates the context menu options.
- * @param {string} markupLanguage - the markup language the user chose.
  * @returns {void}
  */
-export function createContextMenus(markupLanguage) {
+export function createContextMenus() {
     browser.runtime.onInstalled.addListener(() => {
         browser.contextMenus.create(menu.pageItem);
         browser.contextMenus.create(menu.pageSectionItem);
         browser.contextMenus.create(menu.selectionItem);
+        browser.contextMenus.create(menu.selectionWithSourceItem);
+        browser.contextMenus.create(menu.selectionQuoteItem);
         browser.contextMenus.create(menu.linkItem);
         browser.contextMenus.create(menu.imageItem);
         browser.contextMenus.create(menu.videoItem);
@@ -63,8 +64,6 @@ export function createContextMenus(markupLanguage) {
         browser.contextMenus.update('csvTable', { visible: false });
         browser.contextMenus.update('jsonTable', { visible: false });
         browser.contextMenus.update('htmlTable', { visible: false });
-
-        updateContextMenuLanguage(markupLanguage);
     });
 }
 
@@ -73,10 +72,9 @@ export function createContextMenus(markupLanguage) {
  * of HTML element the mouse is interacting with. This only has an effect if the context
  * menu is not currently visible.
  * @param {string} context - info about the element the mouse is interacting with.
- * @param {string} markupLanguage - the markup language the user chose.
  * @returns {Promise<void>}
  */
-export async function updateContextMenu(context, markupLanguage) {
+export async function updateContextMenu(context) {
     switch (context.mouseover) {
         case 'selection':
             browser.contextMenus.update('link', { visible: false });
@@ -96,6 +94,8 @@ export async function updateContextMenu(context, markupLanguage) {
         await sleep(100); // wait for the context menu
 
         browser.contextMenus.update('selection', { visible: false });
+        browser.contextMenus.update('selectionWithSource', { visible: false });
+        browser.contextMenus.update('selectionQuote', { visible: false });
 
         browser.contextMenus.update('markdownTable', { visible: true });
         browser.contextMenus.update('tsvTable', { visible: true });
@@ -104,6 +104,8 @@ export async function updateContextMenu(context, markupLanguage) {
         browser.contextMenus.update('htmlTable', { visible: true });
     } else if (context.selectionchange) {
         browser.contextMenus.update('selection', { visible: true });
+        browser.contextMenus.update('selectionWithSource', { visible: true });
+        browser.contextMenus.update('selectionQuote', { visible: true });
 
         browser.contextMenus.update('markdownTable', { visible: false });
         browser.contextMenus.update('tsvTable', { visible: false });
@@ -111,42 +113,4 @@ export async function updateContextMenu(context, markupLanguage) {
         browser.contextMenus.update('jsonTable', { visible: false });
         browser.contextMenus.update('htmlTable', { visible: false });
     }
-
-    updateContextMenuLanguage(markupLanguage);
-}
-
-/**
- * updateContextMenuLanguage changes the context menu options to reflect the user's
- * chosen markup language.
- * @param {string} markupLanguage - the markup language the user chose.
- * @returns {void}
- */
-export function updateContextMenuLanguage(markupLanguage) {
-    if (markupLanguage === 'html') {
-        markupLanguage = 'HTML';
-    } else if (markupLanguage === 'markdown with some html') {
-        markupLanguage = 'markdown';
-    }
-
-    browser.contextMenus.update('page', {
-        title: `Copy ${markupLanguage} link for this page`,
-    });
-    browser.contextMenus.update('pageSection', {
-        title: `Copy ${markupLanguage} link for this section`,
-    });
-    browser.contextMenus.update('selection', {
-        title: `Copy ${markupLanguage} of selection`,
-    });
-    browser.contextMenus.update('link', {
-        title: `Copy ${markupLanguage} of link`,
-    });
-    browser.contextMenus.update('image', {
-        title: `Copy ${markupLanguage} of image`,
-    });
-    browser.contextMenus.update('video', {
-        title: `Copy ${markupLanguage} of video`,
-    });
-    browser.contextMenus.update('audio', {
-        title: `Copy ${markupLanguage} of audio`,
-    });
 }

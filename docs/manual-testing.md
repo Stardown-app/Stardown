@@ -19,6 +19,7 @@ Here are a bunch of web pages with interesting features for testing.
 - [table with link images](https://en.wikipedia.org/wiki/1926_World_Table_Tennis_Championships)
 - [table with horizontally spanned image](https://en.wikipedia.org/wiki/Toshimi_Kitazawa)
 - [table with vertically spanned image](https://en.wikipedia.org/wiki/Gabiadji)
+- [table of numbers (mostly)](https://finance.yahoo.com/quote/%5EGSPC/history/)
 - [massive table](https://www.worldometers.info/world-population/population-by-country/)
 - [tables used for presentation without the presentation role](https://news.ycombinator.com/)
 - [code blocks that use `<pre>` but not `<code>`](https://www.cnblogs.com/unity2018/p/8492463.html)

@@ -21,15 +21,20 @@
 
 <p align="center"><img alt="demo gif" src="https://github.com/Stardown-app/assets/blob/main/Stardown.gif"></p>
 
-* Press `Alt+C` (Mac: `⌥+C`) to copy a selection or a page's link.
-* Press `Alt+N` (Mac: `⌥+N`) to open a notepad that copying with Stardown automatically pastes into.
-* Right-click part of a page to copy it as markdown. Select before right-clicking to copy multiple parts.
-* Copy links for all tabs. Select tabs first to copy links for only those tabs.
-* Customize these features including keyboard shortcuts in Stardown's settings.
+Copy and paste like you're used to. Press `Alt+C` to copy (Mac: `⌥+C`).
+
+- Copy almost anything as markdown including links, images, videos, lists, bold, italics, quotes, code blocks, etc.
+- Copy tables as markdown, CSV, JSON, and more.
+- Automatically extract the main content of pages.
+- Copy links for the current tab or all tabs. Select tabs to copy links for those tabs.
+- Instantly clip into a note using Stardown's sidebar notepad to simultaneously copy and paste.
+- Create [text fragments](https://developer.mozilla.org/en-US/docs/Web/URI/Fragment/Text_fragments) so you can link to specific parts of pages.
 
 <!--
 Stardown is free except that if you get it from Apple's App Store, there is a small fee to help cover the $99 USD per year cost I'm paying to keep Stardown available in the App Store.
 -->
+
+We're still finding sites where Stardown doesn't work as well as it could. If you find one, please [create an issue](https://github.com/Stardown-app/Stardown/issues) if one doesn't exist for it yet.
 
 ## Privacy
 
@@ -48,13 +53,3 @@ You're welcome to [make a feature request](https://github.com/Stardown-app/Stard
 Contributions are welcome! Let me know (such as in [an issue](https://github.com/Stardown-app/Stardown/issues) or [a discussion](https://github.com/Stardown-app/Stardown/discussions)) what you have in mind ahead of time if you think there's a chance it won't be approved.
 
 Also, please read [./docs/develop.md](docs/develop.md).
-
-## Why Stardown?
-
-Stardown is:
-
-* **Flexible**. Integrates well with many workflows. Select almost anything, copy and paste anywhere.
-* **Instantly clip** into a note using Stardown's sidebar notepad to both copy and paste with `Alt+C` (Mac: `⌥+C`).
-* **Better at converting**. Stardown's custom code for converting HTML to markdown can convert more formatting than alternatives.
-* **Creates [text fragments](https://developer.mozilla.org/en-US/docs/Web/URI/Fragment/Text_fragments)** so you can link to specific parts of pages.
-* **Extensible**. Stardown is designed to be extended for more markdown flavors and other markup languages.

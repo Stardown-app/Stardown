@@ -21,6 +21,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Stardown</title>
+    <link rel="icon" type="image/x-icon" href="./images/favicon.ico" />
     <style>
       body {
         font-family: sans-serif;
@@ -39,6 +40,11 @@
         height: 95vh;
         padding: 10px;
       }
+
+      #char-count {
+        margin-top: -5px;
+        margin-left: 20px;
+      }
     </style>
   </head>
 
@@ -47,6 +53,7 @@
       <div class="notepad-container">
         <textarea id="notepad"></textarea>
       </div>
+      <p id="char-count"></p>
     </main>
     <script src="./sidebar.js"></script>
   </body>

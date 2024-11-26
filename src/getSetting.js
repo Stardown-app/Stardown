@@ -27,6 +27,7 @@ const defaultSettings = {
     notifyOnSuccess: false,
     copyTabsWindows: 'current',
     notepadContent: '',
+    lastUpboardVersion: null,
 
     mdYoutube: 'almost everywhere',
     mdSubBrackets: 'underlined',

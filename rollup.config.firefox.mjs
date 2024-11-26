@@ -69,8 +69,8 @@ export default [
                 // files.
                 targets: [
                     {
-                        // copy the images folder and html files
-                        src: ['src/images', 'src/*.html'],
+                        // copy the images folder and html & css files
+                        src: ['src/images', 'src/*.html', 'src/*.css'],
                         dest: 'firefox',
                     },
                     {
@@ -123,10 +123,8 @@ export default [
 
                     '!firefox/manifest.json',
 
-                    '!firefox/popup.html',
-                    '!firefox/settings.html',
-                    '!firefox/sidebar.html',
-                    '!firefox/welcomeShortcutsMissing.html',
+                    '!firefox/*.html',
+                    '!firefox/*.css',
 
                     '!firefox/browserSpecific.js',
                     '!firefox/background.js',

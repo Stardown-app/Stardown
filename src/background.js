@@ -22,8 +22,39 @@ let jsonDestination = 'clipboard';
 let windowId = null;
 
 browser.runtime.onInstalled.addListener(async details => {
-    if (details.reason === browser.runtime.OnInstalledReason.INSTALL) {
-        await detectMissingShortcuts();
+    switch (details.reason) {
+        case 'install':
+            await detectMissingShortcuts();
+            break;
+        case 'update':
+            // show the upboarding page only if the current one hasn't been shown yet
+            const manifest = await browser.runtime.getManifest();
+            const lastUpboardVersion = await getSetting('lastUpboardVersion');
+
+            const last = lastUpboardVersion?.split('.');
+            const current = manifest.version.split('.');
+
+            if (
+                last === undefined || last[0] > current[0] || (
+                    last[0] === current[0] && (
+                        last[1] > current[1] || (
+                            last[1] === current[1] && last[2] > current[2]
+                        )
+                    )
+                )
+            ) {
+                // [tabs.create() | MDN](https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/API/tabs/create#url)
+                await browser.tabs.create({ url: `/updated.html` });
+                await browser.storage.sync.set({ lastUpboardVersion: manifest.version });
+            }
+            break;
+        case 'browser_update':
+        case 'chrome_update':
+            break;
+        case 'shared_module_update':
+            break;
+        default:
+            console.warn(`Unknown onInstalled reason: ${details.reason}`);
     }
 });
 
@@ -479,7 +510,7 @@ async function detectMissingShortcuts() {
     if (missing.length > 0) {
         console.log('Missing shortcuts:', missing);
 
-        // [tabs.create() - Mozilla | MDN](https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/API/tabs/create#url)
+        // [tabs.create() | MDN](https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/API/tabs/create#url)
         browser.tabs.create({ url: `/welcomeShortcutsMissing.html` });
     }
 }

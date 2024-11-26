@@ -89,10 +89,8 @@ export default [
 
                     '!chrome/manifest.json',
 
-                    '!chrome/popup.html',
-                    '!chrome/settings.html',
-                    '!chrome/sidebar.html',
-                    '!chrome/welcomeShortcutsMissing.html',
+                    '!chrome/*.html',
+                    '!chrome/*.css',
 
                     '!chrome/browserSpecific.js',
                     '!chrome/background.js',

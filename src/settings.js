@@ -137,13 +137,14 @@ async function resetSettings() {
  */
 async function validateTemplateVariables() {
     const title = 'page title';
-    const url = 'https://example.com';
+    const sourceUrl = 'https://example.com';
     const YYYYMMDD = '2024-01-01';
     const text = 'converted text';
     const templateVars = {
-        page: { title, url },
-        date: { YYYYMMDD },
-        text,
+        page: { title: title },
+        source: { url: sourceUrl },
+        date: { YYYYMMDD: YYYYMMDD },
+        text: text.trim(),
     };
 
     const matches = mdSelectionWithSourceTemplateEl.value.matchAll(/{{([^{}]+)}}/g);

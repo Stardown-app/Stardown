@@ -28,17 +28,17 @@ import { htmlToMdAndHtml } from './converters/mdAndHtml.js';
  * is determined by the user's settings. If there is no selection, a link to the page is
  * created.
  * @param {string} title - the title of the page.
- * @param {string} url - the URL of the page.
+ * @param {string} sourceUrl - the URL of the source.
  * @param {Selection|null} selection - a selection object.
  * @param {string} messageCategory
  * @returns {Promise<string>}
  */
-export async function createText(title, url, selection, messageCategory) {
+export async function createText(title, sourceUrl, selection, messageCategory) {
     const markupLanguage = await getSetting('markupLanguage');
 
     const selectedText = selection?.toString().trim();
     if (!selectedText) {
-        const link = await createLink(title, url, markupLanguage);
+        const link = await createLink(title, sourceUrl, markupLanguage);
         await sendToNotepad(link);
         return link;
     }
@@ -53,7 +53,7 @@ export async function createText(title, url, selection, messageCategory) {
 
         await improveConvertibility(frag, location);
 
-        absolutizeNodeUrls(frag, url);
+        absolutizeNodeUrls(frag, sourceUrl);
 
         // convert the fragment to a string
         const div = document.createElement('div');
@@ -78,13 +78,13 @@ export async function createText(title, url, selection, messageCategory) {
             return srcMd;
         case 'selectionWithSourceRightClick':
             const templateMd = await getTemplatedMd(
-                title, url, selection, selectedText, markupLanguage,
+                title, sourceUrl, selection, selectedText, markupLanguage,
             );
             await sendToNotepad(templateMd);
             return templateMd;
         case 'selectionQuoteRightClick':
             const body = await getSourceFormatMd(selection, selectedText, markupLanguage);
-            const blockquote = await md.createBlockquote(body, title, url) + '\n';
+            const blockquote = await md.createBlockquote(body, title, sourceUrl) + '\n';
             await sendToNotepad(blockquote);
             return blockquote;
         default:
@@ -167,19 +167,19 @@ async function getSourceFormatMd(selection, selectedText, markupLanguage) {
  * to format it. The selected text is used as a fallback if the source formatting cannot
  * be obtained.
  * @param {string} title - the title of the page.
- * @param {string} url - the URL of the page.
+ * @param {string} sourceUrl - the URL of the source.
  * @param {Selection|null} selection - a selection object.
  * @param {string} selectedText - the selected text.
  * @param {string} markupLanguage - the user's chosen markup language.
  * @returns {Promise<string>}
  */
-async function getTemplatedMd(title, url, selection, selectedText, markupLanguage) {
+async function getTemplatedMd(title, sourceUrl, selection, selectedText, markupLanguage) {
     title = await md.createLinkTitle(title);
-    url = mdEncodeUri(url);
+    sourceUrl = mdEncodeUri(sourceUrl);
     const text = await getSourceFormatMd(selection, selectedText, markupLanguage);
     const template = await getSetting('mdSelectionWithSourceTemplate');
 
-    return await applyTemplate(template, title, url, text);
+    return await applyTemplate(template, title, sourceUrl, text);
 }
 
 /**

@@ -96,16 +96,17 @@ export async function handleCopyRequest(text) {
  * applyTemplate applies a template to a title, URL, and text.
  * @param {string} template
  * @param {string} title
- * @param {string} url
+ * @param {string} sourceUrl
  * @param {string} text
  * @returns {Promise<string>}
  */
-export async function applyTemplate(template, title, url, text) {
+export async function applyTemplate(template, title, sourceUrl, text) {
     const today = new Date();
     const YYYYMMDD = today.getFullYear() + '/' + (today.getMonth() + 1) + '/' + today.getDate();
     const templateVars = {
-        page: { title, url },
-        date: { YYYYMMDD },
+        page: { title: title },
+        source: { url: sourceUrl },
+        date: { YYYYMMDD: YYYYMMDD },
         text: text.trim(),
     };
 

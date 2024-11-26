@@ -316,8 +316,8 @@ async function handlePageSectionRightClick(htmlId, selection) {
  */
 async function handleSelectionCopyRequest(htmlId, selection, messageCategory) {
     const title = document.title;
-    const url = await addIdAndTextFragment(location.href, htmlId, selection);
-    const text = await htmlSelection.createText(title, url, selection, messageCategory);
+    const sourceUrl = await addIdAndTextFragment(location.href, htmlId, selection);
+    const text = await htmlSelection.createText(title, sourceUrl, selection, messageCategory);
     return await handleCopyRequest(text);
 }
 

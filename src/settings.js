@@ -34,8 +34,8 @@ const notifyOnWarningEl = document.querySelector('#notifyOnWarning');
 const notifyOnSuccessEl = document.querySelector('#notifyOnSuccess');
 
 const mdYoutubeEl = document.querySelector('#mdYoutube');
-const mdSelectionWithSourceTemplateEl = document.querySelector('#mdSelectionWithSourceTemplate');
-const mdSelectionWithSourceTemplateErrorEl = document.querySelector('#mdSelectionWithSourceTemplateError');
+const templateEl = document.querySelector('#template');
+const templateErrorEl = document.querySelector('#templateError');
 const mdSubBracketsEl = document.querySelector('#mdSubBrackets');
 const mdBulletPointEl = document.querySelector('#mdBulletPoint');
 
@@ -56,7 +56,7 @@ initAutosave('notifyOnSuccess', notifyOnSuccessEl, 'checked');
 initAutosave('copyTabsWindows', copyTabsWindowsEl, 'value');
 
 initAutosave('mdYoutube', mdYoutubeEl, 'value');
-initAutosave('mdSelectionWithSourceTemplate', mdSelectionWithSourceTemplateEl, 'value');
+initAutosave('mdSelectionWithSourceTemplate', templateEl, 'value');
 initAutosave('mdSubBrackets', mdSubBracketsEl, 'value');
 initAutosave('mdBulletPoint', mdBulletPointEl, 'value');
 
@@ -102,7 +102,7 @@ async function loadSettings() {
         notifyOnSuccessEl.checked = await getSetting('notifyOnSuccess');
 
         mdYoutubeEl.value = await getSetting('mdYoutube');
-        mdSelectionWithSourceTemplateEl.value = await getSetting('mdSelectionWithSourceTemplate');
+        templateEl.value = await getSetting('mdSelectionWithSourceTemplate');
         mdSubBracketsEl.value = await getSetting('mdSubBrackets');
         mdBulletPointEl.value = await getSetting('mdBulletPoint');
 
@@ -147,7 +147,7 @@ async function validateTemplateVariables() {
         text: text.trim(),
     };
 
-    const matches = mdSelectionWithSourceTemplateEl.value.matchAll(/{{([^{}]+)}}/g);
+    const matches = templateEl.value.matchAll(/{{([^{}]+)}}/g);
     if (!matches) {
         return;
     }
@@ -169,17 +169,17 @@ async function validateTemplateVariables() {
         }
 
         if (value === undefined) {
-            mdSelectionWithSourceTemplateErrorEl.textContent = `Unknown variable "${group}"`;
-            mdSelectionWithSourceTemplateErrorEl.style.display = 'inline-block';
+            templateErrorEl.textContent = `Unknown variable "${group}"`;
+            templateErrorEl.style.display = 'inline-block';
             return;
         }
     }
 
-    mdSelectionWithSourceTemplateErrorEl.textContent = '';
-    mdSelectionWithSourceTemplateErrorEl.style.display = 'none';
+    templateErrorEl.textContent = '';
+    templateErrorEl.style.display = 'none';
 }
 
-mdSelectionWithSourceTemplateEl.addEventListener('input', async function () {
+templateEl.addEventListener('input', async function () {
     await validateTemplateVariables();
 });
 

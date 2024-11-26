@@ -26,7 +26,7 @@ Copy and paste like you're used to. Press `Alt+C` to copy (Mac: `⌥+C`).
 - Copy almost anything as markdown including links, images, videos, lists, bold, italics, quotes, code blocks, etc.
 - Copy tables as markdown, CSV, JSON, and more.
 - Automatically extract the main content of pages.
-- Copy links for the current tab or all tabs. Select tabs to copy links for those tabs.
+- Copy links for the current tab, all tabs, or selected tabs.
 - Instantly clip into a note using Stardown's sidebar notepad to simultaneously copy and paste.
 - Create [text fragments](https://developer.mozilla.org/en-US/docs/Web/URI/Fragment/Text_fragments) so you can link to specific parts of pages.
 
@@ -38,7 +38,7 @@ We're still finding sites where Stardown doesn't work as well as it could. If yo
 
 ## Privacy
 
-Stardown will never sell any data to anyone and does not collect any personal data. Everything you copy with Stardown is stored in your clipboard, local files, and/or your browser's settings depending on which features you use. Stardown's optional notepad saves to your browser's settings.
+Stardown will never sell any data to anyone and does not collect any personal data. Everything you copy with Stardown is stored in your clipboard, local files, and/or your browser's settings depending on which features you use. Stardown's optional notepad saves to your browser's sync storage.
 
 ## Permissions
 

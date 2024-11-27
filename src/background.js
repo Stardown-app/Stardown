@@ -90,11 +90,6 @@ browser.commands.onCommand.addListener(async command => {
         case 'openSettings':
             browser.runtime.openOptionsPage();
             break;
-        case 'openSource':
-            browser.tabs.create({
-                url: 'https://github.com/Stardown-app/Stardown'
-            });
-            break;
         default:
             console.error(`Unknown command: ${command}`);
             throw new Error(`Unknown command: ${command}`);

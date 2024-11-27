@@ -33,7 +33,7 @@ const defaultSettings = {
     mdSubBrackets: 'underlined',
     mdBulletPoint: '-',
     mdSelectionWithSourceTemplate: `> [!note]
-> from [{{page.title}}]({{page.url}}) on {{date.YYYYMMDD}}
+> from [{{page.title}}]({{source.url}}) on {{date.YYYYMMDD}}
 
 {{text}}
 `,

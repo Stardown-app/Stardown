@@ -10,7 +10,7 @@ You can use this [bookmarklet](https://en.wikipedia.org/wiki/Bookmarklet) I made
 
 ## Integrate directly with an editor
 
-* Some editors like Word and Obsidian try to convert pasted HTML automatically, but the result often has formatting errors and important parts missing because they can only see what's in the clipboard. Converting correctly often requires seeing more than just what was selected, which browser extensions can do.
+* Some editors like Word and Obsidian try to convert pasted HTML, but the result tends to have formatting errors and important parts missing. Stardown's output is often significantly better because it can see more than just what's in the clipboard, and because its HTML converter is not a low-priority side feature.
 * [Obsidian Clipper](https://github.com/obsidianmd/obsidian-clipper)
 * [Notion Web Clipper](https://www.notion.so/web-clipper)
 * [Evernote Web Clipper](https://evernote.com/features/webclipper)

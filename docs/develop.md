@@ -53,6 +53,17 @@ Stardown converts HTML to other formats using custom code explained in [../src/c
 - Firefox has [sidebars](https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/API/sidebarAction) and Chromium has [side panels](https://developer.chrome.com/docs/extensions/reference/api/sidePanel), which are mostly the same but have different APIs.
 - Further differences are described in comments throughout Stardown's code.
 
+## Performance
+
+Stardown currently does not cause any noticeable performance problems, but the articles linked below might be helpful in the future. Stardown's main performance impact is probably from injecting content scripts; the code is injected eagerly and none of it is minified. Also, only the primary browser thread is used (no worker threads).
+
+- [Impact of Extensions on Browser Performance: An Empirical Study on Google Chrome](https://arxiv.org/pdf/2404.06827v1#S3)
+- [How do we analyze the browser extensions’ impact on web performance? \| by 偏偏 \| Medium](https://joannechen1223.medium.com/how-do-we-analyze-the-browser-extensions-impact-on-web-performance-886f0b099f35)
+- [Measuring The Performance Impact Of Chrome Extensions \| DebugBear](https://www.debugbear.com/blog/measuring-the-performance-impact-of-chrome-extensions)
+- [How Do Chrome Extensions Impact Website Performance In 2024? \| DebugBear](https://www.debugbear.com/blog/chrome-extensions-website-performance)
+- [How to measure performance of browser extension on websites (> 100) - Stack Overflow](https://stackoverflow.com/questions/72134457/how-to-measure-performance-of-browser-extension-on-websites-100)
+- [treosh/exthouse: Analyze the impact of a browser extension on web performance.](https://github.com/treosh/exthouse)
+
 ## Text fragments
 
 Text fragments and how to generate them is explained in [Text fragments \| MDN](https://developer.mozilla.org/en-US/docs/Web/URI/Fragment/Text_fragments) and in [Boldly link where no one has linked before: Text Fragments \| web.dev](https://web.dev/articles/text-fragments#programmatic_text_fragment_link_generation). The second article mentions [a minified version of the text fragment generation code](https://unpkg.com/text-fragments-polyfill@5.7.0/dist/fragment-generation-utils.js), but Stardown doesn't use the minified version because extension stores need to be able to review the code and minifying code doesn't really help extensions.

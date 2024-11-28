@@ -47,7 +47,7 @@ export default [
                         dest: 'chrome',
                     },
                 ],
-                hook: 'buildStart', // Run the copy before the build starts.
+                hook: 'buildStart', // run the copy before the build starts
             }),
         ]
     },
@@ -83,14 +83,14 @@ export default [
                 // Delete all files in the `chrome` directory that were imported into
                 // other files there and are no longer needed.
                 targets: [
-                    'chrome/*', // Delete all files except the ones below.
+                    'chrome/*', // delete all files except the ones below
 
                     '!chrome/images',
 
                     '!chrome/manifest.json',
 
-                    '!chrome/*.html',
-                    '!chrome/*.css',
+                    '!chrome/**/*.html',
+                    '!chrome/**/*.css',
 
                     '!chrome/browserSpecific.js',
                     '!chrome/background.js',
@@ -101,7 +101,7 @@ export default [
                     '!chrome/text-fragment-utils.js',
                     '!chrome/fragment-generation-utils.js',
                 ],
-                hook: 'buildEnd', // Run the delete after the build ends.
+                hook: 'buildEnd', // run the delete after the build ends
             })
         ]
     }

@@ -25,14 +25,17 @@ import { isProbablyReaderable } from './Readability-readerable.js'
  * @returns {Promise<DocumentFragment>}
  */
 export async function extractMainContent(frag, location) {
+    // prevent extraction of main content for certain sites
+    if (location.hostname === 'news.ycombinator.com') {
+        // Readability.js would remove all HN comments
+        return frag;
+    }
+
     let newFrag = null;
     if (location.href.match(/^https:\/\/(?:[^\/]+\.)?wikipedia\.org\/wiki\/.*/)) {
         newFrag = extractWikipediaArticle(frag);
     } else if (location.href.match(/^https:\/\/github\.com\/[^/]+\/[^/]+\/issues\/\d+/)) {
         newFrag = extractGithubIssue(frag);
-    } else if (location.hostname === 'news.ycombinator.com') {
-        // Running Readability.js on HN removes all comments, so prevent that.
-        return frag;
     }
     if (newFrag) {
         return newFrag;

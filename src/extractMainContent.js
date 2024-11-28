@@ -107,6 +107,7 @@ function extractGithubIssue(frag) {
         '.Details-content--hidden',
         '.discussion-timeline-actions',
         'div.text-right code',
+        'span.State',
     ];
     content.querySelectorAll(toRemove.join(',')).forEach(el => el.remove());
 

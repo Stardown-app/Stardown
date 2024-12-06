@@ -70,7 +70,7 @@ export default [
                 targets: [
                     {
                         // copy the images folder and html & css files
-                        src: ['src/images', 'src/*.html', 'src/*.css'],
+                        src: ['src/images', 'src/**/*.html', 'src/**/*.css'],
                         dest: 'firefox',
                     },
                     {
@@ -80,8 +80,8 @@ export default [
                         transform: transform,
                     },
                 ],
-                flatten: false,
-                hook: 'buildStart', // Run the copy before the build starts.
+                flatten: false, // don't combine all nested folders into one flat folder
+                hook: 'buildStart', // run the copy before the build starts
             }),
         ]
     },
@@ -117,14 +117,14 @@ export default [
                 // Delete all files in the `firefox` directory that were imported into
                 // other files there and are no longer needed.
                 targets: [
-                    'firefox/*', // Delete all files except the ones below.
+                    'firefox/*', // delete all files except the ones below
 
                     '!firefox/images',
 
                     '!firefox/manifest.json',
 
-                    '!firefox/*.html',
-                    '!firefox/*.css',
+                    '!firefox/**/*.html',
+                    '!firefox/**/*.css',
 
                     '!firefox/browserSpecific.js',
                     '!firefox/background.js',
@@ -135,7 +135,7 @@ export default [
                     '!firefox/text-fragment-utils.js',
                     '!firefox/fragment-generation-utils.js',
                 ],
-                hook: 'buildEnd', // Run the delete after the build ends.
+                hook: 'buildEnd', // run the delete after the build ends
             })
         ]
     }

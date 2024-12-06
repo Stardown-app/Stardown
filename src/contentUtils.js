@@ -58,6 +58,7 @@ export async function handleCopyRequest(text) {
 
     try {
         await navigator.clipboard.writeText(text);
+        console.log('Successfully wrote text to the clipboard.');
     } catch (err) {
         console.warn('navigator.clipboard.writeText:', err.message);
         console.log('Using fallback method to write text to the clipboard.');
@@ -69,10 +70,11 @@ export async function handleCopyRequest(text) {
 
         try {
             document.execCommand('copy');
+            console.log('No error thrown by the fallback method.');
         } catch (fallbackError) {
             console.error(
                 'Failed to write text to the clipboard using fallback method because:',
-                fallbackError
+                fallbackError.message,
             );
             return {
                 status: 0, // failure
@@ -84,7 +86,6 @@ export async function handleCopyRequest(text) {
         }
     }
 
-    console.log('Successfully wrote text to the clipboard.');
     return {
         status: 1, // successfully copied one item
         notifTitle: 'Text copied',

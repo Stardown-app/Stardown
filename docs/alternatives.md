@@ -27,8 +27,12 @@ You can use this [bookmarklet](https://en.wikipedia.org/wiki/Bookmarklet) I made
 * [Send To Logseq](https://chromewebstore.google.com/detail/send-to-logseq/mgdccnefjlmhnfbmlnhddoogimbpmilj) is a browser extension that saves web pages to [Logseq](https://github.com/logseq/logseq?tab=readme-ov-file).
 * [github.com/jsartelle/vscode-web-clipper](https://github.com/jsartelle/vscode-web-clipper) is a VS Code extension.
 * [github.com/webclipper/web-clipper](https://github.com/webclipper/web-clipper) can integrate directly with Obsidian, Notion, OneNote, Bear, Yuque, Joplin, and more.
-* [Slurp](https://github.com/inhumantsar/slurp) is an Obsidian community plugin and bookmarklet for saving web pages directly to Obsidian.
-* [import-github-readme](https://github.com/chasebank87/import-github-readme) is an Obsidian plugin for downloading GitHub readme files directly into Obsidian.
+
+### Obsidian plugins
+
+* [Slurp](https://github.com/inhumantsar/slurp) saves webpages directly to Obsidian.
+* [Obsidian-NetClip](https://github.com/Elhary/Obsidian-NetClip) lets you browse the web from within Obsidian, and save webpages as markdown files from there.
+* [import-github-readme](https://github.com/chasebank87/import-github-readme) downloads GitHub readme files directly into Obsidian.
 
 ## Mobile-only
 

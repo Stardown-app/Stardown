@@ -608,11 +608,15 @@ export class MdConverter {
             const result = [];
             for (let i = 0; i < el.childNodes.length; i++) {
                 const child = el.childNodes[i];
-                const t = child.textContent;
-                if (!t) {
-                    continue;
+                if (child.nodeName === 'BR') {
+                    result.push('\n');
+                } else {
+                    const t = child.textContent;
+                    if (!t) {
+                        continue;
+                    }
+                    result.push(t.replaceAll('\n\n', ' '));
                 }
-                result.push(t.replaceAll('\n\n', ' '));
             }
             if (result.length === 0) {
                 return '';

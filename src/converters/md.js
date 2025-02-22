@@ -623,6 +623,8 @@ export class MdConverter {
             const child = el.firstChild;
             if (child.nodeName === 'SAMP' || child.nodeName === 'KBD') {
                 return this.convertCODE(ctx, child);
+            } else if (child.nodeType !== nodeTypes.TEXT_NODE && child.nodeName !== 'CODE') {
+                console.warn(`Unexpected nodeName of only child in a PRE: "${child.nodeName}"`);
             }
 
             text = child.textContent;

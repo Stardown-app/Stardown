@@ -5,7 +5,7 @@
     "version": "1.0.0",
     "homepage_url": "https://github.com/Stardown-app/Stardown",
     "developer": {
-        "name": "Chris Wheeler and Jon Chua"
+        "name": "Chris Wheeler and Jonathan Chua"
     },
     "browser_specific_settings": {
         "gecko": {

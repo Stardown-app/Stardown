@@ -1,5 +1,5 @@
 /*
-   Copyright 2024 Chris Wheeler
+   Copyright 2024 Chris Wheeler and Jonathan Chua
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.

@@ -603,7 +603,7 @@ export class MdConverter {
         }
 
         let text = '';
-        let language = '';
+        let language = el.getAttribute('syntax') || '';
         if (el.childNodes.length > 1) {
             const result = [];
             for (let i = 0; i < el.childNodes.length; i++) {
@@ -632,7 +632,7 @@ export class MdConverter {
                 return '';
             }
 
-            if (child.getAttribute) { // if the child is not a text node
+            if (!language && child.getAttribute) { // if the child is not a text node
                 const class_ = child.getAttribute('class') || '';
                 const languageMatch = class_.match(/language-(\S+)/);
                 if (languageMatch) {

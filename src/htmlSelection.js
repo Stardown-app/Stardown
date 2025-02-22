@@ -325,13 +325,20 @@ function startBeforeAncestorTable(startRange, startNode) {
  * @returns {Node} - the new start node.
  */
 function startBeforeAncestorCode(startRange, startNode) {
-    // If there are only span tags between the start node and an ancestor code tag,
-    // expand the start of the selection to include the code tag. This makes code blocks
-    // easier to copy.
-    let temp = startNode;
-    if (temp.parentNode && temp.parentNode.nodeName === 'SPAN') {
-        temp = temp.parentNode;
+    const parent = startNode.parentNode;
+    if (!parent) {
+        return startNode;
     }
+
+    if (parent.nodeName === 'CODE') {
+        startRange.setStartBefore(parent);
+        return parent;
+    }
+
+    // If there are only span tags between the start node and an ancestor code tag, expand
+    // the start of the selection to include the code tag. This makes code blocks easier
+    // to copy.
+    let temp = parent;
     while (temp && temp.nodeName === 'SPAN') {
         temp = temp.parentNode;
     }
@@ -345,30 +352,30 @@ function startBeforeAncestorCode(startRange, startNode) {
 }
 
 /**
- * startBeforeAncestorPre expands a selection to include code and pre elements that are
+ * startBeforeAncestorPre expands a selection to include span and pre elements that are
  * ancestors to the start of the selection.
  * @param {Range} startRange - a selection's index 0 range.
  * @param {Node} startNode - a selection's index 0 range's start container.
  * @returns {Node} - the new start node.
  */
 function startBeforeAncestorPre(startRange, startNode) {
-    let parent = startNode.parentNode;
-    if (!parent) {
-        return startNode;
-    }
-
-    if (parent.nodeName === 'CODE') {
-        startNode = parent;
-        startRange.setStartBefore(startNode);
-    }
-
-    parent = startNode.parentNode;
+    const parent = startNode.parentNode;
     if (!parent) {
         return startNode;
     }
 
     if (parent.nodeName === 'PRE') {
-        startNode = parent;
+        startRange.setStartBefore(parent);
+        return parent;
+    }
+
+    let temp = parent;
+    while (temp && temp.nodeName === 'SPAN') {
+        temp = temp.parentNode;
+    }
+
+    if (temp && temp.nodeName === 'PRE') {
+        startNode = temp;
         startRange.setStartBefore(startNode);
     }
 

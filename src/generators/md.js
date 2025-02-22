@@ -90,7 +90,11 @@ export async function createAlert(type, text) {
 export async function createBlockquote(body, title, url) {
     body = body.trim().replaceAll('\n', '\n> ');
     const link = await createLink(title, url);
-    return `> ${body}\n> \n> — ${link}`;
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = now.getMonth() + 1;
+    const day = now.getDate();
+    return `> ${body}\n> \n> — ${link} on ${year}/${month}/${day}`;
 }
 
 /**

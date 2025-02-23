@@ -34,13 +34,13 @@ export const selectionItem = {
 
 export const selectionWithSourceItem = {
     id: 'selectionWithSource',
-    title: 'Copy selection with source',
+    title: 'Copy selection, cite source',
     contexts: ['selection'],
 };
 
 export const selectionQuoteItem = {
     id: 'selectionQuote',
-    title: 'Copy selection quote',
+    title: 'Copy selection as a quote',
     contexts: ['selection'],
 };
 

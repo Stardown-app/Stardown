@@ -55,28 +55,37 @@ browser.runtime.onMessage.addListener(async message => {
 
     switch (message.category) {
         case 'sendToNotepad':
-            const newText = '\n\n' + message.text.trim() + '\n\n';
+            const newText = message.text.trim();
             // if the new text to add would go over the character limit
-            if (newText.length + notepad.value.length > MAX_CHARS) {
+            if (newText.length + 4 + notepad.value.length > MAX_CHARS) { // 4 for newlines
                 // ignore the new text and turn the character counter red
                 charCount.setAttribute('style', 'color: red;');
                 return;
             }
             charCount.setAttribute('style', 'color: black;');
 
+            lastEditTime = Date.now();
+
             const notepadAppendOrInsert = await getSetting('notepadAppendOrInsert');
             if (notepadAppendOrInsert === 'append') {
-                notepad.value = (notepad.value.trimEnd() + newText).trim();
+                notepad.value = notepad.value.trim() + '\n\n' + newText;
+                notepad.scrollTop = notepad.scrollHeight; // scroll to the end
             } else if (notepadAppendOrInsert === 'insert') {
-                const before = notepad.value.slice(0, notepad.selectionStart).trimEnd();
-                const after = notepad.value.slice(notepad.selectionEnd).trimStart();
-                notepad.value = (before + newText + after).trim();
+                const before = notepad.value.slice(0, notepad.selectionStart).trim();
+                const after = notepad.value.slice(notepad.selectionEnd).trim();
+                notepad.value = before + '\n\n' + newText + '\n\n' + after;
+
+                // move the cursor to the end of the new text
+                const newCursorPosition = before.length + newText.length + 2; // 2 for newlines
+                notepad.selectionStart = newCursorPosition;
+                notepad.selectionEnd = newCursorPosition;
+
+                scrollToCursor();
             } else {
                 console.error(`Unknown value of notepadAppendOrInsert setting: "${notepadAppendOrInsert}"`);
                 throw new Error(`Unknown value of notepadAppendOrInsert setting: "${notepadAppendOrInsert}"`);
             }
 
-            lastEditTime = Date.now();
             updateCharacterCount();
             await saveNotepad();
             break;
@@ -97,4 +106,28 @@ async function saveNotepad() {
 
 function updateCharacterCount() {
     charCount.textContent = `${notepad.value.length}/${MAX_CHARS} characters`;
+}
+
+/**
+ * scrollToCursor scrolls the notepad to bring the cursor into view.
+ */
+function scrollToCursor() {
+    const textBeforeCursor = notepad.value.substring(0, notepad.selectionStart);
+    const linesBeforeCursor = textBeforeCursor.split('\n').length;
+
+    const lineHeight = parseInt(window.getComputedStyle(notepad).lineHeight);
+    const visibleHeight = notepad.clientHeight;
+    const scrollPosition = notepad.scrollTop;
+
+    const cursorY = linesBeforeCursor * lineHeight;
+
+    const isCursorAbove = cursorY < scrollPosition;
+    const isCursorBelow = cursorY > scrollPosition + visibleHeight - lineHeight;
+
+    if (isCursorAbove) {
+        notepad.scrollTop = cursorY;
+    } else if (isCursorBelow) {
+        notepad.scrollTop = cursorY - visibleHeight + lineHeight;
+    }
+    // if the cursor is already visible, don't scroll
 }

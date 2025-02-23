@@ -26,6 +26,7 @@ const defaultSettings = {
     notifyOnWarning: false,
     notifyOnSuccess: false,
     copyTabsWindows: 'current',
+    notepadAppendOrInsert: 'append',
     notepadContent: '',
     lastUpboardVersion: null,
 

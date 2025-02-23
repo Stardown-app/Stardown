@@ -25,6 +25,7 @@ const form = document.querySelector('form');
 
 const markupLanguageEl = document.querySelector('#markupLanguage');
 const copyTabsWindowsEl = document.querySelector('#copyTabsWindows');
+const notepadAppendOrInsertEl = document.querySelector('#notepadAppendOrInsert');
 const createTextFragmentEl = document.querySelector('#createTextFragment');
 const extractMainContentEl = document.querySelector('#extractMainContent');
 const omitNavEl = document.querySelector('#omitNav');
@@ -46,6 +47,8 @@ const resetButton = document.querySelector('#reset');
 
 // set up setting autosaving
 initAutosave('markupLanguage', markupLanguageEl, 'value');
+initAutosave('copyTabsWindows', copyTabsWindowsEl, 'value');
+initAutosave('notepadAppendOrInsert', notepadAppendOrInsertEl, 'value');
 initAutosave('createTextFragment', createTextFragmentEl, 'checked');
 initAutosave('extractMainContent', extractMainContentEl, 'checked');
 initAutosave('omitNav', omitNavEl, 'checked');
@@ -53,7 +56,6 @@ initAutosave('omitFooter', omitFooterEl, 'checked');
 initAutosave('omitHidden', omitHiddenEl, 'checked');
 initAutosave('notifyOnWarning', notifyOnWarningEl, 'checked');
 initAutosave('notifyOnSuccess', notifyOnSuccessEl, 'checked');
-initAutosave('copyTabsWindows', copyTabsWindowsEl, 'value');
 
 initAutosave('mdYoutube', mdYoutubeEl, 'value');
 initAutosave('mdSelectionWithSourceTemplate', templateEl, 'value');
@@ -93,6 +95,7 @@ async function loadSettings() {
     try {
         markupLanguageEl.value = await getSetting('markupLanguage');
         copyTabsWindowsEl.value = await getSetting('copyTabsWindows');
+        notepadAppendOrInsertEl.value = await getSetting('notepadAppendOrInsert');
         createTextFragmentEl.checked = await getSetting('createTextFragment');
         extractMainContentEl.checked = await getSetting('extractMainContent');
         omitNavEl.checked = await getSetting('omitNav');

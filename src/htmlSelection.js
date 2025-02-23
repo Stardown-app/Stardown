@@ -71,6 +71,11 @@ export async function createText(title, sourceUrl, selection, messageCategory) {
 
     switch (messageCategory) {
         case 'copySelectionShortcut':
+            const selectionMd = await formatSelection(
+                title, sourceUrl, selection, selectedText, markupLanguage,
+            );
+            await sendToNotepad(selectionMd);
+            return selectionMd;
         case 'selectionRightClick':
         case 'markdownTableRightClick':
             const srcMd = await getSourceFormatMd(selection, selectedText, markupLanguage);
@@ -131,6 +136,33 @@ export async function getSelectionFragment(selection) {
     }
 
     return frag;
+}
+
+/**
+ * formatSelection formats a selection based on settings.
+ * @param {string} title
+ * @param {string} sourceUrl
+ * @param {string} selection
+ * @param {string} selectedText
+ * @param {string} markupLanguage
+ * @returns {Promise<string>}
+ */
+async function formatSelection(title, sourceUrl, selection, selectedText, markupLanguage) {
+    const selectionFormat = await getSetting('selectionFormat');
+    switch (selectionFormat) {
+        case 'Copy selection':
+            return await getSourceFormatMd(selection, selectedText, markupLanguage);
+        case 'Copy selection, cite source':
+            return await getTemplatedMd(
+                title, sourceUrl, selection, selectedText, markupLanguage,
+            );
+        case 'Copy selection as a quote':
+            const body = await getSourceFormatMd(selection, selectedText, markupLanguage);
+            return await md.createBlockquote(body, title, sourceUrl) + '\n';
+        default:
+            console.error(`Unknown selectionFormat: ${selectionFormat}`);
+            throw new Error(`Unknown selectionFormat: ${selectionFormat}`);
+    }
 }
 
 /**

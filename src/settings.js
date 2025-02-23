@@ -24,6 +24,7 @@ document.querySelector('#shortcutInstructions').innerHTML = getShortcutInstructi
 const form = document.querySelector('form');
 
 const markupLanguageEl = document.querySelector('#markupLanguage');
+const selectionFormatEl = document.querySelector('#selectionFormat');
 const copyTabsWindowsEl = document.querySelector('#copyTabsWindows');
 const notepadAppendOrInsertEl = document.querySelector('#notepadAppendOrInsert');
 const createTextFragmentEl = document.querySelector('#createTextFragment');
@@ -47,6 +48,7 @@ const resetButton = document.querySelector('#reset');
 
 // set up setting autosaving
 initAutosave('markupLanguage', markupLanguageEl, 'value');
+initAutosave('selectionFormat', selectionFormatEl, 'value');
 initAutosave('copyTabsWindows', copyTabsWindowsEl, 'value');
 initAutosave('notepadAppendOrInsert', notepadAppendOrInsertEl, 'value');
 initAutosave('createTextFragment', createTextFragmentEl, 'checked');
@@ -94,6 +96,7 @@ function initAutosave(settingName, el, valueProperty, then) {
 async function loadSettings() {
     try {
         markupLanguageEl.value = await getSetting('markupLanguage');
+        selectionFormatEl.value = await getSetting('selectionFormat');
         copyTabsWindowsEl.value = await getSetting('copyTabsWindows');
         notepadAppendOrInsertEl.value = await getSetting('notepadAppendOrInsert');
         createTextFragmentEl.checked = await getSetting('createTextFragment');

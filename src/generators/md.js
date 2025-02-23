@@ -94,7 +94,7 @@ export async function createBlockquote(body, title, url) {
     const year = now.getFullYear();
     const month = now.getMonth() + 1;
     const day = now.getDate();
-    return `> ${body}\n> \n> — ${link} on ${year}/${month}/${day}`;
+    return `> ${body}\n> \n> — ${link} (${year}/${month}/${day})`;
 }
 
 /**

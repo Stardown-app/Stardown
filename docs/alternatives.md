@@ -17,12 +17,14 @@ You can use this [bookmarklet](https://en.wikipedia.org/wiki/Bookmarklet) I made
 * [Joplin web clipper](https://github.com/laurent22/joplin/blob/dev/readme/apps/clipper.md)
 * [SiYuan web clipper](https://github.com/siyuan-note/siyuan-chrome)
 * [Roam Highlighter](https://chromewebstore.google.com/detail/roam-highlighter/hponfflfgcjikmehlcdcnpapicnljkkc?pli=1)
+* [wallabag](https://wallabag.org/) (maybe with [Frigoligo](https://github.com/casimir/frigoligo))
+* [Hoarder](https://github.com/hoarder-app/hoarder)
 * [MarkDownload](https://github.com/deathau/markdownload) was developed by an Obsidian community moderator.
-* [Omnivore](https://omnivore.app/) can save content in a variety of formats.
-* [linkding](https://github.com/sissbruecker/linkding) is a self-hosted bookmarks manager.
-* [Raindrop.io](https://raindrop.io/) is an online bookmarks manager.
+* [Omnivore](https://github.com/omnivore-app/omnivore) can save content in a variety of formats.
 * [Readwise](https://readwise.io/) can sync highlights from websites, Kindles, iBooks, and more.
 * [Zotero](https://www.zotero.org/) is one of the best tools for saving and organizing research articles and citations.
+* [mymind](https://mymind.com/browser-extensions)
+* [Slash](https://github.com/yourselfhosted/slash)
 * [HTML to React & Figma by Magic Patterns](https://chromewebstore.google.com/detail/html-to-react-figma-by-ma/chgehghmhgihgmpmdjpolhkcnhkokdfp)
 * [Send To Logseq](https://chromewebstore.google.com/detail/send-to-logseq/mgdccnefjlmhnfbmlnhddoogimbpmilj) is a browser extension that saves web pages to [Logseq](https://github.com/logseq/logseq?tab=readme-ov-file).
 * [github.com/jsartelle/vscode-web-clipper](https://github.com/jsartelle/vscode-web-clipper) is a VS Code extension.
@@ -34,6 +36,16 @@ You can use this [bookmarklet](https://en.wikipedia.org/wiki/Bookmarklet) I made
 * [Obsidian-NetClip](https://github.com/Elhary/Obsidian-NetClip) lets you browse the web from within Obsidian, and save webpages as markdown files from there.
 * [import-github-readme](https://github.com/chasebank87/import-github-readme) downloads GitHub readme files directly into Obsidian.
 
+### Bookmarks managers
+
+* [Pocket](https://getpocket.com/home)
+* [Raindrop.io](https://raindrop.io/)
+* [linkding](https://github.com/sissbruecker/linkding)
+* [Linkwarden](https://github.com/linkwarden/linkwarden)
+* [Shiori](https://github.com/go-shiori/shiori?tab=readme-ov-file)
+* [Shaarli](https://github.com/shaarli/Shaarli)
+* [LinkAce](https://www.linkace.org/)
+
 ## Mobile-only
 
 * [obsidian-markdownr](https://github.com/IAmStoxe/obsidian-markdownr) is an Android app that converts a URL to markdown to share into your favorite notes app.
@@ -41,13 +53,17 @@ You can use this [bookmarklet](https://en.wikipedia.org/wiki/Bookmarklet) I made
 ## Convert between markup languages
 
 * [Pandoc](https://pandoc.org/) offers a command-line tool and a Haskell library that can convert between almost any two markup languages.
+* [MarkItDown](https://news.ycombinator.com/item?id=42410803) is a Python tool for converting files and office documents to Markdown.
+* [Docling](https://github.com/DS4SD/docling) is another Python tool that can convert many file types to markdown.
 * [Marker](https://github.com/vikparuchuri/marker) converts PDF to markdown, optionally using OCRmyPDF.
 * [MinerU](https://github.com/opendatalab/MinerU) converts PDF to markdown or JSON, optionally using PaddleOCR.
+* [pdf-to-markdown](https://github.com/jzillmann/pdf-to-markdown) has online and downloadable versions.
 
 ## Scrape websites
 
-* [Firecrawl](https://github.com/mendableai/firecrawl) is an API and SDKs for scraping websites and saving them as markdown or structured data.
-* [HTML-to-Markdown](https://news.ycombinator.com/item?id=42093511) a REST API, command line tool, and Go library for converting HTML or entire websites to markdown.
+* [Firecrawl](https://github.com/mendableai/firecrawl) has an API, SDKs (for Python, Node, Go, and Rust), and various integrations.
+* [Crawl4AI](https://github.com/unclecode/crawl4ai) is a Python library.
+* [HTML-to-Markdown](https://news.ycombinator.com/item?id=42093511) a REST API, command line tool, and Go library.
 * [UrlToMarkdown.com](https://urltomarkdown.com/)
 * [RedditToMarkdown](https://farnots.github.io/RedditToMarkdown/) export reddit posts to markdown.
 * [Mealie](https://github.com/mealie-recipes/mealie) is a self hosted recipe manager and meal planner.

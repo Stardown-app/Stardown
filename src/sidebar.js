@@ -67,6 +67,7 @@ browser.runtime.onMessage.addListener(async message => {
             const notepadAppendOrInsert = await getSetting('notepadAppendOrInsert');
             if (notepadAppendOrInsert === 'append') {
                 notepad.value = (notepad.value.trimEnd() + newText).trim();
+                notepad.scrollTop = notepad.scrollHeight; // scroll to the end
             } else if (notepadAppendOrInsert === 'insert') {
                 const before = notepad.value.slice(0, notepad.selectionStart).trimEnd();
                 const after = notepad.value.slice(notepad.selectionEnd).trimStart();

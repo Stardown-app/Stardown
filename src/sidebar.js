@@ -64,6 +64,8 @@ browser.runtime.onMessage.addListener(async message => {
             }
             charCount.setAttribute('style', 'color: black;');
 
+            lastEditTime = Date.now();
+
             const notepadAppendOrInsert = await getSetting('notepadAppendOrInsert');
             if (notepadAppendOrInsert === 'append') {
                 notepad.value = (notepad.value.trimEnd() + newText).trim();
@@ -77,7 +79,6 @@ browser.runtime.onMessage.addListener(async message => {
                 throw new Error(`Unknown value of notepadAppendOrInsert setting: "${notepadAppendOrInsert}"`);
             }
 
-            lastEditTime = Date.now();
             updateCharacterCount();
             await saveNotepad();
             break;

@@ -25,6 +25,7 @@ const defaultSettings = {
     omitHidden: true,
     notifyOnWarning: false,
     notifyOnSuccess: false,
+    selectionFormat: 'Copy selection',
     copyTabsWindows: 'current',
     notepadAppendOrInsert: 'append',
     notepadContent: '',

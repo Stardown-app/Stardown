@@ -61,6 +61,7 @@ You can use this [bookmarklet](https://en.wikipedia.org/wiki/Bookmarklet) I made
 
 ## Scrape websites
 
+* [Cobalt](https://github.com/imputnet/cobalt) makes it easy to download photos, gifs, videos, and audio.
 * [Firecrawl](https://github.com/mendableai/firecrawl) has an API, SDKs (for Python, Node, Go, and Rust), and various integrations.
 * [Crawl4AI](https://github.com/unclecode/crawl4ai) is a Python library.
 * [HTML-to-Markdown](https://news.ycombinator.com/item?id=42093511) a REST API, command line tool, and Go library.

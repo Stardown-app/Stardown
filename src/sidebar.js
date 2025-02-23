@@ -64,10 +64,18 @@ browser.runtime.onMessage.addListener(async message => {
             }
             charCount.setAttribute('style', 'color: black;');
 
-            const before = notepad.value.slice(0, notepad.selectionStart).trimEnd();
-            const after = notepad.value.slice(notepad.selectionEnd).trimStart();
+            const notepadAppendOrInsert = await getSetting('notepadAppendOrInsert');
+            if (notepadAppendOrInsert === 'append') {
+                notepad.value = (notepad.value.trimEnd() + newText).trim();
+            } else if (notepadAppendOrInsert === 'insert') {
+                const before = notepad.value.slice(0, notepad.selectionStart).trimEnd();
+                const after = notepad.value.slice(notepad.selectionEnd).trimStart();
+                notepad.value = (before + newText + after).trim();
+            } else {
+                console.error(`Unknown value of notepadAppendOrInsert setting: "${notepadAppendOrInsert}"`);
+                throw new Error(`Unknown value of notepadAppendOrInsert setting: "${notepadAppendOrInsert}"`);
+            }
 
-            notepad.value = (before + newText + after).trim();
             lastEditTime = Date.now();
             updateCharacterCount();
             await saveNotepad();

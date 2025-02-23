@@ -28,7 +28,7 @@ import { createTextFragmentArg } from './createTextFragmentArg.js';
  */
 
 /**
- * sendToNotepad sends text to Stardown's sidebar notepad to be inserted.
+ * sendToNotepad sends text to Stardown's sidebar notepad to be appended or inserted.
  * @param {string} text
  * @returns {Promise<void>}
  */

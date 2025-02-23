@@ -1,5 +1,5 @@
 /*
-   Copyright 2024 Chris Wheeler
+   Copyright 2024 Chris Wheeler and Jonathan Chua
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -36,9 +36,13 @@ Run \`npm run md-diff\` and open md.diff.html to see the differences.`
 
 test('md.createBlockquote', async () => {
     const input = 'This is a test.';
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = now.getMonth() + 1;
+    const day = now.getDate();
     const expected = `> This is a test.
 > 
-> — [Example](https://example.com)
+> — [Example](https://example.com) on ${year}/${month}/${day}
 `;
 
     const title = 'Example';

@@ -1,5 +1,5 @@
 /*
-   Copyright 2024 Chris Wheeler
+   Copyright 2024 Chris Wheeler and Jonathan Chua
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -603,16 +603,20 @@ export class MdConverter {
         }
 
         let text = '';
-        let language = '';
+        let language = el.getAttribute('syntax') || '';
         if (el.childNodes.length > 1) {
             const result = [];
             for (let i = 0; i < el.childNodes.length; i++) {
                 const child = el.childNodes[i];
-                const t = child.textContent;
-                if (!t) {
-                    continue;
+                if (child.nodeName === 'BR') {
+                    result.push('\n');
+                } else {
+                    const t = child.textContent;
+                    if (!t) {
+                        continue;
+                    }
+                    result.push(t.replaceAll('\n\n', ' '));
                 }
-                result.push(t.replaceAll('\n\n', ' '));
             }
             if (result.length === 0) {
                 return '';
@@ -623,6 +627,8 @@ export class MdConverter {
             const child = el.firstChild;
             if (child.nodeName === 'SAMP' || child.nodeName === 'KBD') {
                 return this.convertCODE(ctx, child);
+            } else if (child.nodeType !== nodeTypes.TEXT_NODE && child.nodeName !== 'CODE') {
+                console.warn(`Unexpected nodeName of only child in a PRE: "${child.nodeName}"`);
             }
 
             text = child.textContent;
@@ -630,7 +636,7 @@ export class MdConverter {
                 return '';
             }
 
-            if (child.getAttribute) { // if the child is not a text node
+            if (!language && child.getAttribute) { // if the child is not a text node
                 const class_ = child.getAttribute('class') || '';
                 const languageMatch = class_.match(/language-(\S+)/);
                 if (languageMatch) {

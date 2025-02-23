@@ -52,7 +52,7 @@ When the user right-clicks part of a web page, their browser detects the type of
 - [ ] **Pressing Alt+C (Mac: ⌥+C)** copies a markdown link for the page, unless part of the page is selected in which case markdown of the selection is copied instead.
 - [ ] **Right-clicking an unselected part of a page** shows the "Copy link for this page" and "Copy link for this section" options.
 - [ ] **Right-clicking an unselected image** shows the "Copy image" option.
-- [ ] **Selecting text and/or image(s), then right-clicking the selection** shows the options "Copy selection", "Copy selection with source", and "Copy selection quote".
+- [ ] **Selecting text and/or image(s), then right-clicking the selection** shows the options "Copy selection", "Copy selection, cite source", and "Copy selection as a quote".
 - [ ] **Right-clicking a link that is not an image** shows the "Copy link" option.
 - [ ] **Right-clicking a link that is an image** might not show any context menu options due to browser limitations. If a context menu option appears, it should be "Copy image".
 - [ ] **Right-clicking a video** shows the "Copy video" option, but may require a second right-click for the correct context menu to appear because some videos (e.g. YouTube videos) have a special context menu.
@@ -62,8 +62,8 @@ When the user right-clicks part of a web page, their browser detects the type of
   - [ ] "Copy link for this page" copies a markdown link for the page. The link is guaranteed to not have an HTML element ID nor a text fragment.
   - [ ] "Copy link for this section" copies a markdown link for the page with the nearest HTML element ID above (*above* in the HTML element tree sense) where the page was right-clicked.
   - [ ] "Copy selection" copies markdown of the selection (including all of the page's formatting that markdown supports).
-  - [ ] "Copy selection with source" does the same as "Copy selection" but also includes a markdown link containing a text fragment and possibly an HTML element ID.
-  - [ ] "Copy selection quote" does the same as "Copy selection with source" but formats the output as a markdown block quote.
+  - [ ] "Copy selection, cite source" does the same as "Copy selection" but also includes a markdown link containing a text fragment and possibly an HTML element ID.
+  - [ ] "Copy selection as a quote" does the same as "Copy selection, cite source" but formats the output as a markdown block quote.
   - [ ] "Copy image" copies markdown of the image using the image's URL and any alt text.
   - [ ] "Copy link" copies markdown of the link, using the same title and URL as the link in the page (except for any character escapes or encodings).
   - [ ] "Copy video" copies markdown of the video using the video source's URL.

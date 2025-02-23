@@ -145,6 +145,12 @@ h.J(true, false, k);
     - one
 ```
 
+```
+doSomething(
+    arg
+)
+```
+
 1. reference
 2. litigation
 3. west

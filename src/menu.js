@@ -1,5 +1,5 @@
 /*
-   Copyright 2024 Chris Wheeler
+   Copyright 2024 Chris Wheeler and Jonathan Chua
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -34,13 +34,13 @@ export const selectionItem = {
 
 export const selectionWithSourceItem = {
     id: 'selectionWithSource',
-    title: 'Copy selection with source',
+    title: 'Copy selection, cite source',
     contexts: ['selection'],
 };
 
 export const selectionQuoteItem = {
     id: 'selectionQuote',
-    title: 'Copy selection quote',
+    title: 'Copy selection as a quote',
     contexts: ['selection'],
 };
 

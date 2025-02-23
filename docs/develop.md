@@ -4,7 +4,7 @@ I wrote some general extension development tips in [Making browser extensions](h
 
 ## Goals
 
-Stardown's main goal is to be so simple, fast, reliable, and flexible that people think of it as "it's like Ctrl+C but it keeps formatting". The settings page can have many settings as long as they are well organized, useful, and not so important that many users will be constantly changing them. Stardown's output should render well in at least Obsidian and GitHub, if not also other [markdown renderers and converters](./md-renderers.md).
+Stardown's main goal is to be so simple, fast, reliable, and flexible that people think of it as "it's like Ctrl+C but it keeps formatting". The settings page can have many settings as long as they are well organized, useful, and not so important that many users will be constantly changing them. Stardown's output should render well in at least GitHub and Obsidian, if not also other [markdown renderers and converters](./md-renderers.md).
 
 ## Tests
 
@@ -24,7 +24,7 @@ Stardown uses several different execution contexts as described in [./execution-
 
 ## Writing documentation
 
-This project uses [JSDoc](https://en.wikipedia.org/wiki/JSDoc) to annotate types. In VS Code you can type `/**` above a function and press enter to auto-generate part of its JSDoc comment (this might require the [ESLint](https://marketplace.visualstudio.com/items?itemName=dbaeumer.vscode-eslint) extension).
+This project uses [JSDoc](https://en.wikipedia.org/wiki/JSDoc) to annotate types. In VS Code you can type `/**` above a function and press enter to auto-generate part of its JSDoc comment.
 
 ## Improving Stardown's output
 

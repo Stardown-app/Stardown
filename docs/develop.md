@@ -24,7 +24,7 @@ Stardown uses several different execution contexts as described in [./execution-
 
 ## Writing documentation
 
-This project uses [JSDoc](https://en.wikipedia.org/wiki/JSDoc) to annotate types. In VS Code you can type `/**` above a function and press enter to auto-generate part of its JSDoc comment (this might require the [ESLint](https://marketplace.visualstudio.com/items?itemName=dbaeumer.vscode-eslint) extension).
+This project uses [JSDoc](https://en.wikipedia.org/wiki/JSDoc) to annotate types. In VS Code you can type `/**` above a function and press enter to auto-generate part of its JSDoc comment.
 
 ## Improving Stardown's output
 

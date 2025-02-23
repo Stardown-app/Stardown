@@ -42,7 +42,7 @@ test('md.createBlockquote', async () => {
     const day = now.getDate();
     const expected = `> This is a test.
 > 
-> — [Example](https://example.com) on ${year}/${month}/${day}
+> — [Example](https://example.com) (${year}/${month}/${day})
 `;
 
     const title = 'Example';

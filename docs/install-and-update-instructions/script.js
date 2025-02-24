@@ -98,7 +98,10 @@ function main() {
         instructionsEl.setAttribute('hidden', 'hidden');
     }
 
-    window.scrollTo(0, document.body.scrollHeight);
+    window.scrollTo({
+        top: document.body.scrollHeight,
+        behavior: 'smooth'
+    });
 }
 
 function install(instructions) {

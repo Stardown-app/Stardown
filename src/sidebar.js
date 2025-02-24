@@ -71,15 +71,18 @@ browser.runtime.onMessage.addListener(async message => {
 
             const notepadAppendOrInsert = await getSetting('notepadAppendOrInsert');
             if (notepadAppendOrInsert === 'append') {
-                notepad.value = notepad.value.trim() + '\n\n' + newText;
+                notepad.value = (notepad.value.trim() + '\n\n' + newText).trim();
                 notepad.scrollTop = notepad.scrollHeight; // scroll to the end
             } else if (notepadAppendOrInsert === 'insert') {
                 const before = notepad.value.slice(0, notepad.selectionStart).trim();
                 const after = notepad.value.slice(notepad.selectionEnd).trim();
-                notepad.value = before + '\n\n' + newText + '\n\n' + after;
+                notepad.value = (before + '\n\n' + newText + '\n\n' + after).trim();
 
                 // move the cursor to the end of the new text
-                const newCursorPosition = before.length + newText.length + 2; // 2 for newlines
+                let newCursorPosition = newText.length;
+                if (before.length > 0) {
+                    newCursorPosition += before.length + 2; // 2 for newlines
+                }
                 notepad.selectionStart = newCursorPosition;
                 notepad.selectionEnd = newCursorPosition;
 

@@ -185,15 +185,6 @@ function installWithTerminal(instructions) {
         return;
     }
 
-    if (noNodeV14PlusEl.checked) {
-        instructions.steps.push(`
-            Install Node v14+ from <a href="https://nodejs.org">nodejs.org</a> or with
-            <a href="https://github.com/nvm-sh/nvm">nvm</a>
-            (e.g. <code>nvm install 22</code>)
-        `);
-        // v14+ because Stardown uses Rollup for bundling, and Rollup uses features only
-        // available in Node v14+.
-    }
     if (isWindows) {
         instructions.steps.push(
             '<a href="https://git-scm.com">Install Git</a> if you haven\'t already'
@@ -203,6 +194,21 @@ function installWithTerminal(instructions) {
         `In a terminal, run <code>git clone https://github.com/Stardown-app/Stardown.git
         && cd Stardown</code>`
     );
+
+    if (noNodeV14PlusEl.checked) {
+        instructions.steps.push(`
+            Install Node v14+ from <a href="https://nodejs.org">nodejs.org</a> or with a dev tool manager like
+            <a href="https://github.com/jdx/mise">
+                mise</a>
+            (<code>mise use node@lts</code>)
+            or
+            <a href="https://github.com/nvm-sh/nvm">
+                nvm</a>
+            (<code>nvm install node</code>)
+        `);
+        // v14+ because Stardown uses Rollup for bundling, and Rollup uses features only
+        // available in Node v14+.
+    }
 
     if (chromiumEl.checked) {
         instructions.steps.push(

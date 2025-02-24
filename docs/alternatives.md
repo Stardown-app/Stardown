@@ -22,6 +22,7 @@ You can use this [bookmarklet](https://en.wikipedia.org/wiki/Bookmarklet) I made
 * [MarkDownload](https://github.com/deathau/markdownload) was developed by an Obsidian community moderator.
 * [Omnivore](https://github.com/omnivore-app/omnivore) can save content in a variety of formats.
 * [Readwise](https://readwise.io/) can sync highlights from websites, Kindles, iBooks, and more.
+* [Chrome's page downloader](https://support.google.com/chrome/answer/7343019)
 * [Zotero](https://www.zotero.org/) is one of the best tools for saving and organizing research articles and citations.
 * [mymind](https://mymind.com/browser-extensions)
 * [Slash](https://github.com/yourselfhosted/slash)

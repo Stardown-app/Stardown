@@ -18,13 +18,16 @@ import { browser, sleep } from './browserSpecific.js';
 import { getSetting } from './getSetting.js';
 
 const notepad = document.getElementById('notepad');
-const MAX_CHARS = 8100; // sync storage character limit: https://developer.chrome.com/docs/extensions/reference/api/storage#property-sync-sync-QUOTA_BYTES_PER_ITEM:~:text=quota_bytes_per_item
-notepad.setAttribute('maxlength', MAX_CHARS);
-// if we switch to local storage to save the notepad, set MAX_CHARS to 10485000
+
+const MAX_SYNC_CHARS = 8100; // sync storage character limit: https://developer.chrome.com/docs/extensions/reference/api/storage#property-sync
+const MAX_LOCAL_CHARS = 10485000; // local storage character limit: https://developer.chrome.com/docs/extensions/reference/api/storage#property-local
+let maxChars = MAX_SYNC_CHARS;
+
+notepad.setAttribute('maxlength', maxChars);
 
 const charCount = document.getElementById('char-count');
 
-const SAVE_DELAY = 500; // milliseconds // sync storage time limit: https://developer.chrome.com/docs/extensions/reference/api/storage#property-sync-sync-MAX_WRITE_OPERATIONS_PER_MINUTE
+const SYNC_SAVE_DELAY = 500; // milliseconds // sync storage time limit: https://developer.chrome.com/docs/extensions/reference/api/storage#property-sync-sync-MAX_WRITE_OPERATIONS_PER_MINUTE
 let lastEditTime = 0; // milliseconds
 
 browser.commands.getAll().then(cmds => {
@@ -57,7 +60,7 @@ browser.runtime.onMessage.addListener(async message => {
         case 'sendToNotepad':
             const newText = message.text.trim();
             // if the new text to add would go over the character limit
-            if (newText.length + 4 + notepad.value.length > MAX_CHARS) { // 4 for newlines
+            if (newText.length + 4 + notepad.value.length > maxChars) { // 4 for newlines
                 // ignore the new text and turn the character counter red
                 charCount.setAttribute('style', 'color: red;');
                 return;
@@ -68,15 +71,18 @@ browser.runtime.onMessage.addListener(async message => {
 
             const notepadAppendOrInsert = await getSetting('notepadAppendOrInsert');
             if (notepadAppendOrInsert === 'append') {
-                notepad.value = notepad.value.trim() + '\n\n' + newText;
+                notepad.value = (notepad.value.trim() + '\n\n' + newText).trim();
                 notepad.scrollTop = notepad.scrollHeight; // scroll to the end
             } else if (notepadAppendOrInsert === 'insert') {
                 const before = notepad.value.slice(0, notepad.selectionStart).trim();
                 const after = notepad.value.slice(notepad.selectionEnd).trim();
-                notepad.value = before + '\n\n' + newText + '\n\n' + after;
+                notepad.value = (before + '\n\n' + newText + '\n\n' + after).trim();
 
                 // move the cursor to the end of the new text
-                const newCursorPosition = before.length + newText.length + 2; // 2 for newlines
+                let newCursorPosition = newText.length;
+                if (before.length > 0) {
+                    newCursorPosition += before.length + 2; // 2 for newlines
+                }
                 notepad.selectionStart = newCursorPosition;
                 notepad.selectionEnd = newCursorPosition;
 
@@ -96,8 +102,8 @@ browser.runtime.onMessage.addListener(async message => {
 });
 
 async function saveNotepad() {
-    await sleep(SAVE_DELAY);
-    if (lastEditTime + SAVE_DELAY > Date.now()) {
+    await sleep(SYNC_SAVE_DELAY);
+    if (lastEditTime + SYNC_SAVE_DELAY > Date.now()) {
         return;
     }
 
@@ -105,7 +111,7 @@ async function saveNotepad() {
 }
 
 function updateCharacterCount() {
-    charCount.textContent = `${notepad.value.length}/${MAX_CHARS} characters`;
+    charCount.textContent = `${notepad.value.length}/${maxChars} characters`;
 }
 
 /**

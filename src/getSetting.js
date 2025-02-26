@@ -19,6 +19,8 @@ import { browser } from './browserSpecific.js';
 const defaultSettings = {
     markupLanguage: 'markdown',
     createTextFragment: true,
+    notepadAppendOrInsert: 'append',
+    notepadStorageLocation: 'sync',
     extractMainContent: true,
     omitNav: true,
     omitFooter: true,
@@ -27,7 +29,6 @@ const defaultSettings = {
     notifyOnSuccess: false,
     selectionFormat: 'Copy selection',
     copyTabsWindows: 'current',
-    notepadAppendOrInsert: 'append',
     notepadContent: '',
     lastUpboardVersion: null,
 

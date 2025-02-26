@@ -88,8 +88,8 @@ browser.runtime.onMessage.addListener(async message => {
 
                 scrollToCursor();
             } else {
-                console.error(`Unknown value of notepadAppendOrInsert setting: "${notepadAppendOrInsert}"`);
-                throw new Error(`Unknown value of notepadAppendOrInsert setting: "${notepadAppendOrInsert}"`);
+                console.error(`Unknown notepadAppendOrInsert: "${notepadAppendOrInsert}"`);
+                throw new Error(`Unknown notepadAppendOrInsert: "${notepadAppendOrInsert}"`);
             }
 
             updateCharacterCount();

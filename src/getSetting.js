@@ -20,6 +20,7 @@ const defaultSettings = {
     markupLanguage: 'markdown',
     createTextFragment: true,
     notepadAppendOrInsert: 'append',
+    notepadStorageLocation: 'sync',
     extractMainContent: true,
     omitNav: true,
     omitFooter: true,

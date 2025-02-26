@@ -28,6 +28,7 @@ const selectionFormatEl = document.querySelector('#selectionFormat');
 const copyTabsWindowsEl = document.querySelector('#copyTabsWindows');
 const createTextFragmentEl = document.querySelector('#createTextFragment');
 const notepadAppendOrInsertEl = document.querySelector('#notepadAppendOrInsert');
+const notepadStorageLocationEl = document.querySelector('#notepadStorageLocation');
 const extractMainContentEl = document.querySelector('#extractMainContent');
 const omitNavEl = document.querySelector('#omitNav');
 const omitFooterEl = document.querySelector('#omitFooter');
@@ -52,6 +53,13 @@ initAutosave('selectionFormat', selectionFormatEl, 'value');
 initAutosave('copyTabsWindows', copyTabsWindowsEl, 'value');
 initAutosave('createTextFragment', createTextFragmentEl, 'checked');
 initAutosave('notepadAppendOrInsert', notepadAppendOrInsertEl, 'value');
+initAutosave('notepadStorageLocation', notepadStorageLocationEl, 'value', () => {
+    browser.runtime.sendMessage({
+        destination: 'sidebar',
+        category: 'notepadStorageLocation',
+        notepadStorageLocation: notepadStorageLocationEl.value,
+    });
+});
 initAutosave('extractMainContent', extractMainContentEl, 'checked');
 initAutosave('omitNav', omitNavEl, 'checked');
 initAutosave('omitFooter', omitFooterEl, 'checked');
@@ -69,7 +77,7 @@ initAutosave('jsonDestination', jsonDestinationEl, 'value', () => {
     browser.runtime.sendMessage({
         destination: 'background',
         category: 'jsonDestination',
-        jsonDestination: jsonDestinationEl.value
+        jsonDestination: jsonDestinationEl.value,
     });
 });
 
@@ -100,6 +108,7 @@ async function loadSettings() {
         copyTabsWindowsEl.value = await getSetting('copyTabsWindows');
         createTextFragmentEl.checked = await getSetting('createTextFragment');
         notepadAppendOrInsertEl.value = await getSetting('notepadAppendOrInsert');
+        notepadStorageLocationEl.value = await getSetting('notepadStorageLocation');
         extractMainContentEl.checked = await getSetting('extractMainContent');
         omitNavEl.checked = await getSetting('omitNav');
         omitFooterEl.checked = await getSetting('omitFooter');

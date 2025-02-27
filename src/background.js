@@ -28,7 +28,7 @@ browser.runtime.onInstalled.addListener(async details => {
             break;
         case 'update':
             // show the upboarding page only if the current one hasn't been shown yet
-            const manifest = await browser.runtime.getManifest();
+            const manifest = browser.runtime.getManifest();
             const lastUpboardVersion = await getSetting('lastUpboardVersion');
 
             const last = lastUpboardVersion?.split('.');
@@ -490,7 +490,7 @@ async function detectMissingShortcuts() {
 
     /** @type {string[]} */
     let cmdsExpectingShortcut = [];
-    const manifest = await browser.runtime.getManifest();
+    const manifest = browser.runtime.getManifest();
     const manifestCmds = manifest.commands;
     for (let i = 0; i < cmds.length; i++) {
         const cmd = cmds[i];

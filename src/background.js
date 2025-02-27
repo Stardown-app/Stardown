@@ -84,8 +84,8 @@ browser.commands.onCommand.addListener(async command => {
             await handleInteraction(tabs1[0], { category: 'copyEntirePageShortcut' });
             break;
         case 'copyMultipleTabs':
-            const tabs2 = await browser.tabs.query({ active: true, currentWindow: true });
-            await handleCopyMultipleTabs(tabs2[0]);
+            const tabs2 = await browser.tabs.query({ currentWindow: true, highlighted: true });
+            await handleCopyMultipleTabs(tabs2);
             break;
         case 'openSettings':
             browser.runtime.openOptionsPage();
@@ -122,16 +122,22 @@ browser.runtime.onMessage.addListener(async (message, sender, sendResponse) => {
             }
             break;
         case 'copySelectionButtonPressed':
-            const tabs = await browser.tabs.query({ active: true, currentWindow: true });
-            await handleInteraction(tabs[0], { category: 'copySelectionShortcut' });
+            const tabs = await browser.tabs.query({ currentWindow: true, highlighted: true });
+            if (tabs.length === 1) { // if only one tab is selected
+                // copy the selected part of the page if any, otherwise copy the tab
+                await handleInteraction(tabs[0], { category: 'copySelectionShortcut' });
+            } else { // if multiple tabs are selected
+                // copy the selected tabs
+                await handleCopyMultipleTabs(tabs);
+            }
             break;
         case 'copyEntirePageButtonPressed':
             const tabs1 = await browser.tabs.query({ active: true, currentWindow: true });
             await handleInteraction(tabs1[0], { category: 'copyEntirePageShortcut' });
             break;
         case 'copyMultipleTabsButtonPressed':
-            const tabs2 = await browser.tabs.query({ active: true, currentWindow: true });
-            await handleCopyMultipleTabs(tabs2[0]);
+            const tabs2 = await browser.tabs.query({ currentWindow: true, highlighted: true });
+            await handleCopyMultipleTabs(tabs2);
             break;
         case 'sidebarButtonPressed':
             // Chromium only
@@ -315,12 +321,10 @@ async function handleInteraction(tab, message, options = {}, successStatus = 1) 
  * handleCopyMultipleTabs handles a request from the user to create a markdown list of
  * links, and sends it to the content script to be copied. A status indicator is then
  * shown to the user.
- * @param {any} activeTab
+ * @param {Tab[]} tabs
  * @returns {Promise<void>}
  */
-async function handleCopyMultipleTabs(activeTab) {
-    // figure out which tabs to create links for
-    let tabs = await browser.tabs.query({ currentWindow: true, highlighted: true });
+async function handleCopyMultipleTabs(tabs) {
     if (tabs.length === 1) { // if only one tab is highlighted
         // get unhighlighted tabs
         const copyTabsWindows = await getSetting('copyTabsWindows');
@@ -360,6 +364,8 @@ async function handleCopyMultipleTabs(activeTab) {
 
     const message = { category: 'copyText', text: text };
     const options = {};
+    const activeTabs = await browser.tabs.query({ active: true, currentWindow: true });
+    const activeTab = activeTabs[0];
     await handleInteraction(activeTab, message, options, tabs.length);
 }
 

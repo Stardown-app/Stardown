@@ -32,6 +32,7 @@ Here are a bunch of web pages with interesting features for testing.
 - [GitHub issue with several timeline item types](https://github.com/Stardown-app/Stardown/issues/44)
 - [YouTube video](https://www.youtube.com/watch?v=jfKfPfyJRdk)
 - [PDFs](https://haslab.github.io/SAFER/scp21.pdf) should make Stardown show an error message like "Stardown cannot run on PDFs"
+- On [HBR1 - Music on Futurenet](http://www.hbr1.com/), writing to Stardown's notepad works but writing to the clipboard fails silently for some reason. Writing to the clipboard works on other http sites like [http://detectportal.firefox.com/success.txt](http://detectportal.firefox.com/success.txt), so it's not because it's http. Maybe it's because of HBR1's unusual HTML. The site is ancient and I haven't seen this problem anywhere else, so it's not a priority to fix this.
 
 ### Context types
 

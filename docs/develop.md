@@ -26,6 +26,21 @@ Stardown uses several different execution contexts as described in [./execution-
 
 This project uses [JSDoc](https://en.wikipedia.org/wiki/JSDoc) to annotate types. In VS Code you can type `/**` above a function and press enter to auto-generate part of its JSDoc comment.
 
+## Releasing
+
+When creating a new release:
+
+1. Make sure the tests pass with `npm test`
+2. Update the `VERSION` variable in [../src/settings.js](../src/settings.js)
+3. If the new version is stable (matches the regex pattern `^v\d+\.\d+\.\d+$`)
+   1. Update the "version" properties in the manifests
+   2. Update [../src/updated.html](../src/updated.html)
+4. Commit, push, make a pull request into the main branch, merge, and pull
+5. Tag the merge commit with the same value as the `VERSION` variable in settings.js
+6. Push the tag
+
+This will run a few GitHub actions that will build the extension, create a GitHub release, and update [the install/update instructions site](https://stardown-app.github.io/Stardown/docs/install-and-update-instructions/).
+
 ## Improving Stardown's output
 
 If changes to improve the output can apply to:

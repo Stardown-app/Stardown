@@ -12,6 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+const latestStableVersion = 'LATEST_STABLE_VERSION'; // a script changes this value when the site builds
+const latestPrereleaseVersion = 'LATEST_PRERELEASE_VERSION'; // a script changes this value when the site builds
+
+const chromeStableUrl = `https://github.com/Stardown-app/Stardown/releases/download/${latestStableVersion}/stardown-${latestStableVersion}-chrome.zip`;
+const firefoxStableUrl = `https://github.com/Stardown-app/Stardown/releases/download/${latestStableVersion}/stardown-${latestStableVersion}-firefox.zip`;
+const chromePrereleaseUrl = `https://github.com/Stardown-app/Stardown/releases/download/${latestPrereleaseVersion}/stardown-${latestPrereleaseVersion}-chrome.zip`;
+const firefoxPrereleaseUrl = `https://github.com/Stardown-app/Stardown/releases/download/${latestPrereleaseVersion}/stardown-${latestPrereleaseVersion}-firefox.zip`;
+
 const latestVersionEl = document.querySelector('#latestVersion');
 
 const instructionsEl = document.querySelector('#instructions');
@@ -79,7 +87,7 @@ class Instructions {
 }
 
 async function main() {
-    await fetchLatestReleaseTags();
+    showLatestVersion();
 
     // if this page's URL ends with `/?updating=true`
     const isUpdating = new URLSearchParams(window.location.search).get('updating') === 'true';
@@ -90,62 +98,23 @@ async function main() {
     buildAndShowInstructions();
 }
 
-async function fetchLatestReleaseTags() {
-    const stableReleaseTagPattern = /^v\d+\.\d+\.\d+$/;
-    const prereleaseTagPattern = /^v\d+\.\d+\.\d+-(?:alpha|beta)\.\d{10}$/; // the last 10 digits are YYMMDDhhmm
+function showLatestVersion() {
+    const [stableMajor, stableMinor, stablePatch] = latestStableVersion.substring(1).split('.').map(n => parseInt(n));
+    const [preMajor, preMinor, prePatch] = latestPrereleaseVersion.split('-')[0].substring(1).split('.').map(n => parseInt(n));
 
-    let latestStableVersion = '';
-    let latestPrereleaseVersion = '';
-
-    let page = 1;
-    while (!latestStableVersion) {
-        // request a page of Git tags from the GitHub API
-        let response;
-        try {
-            response = await fetch(`https://api.github.com/repos/Stardown-app/Stardown/tags?page=${page}`); // https://docs.github.com/en/rest/repos/repos?apiVersion=2022-11-28#list-repository-tags
-        } catch (err) {
-            console.error(`fetch error: ${err.message}`);
-            return;
-        }
-        if (!response.ok) {
-            console.error(`The GitHub API responded with error status ${response.status}`);
-            return;
-        }
-
-        // Find the latest stable release tag, and the latest prerelease tag if there is
-        // at least one newer than the latest stable release.
-        const tags = await response.json();
-        for (const tag of tags) {
-            const isStable = stableReleaseTagPattern.test(tag.name);
-            const isPrerelease = prereleaseTagPattern.test(tag.name);
-            if (isStable) {
-                latestStableVersion = tag.name;
-                break;
-            } else if (isPrerelease) {
-                if (!latestPrereleaseVersion) {
-                    latestPrereleaseVersion = tag.name;
-                }
-            } else {
-                console.log(`Ignoring non-release tag: ${tag.name}`);
-            }
-        }
-
-        if (!latestStableVersion) {
-            if (page === 10) {
-                console.error('Failed to find the latest stable release tag after 10 attempts. Stopping.');
-                return;
-            }
-
-            console.warn('Failed to find the latest stable release tag. Trying again in half a second.');
-            page++;
-            await sleep(500);
-        }
-    }
-
-    if (latestPrereleaseVersion) {
+    const isStableNewer = (
+        stableMajor > preMajor || (
+            stableMajor === preMajor && (
+                stableMinor > preMinor || (
+                    stableMinor === preMinor && stablePatch > prePatch
+                )
+            )
+        )
+    );
+    if (isStableNewer) {
+        latestVersionEl.innerHTML = `Latest version: ${latestStableVersion}`;
+    } else {
         latestVersionEl.innerHTML = `Latest stable version: ${latestStableVersion}<br>Latest prerelease version: ${latestPrereleaseVersion}`;
-    } else { // if the latest release is a stable version
-        latestVersionEl.innerHTML = `Latest version: ${latestStableVersion}<br>There are no newer prerelease versions.`;
     }
 }
 
@@ -240,7 +209,7 @@ function installWithStore(instructions) {
 function installWithZip(instructions) {
     if (chromiumEl.checked) {
         instructions.steps.push(
-            '<a class="chrome" target="_blank">Download the zip file</a>',
+            `<a href="${chromePrereleaseUrl}" target="_blank">Download the zip file</a>`,
             'Unzip the zip file',
             'In your browser, open <code>chrome://extensions/</code>',
             'Turn on developer mode',
@@ -249,7 +218,7 @@ function installWithZip(instructions) {
         );
     } else if (firefoxEl.checked) {
         instructions.steps.push(
-            '<a class="firefox" target="_blank">Download the zip file</a>',
+            `<a href="${firefoxPrereleaseUrl}" target="_blank">Download the zip file</a>`,
             'Unzip the zip file',
             'In your browser, open <code>about:debugging#/runtime/this-firefox</code>',
             'Click "Load Temporary Add-on..."',
@@ -331,7 +300,7 @@ function updateWithStore(instructions) {
 function updateWithZip(instructions) {
     if (chromiumEl.checked) {
         instructions.steps.push(
-            '<a class="chrome" target="_blank">Download a new zip file</a>',
+            `<a href="${chromePrereleaseUrl}" target="_blank">Download a new zip file</a>`,
             'Unzip the zip file',
             'In your browser, open <code>chrome://extensions/</code>',
             'Remove Stardown',
@@ -340,7 +309,7 @@ function updateWithZip(instructions) {
         );
     } else if (firefoxEl.checked) {
         instructions.steps.push(
-            '<a class="firefox" target="_blank">Download a new zip file</a>',
+            `<a href="${firefoxPrereleaseUrl}" target="_blank">Download a new zip file</a>`,
             'Unzip the zip file',
             'In your browser, open <code>about:debugging#/runtime/this-firefox</code>',
             'Remove Stardown',

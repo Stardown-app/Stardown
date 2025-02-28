@@ -94,6 +94,12 @@ async function main() {
         console.log(tag.name);
     }
 
+    // if this page's URL ends with `/?updating=true`
+    const isUpdating = new URLSearchParams(window.location.search).get('updating') === 'true';
+    if (isUpdating) {
+        updatingEl.checked = true;
+    }
+
     buildAndShowInstructions();
 }
 

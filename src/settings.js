@@ -44,11 +44,11 @@ checkForUpdatesButton.addEventListener('click', async () => {
     updateCheckResultEl.innerText = 'Checking for updates...';
     checkForUpdatesButton.disabled = true;
 
-    let latestStableVersionStr = '';
-    let latestPrereleaseVersionStr = '';
+    let latestStableVersion = '';
+    let latestPrereleaseVersion = '';
 
     let page = 1;
-    while (!latestStableVersionStr) {
+    while (!latestStableVersion) {
         // request a page of Git tags from the GitHub API
         let response;
         try {
@@ -73,18 +73,18 @@ checkForUpdatesButton.addEventListener('click', async () => {
             const isStable = stableReleaseTagPattern.test(tag.name);
             const isPrerelease = prereleaseTagPattern.test(tag.name);
             if (isStable) {
-                latestStableVersionStr = tag.name;
+                latestStableVersion = tag.name;
                 break;
             } else if (isPrerelease) {
-                if (!latestPrereleaseVersionStr) {
-                    latestPrereleaseVersionStr = tag.name;
+                if (!latestPrereleaseVersion) {
+                    latestPrereleaseVersion = tag.name;
                 }
             } else {
                 console.log(`Ignoring non-release tag: ${tag.name}`);
             }
         }
 
-        if (!latestStableVersionStr) {
+        if (!latestStableVersion) {
             if (page === 10) {
                 console.error('Failed to find the latest stable release tag after 10 attempts. Stopping.');
                 updateCheckResultEl.innerText = 'Failed to check for updates after 10 attempts';
@@ -100,9 +100,9 @@ checkForUpdatesButton.addEventListener('click', async () => {
 
     console.log(`Current version: ${VERSION}`);
     console.log(`Current version in manifest: v${manifest.version}`);
-    console.log(`Latest stable version: ${latestStableVersionStr}`);
-    if (latestPrereleaseVersionStr) {
-        console.log(`Latest prerelease version: ${latestPrereleaseVersionStr}`);
+    console.log(`Latest stable version: ${latestStableVersion}`);
+    if (latestPrereleaseVersion) {
+        console.log(`Latest prerelease version: ${latestPrereleaseVersion}`);
     } else {
         console.log('There are no prerelease versions newer than the latest stable version');
     }
@@ -112,10 +112,10 @@ checkForUpdatesButton.addEventListener('click', async () => {
             Click here for update instructions.</a>
     `;
 
-    if (latestPrereleaseVersionStr) {
-        if (VERSION === latestPrereleaseVersionStr) {
+    if (latestPrereleaseVersion) {
+        if (VERSION === latestPrereleaseVersion) {
             updateCheckResultEl.innerText = 'You have the latest version of Stardown.';
-        } else if (VERSION === latestStableVersionStr) {
+        } else if (VERSION === latestStableVersion) {
             updateCheckResultEl.innerHTML = `
                 You have the latest stable version of Stardown. A newer pre-release version is available. ${updateInstructionsHtml}
             `;
@@ -123,7 +123,7 @@ checkForUpdatesButton.addEventListener('click', async () => {
             updateCheckResultEl.innerHTML = `An update is available! ${updateInstructionsHtml}`;
         }
     } else { // if the latest release is a stable version
-        if (VERSION === latestStableVersionStr) {
+        if (VERSION === latestStableVersion) {
             updateCheckResultEl.innerText = 'You have the latest version of Stardown.';
         } else {
             updateCheckResultEl.innerHTML = `An update is available! ${updateInstructionsHtml}`;

@@ -94,11 +94,11 @@ async function fetchLatestReleaseTags() {
     const stableReleaseTagPattern = /^v\d+\.\d+\.\d+$/;
     const prereleaseTagPattern = /^v\d+\.\d+\.\d+-(?:alpha|beta)\.\d{10}$/; // the last 10 digits are YYMMDDhhmm
 
-    let latestStableVersionStr = '';
-    let latestPrereleaseVersionStr = '';
+    let latestStableVersion = '';
+    let latestPrereleaseVersion = '';
 
     let page = 1;
-    while (!latestStableVersionStr) {
+    while (!latestStableVersion) {
         // request a page of Git tags from the GitHub API
         let response;
         try {
@@ -119,18 +119,18 @@ async function fetchLatestReleaseTags() {
             const isStable = stableReleaseTagPattern.test(tag.name);
             const isPrerelease = prereleaseTagPattern.test(tag.name);
             if (isStable) {
-                latestStableVersionStr = tag.name;
+                latestStableVersion = tag.name;
                 break;
             } else if (isPrerelease) {
-                if (!latestPrereleaseVersionStr) {
-                    latestPrereleaseVersionStr = tag.name;
+                if (!latestPrereleaseVersion) {
+                    latestPrereleaseVersion = tag.name;
                 }
             } else {
                 console.log(`Ignoring non-release tag: ${tag.name}`);
             }
         }
 
-        if (!latestStableVersionStr) {
+        if (!latestStableVersion) {
             if (page === 10) {
                 console.error('Failed to find the latest stable release tag after 10 attempts. Stopping.');
                 return;
@@ -142,10 +142,10 @@ async function fetchLatestReleaseTags() {
         }
     }
 
-    if (latestPrereleaseVersionStr) {
-        latestVersionEl.innerHTML = `Latest stable version: ${latestStableVersionStr}<br>Latest prerelease version: ${latestPrereleaseVersionStr}`;
+    if (latestPrereleaseVersion) {
+        latestVersionEl.innerHTML = `Latest stable version: ${latestStableVersion}<br>Latest prerelease version: ${latestPrereleaseVersion}`;
     } else { // if the latest release is a stable version
-        latestVersionEl.innerHTML = `Latest version: ${latestStableVersionStr}<br>There are no newer prerelease versions.`;
+        latestVersionEl.innerHTML = `Latest version: ${latestStableVersion}<br>There are no newer prerelease versions.`;
     }
 }
 

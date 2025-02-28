@@ -36,11 +36,6 @@ each anchor so that the pages they navigate to are opened in new tabs. -->
         color: black;
       }
 
-      #versionNumber {
-        font-size: 12px;
-        color: gray;
-      }
-
       body {
         font-size: 18px;
         margin: 20px;
@@ -91,14 +86,23 @@ each anchor so that the pages they navigate to are opened in new tabs. -->
   </head>
 
   <body>
-    <h1>
-      <a href="https://github.com/Stardown-app/Stardown" target="_blank">
-        <img width="30" alt="Stardown's icon" src="images/stardown.svg">
-        Stardown
-      </a>
-    </h1>
-    <small id="versionNumber"></small>
-    <p>Copy the web as markdown.</p>
+    <div style="display: flex; align-items: center;">
+      <h1>
+        <a href="https://github.com/Stardown-app/Stardown" target="_blank">
+          <img width="30" alt="Stardown's icon" src="images/stardown.svg">
+          Stardown
+        </a>
+      </h1>
+      <p style="margin-left: 30px">
+        Copy the web as markdown.
+      </p>
+    </div>
+
+    <p>
+      <span id="versionNumber" style="margin-right: 10px"></span>
+      <button id="checkForUpdates" type="button">Check for updates</button>
+      <span id="updateCheckResult"></span>
+    </p>
 
     <h2>How to change the keyboard shortcuts</h2>
 

@@ -31,8 +31,8 @@ browser.runtime.onInstalled.addListener(async details => {
             const manifest = browser.runtime.getManifest();
             const lastUpboardVersion = await getSetting('lastUpboardVersion');
 
-            const last = lastUpboardVersion?.split('.');
-            const current = manifest.version.split('.');
+            const last = lastUpboardVersion?.split('.').map(n => parseInt(n));
+            const current = manifest.version.split('.').map(n => parseInt(n));
 
             if (
                 last === undefined || last[0] > current[0] || (

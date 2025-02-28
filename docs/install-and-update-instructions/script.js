@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+const latestVersionEl = document.querySelector('#latestVersion');
+
 const instructionsEl = document.querySelector('#instructions');
 
 // fieldsets that start hidden
@@ -77,22 +79,7 @@ class Instructions {
 }
 
 async function main() {
-    // request a page of Git tags from the GitHub API
-    let response;
-    try {
-        response = await fetch(`https://api.github.com/repos/Stardown-app/Stardown/tags`); // https://docs.github.com/en/rest/repos/repos?apiVersion=2022-11-28#list-repository-tags
-    } catch (err) {
-        console.error(`fetch error: ${err.message}`);
-        return;
-    }
-    if (!response.ok) {
-        console.error(`The GitHub API responded with error status ${response.status}`);
-        return;
-    }
-    const tags = await response.json();
-    for (const tag of tags) {
-        console.log(tag.name);
-    }
+    await fetchLatestReleaseTags();
 
     // if this page's URL ends with `/?updating=true`
     const isUpdating = new URLSearchParams(window.location.search).get('updating') === 'true';
@@ -101,6 +88,65 @@ async function main() {
     }
 
     buildAndShowInstructions();
+}
+
+async function fetchLatestReleaseTags() {
+    const stableReleaseTagPattern = /^v\d+\.\d+\.\d+$/;
+    const prereleaseTagPattern = /^v\d+\.\d+\.\d+-(?:alpha|beta)\.\d{10}$/; // the last 10 digits are YYMMDDhhmm
+
+    let latestStableVersionStr = '';
+    let latestPrereleaseVersionStr = '';
+
+    let page = 1;
+    while (!latestStableVersionStr) {
+        // request a page of Git tags from the GitHub API
+        let response;
+        try {
+            response = await fetch(`https://api.github.com/repos/Stardown-app/Stardown/tags?page=${page}`); // https://docs.github.com/en/rest/repos/repos?apiVersion=2022-11-28#list-repository-tags
+        } catch (err) {
+            console.error(`fetch error: ${err.message}`);
+            return;
+        }
+        if (!response.ok) {
+            console.error(`The GitHub API responded with error status ${response.status}`);
+            return;
+        }
+
+        // Find the latest stable release tag, and the latest prerelease tag if there is
+        // at least one newer than the latest stable release.
+        const tags = await response.json();
+        for (const tag of tags) {
+            const isStable = stableReleaseTagPattern.test(tag.name);
+            const isPrerelease = prereleaseTagPattern.test(tag.name);
+            if (isStable) {
+                latestStableVersionStr = tag.name;
+                break;
+            } else if (isPrerelease) {
+                if (!latestPrereleaseVersionStr) {
+                    latestPrereleaseVersionStr = tag.name;
+                }
+            } else {
+                console.log(`Ignoring non-release tag: ${tag.name}`);
+            }
+        }
+
+        if (!latestStableVersionStr) {
+            if (page === 10) {
+                console.error('Failed to find the latest stable release tag after 10 attempts. Stopping.');
+                return;
+            }
+
+            console.warn('Failed to find the latest stable release tag. Trying again in half a second.');
+            page++;
+            await sleep(500);
+        }
+    }
+
+    if (latestPrereleaseVersionStr) {
+        latestVersionEl.innerHTML = `Latest stable version: ${latestStableVersionStr}<br>Latest prerelease version: ${latestPrereleaseVersionStr}`;
+    } else { // if the latest release is a stable version
+        latestVersionEl.innerHTML = `Latest version: ${latestStableVersionStr}<br>There are no newer prerelease versions.`;
+    }
 }
 
 function buildAndShowInstructionsAndScroll() {
@@ -341,6 +387,16 @@ function showInstructions(instructions) {
         <br />
         <a href="https://github.com/Stardown-app/Stardown">Return to GitHub</a>
     `;
+}
+
+/**
+ * sleep pauses the execution of the current async function for a number of
+ * milliseconds.
+ * @param {number} ms - the number of milliseconds to sleep.
+ * @returns {Promise<void>}
+ */
+async function sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
 }
 
 main();

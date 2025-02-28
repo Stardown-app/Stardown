@@ -55,19 +55,19 @@ if (!chromiumEl.checked && !firefoxEl.checked && !safariEl.checked) {
     chromiumEl.checked = true;
 }
 
-chromiumEl.addEventListener('change', buildAndShowInstructions);
-firefoxEl.addEventListener('change', buildAndShowInstructions);
-safariEl.addEventListener('change', buildAndShowInstructions);
-installingEl.addEventListener('change', buildAndShowInstructions);
-updatingEl.addEventListener('change', buildAndShowInstructions);
-installedWithStoreEl.addEventListener('change', buildAndShowInstructions);
-installedWithZipEl.addEventListener('change', buildAndShowInstructions);
-installedWithTerminalEl.addEventListener('change', buildAndShowInstructions);
-willInstallWithStoreEl.addEventListener('change', buildAndShowInstructions);
-willInstallWithZipEl.addEventListener('change', buildAndShowInstructions);
-willInstallWithTerminalEl.addEventListener('change', buildAndShowInstructions);
-yesNodeV14PlusEl.addEventListener('change', buildAndShowInstructions);
-noNodeV14PlusEl.addEventListener('change', buildAndShowInstructions);
+chromiumEl.addEventListener('change', buildAndShowInstructionsAndScroll);
+firefoxEl.addEventListener('change', buildAndShowInstructionsAndScroll);
+safariEl.addEventListener('change', buildAndShowInstructionsAndScroll);
+installingEl.addEventListener('change', buildAndShowInstructionsAndScroll);
+updatingEl.addEventListener('change', buildAndShowInstructionsAndScroll);
+installedWithStoreEl.addEventListener('change', buildAndShowInstructionsAndScroll);
+installedWithZipEl.addEventListener('change', buildAndShowInstructionsAndScroll);
+installedWithTerminalEl.addEventListener('change', buildAndShowInstructionsAndScroll);
+willInstallWithStoreEl.addEventListener('change', buildAndShowInstructionsAndScroll);
+willInstallWithZipEl.addEventListener('change', buildAndShowInstructionsAndScroll);
+willInstallWithTerminalEl.addEventListener('change', buildAndShowInstructionsAndScroll);
+yesNodeV14PlusEl.addEventListener('change', buildAndShowInstructionsAndScroll);
+noNodeV14PlusEl.addEventListener('change', buildAndShowInstructionsAndScroll);
 
 class Instructions {
     constructor() {
@@ -103,6 +103,15 @@ async function main() {
     buildAndShowInstructions();
 }
 
+function buildAndShowInstructionsAndScroll() {
+    buildAndShowInstructions();
+
+    window.scrollTo({
+        top: document.body.scrollHeight,
+        behavior: 'smooth'
+    });
+}
+
 function buildAndShowInstructions() {
     const instructions = new Instructions();
 
@@ -124,11 +133,6 @@ function buildAndShowInstructions() {
     } else {
         instructionsEl.setAttribute('hidden', 'hidden');
     }
-
-    window.scrollTo({
-        top: document.body.scrollHeight,
-        behavior: 'smooth'
-    });
 }
 
 function install(instructions) {

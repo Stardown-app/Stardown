@@ -55,19 +55,19 @@ if (!chromiumEl.checked && !firefoxEl.checked && !safariEl.checked) {
     chromiumEl.checked = true;
 }
 
-chromiumEl.addEventListener('change', main);
-firefoxEl.addEventListener('change', main);
-safariEl.addEventListener('change', main);
-installingEl.addEventListener('change', main);
-updatingEl.addEventListener('change', main);
-installedWithStoreEl.addEventListener('change', main);
-installedWithZipEl.addEventListener('change', main);
-installedWithTerminalEl.addEventListener('change', main);
-willInstallWithStoreEl.addEventListener('change', main);
-willInstallWithZipEl.addEventListener('change', main);
-willInstallWithTerminalEl.addEventListener('change', main);
-yesNodeV14PlusEl.addEventListener('change', main);
-noNodeV14PlusEl.addEventListener('change', main);
+chromiumEl.addEventListener('change', buildAndShowInstructions);
+firefoxEl.addEventListener('change', buildAndShowInstructions);
+safariEl.addEventListener('change', buildAndShowInstructions);
+installingEl.addEventListener('change', buildAndShowInstructions);
+updatingEl.addEventListener('change', buildAndShowInstructions);
+installedWithStoreEl.addEventListener('change', buildAndShowInstructions);
+installedWithZipEl.addEventListener('change', buildAndShowInstructions);
+installedWithTerminalEl.addEventListener('change', buildAndShowInstructions);
+willInstallWithStoreEl.addEventListener('change', buildAndShowInstructions);
+willInstallWithZipEl.addEventListener('change', buildAndShowInstructions);
+willInstallWithTerminalEl.addEventListener('change', buildAndShowInstructions);
+yesNodeV14PlusEl.addEventListener('change', buildAndShowInstructions);
+noNodeV14PlusEl.addEventListener('change', buildAndShowInstructions);
 
 class Instructions {
     constructor() {
@@ -76,7 +76,28 @@ class Instructions {
     }
 }
 
-function main() {
+async function main() {
+    // request a page of Git tags from the GitHub API
+    let response;
+    try {
+        response = await fetch(`https://api.github.com/repos/Stardown-app/Stardown/tags`); // https://docs.github.com/en/rest/repos/repos?apiVersion=2022-11-28#list-repository-tags
+    } catch (err) {
+        console.error(`fetch error: ${err.message}`);
+        return;
+    }
+    if (!response.ok) {
+        console.error(`The GitHub API responded with error status ${response.status}`);
+        return;
+    }
+    const tags = await response.json();
+    for (const tag of tags) {
+        console.log(tag.name);
+    }
+
+    buildAndShowInstructions();
+}
+
+function buildAndShowInstructions() {
     const instructions = new Instructions();
 
     if (safariEl.checked) {

@@ -32,7 +32,7 @@ When creating a new release:
 
 1. Make sure the tests pass with `npm test`
 2. Update the `VERSION` variable in [../src/settings.js](../src/settings.js)
-3. If the new version is stable (matches the regex pattern `^v\d+\.\d+\.\d+$`)
+3. If the new version is a stable release
    1. Update the "version" properties in the manifests
    2. Update [../src/updated.html](../src/updated.html)
 4. Commit, push, make a pull request into the main branch, merge, and pull

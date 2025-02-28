@@ -108,7 +108,7 @@ checkForUpdatesButton.addEventListener('click', async () => {
     }
 
     const updateInstructionsHtml = `
-        <a href="https://stardown-app.github.io/Stardown/docs/install-and-update-instructions">
+        <a href="https://stardown-app.github.io/Stardown/docs/install-and-update-instructions/?updating=true">
             Click here for update instructions.</a>
     `;
 
@@ -154,8 +154,6 @@ const mdBulletPointEl = document.querySelector('#mdBulletPoint');
 
 const jsonEmptyCellEl = document.querySelector('#jsonEmptyCell');
 const jsonDestinationEl = document.querySelector('#jsonDestination');
-
-const resetButton = document.querySelector('#reset');
 
 // set up setting autosaving
 initAutosave('markupLanguage', markupLanguageEl, 'value');
@@ -240,22 +238,6 @@ async function loadSettings() {
 }
 
 /**
- * resetSettings deletes all settings from browser storage and indicates success. It
- * assumes it's being used as a form event listener for the 'reset' event so that it
- * doesn't have to reset the settings page.
- */
-async function resetSettings() {
-    await browser.storage.sync.clear();
-
-    resetButton.value = 'Reset all ✔';
-    resetButton.style.backgroundColor = '#aadafa';
-    setTimeout(() => {
-        resetButton.value = 'Reset all';
-        resetButton.style.backgroundColor = '';
-    }, 750);
-}
-
-/**
  * validateTemplateVariables validates the selection template's variables. If any are
  * invalid, an error message is displayed.
  * @returns {Promise<void>}
@@ -309,4 +291,3 @@ templateEl.addEventListener('input', async function () {
 });
 
 document.addEventListener('DOMContentLoaded', loadSettings);
-form.addEventListener('reset', resetSettings);

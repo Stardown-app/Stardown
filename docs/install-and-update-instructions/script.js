@@ -55,19 +55,19 @@ if (!chromiumEl.checked && !firefoxEl.checked && !safariEl.checked) {
     chromiumEl.checked = true;
 }
 
-chromiumEl.addEventListener('change', main);
-firefoxEl.addEventListener('change', main);
-safariEl.addEventListener('change', main);
-installingEl.addEventListener('change', main);
-updatingEl.addEventListener('change', main);
-installedWithStoreEl.addEventListener('change', main);
-installedWithZipEl.addEventListener('change', main);
-installedWithTerminalEl.addEventListener('change', main);
-willInstallWithStoreEl.addEventListener('change', main);
-willInstallWithZipEl.addEventListener('change', main);
-willInstallWithTerminalEl.addEventListener('change', main);
-yesNodeV14PlusEl.addEventListener('change', main);
-noNodeV14PlusEl.addEventListener('change', main);
+chromiumEl.addEventListener('change', buildAndShowInstructionsAndScroll);
+firefoxEl.addEventListener('change', buildAndShowInstructionsAndScroll);
+safariEl.addEventListener('change', buildAndShowInstructionsAndScroll);
+installingEl.addEventListener('change', buildAndShowInstructionsAndScroll);
+updatingEl.addEventListener('change', buildAndShowInstructionsAndScroll);
+installedWithStoreEl.addEventListener('change', buildAndShowInstructionsAndScroll);
+installedWithZipEl.addEventListener('change', buildAndShowInstructionsAndScroll);
+installedWithTerminalEl.addEventListener('change', buildAndShowInstructionsAndScroll);
+willInstallWithStoreEl.addEventListener('change', buildAndShowInstructionsAndScroll);
+willInstallWithZipEl.addEventListener('change', buildAndShowInstructionsAndScroll);
+willInstallWithTerminalEl.addEventListener('change', buildAndShowInstructionsAndScroll);
+yesNodeV14PlusEl.addEventListener('change', buildAndShowInstructionsAndScroll);
+noNodeV14PlusEl.addEventListener('change', buildAndShowInstructionsAndScroll);
 
 class Instructions {
     constructor() {
@@ -76,7 +76,43 @@ class Instructions {
     }
 }
 
-function main() {
+async function main() {
+    // request a page of Git tags from the GitHub API
+    let response;
+    try {
+        response = await fetch(`https://api.github.com/repos/Stardown-app/Stardown/tags`); // https://docs.github.com/en/rest/repos/repos?apiVersion=2022-11-28#list-repository-tags
+    } catch (err) {
+        console.error(`fetch error: ${err.message}`);
+        return;
+    }
+    if (!response.ok) {
+        console.error(`The GitHub API responded with error status ${response.status}`);
+        return;
+    }
+    const tags = await response.json();
+    for (const tag of tags) {
+        console.log(tag.name);
+    }
+
+    // if this page's URL ends with `/?updating=true`
+    const isUpdating = new URLSearchParams(window.location.search).get('updating') === 'true';
+    if (isUpdating) {
+        updatingEl.checked = true;
+    }
+
+    buildAndShowInstructions();
+}
+
+function buildAndShowInstructionsAndScroll() {
+    buildAndShowInstructions();
+
+    window.scrollTo({
+        top: document.body.scrollHeight,
+        behavior: 'smooth'
+    });
+}
+
+function buildAndShowInstructions() {
     const instructions = new Instructions();
 
     if (safariEl.checked) {
@@ -97,11 +133,6 @@ function main() {
     } else {
         instructionsEl.setAttribute('hidden', 'hidden');
     }
-
-    window.scrollTo({
-        top: document.body.scrollHeight,
-        behavior: 'smooth'
-    });
 }
 
 function install(instructions) {

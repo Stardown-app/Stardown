@@ -36,7 +36,8 @@ fieldset {
     margin: 20px;
 }
 
-#instructions {
+#instructions,
+#latestVersion {
     margin: 50px;
 }
 

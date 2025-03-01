@@ -120,7 +120,7 @@ checkForUpdatesButton.addEventListener('click', async () => {
 
     if (latestPrereleaseVersion) {
         if (VERSION === latestPrereleaseVersion) {
-            updateCheckResultEl.innerText = 'You have the latest version of Stardown.';
+            updateCheckResultEl.innerHTML = 'You have the latest version of Stardown.';
         } else if (VERSION === latestStableVersion) {
             updateCheckResultEl.innerHTML = `
                 You have the latest stable version of Stardown. A newer pre-release version is available. ${updateInstructionsHtml}
@@ -130,7 +130,7 @@ checkForUpdatesButton.addEventListener('click', async () => {
         }
     } else { // if the latest release is a stable version
         if (VERSION === latestStableVersion) {
-            updateCheckResultEl.innerText = 'You have the latest version of Stardown.';
+            updateCheckResultEl.innerHTML = 'You have the latest version of Stardown.';
         } else {
             updateCheckResultEl.innerHTML = `An update is available! ${updateInstructionsHtml}`;
         }

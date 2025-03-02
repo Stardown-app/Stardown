@@ -23,9 +23,9 @@ import { getSetting } from './getSetting.js';
  * exists because the "version" properties in the manifests only support stable release
  * versions.
  */
-const VERSION = 'v2.0.0-alpha.2411120735';
+const VERSION = 'v2.0.0-alpha.2503020621';
 const stableReleaseTagPattern = /^v\d+\.\d+\.\d+$/;
-const prereleaseTagPattern = /^v\d+\.\d+\.\d+-(?:alpha|beta)\.\d{10}$/; // the last 10 digits are YYMMDDhhmm
+const prereleaseTagPattern = /^v\d+\.\d+\.\d+-(?:alpha|beta)\.\d{10}$/; // the last 10 digits are YYMMDDhhmm in UTC
 if (!stableReleaseTagPattern.test(VERSION) && !prereleaseTagPattern.test(VERSION)) {
     throw "Stardown's version must match either of two regular expressions";
 } else {

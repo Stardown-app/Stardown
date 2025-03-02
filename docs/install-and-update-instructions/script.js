@@ -28,6 +28,7 @@ const instructionsEl = document.querySelector('#instructions');
 const installedWithEl = document.querySelector('#installedWith');
 const willInstallWithEl = document.querySelector('#willInstallWith');
 const hasNodeV14PlusEl = document.querySelector('#hasNodeV14Plus');
+const wantsStableOrPrereleaseEl = document.querySelector('#wantsStableOrPrerelease');
 
 // radio inputs
 const chromiumEl = document.querySelector('#chromium');
@@ -43,11 +44,17 @@ const willInstallWithZipEl = document.querySelector('#willInstallWithZip');
 const willInstallWithTerminalEl = document.querySelector('#willInstallWithTerminal');
 const yesNodeV14PlusEl = document.querySelector('#yesNodeV14Plus');
 const noNodeV14PlusEl = document.querySelector('#noNodeV14Plus');
+const wantsStableEl = document.querySelector('#wantsStable');
+const wantsPrereleaseEl = document.querySelector('#wantsPrerelease');
+
+const wantsStableLabelEl = document.querySelector('#wantsStableLabel');
+const wantsPrereleaseLabelEl = document.querySelector('#wantsPrereleaseLabel');
 
 instructionsEl.setAttribute('hidden', 'hidden');
 installedWithEl.setAttribute('hidden', 'hidden');
 willInstallWithEl.setAttribute('hidden', 'hidden');
 hasNodeV14PlusEl.setAttribute('hidden', 'hidden');
+wantsStableOrPrereleaseEl.setAttribute('hidden', 'hidden');
 
 const isWindows = navigator.userAgent.includes('Windows');
 
@@ -78,6 +85,21 @@ willInstallWithZipEl.addEventListener('change', buildAndShowInstructionsAndScrol
 willInstallWithTerminalEl.addEventListener('change', buildAndShowInstructionsAndScroll);
 yesNodeV14PlusEl.addEventListener('change', buildAndShowInstructionsAndScroll);
 noNodeV14PlusEl.addEventListener('change', buildAndShowInstructionsAndScroll);
+wantsStableEl.addEventListener('change', buildAndShowInstructionsAndScroll);
+wantsPrereleaseEl.addEventListener('change', buildAndShowInstructionsAndScroll);
+
+const [stableMajor, stableMinor, stablePatch] = latestStableVersion.substring(1).split('.').map(n => parseInt(n));
+const [preMajor, preMinor, prePatch] = latestPrereleaseVersion.split('-')[0].substring(1).split('.').map(n => parseInt(n));
+
+const isStableNewer = (
+    stableMajor > preMajor || (
+        stableMajor === preMajor && (
+            stableMinor > preMinor || (
+                stableMinor === preMinor && stablePatch > prePatch
+            )
+        )
+    )
+);
 
 class Instructions {
     constructor() {
@@ -99,22 +121,12 @@ async function main() {
 }
 
 function showLatestVersion() {
-    const [stableMajor, stableMinor, stablePatch] = latestStableVersion.substring(1).split('.').map(n => parseInt(n));
-    const [preMajor, preMinor, prePatch] = latestPrereleaseVersion.split('-')[0].substring(1).split('.').map(n => parseInt(n));
-
-    const isStableNewer = (
-        stableMajor > preMajor || (
-            stableMajor === preMajor && (
-                stableMinor > preMinor || (
-                    stableMinor === preMinor && stablePatch > prePatch
-                )
-            )
-        )
-    );
     if (isStableNewer) {
         latestVersionEl.innerHTML = `Latest version: ${latestStableVersion}`;
     } else {
         latestVersionEl.innerHTML = `Latest stable version: ${latestStableVersion}<br>Latest prerelease version: ${latestPrereleaseVersion}`;
+        wantsStableLabelEl.innerHTML += ` (${latestStableVersion})`;
+        wantsPrereleaseLabelEl.innerHTML += ` (${latestPrereleaseVersion})`;
     }
 }
 
@@ -135,6 +147,7 @@ function buildAndShowInstructions() {
         willInstallWithEl.setAttribute('hidden', 'hidden');
         installedWithEl.setAttribute('hidden', 'hidden');
         hasNodeV14PlusEl.setAttribute('hidden', 'hidden');
+        wantsStableOrPrereleaseEl.setAttribute('hidden', 'hidden');
     } else if (installingEl.checked) {
         install(instructions);
     } else if (updatingEl.checked) {
@@ -157,14 +170,19 @@ function install(instructions) {
     if (willInstallWithStoreEl.checked) {
         installedWithStoreEl.checked = true;
         hasNodeV14PlusEl.setAttribute('hidden', 'hidden');
+        wantsStableOrPrereleaseEl.setAttribute('hidden', 'hidden');
         installWithStore(instructions);
     } else if (willInstallWithZipEl.checked) {
         installedWithZipEl.checked = true;
         hasNodeV14PlusEl.setAttribute('hidden', 'hidden');
+        if (!isStableNewer) {
+            wantsStableOrPrereleaseEl.removeAttribute('hidden');
+        }
         installWithZip(instructions);
     } else if (willInstallWithTerminalEl.checked) {
         installedWithTerminalEl.checked = true;
         hasNodeV14PlusEl.removeAttribute('hidden');
+        wantsStableOrPrereleaseEl.setAttribute('hidden', 'hidden');
         installWithTerminal(instructions);
     } else {
         return;
@@ -178,12 +196,17 @@ function update(instructions) {
 
     if (installedWithStoreEl.checked) {
         willInstallWithStoreEl.checked = true;
+        wantsStableOrPrereleaseEl.setAttribute('hidden', 'hidden');
         updateWithStore(instructions);
     } else if (installedWithZipEl.checked) {
         willInstallWithZipEl.checked = true;
+        if (!isStableNewer) {
+            wantsStableOrPrereleaseEl.removeAttribute('hidden');
+        }
         updateWithZip(instructions);
     } else if (installedWithTerminalEl.checked) {
         willInstallWithTerminalEl.checked = true;
+        wantsStableOrPrereleaseEl.setAttribute('hidden', 'hidden');
         updateWithTerminal(instructions);
     } else {
         return;
@@ -207,9 +230,16 @@ function installWithStore(instructions) {
 }
 
 function installWithZip(instructions) {
+    if (!isStableNewer && !wantsStableEl.checked && !wantsPrereleaseEl.checked) {
+        return;
+    }
+
+    const usingStable = isStableNewer || wantsStableEl.checked;
+
     if (chromiumEl.checked) {
+        const url = usingStable ? chromeStableUrl : chromePrereleaseUrl;
         instructions.steps.push(
-            `<a href="${chromePrereleaseUrl}" target="_blank">Download the zip file</a>`,
+            `<a href="${url}" target="_blank">Download the zip file</a>`,
             'Unzip the zip file',
             'In your browser, open <code>chrome://extensions/</code>',
             'Turn on developer mode',
@@ -217,8 +247,9 @@ function installWithZip(instructions) {
             'Select the unzipped copy of Stardown',
         );
     } else if (firefoxEl.checked) {
+        const url = usingStable ? firefoxStableUrl : firefoxPrereleaseUrl;
         instructions.steps.push(
-            `<a href="${firefoxPrereleaseUrl}" target="_blank">Download the zip file</a>`,
+            `<a href="${url}" target="_blank">Download the zip file</a>`,
             'Unzip the zip file',
             'In your browser, open <code>about:debugging#/runtime/this-firefox</code>',
             'Click "Load Temporary Add-on..."',
@@ -298,9 +329,16 @@ function updateWithStore(instructions) {
 }
 
 function updateWithZip(instructions) {
+    if (!isStableNewer && !wantsStableEl.checked && !wantsPrereleaseEl.checked) {
+        return;
+    }
+
+    const usingStable = isStableNewer || wantsStableEl.checked;
+
     if (chromiumEl.checked) {
+        const url = usingStable ? chromeStableUrl : chromePrereleaseUrl;
         instructions.steps.push(
-            `<a href="${chromePrereleaseUrl}" target="_blank">Download a new zip file</a>`,
+            `<a href="${url}" target="_blank">Download a new zip file</a>`,
             'Unzip the zip file',
             'In your browser, open <code>chrome://extensions/</code>',
             'Remove Stardown',
@@ -308,8 +346,9 @@ function updateWithZip(instructions) {
             'Select the newly unzipped copy of Stardown',
         );
     } else if (firefoxEl.checked) {
+        const url = usingStable ? firefoxStableUrl : firefoxPrereleaseUrl;
         instructions.steps.push(
-            `<a href="${firefoxPrereleaseUrl}" target="_blank">Download a new zip file</a>`,
+            `<a href="${url}" target="_blank">Download a new zip file</a>`,
             'Unzip the zip file',
             'In your browser, open <code>about:debugging#/runtime/this-firefox</code>',
             'Remove Stardown',

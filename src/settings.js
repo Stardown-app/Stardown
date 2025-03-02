@@ -18,13 +18,19 @@ import { browser, sleep, getShortcutInstructions } from './browserSpecific.js';
 import { getSetting } from './getSetting.js';
 
 /**
- * VERSION is Stardown's version. The value must match one of the regex patterns below.
- * This variable exists because the "version" properties in the manifests only support
- * stable release versions.
+ * VERSION is Stardown's version. The value must match one of the regex patterns below;
+ * you might want to copy & paste this block of code into a REPL to check. This variable
+ * exists because the "version" properties in the manifests only support stable release
+ * versions.
  */
-const VERSION = 'v2.0.0-alpha.2411120735';
+const VERSION = 'v2.0.0-alpha.2503020621';
 const stableReleaseTagPattern = /^v\d+\.\d+\.\d+$/;
-const prereleaseTagPattern = /^v\d+\.\d+\.\d+-(?:alpha|beta)\.\d{10}$/; // the last 10 digits are YYMMDDhhmm
+const prereleaseTagPattern = /^v\d+\.\d+\.\d+-(?:alpha|beta)\.\d{10}$/; // the last 10 digits are YYMMDDhhmm in UTC
+if (!stableReleaseTagPattern.test(VERSION) && !prereleaseTagPattern.test(VERSION)) {
+    throw "Stardown's version must match either of two regular expressions";
+} else {
+    console.log("The version's format is correct");
+}
 
 const manifest = browser.runtime.getManifest();
 document.querySelector('#versionNumber').innerHTML = VERSION;
@@ -44,11 +50,11 @@ checkForUpdatesButton.addEventListener('click', async () => {
     updateCheckResultEl.innerText = 'Checking for updates...';
     checkForUpdatesButton.disabled = true;
 
-    let latestStableVersionStr = '';
-    let latestPrereleaseVersionStr = '';
+    let latestStableVersion = '';
+    let latestPrereleaseVersion = '';
 
     let page = 1;
-    while (!latestStableVersionStr) {
+    while (!latestStableVersion) {
         // request a page of Git tags from the GitHub API
         let response;
         try {
@@ -73,18 +79,18 @@ checkForUpdatesButton.addEventListener('click', async () => {
             const isStable = stableReleaseTagPattern.test(tag.name);
             const isPrerelease = prereleaseTagPattern.test(tag.name);
             if (isStable) {
-                latestStableVersionStr = tag.name;
+                latestStableVersion = tag.name;
                 break;
             } else if (isPrerelease) {
-                if (!latestPrereleaseVersionStr) {
-                    latestPrereleaseVersionStr = tag.name;
+                if (!latestPrereleaseVersion) {
+                    latestPrereleaseVersion = tag.name;
                 }
             } else {
                 console.log(`Ignoring non-release tag: ${tag.name}`);
             }
         }
 
-        if (!latestStableVersionStr) {
+        if (!latestStableVersion) {
             if (page === 10) {
                 console.error('Failed to find the latest stable release tag after 10 attempts. Stopping.');
                 updateCheckResultEl.innerText = 'Failed to check for updates after 10 attempts';
@@ -100,33 +106,33 @@ checkForUpdatesButton.addEventListener('click', async () => {
 
     console.log(`Current version: ${VERSION}`);
     console.log(`Current version in manifest: v${manifest.version}`);
-    console.log(`Latest stable version: ${latestStableVersionStr}`);
-    if (latestPrereleaseVersionStr) {
-        console.log(`Latest prerelease version: ${latestPrereleaseVersionStr}`);
+    console.log(`Latest stable version: ${latestStableVersion}`);
+    if (latestPrereleaseVersion) {
+        console.log(`Latest prerelease version: ${latestPrereleaseVersion}`);
     } else {
         console.log('There are no prerelease versions newer than the latest stable version');
     }
 
     const updateInstructionsHtml = `
         <a href="https://stardown-app.github.io/Stardown/docs/install-and-update-instructions/?updating=true">
-            Click here for update instructions.</a>
+            Click here for update instructions</a>
     `;
 
-    if (latestPrereleaseVersionStr) {
-        if (VERSION === latestPrereleaseVersionStr) {
-            updateCheckResultEl.innerText = 'You have the latest version of Stardown.';
-        } else if (VERSION === latestStableVersionStr) {
+    if (latestPrereleaseVersion) {
+        if (VERSION === latestPrereleaseVersion) {
+            updateCheckResultEl.innerHTML = 'You have the latest version of Stardown.';
+        } else if (VERSION === latestStableVersion) {
             updateCheckResultEl.innerHTML = `
-                You have the latest stable version of Stardown. A newer pre-release version is available. ${updateInstructionsHtml}
+                You have the latest stable version of Stardown. A newer prerelease version is available. ${updateInstructionsHtml} if you're interested.
             `;
         } else {
-            updateCheckResultEl.innerHTML = `An update is available! ${updateInstructionsHtml}`;
+            updateCheckResultEl.innerHTML = `An update is available! ${updateInstructionsHtml}.`;
         }
     } else { // if the latest release is a stable version
-        if (VERSION === latestStableVersionStr) {
-            updateCheckResultEl.innerText = 'You have the latest version of Stardown.';
+        if (VERSION === latestStableVersion) {
+            updateCheckResultEl.innerHTML = 'You have the latest version of Stardown.';
         } else {
-            updateCheckResultEl.innerHTML = `An update is available! ${updateInstructionsHtml}`;
+            updateCheckResultEl.innerHTML = `An update is available! ${updateInstructionsHtml}.`;
         }
     }
 });

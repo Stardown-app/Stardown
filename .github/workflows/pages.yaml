@@ -24,13 +24,13 @@ jobs:
           fetch-depth: 0
       - name: Add zip file download links to the installation instructions
         run: |
-          RELEASE_TAG=$(git describe --tags --abbrev=0 --match=v*.*.*)
-          echo $RELEASE_TAG
-          URL="https://github.com/Stardown-app/Stardown/releases/download/${RELEASE_TAG}/stardown-${RELEASE_TAG}"
-          echo $URL
+          LATEST_STABLE_VERSION=$(git tag --list 'v*' | grep -E '^v[0-9]+\.[0-9]+\.[0-9]+$' | sort -V | tail -n 1 | xargs git describe --tags --abbrev=0)
+          LATEST_PRERELEASE_VERSION=$(git tag --list 'v*' | grep -E '^v[0-9]+\.[0-9]+\.[0-9]+-(?:alpha|beta)\.[0-9]{10}$' | sort -V | tail -n 1 | xargs git describe --tags --abbrev=0)
+          echo "Latest stable version: $LATEST_STABLE_VERSION"
+          echo "Latest prerelease version: $LATEST_PRERELEASE_VERSION"
           cat docs/install-and-update-instructions/script.js \
-            | sed s,\<a\ class=\"firefox\",\<a\ href=\"$URL-firefox.zip\", \
-            | sed s,\<a\ class=\"chrome\",\<a\ href=\"$URL-chrome.zip\", \
+            | sed s,LATEST_STABLE_VERSION,$LATEST_STABLE_VERSION, \
+            | sed s,LATEST_PRERELEASE_VERSION,$LATEST_PRERELEASE_VERSION, \
             | tee docs/install-and-update-instructions/script.js >/dev/null
       - name: Set up GitHub Pages
         id: pages

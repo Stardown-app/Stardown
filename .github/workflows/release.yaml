@@ -7,7 +7,8 @@ name: Build and release zip files
 on:
   push:
     tags:
-      - 'v*.*.*'
+      - 'v[0-9]+.[0-9]+.[0-9]+'
+      - 'v[0-9]+.[0-9]+.[0-9]+-(alpha|beta).[0-9]{10}'
 
 permissions:
   contents: write

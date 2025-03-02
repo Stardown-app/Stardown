@@ -12,6 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+const latestStableVersion = 'LATEST_STABLE_VERSION'; // a script changes this value when the site builds
+const latestPrereleaseVersion = 'LATEST_PRERELEASE_VERSION'; // a script changes this value when the site builds
+
+const chromeStableUrl = `https://github.com/Stardown-app/Stardown/releases/download/${latestStableVersion}/stardown-${latestStableVersion}-chrome.zip`;
+const firefoxStableUrl = `https://github.com/Stardown-app/Stardown/releases/download/${latestStableVersion}/stardown-${latestStableVersion}-firefox.zip`;
+const chromePrereleaseUrl = `https://github.com/Stardown-app/Stardown/releases/download/${latestPrereleaseVersion}/stardown-${latestPrereleaseVersion}-chrome.zip`;
+const firefoxPrereleaseUrl = `https://github.com/Stardown-app/Stardown/releases/download/${latestPrereleaseVersion}/stardown-${latestPrereleaseVersion}-firefox.zip`;
+
 const latestVersionEl = document.querySelector('#latestVersion');
 
 const instructionsEl = document.querySelector('#instructions');
@@ -20,6 +28,7 @@ const instructionsEl = document.querySelector('#instructions');
 const installedWithEl = document.querySelector('#installedWith');
 const willInstallWithEl = document.querySelector('#willInstallWith');
 const hasNodeV14PlusEl = document.querySelector('#hasNodeV14Plus');
+const wantsStableOrPrereleaseEl = document.querySelector('#wantsStableOrPrerelease');
 
 // radio inputs
 const chromiumEl = document.querySelector('#chromium');
@@ -35,11 +44,17 @@ const willInstallWithZipEl = document.querySelector('#willInstallWithZip');
 const willInstallWithTerminalEl = document.querySelector('#willInstallWithTerminal');
 const yesNodeV14PlusEl = document.querySelector('#yesNodeV14Plus');
 const noNodeV14PlusEl = document.querySelector('#noNodeV14Plus');
+const wantsStableEl = document.querySelector('#wantsStable');
+const wantsPrereleaseEl = document.querySelector('#wantsPrerelease');
+
+const wantsStableLabelEl = document.querySelector('#wantsStableLabel');
+const wantsPrereleaseLabelEl = document.querySelector('#wantsPrereleaseLabel');
 
 instructionsEl.setAttribute('hidden', 'hidden');
 installedWithEl.setAttribute('hidden', 'hidden');
 willInstallWithEl.setAttribute('hidden', 'hidden');
 hasNodeV14PlusEl.setAttribute('hidden', 'hidden');
+wantsStableOrPrereleaseEl.setAttribute('hidden', 'hidden');
 
 const isWindows = navigator.userAgent.includes('Windows');
 
@@ -70,6 +85,21 @@ willInstallWithZipEl.addEventListener('change', buildAndShowInstructionsAndScrol
 willInstallWithTerminalEl.addEventListener('change', buildAndShowInstructionsAndScroll);
 yesNodeV14PlusEl.addEventListener('change', buildAndShowInstructionsAndScroll);
 noNodeV14PlusEl.addEventListener('change', buildAndShowInstructionsAndScroll);
+wantsStableEl.addEventListener('change', buildAndShowInstructionsAndScroll);
+wantsPrereleaseEl.addEventListener('change', buildAndShowInstructionsAndScroll);
+
+const [stableMajor, stableMinor, stablePatch] = latestStableVersion.substring(1).split('.').map(n => parseInt(n));
+const [preMajor, preMinor, prePatch] = latestPrereleaseVersion.split('-')[0].substring(1).split('.').map(n => parseInt(n));
+
+const isStableNewer = (
+    stableMajor > preMajor || (
+        stableMajor === preMajor && (
+            stableMinor > preMinor || (
+                stableMinor === preMinor && stablePatch > prePatch
+            )
+        )
+    )
+);
 
 class Instructions {
     constructor() {
@@ -79,7 +109,7 @@ class Instructions {
 }
 
 async function main() {
-    await fetchLatestReleaseTags();
+    showLatestVersion();
 
     // if this page's URL ends with `/?updating=true`
     const isUpdating = new URLSearchParams(window.location.search).get('updating') === 'true';
@@ -90,62 +120,13 @@ async function main() {
     buildAndShowInstructions();
 }
 
-async function fetchLatestReleaseTags() {
-    const stableReleaseTagPattern = /^v\d+\.\d+\.\d+$/;
-    const prereleaseTagPattern = /^v\d+\.\d+\.\d+-(?:alpha|beta)\.\d{10}$/; // the last 10 digits are YYMMDDhhmm
-
-    let latestStableVersionStr = '';
-    let latestPrereleaseVersionStr = '';
-
-    let page = 1;
-    while (!latestStableVersionStr) {
-        // request a page of Git tags from the GitHub API
-        let response;
-        try {
-            response = await fetch(`https://api.github.com/repos/Stardown-app/Stardown/tags?page=${page}`); // https://docs.github.com/en/rest/repos/repos?apiVersion=2022-11-28#list-repository-tags
-        } catch (err) {
-            console.error(`fetch error: ${err.message}`);
-            return;
-        }
-        if (!response.ok) {
-            console.error(`The GitHub API responded with error status ${response.status}`);
-            return;
-        }
-
-        // Find the latest stable release tag, and the latest prerelease tag if there is
-        // at least one newer than the latest stable release.
-        const tags = await response.json();
-        for (const tag of tags) {
-            const isStable = stableReleaseTagPattern.test(tag.name);
-            const isPrerelease = prereleaseTagPattern.test(tag.name);
-            if (isStable) {
-                latestStableVersionStr = tag.name;
-                break;
-            } else if (isPrerelease) {
-                if (!latestPrereleaseVersionStr) {
-                    latestPrereleaseVersionStr = tag.name;
-                }
-            } else {
-                console.log(`Ignoring non-release tag: ${tag.name}`);
-            }
-        }
-
-        if (!latestStableVersionStr) {
-            if (page === 10) {
-                console.error('Failed to find the latest stable release tag after 10 attempts. Stopping.');
-                return;
-            }
-
-            console.warn('Failed to find the latest stable release tag. Trying again in half a second.');
-            page++;
-            await sleep(500);
-        }
-    }
-
-    if (latestPrereleaseVersionStr) {
-        latestVersionEl.innerHTML = `Latest stable version: ${latestStableVersionStr}<br>Latest prerelease version: ${latestPrereleaseVersionStr}`;
-    } else { // if the latest release is a stable version
-        latestVersionEl.innerHTML = `Latest version: ${latestStableVersionStr}<br>There are no newer prerelease versions.`;
+function showLatestVersion() {
+    if (isStableNewer) {
+        latestVersionEl.innerHTML = `Latest version: ${latestStableVersion}`;
+    } else {
+        latestVersionEl.innerHTML = `Latest stable version: ${latestStableVersion}<br>Latest prerelease version: ${latestPrereleaseVersion}`;
+        wantsStableLabelEl.innerHTML += ` (${latestStableVersion})`;
+        wantsPrereleaseLabelEl.innerHTML += ` (${latestPrereleaseVersion})`;
     }
 }
 
@@ -166,6 +147,7 @@ function buildAndShowInstructions() {
         willInstallWithEl.setAttribute('hidden', 'hidden');
         installedWithEl.setAttribute('hidden', 'hidden');
         hasNodeV14PlusEl.setAttribute('hidden', 'hidden');
+        wantsStableOrPrereleaseEl.setAttribute('hidden', 'hidden');
     } else if (installingEl.checked) {
         install(instructions);
     } else if (updatingEl.checked) {
@@ -188,14 +170,19 @@ function install(instructions) {
     if (willInstallWithStoreEl.checked) {
         installedWithStoreEl.checked = true;
         hasNodeV14PlusEl.setAttribute('hidden', 'hidden');
+        wantsStableOrPrereleaseEl.setAttribute('hidden', 'hidden');
         installWithStore(instructions);
     } else if (willInstallWithZipEl.checked) {
         installedWithZipEl.checked = true;
         hasNodeV14PlusEl.setAttribute('hidden', 'hidden');
+        if (!isStableNewer) {
+            wantsStableOrPrereleaseEl.removeAttribute('hidden');
+        }
         installWithZip(instructions);
     } else if (willInstallWithTerminalEl.checked) {
         installedWithTerminalEl.checked = true;
         hasNodeV14PlusEl.removeAttribute('hidden');
+        wantsStableOrPrereleaseEl.setAttribute('hidden', 'hidden');
         installWithTerminal(instructions);
     } else {
         return;
@@ -209,12 +196,17 @@ function update(instructions) {
 
     if (installedWithStoreEl.checked) {
         willInstallWithStoreEl.checked = true;
+        wantsStableOrPrereleaseEl.setAttribute('hidden', 'hidden');
         updateWithStore(instructions);
     } else if (installedWithZipEl.checked) {
         willInstallWithZipEl.checked = true;
+        if (!isStableNewer) {
+            wantsStableOrPrereleaseEl.removeAttribute('hidden');
+        }
         updateWithZip(instructions);
     } else if (installedWithTerminalEl.checked) {
         willInstallWithTerminalEl.checked = true;
+        wantsStableOrPrereleaseEl.setAttribute('hidden', 'hidden');
         updateWithTerminal(instructions);
     } else {
         return;
@@ -238,9 +230,16 @@ function installWithStore(instructions) {
 }
 
 function installWithZip(instructions) {
+    if (!isStableNewer && !wantsStableEl.checked && !wantsPrereleaseEl.checked) {
+        return;
+    }
+
+    const usingStable = isStableNewer || wantsStableEl.checked;
+
     if (chromiumEl.checked) {
+        const url = usingStable ? chromeStableUrl : chromePrereleaseUrl;
         instructions.steps.push(
-            '<a class="chrome" target="_blank">Download the zip file</a>',
+            `<a href="${url}" target="_blank">Download the zip file</a>`,
             'Unzip the zip file',
             'In your browser, open <code>chrome://extensions/</code>',
             'Turn on developer mode',
@@ -248,8 +247,9 @@ function installWithZip(instructions) {
             'Select the unzipped copy of Stardown',
         );
     } else if (firefoxEl.checked) {
+        const url = usingStable ? firefoxStableUrl : firefoxPrereleaseUrl;
         instructions.steps.push(
-            '<a class="firefox" target="_blank">Download the zip file</a>',
+            `<a href="${url}" target="_blank">Download the zip file</a>`,
             'Unzip the zip file',
             'In your browser, open <code>about:debugging#/runtime/this-firefox</code>',
             'Click "Load Temporary Add-on..."',
@@ -329,9 +329,16 @@ function updateWithStore(instructions) {
 }
 
 function updateWithZip(instructions) {
+    if (!isStableNewer && !wantsStableEl.checked && !wantsPrereleaseEl.checked) {
+        return;
+    }
+
+    const usingStable = isStableNewer || wantsStableEl.checked;
+
     if (chromiumEl.checked) {
+        const url = usingStable ? chromeStableUrl : chromePrereleaseUrl;
         instructions.steps.push(
-            '<a class="chrome" target="_blank">Download a new zip file</a>',
+            `<a href="${url}" target="_blank">Download a new zip file</a>`,
             'Unzip the zip file',
             'In your browser, open <code>chrome://extensions/</code>',
             'Remove Stardown',
@@ -339,8 +346,9 @@ function updateWithZip(instructions) {
             'Select the newly unzipped copy of Stardown',
         );
     } else if (firefoxEl.checked) {
+        const url = usingStable ? firefoxStableUrl : firefoxPrereleaseUrl;
         instructions.steps.push(
-            '<a class="firefox" target="_blank">Download a new zip file</a>',
+            `<a href="${url}" target="_blank">Download a new zip file</a>`,
             'Unzip the zip file',
             'In your browser, open <code>about:debugging#/runtime/this-firefox</code>',
             'Remove Stardown',

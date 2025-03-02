@@ -36,7 +36,7 @@
     </header>
 
     <main>
-      <p id="latestVersion" style="margin: 50px"></p>
+      <p id="latestVersion"></p>
 
       <noscript>
         <p>
@@ -177,6 +177,21 @@
             </li>
           </ul>
         </fieldset>
+
+        <!-- if (installing or updating) a zip file and there's a prerelease newer than the latest stable release -->
+         <fieldset id="wantsStableOrPrerelease">
+          <legend>Which version of Stardown do you want?</legend>
+          <ul>
+            <li>
+              <input type="radio" id="wantsStable" name="wantsStableOrPrerelease" value="wantsStable" />
+              <label id="wantsStableLabel" for="wantsStable">the latest stable version</label>
+            </li>
+            <li>
+              <input type="radio" id="wantsPrerelease" name="wantsStableOrPrerelease" value="wantsPrerelease" />
+              <label id="wantsPrereleaseLabel" for="wantsPrerelease">the newer prerelease version</label>
+            </li>
+          </ul>
+         </fieldset>
       </form>
 
       <div id="instructions"></div>

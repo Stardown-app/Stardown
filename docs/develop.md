@@ -32,12 +32,13 @@ When creating a new release:
 
 1. Make sure the tests pass with `npm test`
 2. Update the `VERSION` variable in [../src/settings.js](../src/settings.js)
-3. If the new version is a stable release
+3. Run the `VERSION` block of code in a REPL to make sure the new version is correctly formatted.
+4. If the new version is a stable release
    1. Update the "version" properties in the manifests
    2. Update [../src/updated.html](../src/updated.html)
-4. Commit, push, make a pull request into the main branch, merge, and pull
-5. Tag the merge commit with the same value as the `VERSION` variable in settings.js
-6. Push the tag
+5. Commit, push, make a pull request into the main branch, merge, and pull
+6. Tag the merge commit with the same value as the `VERSION` variable in settings.js
+7. Push the tag
 
 This will run a few GitHub actions that will build the extension, create a GitHub release, and update [the install/update instructions site](https://stardown-app.github.io/Stardown/docs/install-and-update-instructions/).
 

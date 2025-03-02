@@ -115,7 +115,7 @@ checkForUpdatesButton.addEventListener('click', async () => {
 
     const updateInstructionsHtml = `
         <a href="https://stardown-app.github.io/Stardown/docs/install-and-update-instructions/?updating=true">
-            Click here for update instructions.</a>
+            Click here for update instructions</a>
     `;
 
     if (latestPrereleaseVersion) {
@@ -123,16 +123,16 @@ checkForUpdatesButton.addEventListener('click', async () => {
             updateCheckResultEl.innerHTML = 'You have the latest version of Stardown.';
         } else if (VERSION === latestStableVersion) {
             updateCheckResultEl.innerHTML = `
-                You have the latest stable version of Stardown. A newer prerelease version is available. ${updateInstructionsHtml}
+                You have the latest stable version of Stardown. A newer prerelease version is available. ${updateInstructionsHtml} if you're interested.
             `;
         } else {
-            updateCheckResultEl.innerHTML = `An update is available! ${updateInstructionsHtml}`;
+            updateCheckResultEl.innerHTML = `An update is available! ${updateInstructionsHtml}.`;
         }
     } else { // if the latest release is a stable version
         if (VERSION === latestStableVersion) {
             updateCheckResultEl.innerHTML = 'You have the latest version of Stardown.';
         } else {
-            updateCheckResultEl.innerHTML = `An update is available! ${updateInstructionsHtml}`;
+            updateCheckResultEl.innerHTML = `An update is available! ${updateInstructionsHtml}.`;
         }
     }
 });

@@ -1,0 +1,12 @@
+{
+    "compilerOptions": {
+        "target": "es6",
+        "module": "esnext",
+        "esModuleInterop": true,
+        "strict": true,
+        "moduleResolution": "node"
+    },
+    "include": [
+        "codejar.ts"
+    ]
+}

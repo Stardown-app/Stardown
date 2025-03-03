@@ -7,9 +7,9 @@ name: Build and release zip files
 on:
   push:
     tags:
-      - 'v[0-9]+.[0-9]+.[0-9]+'
-      - 'v[0-9]+.[0-9]+.[0-9]+-alpha.[0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]'
-      - 'v[0-9]+.[0-9]+.[0-9]+-beta.[0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]'
+      - "v[0-9]+.[0-9]+.[0-9]+"
+      - "v[0-9]+.[0-9]+.[0-9]+-alpha.[0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]"
+      - "v[0-9]+.[0-9]+.[0-9]+-beta.[0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]"
 
 permissions:
   contents: write
@@ -24,7 +24,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 22
-          cache: 'npm'
+          cache: "npm"
       - name: Install dependencies
         run: npm install
       - name: Build for Firefox
@@ -55,3 +55,9 @@ jobs:
           files: |
             firefox/stardown-${{ github.ref_name }}-firefox.zip
             chrome/stardown-${{ github.ref_name }}-chrome.zip
+          body: |
+            If you installed Stardown from an extensions store, it will update automatically when the new version is available there if you didn't turn automatic updates off. Only stable releases are published to the extensions stores, and they could take hours or days to be approved.
+
+            Otherwise, you can find [instructions to install or update here](https://stardown-app.github.io/Stardown/docs/install-and-update-instructions/).
+
+            ---

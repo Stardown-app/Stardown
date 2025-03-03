@@ -29,6 +29,11 @@ let lastEditTime = 0; // milliseconds
 const MAX_SYNC_CHARS = 8100; // sync storage character limit: https://developer.chrome.com/docs/extensions/reference/api/storage#property-sync
 const MAX_LOCAL_CHARS = 10485000; // local storage character limit: https://developer.chrome.com/docs/extensions/reference/api/storage#property-local
 
+// In sync storage, all double quotes are replaced with the record separator character (␞)
+// and all backslashes are replaced with the unit separator character (␟) because
+// otherwise they would need to be escaped by the browser when converting to JSON which
+// could make the string exceed the sync storage character limit.
+
 let notepadStorageLocation = 'sync';
 getSetting('notepadStorageLocation').then(newValue => {
     notepadStorageLocation = newValue;
@@ -38,7 +43,11 @@ getSetting('notepadStorageLocation').then(newValue => {
     getLocalSetting('notepadContent').then(content => {
         if (!content) {
             getSetting('notepadContent').then(content => {
-                jar.updateCode(content || '');
+                jar.updateCode(
+                    (content || '')
+                        .replaceAll('␞', '"')
+                        .replaceAll('␟', '\\')
+                );
                 updateCharacterCount(charLimit);
             });
         } else {
@@ -120,13 +129,19 @@ async function saveNotepad(charLimit) {
             const isOverCharLimit = content.length > charLimit;
             console.debug(`saveNotepad isOverCharLimit: ${isOverCharLimit}`);
             if (isOverCharLimit) {
-                const limitedChars = content.substring(0, charLimit);
+                const limitedChars = content
+                    .substring(0, charLimit)
+                    .replaceAll('"', '␞')
+                    .replaceAll('\\', '␟');
                 console.debug(`saveNotepad limitedChars.length: ${limitedChars.length}`);
                 console.debug(`saveNotepad JSON.stringify(limitedChars).length: ${JSON.stringify(limitedChars).length}`);
                 browser.storage.sync.set({ notepadContent: limitedChars });
                 browser.storage.local.set({ notepadContent: content });
             } else {
-                browser.storage.sync.set({ notepadContent: content });
+                const chars = content
+                    .replaceAll('"', '␞')
+                    .replaceAll('\\', '␟');
+                browser.storage.sync.set({ notepadContent: chars });
                 browser.storage.local.set({ notepadContent: '' });
             }
             break;

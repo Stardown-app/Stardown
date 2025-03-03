@@ -29,10 +29,9 @@ let lastEditTime = 0; // milliseconds
 const MAX_SYNC_CHARS = 8100; // sync storage character limit: https://developer.chrome.com/docs/extensions/reference/api/storage#property-sync
 const MAX_LOCAL_CHARS = 10485000; // local storage character limit: https://developer.chrome.com/docs/extensions/reference/api/storage#property-local
 
-// In sync storage, all double quotes are replaced with the record separator character (␞)
-// and all backslashes are replaced with the unit separator character (␟) because
-// otherwise they would need to be escaped by the browser when converting to JSON which
-// could make the string exceed the sync storage character limit.
+// For sync storage, all of the notepad's double quotes, backslashes, newlines, and tabs
+// are replaced with other characters to prevent the character count from increasing when
+// converting to JSON.
 
 let notepadStorageLocation = 'sync';
 getSetting('notepadStorageLocation').then(newValue => {
@@ -46,7 +45,9 @@ getSetting('notepadStorageLocation').then(newValue => {
                 jar.updateCode(
                     (content || '')
                         .replaceAll('␞', '"')
-                        .replaceAll('␟', '\\')
+                        .replaceAll('␛', '\\')
+                        .replaceAll('␊', '\n')
+                        .replaceAll('␉', '\t')
                 );
                 updateCharacterCount(charLimit);
             });
@@ -132,7 +133,9 @@ async function saveNotepad(charLimit) {
                 const limitedChars = content
                     .substring(0, charLimit)
                     .replaceAll('"', '␞')
-                    .replaceAll('\\', '␟');
+                    .replaceAll('\\', '␛')
+                    .replaceAll('\n', '␊')
+                    .replaceAll('\t', '␉');
                 console.debug(`saveNotepad limitedChars.length: ${limitedChars.length}`);
                 console.debug(`saveNotepad JSON.stringify(limitedChars).length: ${JSON.stringify(limitedChars).length}`);
                 browser.storage.sync.set({ notepadContent: limitedChars });
@@ -140,7 +143,9 @@ async function saveNotepad(charLimit) {
             } else {
                 const chars = content
                     .replaceAll('"', '␞')
-                    .replaceAll('\\', '␟');
+                    .replaceAll('\\', '␛')
+                    .replaceAll('\n', '␊')
+                    .replaceAll('\t', '␉');
                 browser.storage.sync.set({ notepadContent: chars });
                 browser.storage.local.set({ notepadContent: '' });
             }

@@ -19,9 +19,9 @@ import { getSetting } from './getSetting.js';
 
 /**
  * VERSION is Stardown's version. The value must match one of the regex patterns below;
- * you might want to copy & paste this block of code into a REPL to check. This variable
- * exists because the "version" properties in the manifests only support stable release
- * versions.
+ * you might want to copy & paste this block of code into a new REPL session to check.
+ * This variable exists because the "version" properties in the manifests only support
+ * stable release versions.
  */
 const VERSION = 'v2.0.0-alpha.2503020842';
 const stableReleaseTagPattern = /^v\d+\.\d+\.\d+$/;

@@ -138,6 +138,7 @@ async function saveNotepad(charLimit) {
                     .replaceAll('\t', '␉');
                 console.debug(`saveNotepad limitedChars.length: ${limitedChars.length}`);
                 console.debug(`saveNotepad JSON.stringify(limitedChars).length: ${JSON.stringify(limitedChars).length}`);
+                console.debug(`saveNotepad new Blob([JSON.stringify(limitedChars)]).size: ${new Blob([JSON.stringify(limitedChars)]).size}`);
                 browser.storage.sync.set({ notepadContent: limitedChars });
                 browser.storage.local.set({ notepadContent: content });
             } else {

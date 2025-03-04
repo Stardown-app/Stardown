@@ -33,6 +33,11 @@
         box-sizing: border-box;
       }
 
+      #notepad:empty::before {
+        content: attr(data-placeholder);
+        color: gray;
+      }
+
       .notepad-container {
         display: flex;
         justify-content: center;

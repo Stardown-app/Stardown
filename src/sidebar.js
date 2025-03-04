@@ -52,7 +52,7 @@ browser.commands.getAll().then(cmds => {
     const copySelectionShortcut = cmds.find(
         cmd => cmd.name === 'copySelection'
     )?.shortcut || 'Alt+C';
-    notepad.placeholder = `Press ${copySelectionShortcut} to copy and paste.`;
+    notepad.setAttribute('data-placeholder', `Press ${copySelectionShortcut} to copy and paste.`);
 });
 
 // save the notepad content when it changes

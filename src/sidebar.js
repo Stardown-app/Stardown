@@ -85,10 +85,10 @@ browser.runtime.onMessage.addListener(async message => {
 });
 
 function highlight(editor, cursorPos) {
-    let text = editor.textContent;
+    let text = editor.textContent || '';
 
     const byteLimit = getByteLimit();
-    const byteCount = getJsonByteCount(jar.toString());
+    const byteCount = getJsonByteCount(text);
 
     // update the byte count
     byteCountEl.textContent = `${byteCount}/${byteLimit} bytes`;
@@ -99,8 +99,8 @@ function highlight(editor, cursorPos) {
         syncLimitMessageEl.style.visibility = 'visible';
 
         // give a light red background to the characters that are over the byte limit
-        const before = getSubstringByJsonBytes(jar.toString(), byteLimit);
-        const after = jar.toString().slice(before.length);
+        const before = getSubstringByJsonBytes(text, byteLimit);
+        const after = text.slice(before.length);
         text = `${before}<span style="background-color: rgba(255, 0, 0, 0.2)">${after}</span>`
     } else {
         byteCountEl.style.color = 'black';

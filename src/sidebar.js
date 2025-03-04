@@ -18,11 +18,11 @@ import { browser, sleep } from './browserSpecific.js';
 import { CodeJar } from './codejar.js';
 import { getSetting } from './getSetting.js';
 
-const notepad = document.getElementById('notepad');
+const notepadEl = document.getElementById('notepad');
 const byteCountEl = document.getElementById('byte-count');
 const syncLimitButton = document.getElementById('sync-limit-button');
 
-const jar = CodeJar(notepad, () => { });
+const jar = CodeJar(notepadEl, () => { });
 
 const SYNC_SAVE_DELAY = 500; // milliseconds // sync storage time limit: https://developer.chrome.com/docs/extensions/reference/api/storage#property-sync-sync-MAX_WRITE_OPERATIONS_PER_MINUTE
 let lastEditTime = 0; // milliseconds
@@ -52,11 +52,11 @@ browser.commands.getAll().then(cmds => {
     const copySelectionShortcut = cmds.find(
         cmd => cmd.name === 'copySelection'
     )?.shortcut || 'Alt+C';
-    notepad.setAttribute('data-placeholder', `Press ${copySelectionShortcut} to copy and paste.`);
+    notepadEl.setAttribute('data-placeholder', `Press ${copySelectionShortcut} to copy and paste.`);
 });
 
 // save the notepad content when it changes
-notepad.addEventListener('input', async () => {
+notepadEl.addEventListener('input', async () => {
     lastEditTime = Date.now();
     const byteLimit = getByteLimit();
     updateByteCount(byteLimit);
@@ -73,7 +73,7 @@ syncLimitButton.addEventListener('click', async () => {
     });
 
     scrollToCursor();
-    notepad.focus();
+    notepadEl.focus();
 });
 
 browser.runtime.onMessage.addListener(async message => {
@@ -186,9 +186,9 @@ function scrollToCursor() {
     const textBeforeCursor = jar.toString().substring(0, cursorPos.start);
     const linesBeforeCursor = textBeforeCursor.split('\n').length;
 
-    const lineHeight = parseInt(window.getComputedStyle(notepad).lineHeight);
-    const visibleHeight = notepad.clientHeight;
-    const scrollPosition = notepad.scrollTop;
+    const lineHeight = parseInt(window.getComputedStyle(notepadEl).lineHeight);
+    const visibleHeight = notepadEl.clientHeight;
+    const scrollPosition = notepadEl.scrollTop;
 
     const cursorY = linesBeforeCursor * lineHeight;
 
@@ -196,9 +196,9 @@ function scrollToCursor() {
     const isCursorBelow = cursorY > scrollPosition + visibleHeight - lineHeight;
 
     if (isCursorAbove) {
-        notepad.scrollTop = cursorY;
+        notepadEl.scrollTop = cursorY;
     } else if (isCursorBelow) {
-        notepad.scrollTop = cursorY - visibleHeight + lineHeight;
+        notepadEl.scrollTop = cursorY - visibleHeight + lineHeight;
     }
     // if the cursor is already visible, don't scroll
 }
@@ -213,7 +213,7 @@ async function receiveToNotepad(newText) {
     const notepadAppendOrInsert = await getSetting('notepadAppendOrInsert');
     if (notepadAppendOrInsert === 'append') {
         jar.updateCode((jar.toString().trim() + '\n\n' + newText).trim());
-        notepad.scrollTop = notepad.scrollHeight; // scroll to the end
+        notepadEl.scrollTop = notepadEl.scrollHeight; // scroll to the end
     } else if (notepadAppendOrInsert === 'insert') {
         const cursorPos = jar.save();
         const before = jar.toString().slice(0, cursorPos.start).trim();

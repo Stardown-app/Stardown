@@ -19,7 +19,8 @@ import { CodeJar } from './codejar.js';
 import { getSetting } from './getSetting.js';
 
 const notepadEl = document.getElementById('notepad');
-const byteCountEl = document.getElementById('byte-count');
+const byteCountEl = document.getElementById('byteCount');
+const syncLimitMessageEl = document.getElementById('syncLimitMessage');
 
 const jar = CodeJar(notepadEl, highlight);
 
@@ -94,14 +95,16 @@ function highlight(editor, cursorPos) {
 
     const isOverByteLimit = byteCount > byteLimit;
     if (isOverByteLimit) {
-        byteCountEl.setAttribute('style', 'color: red');
+        byteCountEl.style.color = 'red';
+        syncLimitMessageEl.style.visibility = 'visible';
 
         // give a light red background to the characters that are over the byte limit
         const before = getSubstringByJsonBytes(jar.toString(), byteLimit);
         const after = jar.toString().slice(before.length);
         text = `${before}<span style="background-color: rgba(255, 0, 0, 0.2)">${after}</span>`
     } else {
-        byteCountEl.setAttribute('style', 'color: black');
+        byteCountEl.style.color = 'black';
+        syncLimitMessageEl.style.visibility = 'hidden';
     }
 
     editor.innerHTML = text;

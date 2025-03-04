@@ -38,7 +38,7 @@
         color: gray;
       }
 
-      .notepad-container {
+      .notepadContainer {
         display: flex;
         justify-content: center;
         align-items: center;
@@ -50,7 +50,7 @@
         margin-top: -10px;
       }
 
-      #byte-count {
+      p {
         margin-left: 20px;
       }
     </style>
@@ -58,11 +58,12 @@
 
   <body>
     <main>
-      <div class="notepad-container">
+      <div class="notepadContainer">
         <div id="notepad"></div>
       </div>
       <hr />
-      <p id="byte-count"></p>
+      <p id="byteCount"></p>
+      <p id="syncLimitMessage" style="visibility: hidden; color: red;">Some of the notepad is over the sync limit.</p>
     </main>
     <script src="./sidebar.js"></script>
   </body>

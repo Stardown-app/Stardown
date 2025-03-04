@@ -20,9 +20,8 @@ import { getSetting } from './getSetting.js';
 
 const notepadEl = document.getElementById('notepad');
 const byteCountEl = document.getElementById('byte-count');
-const syncLimitButton = document.getElementById('sync-limit-button');
 
-const jar = CodeJar(notepadEl, () => { });
+const jar = CodeJar(notepadEl, highlight);
 
 const SYNC_SAVE_DELAY = 500; // milliseconds // sync storage time limit: https://developer.chrome.com/docs/extensions/reference/api/storage#property-sync-sync-MAX_WRITE_OPERATIONS_PER_MINUTE
 let lastEditTime = 0; // milliseconds
@@ -39,11 +38,9 @@ getSetting('notepadStorageLocation').then(newValue => {
         if (!content) {
             getSetting('notepadContent').then(content => {
                 jar.updateCode(content || '');
-                updateByteCount(byteLimit);
             });
         } else {
             jar.updateCode(content || '');
-            updateByteCount(byteLimit);
         }
     });
 });
@@ -59,21 +56,7 @@ browser.commands.getAll().then(cmds => {
 notepadEl.addEventListener('input', async () => {
     lastEditTime = Date.now();
     const byteLimit = getByteLimit();
-    updateByteCount(byteLimit);
     await saveNotepad(byteLimit);
-});
-
-syncLimitButton.addEventListener('click', async () => {
-    // move the cursor to where syncing ends
-    const byteLimit = getByteLimit();
-    const i = getSubstringByJsonBytes(jar.toString(), byteLimit).length;
-    jar.restore({
-        start: i,
-        end: i,
-    });
-
-    scrollToCursor();
-    notepadEl.focus();
 });
 
 browser.runtime.onMessage.addListener(async message => {
@@ -99,6 +82,30 @@ browser.runtime.onMessage.addListener(async message => {
             throw new Error(`Unknown message category: ${message.category}`);
     }
 });
+
+function highlight(editor, cursorPos) {
+    let text = editor.textContent;
+
+    const byteLimit = getByteLimit();
+    const byteCount = getJsonByteCount(jar.toString());
+
+    // update the byte count
+    byteCountEl.textContent = `${byteCount}/${byteLimit} bytes`;
+
+    const isOverByteLimit = byteCount > byteLimit;
+    if (isOverByteLimit) {
+        byteCountEl.setAttribute('style', 'color: red');
+
+        // give a light red background to the characters that are over the byte limit
+        const before = getSubstringByJsonBytes(jar.toString(), byteLimit);
+        const after = jar.toString().slice(before.length);
+        text = `${before}<span style="background-color: rgba(255, 0, 0, 0.2)">${after}</span>`
+    } else {
+        byteCountEl.setAttribute('style', 'color: black');
+    }
+
+    editor.innerHTML = text;
+}
 
 /**
  * @param {number} byteLimit
@@ -130,25 +137,6 @@ async function saveNotepad(byteLimit) {
         default:
             console.error(`Unknown notepadStorageLocation: ${notepadStorageLocation}`);
             throw new Error(`Unknown notepadStorageLocation: ${notepadStorageLocation}`);
-    }
-}
-
-/**
- * @param {number} byteLimit
- * @returns {void}
- */
-function updateByteCount(byteLimit) {
-    const byteCount = getJsonByteCount(jar.toString());
-    byteCountEl.textContent = `${byteCount}/${byteLimit} bytes`;
-    const isOverByteLimit = byteCount > byteLimit;
-    if (isOverByteLimit) {
-        byteCountEl.setAttribute('style', 'color: red');
-        if (notepadStorageLocation === 'sync') {
-            syncLimitButton.setAttribute('style', 'visibility: visible');
-        }
-    } else {
-        byteCountEl.setAttribute('style', 'color: black');
-        syncLimitButton.setAttribute('style', 'visibility: hidden');
     }
 }
 
@@ -228,7 +216,7 @@ async function receiveToNotepad(newText) {
         jar.restore({
             start: newCursorPosition,
             end: newCursorPosition,
-        })
+        });
 
         scrollToCursor();
     } else {
@@ -237,7 +225,6 @@ async function receiveToNotepad(newText) {
     }
 
     const byteLimit = getByteLimit();
-    updateByteCount(byteLimit);
     await saveNotepad(byteLimit);
 }
 
@@ -246,7 +233,6 @@ async function receiveToNotepad(newText) {
  */
 async function changeNotepadStorageLocation() {
     const byteLimit = getByteLimit();
-    updateByteCount(byteLimit);
     await saveNotepad(byteLimit);
 
     const isWithinByteLimit = getJsonByteCount(jar.toString()) <= byteLimit;
@@ -297,8 +283,8 @@ async function getLocalSetting(name) {
 }
 
 /**
- * getSubstringByJsonBytes gets a substring of up to byteLimit JSON bytes without
- * splitting any characters.
+ * getSubstringByJsonBytes gets the beginning of the string up to byteLimit JSON bytes
+ * without splitting any characters.
  * @param {string} text
  * @param {number} byteLimit
  * @returns {string}

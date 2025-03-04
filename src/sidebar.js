@@ -132,12 +132,6 @@ function highlight(editor, cursorPos) {
         // bold and/or italic
         .replaceAll(/((\*|_){1,3}\S(?:[^\n]+?\S)?\2)/g, '<span style="color: rgb(6, 117, 15)">$1</span>')
 
-    // Style elements (strong, em, etc.) should not be applied because then copying from
-    // Stardown's notepad into an application that converts pasted HTML to markdown, like
-    // Obsidian, would duplicate the style characters. Maybe there's a way to change
-    // Stardown's notepad to not include HTML style when copying, but I haven't looked
-    // into that.
-
     editor.innerHTML = text;
 }
 

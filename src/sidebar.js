@@ -130,7 +130,7 @@ function highlight(editor, cursorPos) {
         // code block
         .replaceAll(/(^|\n)([`~]{3,}[^\n]*\n(?:.|\n)*?[`~]{3,})\n/g, '$1<span style="background-color: rgb(224, 224, 224); display: block;">$2</span>\n')
         // bold and/or italic
-        .replaceAll(/([_*]{1,3}\S(?:[^\n]+?\S)?[_*]{1,3})/g, '<span style="color: rgb(6, 117, 15)">$1</span>')
+        .replaceAll(/((\*|_){1,3}\S(?:[^\n]+?\S)?\2)/g, '<span style="color: rgb(6, 117, 15)">$1</span>')
 
     // Style elements (strong, em, etc.) should not be applied because then copying from
     // Stardown's notepad into an application that converts pasted HTML to markdown, like

@@ -109,10 +109,8 @@ async function saveNotepad(byteLimit) {
     if (lastEditTime + SYNC_SAVE_DELAY > Date.now()) {
         return;
     }
-    console.debug(`saveNotepad saving`);
 
     const content = jar.toString().trim();
-    console.debug(`saveNotepad content.length: ${content.length}`);
 
     switch (notepadStorageLocation) {
         case 'sync':
@@ -213,9 +211,6 @@ async function receiveToNotepad(newText) {
     lastEditTime = Date.now();
 
     const notepadAppendOrInsert = await getSetting('notepadAppendOrInsert');
-    console.debug(`notepadAppendOrInsert: ${notepadAppendOrInsert}`);
-    console.debug(`JSON.stringify(jar.save()): ${JSON.stringify(jar.save())}`);
-    console.debug(`Notepad content: ${jar.toString().trim()}`);
     if (notepadAppendOrInsert === 'append') {
         jar.updateCode((jar.toString().trim() + '\n\n' + newText).trim());
         notepad.scrollTop = notepad.scrollHeight; // scroll to the end

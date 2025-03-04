@@ -107,6 +107,25 @@ function highlight(editor, cursorPos) {
         syncLimitMessageEl.style.visibility = 'hidden';
     }
 
+    // apply markdown syntax highlighting
+    text = text
+        // header
+        .replaceAll(/((^|\n)#+ [^\n]*)/g, '<span style="color: rgb(199, 83, 0)">$1</span>')
+        // link
+        .replaceAll(/\[([^\^]?[^\[\]\n]*)\]\(([^\(\)\n]+)\)/g, '[<span style="color: rgb(50, 116, 240)">$1</span>](<span style="color: rgb(150, 150, 150)">$2</span>)')
+        // inline code block delimited by single backticks
+        .replaceAll(/(?<!`)`([^`\n]+)`(?!`)/g, '`<span style="background-color: rgb(224, 224, 224)">$1</span>`')
+        // code block
+        .replaceAll(/(^|\n)([`~]{3,}[^\n]*\n(?:.|\n)*?[`~]{3,})\n/g, '$1<span style="background-color: rgb(224, 224, 224); display: block;">$2</span>\n')
+        // bold and/or italic
+        .replaceAll(/([_*]{1,3}\S(?:[^\n]+?\S)?[_*]{1,3})/g, '<span style="color: rgb(6, 117, 15)">$1</span>')
+
+    // Style elements (strong, em, etc.) should not be applied because then copying from
+    // Stardown's notepad into an application that converts pasted HTML to markdown, like
+    // Obsidian, would duplicate the style characters. Maybe there's a way to change
+    // Stardown's notepad to not include HTML style when copying, but I haven't looked
+    // into that.
+
     editor.innerHTML = text;
 }
 

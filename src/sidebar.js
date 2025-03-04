@@ -60,6 +60,18 @@ notepadEl.addEventListener('input', async () => {
     await saveNotepad(byteLimit);
 });
 
+// prevent writing to the clipboard with the HTML MIME type because it's completely
+// unnecessary and sometimes causes formatting problems
+notepadEl.addEventListener('copy', event => {
+    event.preventDefault();
+
+    const selection = window.getSelection();
+    const selectedText = selection.toString();
+    if (selectedText) {
+        event.clipboardData.setData('text/plain', selectedText);
+    }
+});
+
 browser.runtime.onMessage.addListener(async message => {
     if (message.destination !== 'sidebar') {
         return;

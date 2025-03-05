@@ -14,7 +14,7 @@
    limitations under the License.
 */
 
-import { browser, sleep } from './browserSpecific.js';
+import { browser } from './browserSpecific.js';
 import { CodeJar } from './codejar.js';
 import { getSetting } from './getSetting.js';
 

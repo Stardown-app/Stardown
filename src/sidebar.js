@@ -32,22 +32,21 @@ let notepadStorageLocation = 'sync';
 async function main() {
     notepadStorageLocation = await getSetting('notepadStorageLocation');
 
-    // load the notepad content
+    // load notepad content
     let content = await getLocalSetting('notepadContent');
     if (!content) {
         content = await getSetting('notepadContent');
     }
     jar.updateCode(content);
 
+    // scroll to the previous scroll position
     notepadEl.scrollTop = await getSetting('notepadScrollPosition');
-}
 
-browser.commands.getAll().then(cmds => {
-    const copySelectionShortcut = cmds.find(
-        cmd => cmd.name === 'copySelection'
-    )?.shortcut || 'Alt+C';
+    // set placeholder text
+    const cmds = await browser.commands.getAll();
+    const copySelectionShortcut = cmds.find(cmd => cmd.name === 'copySelection')?.shortcut || 'Alt+C';
     notepadEl.setAttribute('data-placeholder', `Press ${copySelectionShortcut} to copy and paste.`);
-});
+}
 
 notepadEl.addEventListener('scrollend', event => {
     saveScrollPosition();
@@ -334,7 +333,6 @@ async function changeNotepadStorageLocation() {
 const defaultLocalSettings = {
     notepadContent: '',
 };
-
 /**
  * getLocalSetting gets a setting from the browser's local storage. If the setting does
  * not exist there, its default value is returned.

@@ -187,17 +187,14 @@ function highlight(text) {
 }
 
 let notepadSaveTimeout = 0;
-/**
- * @param {number} byteLimit
- * @returns {void}
- */
-function saveNotepad(byteLimit) {
+function saveNotepad() {
     clearTimeout(notepadSaveTimeout);
     notepadSaveTimeout = setTimeout(() => {
         const content = jar.toString().trim();
 
         switch (notepadStorageLocation) {
             case 'sync':
+                const byteLimit = getByteLimit();
                 const isOverByteLimit = getJsonByteCount(content) > byteLimit;
                 if (isOverByteLimit) {
                     const limitedChars = getSubstringByJsonBytes(content, byteLimit);
@@ -308,18 +305,16 @@ async function receiveToNotepad(newText) {
         throw new Error(`Unknown notepadAppendOrInsert: "${notepadAppendOrInsert}"`);
     }
 
-    const byteLimit = getByteLimit();
-    saveNotepad(byteLimit);
+    saveNotepad();
 }
 
 /**
  * @returns {Promise<void>}
  */
 async function changeNotepadStorageLocation() {
-    const byteLimit = getByteLimit();
-    saveNotepad(byteLimit);
+    saveNotepad();
 
-    const isWithinByteLimit = getJsonByteCount(jar.toString()) <= byteLimit;
+    const isWithinByteLimit = getJsonByteCount(jar.toString()) <= getByteLimit();
     if (isWithinByteLimit) {
         // remove the notepad content from its current storage location
         switch (notepadStorageLocation) {

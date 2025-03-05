@@ -162,7 +162,7 @@ function highlight(text) {
 
         // bold and/or italic
         .replaceAll(
-            /((\*|_){1,3}\S(?:[^\n]+?\S)?\2)/g,
+            /((\*\*\*|___|\*\*|__|\*|_)\S(?:[^\n]*?\S)?\2)/g,
             '<span style="color: rgb(6, 117, 15)">$1</span>'
         )
 }

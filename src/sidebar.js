@@ -18,11 +18,15 @@ import { browser } from './browserSpecific.js';
 import { CodeJar } from './codejar.js';
 import { getSetting } from './getSetting.js';
 
+/**
+ * @typedef {import('./codejar.js').Position} Position
+ */
+
 const notepadEl = document.getElementById('notepad');
 const byteCountEl = document.getElementById('byteCount');
 const syncLimitMessageEl = document.getElementById('syncLimitMessage');
 
-const jar = CodeJar(notepadEl, render);
+const jar = CodeJar(notepadEl, codejarHighlight);
 
 const SYNC_SAVE_DELAY = 500; // milliseconds // sync storage time limit: https://developer.chrome.com/docs/extensions/reference/api/storage#property-sync-sync-MAX_WRITE_OPERATIONS_PER_MINUTE
 const MAX_SYNC_BYTES = 8100; // sync storage byte limit: https://developer.chrome.com/docs/extensions/reference/api/storage#property-sync
@@ -113,7 +117,24 @@ browser.runtime.onMessage.addListener(async message => {
     }
 });
 
-function render(editor, cursorPos) {
+/**
+ * @param {string} text
+ * @returns {string}
+ */
+function escapeHtml(text) {
+    return text
+        .replaceAll('&', '&amp;')
+        .replaceAll('<', '&lt;')
+        .replaceAll('>', '&gt;')
+        .replaceAll('"', '&quot;')
+        .replaceAll("'", '&#039;')
+}
+
+/**
+ * @param {Element} editor
+ * @param {Position} cursorPos
+ */
+function codejarHighlight(editor, cursorPos) {
     let text = editor.textContent || '';
 
     const byteLimit = getByteLimit();
@@ -130,7 +151,7 @@ function render(editor, cursorPos) {
         syncLimitMessageEl.style.visibility = 'visible';
 
         beforeLimit = getSubstringByJsonBytes(text, byteLimit);
-        afterLimit = text.slice(beforeLimit.length);
+        afterLimit = escapeHtml(text.slice(beforeLimit.length));
         // give a light red background to the characters that are over the byte limit
         afterLimit = '<span style="background-color: rgba(255, 0, 0, 0.2)">' + afterLimit + '</span>';
     } else {
@@ -139,7 +160,7 @@ function render(editor, cursorPos) {
         syncLimitMessageEl.style.visibility = 'hidden';
     }
 
-    editor.innerHTML = highlight(beforeLimit) + afterLimit;
+    editor.innerHTML = highlight(escapeHtml(beforeLimit)) + afterLimit;
     // afterLimit should probably not be highlighted because (1) it doesn't really need to
     // be, (2) the red background that marks which characters are over the limit would not
     // appear everywhere it should, and (3) if the byte limit is within an element that

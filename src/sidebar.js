@@ -68,6 +68,25 @@ notepadEl.addEventListener('copy', event => {
     const selectedText = selection.toString();
     if (selectedText) {
         event.clipboardData.setData('text/plain', selectedText);
+    } else {
+        // copy the line the cursor is on
+        const cursorPosStart = jar.save().start;
+        const content = jar.toString();
+        if (content.length === 0) {
+            event.clipboardData.setData('text/plain', '');
+            return;
+        }
+
+        let leftEdge = cursorPosStart - 1;
+        while (leftEdge >= 0 && content[leftEdge] !== '\n') {
+            leftEdge--;
+        }
+        let rightEdge = cursorPosStart;
+        while (rightEdge < content.length && content[rightEdge] !== '\n') {
+            rightEdge++;
+        }
+
+        event.clipboardData.setData('text/plain', content.slice(leftEdge + 1, rightEdge) + '\n');
     }
 });
 

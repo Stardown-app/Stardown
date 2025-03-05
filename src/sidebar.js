@@ -39,7 +39,7 @@ async function main() {
     }
     jar.updateCode(content);
 
-    notepadEl.scrollTop = getSetting('notepadScrollPosition');
+    notepadEl.scrollTop = await getSetting('notepadScrollPosition');
 }
 
 browser.commands.getAll().then(cmds => {

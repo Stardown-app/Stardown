@@ -28,28 +28,20 @@ const SYNC_SAVE_DELAY = 500; // milliseconds // sync storage time limit: https:/
 let lastEditTime = 0; // milliseconds
 const MAX_SYNC_BYTES = 8100; // sync storage byte limit: https://developer.chrome.com/docs/extensions/reference/api/storage#property-sync
 const MAX_LOCAL_BYTES = 10485000; // local storage byte limit: https://developer.chrome.com/docs/extensions/reference/api/storage#property-local
-
 let notepadStorageLocation = 'sync';
-getSetting('notepadStorageLocation').then(newValue => {
-    notepadStorageLocation = newValue;
 
-    // load the notepad content when the page loads
-    getLocalSetting('notepadContent').then(content => {
-        if (!content) {
-            getSetting('notepadContent').then(content => {
-                jar.updateCode(content || '');
-                getSetting('notepadScrollPosition').then(newValue => {
-                    notepadEl.scrollTop = newValue;
-                });
-            });
-        } else {
-            jar.updateCode(content || '');
-            getSetting('notepadScrollPosition').then(newValue => {
-                notepadEl.scrollTop = newValue;
-            });
-        }
-    });
-});
+async function main() {
+    notepadStorageLocation = await getSetting('notepadStorageLocation');
+
+    // load the notepad content
+    let content = await getLocalSetting('notepadContent');
+    if (!content) {
+        content = await getSetting('notepadContent');
+    }
+    jar.updateCode(content);
+
+    notepadEl.scrollTop = getSetting('notepadScrollPosition');
+}
 
 browser.commands.getAll().then(cmds => {
     const copySelectionShortcut = cmds.find(
@@ -404,3 +396,5 @@ function getSubstringByJsonBytes(text, byteLimit) {
     // decode the valid portion
     return JSON.parse('"' + decoder.decode(encoded.subarray(0, validByteLength)) + '"');
 }
+
+main();

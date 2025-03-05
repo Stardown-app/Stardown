@@ -61,7 +61,9 @@ browser.runtime.onInstalled.addListener(async details => {
 createContextMenus();
 getSetting('jsonDestination').then(value => jsonDestination = value);
 browser.tabs.query({ currentWindow: true, active: true }).then(tabs => {
-    windowId = tabs[0].windowId;
+    if (tabs[0]) {
+        windowId = tabs[0].windowId;
+    }
 });
 browser.windows.onFocusChanged.addListener(async newWindowId => {
     if (newWindowId !== -1) {

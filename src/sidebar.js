@@ -38,9 +38,15 @@ getSetting('notepadStorageLocation').then(newValue => {
         if (!content) {
             getSetting('notepadContent').then(content => {
                 jar.updateCode(content || '');
+                getSetting('notepadScrollPosition').then(newValue => {
+                    notepadEl.scrollTop = newValue;
+                });
             });
         } else {
             jar.updateCode(content || '');
+            getSetting('notepadScrollPosition').then(newValue => {
+                notepadEl.scrollTop = newValue;
+            });
         }
     });
 });
@@ -50,6 +56,10 @@ browser.commands.getAll().then(cmds => {
         cmd => cmd.name === 'copySelection'
     )?.shortcut || 'Alt+C';
     notepadEl.setAttribute('data-placeholder', `Press ${copySelectionShortcut} to copy and paste.`);
+});
+
+notepadEl.addEventListener('scrollend', event => {
+    saveScrollPosition();
 });
 
 // save the notepad content when it changes
@@ -217,6 +227,14 @@ async function saveNotepad(byteLimit) {
             console.error(`Unknown notepadStorageLocation: ${notepadStorageLocation}`);
             throw new Error(`Unknown notepadStorageLocation: ${notepadStorageLocation}`);
     }
+}
+
+let scrollPosTimeout = 0;
+function saveScrollPosition() {
+    clearTimeout(scrollPosTimeout);
+    scrollPosTimeout = setTimeout(() => {
+        browser.storage.sync.set({ notepadScrollPosition: notepadEl.scrollTop });
+    }, SYNC_SAVE_DELAY);
 }
 
 /**

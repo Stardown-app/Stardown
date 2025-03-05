@@ -30,6 +30,7 @@ const defaultSettings = {
     selectionFormat: 'Copy selection',
     copyTabsWindows: 'current',
     notepadContent: '',
+    notepadScrollPosition: 0,
     lastUpboardVersion: null,
 
     mdYoutube: 'almost everywhere',

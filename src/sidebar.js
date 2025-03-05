@@ -32,7 +32,6 @@ const MAX_LOCAL_BYTES = 10485000; // local storage byte limit: https://developer
 let notepadStorageLocation = 'sync';
 getSetting('notepadStorageLocation').then(newValue => {
     notepadStorageLocation = newValue;
-    const byteLimit = getByteLimit();
 
     // load the notepad content when the page loads
     getLocalSetting('notepadContent').then(content => {

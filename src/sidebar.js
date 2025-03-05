@@ -22,7 +22,7 @@ const notepadEl = document.getElementById('notepad');
 const byteCountEl = document.getElementById('byteCount');
 const syncLimitMessageEl = document.getElementById('syncLimitMessage');
 
-const jar = CodeJar(notepadEl, highlight);
+const jar = CodeJar(notepadEl, render);
 
 const SYNC_SAVE_DELAY = 500; // milliseconds // sync storage time limit: https://developer.chrome.com/docs/extensions/reference/api/storage#property-sync-sync-MAX_WRITE_OPERATIONS_PER_MINUTE
 let lastEditTime = 0; // milliseconds
@@ -95,7 +95,7 @@ browser.runtime.onMessage.addListener(async message => {
     }
 });
 
-function highlight(editor, cursorPos) {
+function render(editor, cursorPos) {
     let text = editor.textContent || '';
 
     const byteLimit = getByteLimit();
@@ -104,34 +104,67 @@ function highlight(editor, cursorPos) {
     // update the byte count
     byteCountEl.textContent = `${byteCount}/${byteLimit} bytes`;
 
+    let beforeLimit = '';
+    let afterLimit = '';
     const isOverByteLimit = byteCount > byteLimit;
     if (isOverByteLimit) {
         byteCountEl.style.color = 'red';
         syncLimitMessageEl.style.visibility = 'visible';
 
+        beforeLimit = getSubstringByJsonBytes(text, byteLimit);
+        afterLimit = text.slice(beforeLimit.length);
         // give a light red background to the characters that are over the byte limit
-        const before = getSubstringByJsonBytes(text, byteLimit);
-        const after = text.slice(before.length);
-        text = `${before}<span style="background-color: rgba(255, 0, 0, 0.2)">${after}</span>`
+        afterLimit = '<span style="background-color: rgba(255, 0, 0, 0.2)">' + afterLimit + '</span>';
     } else {
+        beforeLimit = text;
         byteCountEl.style.color = 'black';
         syncLimitMessageEl.style.visibility = 'hidden';
     }
 
-    // apply markdown syntax highlighting
-    text = text
-        // header
-        .replaceAll(/((^|\n)#+ [^\n]*)/g, '<span style="color: rgb(199, 83, 0)">$1</span>')
-        // link
-        .replaceAll(/\[([^\^]?[^\[\]\n]*)\]\(([^\(\)\n]+)\)/g, '[<span style="color: rgb(50, 116, 240)">$1</span>](<span style="color: rgb(150, 150, 150)">$2</span>)')
-        // inline code block delimited by single backticks
-        .replaceAll(/(?<!`)`([^`\n]+)`(?!`)/g, '`<span style="background-color: rgb(224, 224, 224)">$1</span>`')
-        // code block
-        .replaceAll(/(^|\n)([`~]{3,}[^\n]*\n(?:.|\n)*?[`~]{3,})\n/g, '$1<span style="background-color: rgb(224, 224, 224); display: block;">$2</span>\n')
-        // bold and/or italic
-        .replaceAll(/((\*|_){1,3}\S(?:[^\n]+?\S)?\2)/g, '<span style="color: rgb(6, 117, 15)">$1</span>')
+    editor.innerHTML = highlight(beforeLimit) + afterLimit;
+    // afterLimit should probably not be highlighted because (1) it doesn't really need to
+    // be, (2) the red background that marks which characters are over the limit would not
+    // appear everywhere it should, and (3) if the byte limit is within an element that
+    // normally should be highlighted, all highlighting throughout afterLimit would
+    // probably get messed up
+}
 
-    editor.innerHTML = text;
+/**
+ * highlight applies syntax highlighting.
+ * @param {string} text
+ * @returns {string}
+ */
+function highlight(text) {
+    return text
+        // header
+        .replaceAll(
+            /((^|\n)#+ [^\n]*)/g,
+            '<span style="color: rgb(199, 83, 0)">$1</span>'
+        )
+
+        // link
+        .replaceAll(
+            /\[([^\^]?[^\[\]\n]*)\]\(([^\(\)\n]+)\)/g,
+            '[<span style="color: rgb(50, 116, 240)">$1</span>](<span style="color: rgb(150, 150, 150)">$2</span>)'
+        )
+
+        // inline code block delimited by single backticks
+        .replaceAll(
+            /(?<!`)`([^`\n]+)`(?!`)/g,
+            '`<span style="background-color: rgb(224, 224, 224)">$1</span>`'
+        )
+
+        // code block
+        .replaceAll(
+            /(^|\n)([`~]{3,}[^\n]*\n(?:.|\n)*?[`~]{3,})\n/g,
+            '$1<span style="background-color: rgb(224, 224, 224); display: block;">$2</span>\n'
+        )
+
+        // bold and/or italic
+        .replaceAll(
+            /((\*|_){1,3}\S(?:[^\n]+?\S)?\2)/g,
+            '<span style="color: rgb(6, 117, 15)">$1</span>'
+        )
 }
 
 /**

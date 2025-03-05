@@ -1,10 +1,15 @@
 {
     "compilerOptions": {
-        "target": "es6",
-        "module": "esnext",
-        "esModuleInterop": true,
+        "target": "ES2021",
+        "lib": [
+            "ES2021",
+            "DOM"
+        ],
+        "module": "NodeNext",
+        "moduleResolution": "NodeNext",
         "strict": true,
-        "moduleResolution": "node"
+        "declaration": true,
+        "noUnusedLocals": true
     },
     "include": [
         "codejar.ts"

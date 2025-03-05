@@ -25,7 +25,6 @@ const syncLimitMessageEl = document.getElementById('syncLimitMessage');
 const jar = CodeJar(notepadEl, render);
 
 const SYNC_SAVE_DELAY = 500; // milliseconds // sync storage time limit: https://developer.chrome.com/docs/extensions/reference/api/storage#property-sync-sync-MAX_WRITE_OPERATIONS_PER_MINUTE
-let lastEditTime = 0; // milliseconds
 const MAX_SYNC_BYTES = 8100; // sync storage byte limit: https://developer.chrome.com/docs/extensions/reference/api/storage#property-sync
 const MAX_LOCAL_BYTES = 10485000; // local storage byte limit: https://developer.chrome.com/docs/extensions/reference/api/storage#property-local
 let notepadStorageLocation = 'sync';
@@ -56,9 +55,8 @@ notepadEl.addEventListener('scrollend', event => {
 
 // save the notepad content when it changes
 notepadEl.addEventListener('input', async () => {
-    lastEditTime = Date.now();
     const byteLimit = getByteLimit();
-    await saveNotepad(byteLimit);
+    saveNotepad(byteLimit);
 });
 
 // prevent writing to the clipboard with the HTML MIME type because it's completely
@@ -188,37 +186,36 @@ function highlight(text) {
         )
 }
 
+let notepadSaveTimeout = 0;
 /**
  * @param {number} byteLimit
- * @returns {Promise<void>}
+ * @returns {void}
  */
-async function saveNotepad(byteLimit) {
-    await sleep(SYNC_SAVE_DELAY);
-    if (lastEditTime + SYNC_SAVE_DELAY > Date.now()) {
-        return;
-    }
+function saveNotepad(byteLimit) {
+    clearTimeout(notepadSaveTimeout);
+    notepadSaveTimeout = setTimeout(() => {
+        const content = jar.toString().trim();
 
-    const content = jar.toString().trim();
-
-    switch (notepadStorageLocation) {
-        case 'sync':
-            const isOverByteLimit = getJsonByteCount(content) > byteLimit;
-            if (isOverByteLimit) {
-                const limitedChars = getSubstringByJsonBytes(content, byteLimit);
-                browser.storage.sync.set({ notepadContent: limitedChars });
+        switch (notepadStorageLocation) {
+            case 'sync':
+                const isOverByteLimit = getJsonByteCount(content) > byteLimit;
+                if (isOverByteLimit) {
+                    const limitedChars = getSubstringByJsonBytes(content, byteLimit);
+                    browser.storage.sync.set({ notepadContent: limitedChars });
+                    browser.storage.local.set({ notepadContent: content });
+                } else {
+                    browser.storage.sync.set({ notepadContent: content });
+                    browser.storage.local.set({ notepadContent: '' });
+                }
+                break;
+            case 'local':
                 browser.storage.local.set({ notepadContent: content });
-            } else {
-                browser.storage.sync.set({ notepadContent: content });
-                browser.storage.local.set({ notepadContent: '' });
-            }
-            break;
-        case 'local':
-            browser.storage.local.set({ notepadContent: content });
-            break;
-        default:
-            console.error(`Unknown notepadStorageLocation: ${notepadStorageLocation}`);
-            throw new Error(`Unknown notepadStorageLocation: ${notepadStorageLocation}`);
-    }
+                break;
+            default:
+                console.error(`Unknown notepadStorageLocation: ${notepadStorageLocation}`);
+                throw new Error(`Unknown notepadStorageLocation: ${notepadStorageLocation}`);
+        }
+    }, SYNC_SAVE_DELAY);
 }
 
 let scrollPosTimeout = 0;
@@ -285,8 +282,6 @@ function scrollToCursor() {
  * @returns {Promise<void>}
  */
 async function receiveToNotepad(newText) {
-    lastEditTime = Date.now();
-
     const notepadAppendOrInsert = await getSetting('notepadAppendOrInsert');
     if (notepadAppendOrInsert === 'append') {
         jar.updateCode((jar.toString().trim() + '\n\n' + newText).trim());
@@ -314,7 +309,7 @@ async function receiveToNotepad(newText) {
     }
 
     const byteLimit = getByteLimit();
-    await saveNotepad(byteLimit);
+    saveNotepad(byteLimit);
 }
 
 /**
@@ -322,7 +317,7 @@ async function receiveToNotepad(newText) {
  */
 async function changeNotepadStorageLocation() {
     const byteLimit = getByteLimit();
-    await saveNotepad(byteLimit);
+    saveNotepad(byteLimit);
 
     const isWithinByteLimit = getJsonByteCount(jar.toString()) <= byteLimit;
     if (isWithinByteLimit) {

@@ -148,15 +148,15 @@ function highlight(text) {
             '[<span style="color: rgb(50, 116, 240)">$1</span>](<span style="color: rgb(150, 150, 150)">$2</span>)'
         )
 
-        // inline code block delimited by single backticks
+        // inline code block
         .replaceAll(
-            /(?<!`)`([^`\n]+)`(?!`)/g,
-            '`<span style="background-color: rgb(224, 224, 224)">$1</span>`'
+            /(`+)([^\n]*?[^`\n][^\n]*?)\1/g,
+            '$1<span style="background-color: rgb(224, 224, 224)">$2</span>$1'
         )
 
         // code block
         .replaceAll(
-            /(^|\n)([`~]{3,}[^\n]*\n(?:.|\n)*?[`~]{3,})\n/g,
+            /(^|\n)(([`~]{3,})[^\n]*\n(?:.|\n)*?\3)\n/g,
             '$1<span style="background-color: rgb(224, 224, 224); display: block;">$2</span>\n'
         )
 

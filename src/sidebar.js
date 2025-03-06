@@ -37,6 +37,8 @@ let notepadStorageLocation = 'sync';
 async function main() {
     notepadStorageLocation = await getSetting('notepadStorageLocation');
 
+    document.body.style.fontSize = await getSetting('notepadFontSize');
+
     // load notepad content
     let content = await getLocalSetting('notepadContent');
     if (!content) {
@@ -100,6 +102,9 @@ browser.runtime.onMessage.addListener(async message => {
     }
 
     switch (message.category) {
+        case 'notepadFontSize':
+            document.body.style.fontSize = message.notepadFontSize;
+            break;
         case 'notepadStorageLocation':
             if (message.notepadStorageLocation !== notepadStorageLocation) {
                 notepadStorageLocation = message.notepadStorageLocation;

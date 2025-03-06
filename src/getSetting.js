@@ -19,6 +19,7 @@ import { browser } from './browserSpecific.js';
 const defaultSettings = {
     markupLanguage: 'markdown',
     createTextFragment: true,
+    notepadFontSize: '12pt',
     notepadAppendOrInsert: 'append',
     notepadStorageLocation: 'sync',
     extractMainContent: true,

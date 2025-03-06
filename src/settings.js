@@ -144,6 +144,7 @@ const markupLanguageEl = document.querySelector('#markupLanguage');
 const selectionFormatEl = document.querySelector('#selectionFormat');
 const copyTabsWindowsEl = document.querySelector('#copyTabsWindows');
 const createTextFragmentEl = document.querySelector('#createTextFragment');
+const notepadFontSizeEl = document.querySelector('#notepadFontSize');
 const notepadAppendOrInsertEl = document.querySelector('#notepadAppendOrInsert');
 const notepadStorageLocationEl = document.querySelector('#notepadStorageLocation');
 const extractMainContentEl = document.querySelector('#extractMainContent');
@@ -167,6 +168,13 @@ initAutosave('markupLanguage', markupLanguageEl, 'value');
 initAutosave('selectionFormat', selectionFormatEl, 'value');
 initAutosave('copyTabsWindows', copyTabsWindowsEl, 'value');
 initAutosave('createTextFragment', createTextFragmentEl, 'checked');
+initAutosave('notepadFontSize', notepadFontSizeEl, 'value', 0, () => {
+    browser.runtime.sendMessage({
+        destination: 'sidebar',
+        category: 'notepadFontSize',
+        notepadFontSize: notepadFontSizeEl.value,
+    });
+});
 initAutosave('notepadAppendOrInsert', notepadAppendOrInsertEl, 'value');
 initAutosave('notepadStorageLocation', notepadStorageLocationEl, 'value', 0, () => {
     browser.runtime.sendMessage({
@@ -236,6 +244,7 @@ async function loadSettings() {
         selectionFormatEl.value = await getSetting('selectionFormat');
         copyTabsWindowsEl.value = await getSetting('copyTabsWindows');
         createTextFragmentEl.checked = await getSetting('createTextFragment');
+        notepadFontSizeEl.value = await getSetting('notepadFontSize');
         notepadAppendOrInsertEl.value = await getSetting('notepadAppendOrInsert');
         notepadStorageLocationEl.value = await getSetting('notepadStorageLocation');
         extractMainContentEl.checked = await getSetting('extractMainContent');

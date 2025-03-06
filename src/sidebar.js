@@ -25,6 +25,7 @@ import { getSetting } from './getSetting.js';
 const notepadEl = document.getElementById('notepad');
 const byteCountEl = document.getElementById('byteCount');
 const syncLimitMessageEl = document.getElementById('syncLimitMessage');
+const saveErrorIconEl = document.getElementById('saveErrorIcon');
 
 const jar = CodeJar(notepadEl, codejarHighlight);
 
@@ -212,25 +213,34 @@ function saveNotepad() {
     notepadSaveTimeout = setTimeout(() => {
         const content = jar.toString().trim();
 
-        switch (notepadStorageLocation) {
-            case 'sync':
-                const byteLimit = getByteLimit();
-                const isOverByteLimit = getJsonByteCount(content) > byteLimit;
-                if (isOverByteLimit) {
-                    const limitedChars = getSubstringByJsonBytes(content, byteLimit);
-                    browser.storage.sync.set({ notepadContent: limitedChars });
+        try {
+            switch (notepadStorageLocation) {
+                case 'sync':
+                    const byteLimit = getByteLimit();
+                    const isOverByteLimit = getJsonByteCount(content) > byteLimit;
+                    if (isOverByteLimit) {
+                        const limitedChars = getSubstringByJsonBytes(content, byteLimit);
+                        browser.storage.sync.set({ notepadContent: limitedChars });
+                        browser.storage.local.set({ notepadContent: content });
+                    } else {
+                        browser.storage.sync.set({ notepadContent: content });
+                        browser.storage.local.set({ notepadContent: '' });
+                    }
+                    break;
+                case 'local':
                     browser.storage.local.set({ notepadContent: content });
-                } else {
-                    browser.storage.sync.set({ notepadContent: content });
-                    browser.storage.local.set({ notepadContent: '' });
-                }
-                break;
-            case 'local':
-                browser.storage.local.set({ notepadContent: content });
-                break;
-            default:
-                console.error(`Unknown notepadStorageLocation: ${notepadStorageLocation}`);
-                throw new Error(`Unknown notepadStorageLocation: ${notepadStorageLocation}`);
+                    break;
+                default:
+                    console.error(`Unknown notepadStorageLocation: ${notepadStorageLocation}`);
+                    throw new Error(`Unknown notepadStorageLocation: ${notepadStorageLocation}`);
+            }
+        } catch (err) {
+            saveErrorIconEl.style.visibility = 'visible';
+            setTimeout(() => {
+                saveErrorIconEl.style.visibility = 'hidden';
+            }, 5000);
+
+            throw err;
         }
     }, SYNC_SAVE_DELAY);
 }

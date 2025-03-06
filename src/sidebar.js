@@ -302,7 +302,13 @@ async function receiveToNotepad(newText) {
     const notepadAppendOrInsert = await getSetting('notepadAppendOrInsert');
     if (notepadAppendOrInsert === 'append') {
         jar.updateCode((jar.toString().trim() + '\n\n' + newText).trim());
-        notepadEl.scrollTop = notepadEl.scrollHeight; // scroll to the end
+        // scroll to the end
+        notepadEl.scrollTop = notepadEl.scrollHeight;
+        // move the cursor to the end
+        jar.restore({
+            start: notepadEl.textContent.length,
+            end: notepadEl.textContent.length,
+        });
     } else if (notepadAppendOrInsert === 'insert') {
         const cursorPos = jar.save();
         const before = jar.toString().slice(0, cursorPos.start).trim();

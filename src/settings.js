@@ -35,6 +35,8 @@ if (!stableReleaseTagPattern.test(VERSION) && !prereleaseTagPattern.test(VERSION
 const manifest = browser.runtime.getManifest();
 document.querySelector('#versionNumber').innerHTML = VERSION;
 
+const SYNC_SAVE_DELAY = 500; // milliseconds // sync storage time limit: https://developer.chrome.com/docs/extensions/reference/api/storage#property-sync-sync-MAX_WRITE_OPERATIONS_PER_MINUTE
+
 document.querySelector('#shortcutInstructions').innerHTML = getShortcutInstructions();
 
 const checkForUpdatesButton = document.querySelector('#checkForUpdates');
@@ -167,7 +169,7 @@ initAutosave('selectionFormat', selectionFormatEl, 'value');
 initAutosave('copyTabsWindows', copyTabsWindowsEl, 'value');
 initAutosave('createTextFragment', createTextFragmentEl, 'checked');
 initAutosave('notepadAppendOrInsert', notepadAppendOrInsertEl, 'value');
-initAutosave('notepadStorageLocation', notepadStorageLocationEl, 'value', () => {
+initAutosave('notepadStorageLocation', notepadStorageLocationEl, 'value', 0, () => {
     browser.runtime.sendMessage({
         destination: 'sidebar',
         category: 'notepadStorageLocation',
@@ -182,12 +184,12 @@ initAutosave('notifyOnWarning', notifyOnWarningEl, 'checked');
 initAutosave('notifyOnSuccess', notifyOnSuccessEl, 'checked');
 
 initAutosave('mdYoutube', mdYoutubeEl, 'value');
-initAutosave('mdSelectionWithSourceTemplate', templateEl, 'value');
+initAutosave('mdSelectionWithSourceTemplate', templateEl, 'value', SYNC_SAVE_DELAY);
 initAutosave('mdSubBrackets', mdSubBracketsEl, 'value');
 initAutosave('mdBulletPoint', mdBulletPointEl, 'value');
 
 initAutosave('jsonEmptyCell', jsonEmptyCellEl, 'value');
-initAutosave('jsonDestination', jsonDestinationEl, 'value', () => {
+initAutosave('jsonDestination', jsonDestinationEl, 'value', 0, () => {
     browser.runtime.sendMessage({
         destination: 'background',
         category: 'jsonDestination',
@@ -201,14 +203,28 @@ initAutosave('jsonDestination', jsonDestinationEl, 'value', () => {
  * @param {HTMLElement} el - the HTML element of the setting's input field.
  * @param {string} valueProperty - the HTML element's property that holds the setting's
  * value.
+ * @param {number|undefined} wait - the number of milliseconds to wait before saving, to
+ * debounce save requests.
  * @param {function|undefined} then - an optional function to run after applying the
  * setting completes.
  */
-function initAutosave(settingName, el, valueProperty, then) {
-    el.addEventListener('input', async (event) => {
+function initAutosave(settingName, el, valueProperty, wait, then) {
+    const saveSetting = async () => {
         const obj = {};
         obj[settingName] = el[valueProperty];
         await browser.storage.sync.set(obj).then(then);
+    };
+
+    let timeout = 0;
+    el.addEventListener('input', async event => {
+        if (wait) {
+            clearTimeout(timeout);
+            timeout = setTimeout(async () => {
+                await saveSetting();
+            }, wait);
+        } else {
+            await saveSetting();
+        }
     });
 }
 

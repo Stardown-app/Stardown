@@ -168,21 +168,9 @@ initAutosave('markupLanguage', markupLanguageEl, 'value');
 initAutosave('selectionFormat', selectionFormatEl, 'value');
 initAutosave('copyTabsWindows', copyTabsWindowsEl, 'value');
 initAutosave('createTextFragment', createTextFragmentEl, 'checked');
-initAutosave('notepadFontSize', notepadFontSizeEl, 'value', 0, () => {
-    browser.runtime.sendMessage({
-        destination: 'sidebar',
-        category: 'notepadFontSize',
-        notepadFontSize: notepadFontSizeEl.value,
-    });
-});
+initAutosave('notepadFontSize', notepadFontSizeEl, 'value', 0, ['sidebar']);
 initAutosave('notepadAppendOrInsert', notepadAppendOrInsertEl, 'value');
-initAutosave('notepadStorageLocation', notepadStorageLocationEl, 'value', 0, () => {
-    browser.runtime.sendMessage({
-        destination: 'sidebar',
-        category: 'notepadStorageLocation',
-        notepadStorageLocation: notepadStorageLocationEl.value,
-    });
-});
+initAutosave('notepadStorageLocation', notepadStorageLocationEl, 'value', 0, ['sidebar']);
 initAutosave('extractMainContent', extractMainContentEl, 'checked');
 initAutosave('omitNav', omitNavEl, 'checked');
 initAutosave('omitFooter', omitFooterEl, 'checked');
@@ -196,13 +184,7 @@ initAutosave('mdSubBrackets', mdSubBracketsEl, 'value');
 initAutosave('mdBulletPoint', mdBulletPointEl, 'value');
 
 initAutosave('jsonEmptyCell', jsonEmptyCellEl, 'value');
-initAutosave('jsonDestination', jsonDestinationEl, 'value', 0, () => {
-    browser.runtime.sendMessage({
-        destination: 'background',
-        category: 'jsonDestination',
-        jsonDestination: jsonDestinationEl.value,
-    });
-});
+initAutosave('jsonDestination', jsonDestinationEl, 'value', 0, ['background']);
 
 /**
  * initAutosave initializes autosaving for a setting.
@@ -212,14 +194,25 @@ initAutosave('jsonDestination', jsonDestinationEl, 'value', 0, () => {
  * value.
  * @param {number|undefined} wait - the number of milliseconds to wait before saving, to
  * debounce save requests.
- * @param {function|undefined} then - an optional function to run after applying the
- * setting completes.
+ * @param {string[]|undefined} ctxNames - a list of names of execution contexts to send an
+ * update to when the setting changes. The message category will be the name of the
+ * setting, and the new value will be in a property named after the setting.
  */
-function initAutosave(settingName, el, valueProperty, wait, then) {
+function initAutosave(settingName, el, valueProperty, wait, ctxNames) {
     const saveSetting = async () => {
         const obj = {};
         obj[settingName] = el[valueProperty];
-        await browser.storage.sync.set(obj).then(then);
+        await browser.storage.sync.set(obj);
+        if (ctxNames && ctxNames.length > 0) {
+            for (const ctxName of ctxNames) {
+                const msg = {
+                    destination: ctxName,
+                    category: settingName,
+                };
+                msg[settingName] = el[valueProperty];
+                browser.runtime.sendMessage(msg);
+            }
+        }
     };
 
     let timeout = 0;

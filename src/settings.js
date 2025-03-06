@@ -117,8 +117,7 @@ checkForUpdatesButton.addEventListener('click', async () => {
 
     const updateInstructionsHtml = `
         <a href="https://stardown-app.github.io/Stardown/docs/install-and-update-instructions/?updating=true">
-            Click here for update instructions</a>
-    `;
+            Click here for update instructions</a>`;
 
     if (latestPrereleaseVersion) {
         if (VERSION === latestPrereleaseVersion) {

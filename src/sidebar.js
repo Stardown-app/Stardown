@@ -14,60 +14,86 @@
    limitations under the License.
 */
 
-import { browser, sleep } from './browserSpecific.js';
+import { browser } from './browserSpecific.js';
+import { CodeJar } from './codejar.js';
 import { getSetting } from './getSetting.js';
 
-const notepad = document.getElementById('notepad');
-const byteCountEl = document.getElementById('byte-count');
-const syncLimitButton = document.getElementById('sync-limit-button');
+/**
+ * @typedef {import('./codejar.js').Position} Position
+ */
+
+const notepadEl = document.getElementById('notepad');
+const byteCountEl = document.getElementById('byteCount');
+const syncLimitMessageEl = document.getElementById('syncLimitMessage');
+const saveErrorIconEl = document.getElementById('saveErrorIcon');
+
+const jar = CodeJar(notepadEl, codejarHighlight);
 
 const SYNC_SAVE_DELAY = 500; // milliseconds // sync storage time limit: https://developer.chrome.com/docs/extensions/reference/api/storage#property-sync-sync-MAX_WRITE_OPERATIONS_PER_MINUTE
-let lastEditTime = 0; // milliseconds
 const MAX_SYNC_BYTES = 8100; // sync storage byte limit: https://developer.chrome.com/docs/extensions/reference/api/storage#property-sync
 const MAX_LOCAL_BYTES = 10485000; // local storage byte limit: https://developer.chrome.com/docs/extensions/reference/api/storage#property-local
-
 let notepadStorageLocation = 'sync';
-getSetting('notepadStorageLocation').then(newValue => {
-    notepadStorageLocation = newValue;
-    const byteLimit = getByteLimit();
 
-    // load the notepad content when the page loads
-    getLocalSetting('notepadContent').then(content => {
-        if (!content) {
-            getSetting('notepadContent').then(content => {
-                notepad.value = content || '';
-                updateByteCount(byteLimit);
-            });
-        } else {
-            notepad.value = content;
-            updateByteCount(byteLimit);
-        }
-    });
-});
+async function main() {
+    notepadStorageLocation = await getSetting('notepadStorageLocation');
 
-browser.commands.getAll().then(cmds => {
-    const copySelectionShortcut = cmds.find(
-        cmd => cmd.name === 'copySelection'
-    )?.shortcut || 'Alt+C';
-    notepad.placeholder = `Press ${copySelectionShortcut} to copy and paste.`;
+    document.body.style.fontSize = await getSetting('notepadFontSize');
+
+    // load notepad content
+    let content = await getLocalSetting('notepadContent');
+    if (!content) {
+        content = await getSetting('notepadContent');
+    }
+    jar.updateCode(content);
+
+    // scroll to the previous scroll position
+    notepadEl.scrollTop = await getSetting('notepadScrollPosition');
+
+    // set placeholder text
+    const cmds = await browser.commands.getAll();
+    const copySelectionShortcut = cmds.find(cmd => cmd.name === 'copySelection')?.shortcut || 'Alt+C';
+    notepadEl.setAttribute('data-placeholder', `Press ${copySelectionShortcut} to copy and paste.`);
+}
+
+notepadEl.addEventListener('scrollend', event => {
+    saveScrollPosition();
 });
 
 // save the notepad content when it changes
-notepad.addEventListener('input', async () => {
-    lastEditTime = Date.now();
+notepadEl.addEventListener('input', async () => {
     const byteLimit = getByteLimit();
-    updateByteCount(byteLimit);
-    await saveNotepad(byteLimit);
+    saveNotepad(byteLimit);
 });
 
-syncLimitButton.addEventListener('click', async () => {
-    // move the cursor to where syncing ends
-    const byteLimit = getByteLimit();
-    notepad.selectionStart = byteLimit;
-    notepad.selectionEnd = byteLimit;
+// prevent writing to the clipboard with the HTML MIME type because it's completely
+// unnecessary and sometimes causes formatting problems when pasting
+notepadEl.addEventListener('copy', event => {
+    event.preventDefault();
 
-    scrollToCursor();
-    notepad.focus();
+    const selection = window.getSelection();
+    const selectedText = selection.toString();
+    if (selectedText) {
+        event.clipboardData.setData('text/plain', selectedText);
+    } else {
+        // copy the line the cursor is on
+        const cursorPosStart = jar.save().start;
+        const content = jar.toString();
+        if (content.length === 0) {
+            event.clipboardData.setData('text/plain', '');
+            return;
+        }
+
+        let leftEdge = cursorPosStart - 1;
+        while (leftEdge >= 0 && content[leftEdge] !== '\n') {
+            leftEdge--;
+        }
+        let rightEdge = cursorPosStart;
+        while (rightEdge < content.length && content[rightEdge] !== '\n') {
+            rightEdge++;
+        }
+
+        event.clipboardData.setData('text/plain', content.slice(leftEdge + 1, rightEdge) + '\n');
+    }
 });
 
 browser.runtime.onMessage.addListener(async message => {
@@ -76,6 +102,9 @@ browser.runtime.onMessage.addListener(async message => {
     }
 
     switch (message.category) {
+        case 'notepadFontSize':
+            document.body.style.fontSize = message.notepadFontSize;
+            break;
         case 'notepadStorageLocation':
             if (message.notepadStorageLocation !== notepadStorageLocation) {
                 notepadStorageLocation = message.notepadStorageLocation;
@@ -95,53 +124,138 @@ browser.runtime.onMessage.addListener(async message => {
 });
 
 /**
- * @param {number} byteLimit
- * @returns {Promise<void>}
+ * @param {string} text
+ * @returns {string}
  */
-async function saveNotepad(byteLimit) {
-    await sleep(SYNC_SAVE_DELAY);
-    if (lastEditTime + SYNC_SAVE_DELAY > Date.now()) {
-        return;
-    }
-
-    switch (notepadStorageLocation) {
-        case 'sync':
-            const isOverByteLimit = getJsonByteCount(notepad.value) > byteLimit;
-            if (isOverByteLimit) {
-                const limitedChars = getSubstringByJsonBytes(notepad.value, byteLimit);
-                browser.storage.sync.set({ notepadContent: limitedChars });
-                browser.storage.local.set({ notepadContent: notepad.value });
-            } else {
-                browser.storage.sync.set({ notepadContent: notepad.value });
-                browser.storage.local.set({ notepadContent: '' });
-            }
-            break;
-        case 'local':
-            browser.storage.local.set({ notepadContent: notepad.value });
-            break;
-        default:
-            console.error(`Unknown notepadStorageLocation: ${notepadStorageLocation}`);
-            throw new Error(`Unknown notepadStorageLocation: ${notepadStorageLocation}`);
-    }
+function escapeHtml(text) {
+    return text
+        .replaceAll('&', '&amp;')
+        .replaceAll('<', '&lt;')
+        .replaceAll('>', '&gt;')
+        .replaceAll('"', '&quot;')
+        .replaceAll("'", '&#039;')
 }
 
 /**
- * @param {number} byteLimit
- * @returns {void}
+ * @param {Element} editor
+ * @param {Position} cursorPos
  */
-function updateByteCount(byteLimit) {
-    const byteCount = getJsonByteCount(notepad.value);
+function codejarHighlight(editor, cursorPos) {
+    let text = editor.textContent || '';
+
+    const byteLimit = getByteLimit();
+    const byteCount = getJsonByteCount(text);
+
+    // update the byte count
     byteCountEl.textContent = `${byteCount}/${byteLimit} bytes`;
+
+    let beforeLimit = '';
+    let afterLimit = '';
     const isOverByteLimit = byteCount > byteLimit;
     if (isOverByteLimit) {
-        byteCountEl.setAttribute('style', 'color: red');
-        if (notepadStorageLocation === 'sync') {
-            syncLimitButton.setAttribute('style', 'visibility: visible');
-        }
+        byteCountEl.style.color = 'red';
+        syncLimitMessageEl.style.visibility = 'visible';
+
+        beforeLimit = getSubstringByJsonBytes(text, byteLimit);
+        afterLimit = escapeHtml(text.slice(beforeLimit.length));
+        // give a light red background to the characters that are over the byte limit
+        afterLimit = '<span style="background-color: rgba(255, 0, 0, 0.2)">' + afterLimit + '</span>';
     } else {
-        byteCountEl.setAttribute('style', 'color: black');
-        syncLimitButton.setAttribute('style', 'visibility: hidden');
+        beforeLimit = text;
+        byteCountEl.style.color = 'black';
+        syncLimitMessageEl.style.visibility = 'hidden';
     }
+
+    editor.innerHTML = highlight(escapeHtml(beforeLimit)) + afterLimit;
+    // afterLimit should probably not be highlighted because (1) it doesn't really need to
+    // be, (2) the red background that marks which characters are over the limit would not
+    // appear everywhere it should, and (3) if the byte limit is within an element that
+    // normally should be highlighted, all highlighting throughout afterLimit would
+    // probably get messed up
+}
+
+/**
+ * highlight applies syntax highlighting.
+ * @param {string} text
+ * @returns {string}
+ */
+function highlight(text) {
+    return text
+        // header
+        .replaceAll(
+            /((^|\n)#+ [^\n]*)/g,
+            '<span style="color: rgb(199, 83, 0)">$1</span>'
+        )
+
+        // link
+        .replaceAll(
+            /\[([^\^]?[^\[\]\n]*)\]\(([^\(\)\n]+)\)/g,
+            '[<span style="color: rgb(50, 116, 240)">$1</span>](<span style="color: rgb(150, 150, 150)">$2</span>)'
+        )
+
+        // inline code block
+        .replaceAll(
+            /(`+)([^\n]*?[^`\n][^\n]*?)\1/g,
+            '$1<span style="background-color: rgb(224, 224, 224)">$2</span>$1'
+        )
+
+        // code block
+        .replaceAll(
+            /(^|\n)(([`~]{3,})[^\n]*\n(?:.|\n)*?\3)\n/g,
+            '$1<span style="background-color: rgb(224, 224, 224); display: block;">$2</span>\n'
+        )
+
+        // bold and/or italic
+        .replaceAll(
+            /((\*\*\*|___|\*\*|__|\*|_)\S(?:[^\n]*?\S)?\2)/g,
+            '<span style="color: rgb(6, 117, 15)">$1</span>'
+        )
+}
+
+let notepadSaveTimeout = 0;
+function saveNotepad() {
+    clearTimeout(notepadSaveTimeout);
+    notepadSaveTimeout = setTimeout(() => {
+        const content = jar.toString().trim();
+
+        try {
+            switch (notepadStorageLocation) {
+                case 'sync':
+                    const byteLimit = getByteLimit();
+                    const isOverByteLimit = getJsonByteCount(content) > byteLimit;
+                    if (isOverByteLimit) {
+                        const limitedChars = getSubstringByJsonBytes(content, byteLimit);
+                        browser.storage.sync.set({ notepadContent: limitedChars });
+                        browser.storage.local.set({ notepadContent: content });
+                    } else {
+                        browser.storage.sync.set({ notepadContent: content });
+                        browser.storage.local.set({ notepadContent: '' });
+                    }
+                    break;
+                case 'local':
+                    browser.storage.local.set({ notepadContent: content });
+                    break;
+                default:
+                    console.error(`Unknown notepadStorageLocation: ${notepadStorageLocation}`);
+                    throw new Error(`Unknown notepadStorageLocation: ${notepadStorageLocation}`);
+            }
+        } catch (err) {
+            saveErrorIconEl.style.visibility = 'visible';
+            setTimeout(() => {
+                saveErrorIconEl.style.visibility = 'hidden';
+            }, 5000);
+
+            throw err;
+        }
+    }, SYNC_SAVE_DELAY);
+}
+
+let scrollPosTimeout = 0;
+function saveScrollPosition() {
+    clearTimeout(scrollPosTimeout);
+    scrollPosTimeout = setTimeout(() => {
+        browser.storage.sync.set({ notepadScrollPosition: notepadEl.scrollTop });
+    }, SYNC_SAVE_DELAY);
 }
 
 /**
@@ -174,12 +288,13 @@ function getJsonByteCount(text) {
  * @returns {void}
  */
 function scrollToCursor() {
-    const textBeforeCursor = notepad.value.substring(0, notepad.selectionStart);
+    const cursorPos = jar.save();
+    const textBeforeCursor = jar.toString().substring(0, cursorPos.start);
     const linesBeforeCursor = textBeforeCursor.split('\n').length;
 
-    const lineHeight = parseInt(window.getComputedStyle(notepad).lineHeight);
-    const visibleHeight = notepad.clientHeight;
-    const scrollPosition = notepad.scrollTop;
+    const lineHeight = parseInt(window.getComputedStyle(notepadEl).lineHeight);
+    const visibleHeight = notepadEl.clientHeight;
+    const scrollPosition = notepadEl.scrollTop;
 
     const cursorY = linesBeforeCursor * lineHeight;
 
@@ -187,9 +302,9 @@ function scrollToCursor() {
     const isCursorBelow = cursorY > scrollPosition + visibleHeight - lineHeight;
 
     if (isCursorAbove) {
-        notepad.scrollTop = cursorY;
+        notepadEl.scrollTop = cursorY;
     } else if (isCursorBelow) {
-        notepad.scrollTop = cursorY - visibleHeight + lineHeight;
+        notepadEl.scrollTop = cursorY - visibleHeight + lineHeight;
     }
     // if the cursor is already visible, don't scroll
 }
@@ -199,24 +314,31 @@ function scrollToCursor() {
  * @returns {Promise<void>}
  */
 async function receiveToNotepad(newText) {
-    lastEditTime = Date.now();
-
     const notepadAppendOrInsert = await getSetting('notepadAppendOrInsert');
     if (notepadAppendOrInsert === 'append') {
-        notepad.value = (notepad.value.trim() + '\n\n' + newText).trim();
-        notepad.scrollTop = notepad.scrollHeight; // scroll to the end
+        jar.updateCode((jar.toString().trim() + '\n\n' + newText).trim());
+        // scroll to the end
+        notepadEl.scrollTop = notepadEl.scrollHeight;
+        // move the cursor to the end
+        jar.restore({
+            start: notepadEl.textContent.length,
+            end: notepadEl.textContent.length,
+        });
     } else if (notepadAppendOrInsert === 'insert') {
-        const before = notepad.value.slice(0, notepad.selectionStart).trim();
-        const after = notepad.value.slice(notepad.selectionEnd).trim();
-        notepad.value = (before + '\n\n' + newText + '\n\n' + after).trim();
+        const cursorPos = jar.save();
+        const before = jar.toString().slice(0, cursorPos.start).trim();
+        const after = jar.toString().slice(cursorPos.end).trim();
+        jar.updateCode((before + '\n\n' + newText + '\n\n' + after).trim());
 
         // move the cursor to the end of the new text
         let newCursorPosition = newText.length;
         if (before.length > 0) {
             newCursorPosition += before.length + 2; // 2 for newlines
         }
-        notepad.selectionStart = newCursorPosition;
-        notepad.selectionEnd = newCursorPosition;
+        jar.restore({
+            start: newCursorPosition,
+            end: newCursorPosition,
+        });
 
         scrollToCursor();
     } else {
@@ -224,20 +346,16 @@ async function receiveToNotepad(newText) {
         throw new Error(`Unknown notepadAppendOrInsert: "${notepadAppendOrInsert}"`);
     }
 
-    const byteLimit = getByteLimit();
-    updateByteCount(byteLimit);
-    await saveNotepad(byteLimit);
+    saveNotepad();
 }
 
 /**
  * @returns {Promise<void>}
  */
 async function changeNotepadStorageLocation() {
-    const byteLimit = getByteLimit();
-    updateByteCount(byteLimit);
-    await saveNotepad(byteLimit);
+    saveNotepad();
 
-    const isWithinByteLimit = getJsonByteCount(notepad.value) <= byteLimit;
+    const isWithinByteLimit = getJsonByteCount(jar.toString()) <= getByteLimit();
     if (isWithinByteLimit) {
         // remove the notepad content from its current storage location
         switch (notepadStorageLocation) {
@@ -257,7 +375,6 @@ async function changeNotepadStorageLocation() {
 const defaultLocalSettings = {
     notepadContent: '',
 };
-
 /**
  * getLocalSetting gets a setting from the browser's local storage. If the setting does
  * not exist there, its default value is returned.
@@ -285,8 +402,8 @@ async function getLocalSetting(name) {
 }
 
 /**
- * getSubstringByJsonBytes gets a substring of up to byteLimit JSON bytes without
- * splitting any characters.
+ * getSubstringByJsonBytes gets the beginning of the string up to byteLimit JSON bytes
+ * without splitting any characters.
  * @param {string} text
  * @param {number} byteLimit
  * @returns {string}
@@ -309,3 +426,5 @@ function getSubstringByJsonBytes(text, byteLimit) {
     // decode the valid portion
     return JSON.parse('"' + decoder.decode(encoded.subarray(0, validByteLength)) + '"');
 }
+
+main();

@@ -35,6 +35,8 @@ if (!stableReleaseTagPattern.test(VERSION) && !prereleaseTagPattern.test(VERSION
 const manifest = browser.runtime.getManifest();
 document.querySelector('#versionNumber').innerHTML = VERSION;
 
+const SYNC_SAVE_DELAY = 500; // milliseconds // sync storage time limit: https://developer.chrome.com/docs/extensions/reference/api/storage#property-sync-sync-MAX_WRITE_OPERATIONS_PER_MINUTE
+
 document.querySelector('#shortcutInstructions').innerHTML = getShortcutInstructions();
 
 const checkForUpdatesButton = document.querySelector('#checkForUpdates');
@@ -115,8 +117,7 @@ checkForUpdatesButton.addEventListener('click', async () => {
 
     const updateInstructionsHtml = `
         <a href="https://stardown-app.github.io/Stardown/docs/install-and-update-instructions/?updating=true">
-            Click here for update instructions</a>
-    `;
+            Click here for update instructions</a>`;
 
     if (latestPrereleaseVersion) {
         if (VERSION === latestPrereleaseVersion) {
@@ -143,6 +144,7 @@ const markupLanguageEl = document.querySelector('#markupLanguage');
 const selectionFormatEl = document.querySelector('#selectionFormat');
 const copyTabsWindowsEl = document.querySelector('#copyTabsWindows');
 const createTextFragmentEl = document.querySelector('#createTextFragment');
+const notepadFontSizeEl = document.querySelector('#notepadFontSize');
 const notepadAppendOrInsertEl = document.querySelector('#notepadAppendOrInsert');
 const notepadStorageLocationEl = document.querySelector('#notepadStorageLocation');
 const extractMainContentEl = document.querySelector('#extractMainContent');
@@ -166,14 +168,9 @@ initAutosave('markupLanguage', markupLanguageEl, 'value');
 initAutosave('selectionFormat', selectionFormatEl, 'value');
 initAutosave('copyTabsWindows', copyTabsWindowsEl, 'value');
 initAutosave('createTextFragment', createTextFragmentEl, 'checked');
+initAutosave('notepadFontSize', notepadFontSizeEl, 'value', 0, ['sidebar']);
 initAutosave('notepadAppendOrInsert', notepadAppendOrInsertEl, 'value');
-initAutosave('notepadStorageLocation', notepadStorageLocationEl, 'value', () => {
-    browser.runtime.sendMessage({
-        destination: 'sidebar',
-        category: 'notepadStorageLocation',
-        notepadStorageLocation: notepadStorageLocationEl.value,
-    });
-});
+initAutosave('notepadStorageLocation', notepadStorageLocationEl, 'value', 0, ['sidebar']);
 initAutosave('extractMainContent', extractMainContentEl, 'checked');
 initAutosave('omitNav', omitNavEl, 'checked');
 initAutosave('omitFooter', omitFooterEl, 'checked');
@@ -182,18 +179,12 @@ initAutosave('notifyOnWarning', notifyOnWarningEl, 'checked');
 initAutosave('notifyOnSuccess', notifyOnSuccessEl, 'checked');
 
 initAutosave('mdYoutube', mdYoutubeEl, 'value');
-initAutosave('mdSelectionWithSourceTemplate', templateEl, 'value');
+initAutosave('mdSelectionWithSourceTemplate', templateEl, 'value', SYNC_SAVE_DELAY);
 initAutosave('mdSubBrackets', mdSubBracketsEl, 'value');
 initAutosave('mdBulletPoint', mdBulletPointEl, 'value');
 
 initAutosave('jsonEmptyCell', jsonEmptyCellEl, 'value');
-initAutosave('jsonDestination', jsonDestinationEl, 'value', () => {
-    browser.runtime.sendMessage({
-        destination: 'background',
-        category: 'jsonDestination',
-        jsonDestination: jsonDestinationEl.value,
-    });
-});
+initAutosave('jsonDestination', jsonDestinationEl, 'value', 0, ['background']);
 
 /**
  * initAutosave initializes autosaving for a setting.
@@ -201,14 +192,39 @@ initAutosave('jsonDestination', jsonDestinationEl, 'value', () => {
  * @param {HTMLElement} el - the HTML element of the setting's input field.
  * @param {string} valueProperty - the HTML element's property that holds the setting's
  * value.
- * @param {function|undefined} then - an optional function to run after applying the
- * setting completes.
+ * @param {number|undefined} wait - the number of milliseconds to wait before saving, to
+ * debounce save requests.
+ * @param {string[]|undefined} ctxNames - a list of names of execution contexts to send an
+ * update to when the setting changes. The message category will be the name of the
+ * setting, and the new value will be in a property named after the setting.
  */
-function initAutosave(settingName, el, valueProperty, then) {
-    el.addEventListener('input', async (event) => {
+function initAutosave(settingName, el, valueProperty, wait, ctxNames) {
+    const saveSetting = async () => {
         const obj = {};
         obj[settingName] = el[valueProperty];
-        await browser.storage.sync.set(obj).then(then);
+        await browser.storage.sync.set(obj);
+        if (ctxNames && ctxNames.length > 0) {
+            for (const ctxName of ctxNames) {
+                const msg = {
+                    destination: ctxName,
+                    category: settingName,
+                };
+                msg[settingName] = el[valueProperty];
+                browser.runtime.sendMessage(msg);
+            }
+        }
+    };
+
+    let timeout = 0;
+    el.addEventListener('input', async event => {
+        if (wait) {
+            clearTimeout(timeout);
+            timeout = setTimeout(async () => {
+                await saveSetting();
+            }, wait);
+        } else {
+            await saveSetting();
+        }
     });
 }
 
@@ -221,6 +237,7 @@ async function loadSettings() {
         selectionFormatEl.value = await getSetting('selectionFormat');
         copyTabsWindowsEl.value = await getSetting('copyTabsWindows');
         createTextFragmentEl.checked = await getSetting('createTextFragment');
+        notepadFontSizeEl.value = await getSetting('notepadFontSize');
         notepadAppendOrInsertEl.value = await getSetting('notepadAppendOrInsert');
         notepadStorageLocationEl.value = await getSetting('notepadStorageLocation');
         extractMainContentEl.checked = await getSetting('extractMainContent');

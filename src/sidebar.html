@@ -25,24 +25,39 @@
     <style>
       body {
         font-family: sans-serif;
+        font-size: 12pt;
       }
 
       #notepad {
         width: 100%;
-        height: 100%;
+        min-height: 100%;
         box-sizing: border-box;
+        overflow-y: auto;
+        overflow-x: hidden;
       }
 
-      .notepad-container {
+      #notepad:empty::before {
+        content: attr(data-placeholder);
+        color: gray;
+      }
+
+      #notepadContainer {
         display: flex;
         justify-content: center;
-        align-items: center;
-        height: 93vh;
+        align-items: stretch;
+        height: 89vh;
         padding: 10px;
       }
 
-      #byte-count {
-        margin-top: -5px;
+      #infoContainer {
+        height: 10vh;
+      }
+
+      hr {
+        margin-top: -10px;
+      }
+
+      p {
         margin-left: 20px;
       }
     </style>
@@ -50,13 +65,19 @@
 
   <body>
     <main>
-      <div class="notepad-container">
-        <textarea id="notepad"></textarea>
+      <div id="notepadContainer">
+        <div id="notepad"></div>
       </div>
-      <p id="byte-count"></p>
-      <button id="sync-limit-button" type="button" style="visibility: hidden">
-        Where does syncing stop?
-      </button>
+      <hr />
+      <div id="infoContainer">
+        <p id="byteCount"></p>
+        <p id="syncLimitMessage" style="visibility: hidden; color: red;">
+          Some of the notepad is over the sync limit.
+        </p>
+        <p id="saveErrorIcon" style="visibility: hidden">
+          ⛔
+        </p>
+      </div>
     </main>
     <script src="./sidebar.js"></script>
   </body>

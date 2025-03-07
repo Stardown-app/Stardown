@@ -21,7 +21,7 @@
 
 <p align="center"><img alt="demo gif" src="https://github.com/Stardown-app/assets/blob/main/Stardown.gif"></p>
 
-Copy and paste like you're used to. Press `Alt+C` to copy (Mac: `⌥+C`) (Firefox: `Ctrl+Alt+C` or `⌘+Alt+C` because of [Firefox bug 1945032](https://github.com/Stardown-app/Stardown/issues/203)).
+Copy and paste like you're used to. Press `Alt+C` to copy (Mac: `⌥+C`) (Firefox: `Ctrl+Alt+C` or `⌘+⌥+C` because of [Firefox bug 1945032](https://github.com/Stardown-app/Stardown/issues/203)).
 
 - Copy almost anything as markdown including links, images, videos, lists, bold, italics, quotes, code blocks, etc.
 - Copy tables as markdown, CSV, JSON, and more.

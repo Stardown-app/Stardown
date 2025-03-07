@@ -68,31 +68,31 @@
     "commands": {
         "copySelection": {
             "suggested_key": {
-                "default": "Alt+C"
+                "default": "Ctrl+Alt+C"
             },
             "description": "Copy selection"
         },
         "copyEntirePage": {
             "suggested_key": {
-                "default": "Alt+P"
+                "default": "Ctrl+Alt+P"
             },
             "description": "Copy entire page"
         },
         "copyMultipleTabs": {
             "suggested_key": {
-                "default": "Alt+M"
+                "default": "Ctrl+Alt+M"
             },
             "description": "Copy multiple tabs"
         },
         "_execute_sidebar_action": {
             "suggested_key": {
-                "default": "Alt+N"
+                "default": "Ctrl+Alt+N"
             },
             "description": "Toggle Stardown's notepad"
         },
         "openSettings": {
             "suggested_key": {
-                "default": "Alt+O"
+                "default": "Ctrl+Alt+O"
             },
             "description": "Open settings"
         }

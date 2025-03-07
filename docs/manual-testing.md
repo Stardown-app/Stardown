@@ -52,7 +52,7 @@ When the user right-clicks part of a web page, their browser detects the type of
 ### Features
 
 - [ ] **Pressing any button in the popup** should do what the button's text describes.
-- [ ] **Pressing Alt+C (Mac: ⌥+C)** copies a markdown link for the page, unless part of the page is selected in which case markdown of the selection is copied instead.
+- [ ] **Pressing Stardown's copy shortcut** copies a markdown link for the page, unless part of the page is selected in which case markdown of the selection is copied instead.
 - [ ] **Right-clicking an unselected part of a page** shows the "Copy link for this page" and "Copy link for this section" options.
 - [ ] **Right-clicking an unselected image** shows the "Copy image" option.
 - [ ] **Selecting text and/or image(s), then right-clicking the selection** shows the options "Copy selection", "Copy selection, cite source", and "Copy selection as a quote".

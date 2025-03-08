@@ -101,6 +101,6 @@ Here's what I do when creating a new release:
 5. Commit, push, make a pull request into the main branch, merge, and pull
 6. Tag the merge commit with the same value as the `VERSION` variable in settings.js
 7. Push the tag
-8. [Open the GH pages action](https://github.com/Stardown-app/Stardown/actions/workflows/pages.yaml) and click "Run workflow". I tried to make this step run automatically on new release tags, but for some reason the `deploy` job would always ignore the artifact most recently uploaded by the `build` job and use the previous one instead.
+8. Run `gh workflow run pages.yaml` to rebuild the instructions page. I tried to make this step run automatically on new release tags, but for some reason the `deploy` job would always ignore the artifact most recently uploaded by the `build` job and use the previous one instead.
 
 This will run a few GitHub actions that will build the extension, create a GitHub release, and update [the install/update instructions site](https://stardown-app.github.io/Stardown/docs/install-and-update-instructions/).

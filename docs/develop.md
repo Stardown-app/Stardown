@@ -93,8 +93,8 @@ Sample markdown tables for testing markdown renderers can be found in [./sample-
 Here's what I do when creating a new release:
 
 1. Make sure the tests pass with `npm test`
-2. Update the `VERSION` variable in [../src/settings.js](../src/settings.js)
-3. Run the `VERSION` block of code in a new REPL session to make sure the new version is correctly formatted.
+2. Update the `VERSION` variable in [../src/version.js](../src/version.js)
+3. Run `npm run check-version` to make sure the new version is correctly formatted.
 4. If the new version is a stable release
    1. Update the "version" properties in the manifests
    2. Update [../src/updated.html](../src/updated.html)

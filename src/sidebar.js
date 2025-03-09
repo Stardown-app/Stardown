@@ -25,6 +25,7 @@ import { getSetting } from './getSetting.js';
 const notepadEl = document.getElementById('notepad');
 const byteCountEl = document.getElementById('byteCount');
 const syncLimitMessageEl = document.getElementById('syncLimitMessage');
+const syncLimitButton = document.getElementById('syncLimitButton');
 const saveErrorIconEl = document.getElementById('saveErrorIcon');
 
 const jar = CodeJar(notepadEl, codejarHighlight);
@@ -54,6 +55,19 @@ async function main() {
     const copySelectionShortcut = cmds.find(cmd => cmd.name === 'copySelection')?.shortcut || 'Alt+C';
     notepadEl.setAttribute('data-placeholder', `Press ${copySelectionShortcut} to copy and paste.`);
 }
+
+syncLimitButton.addEventListener('click', () => {
+    // move the cursor to where syncing ends
+    const byteLimit = getByteLimit();
+    const i = getSubstringByJsonBytes(jar.toString(), byteLimit).length;
+    jar.restore({
+        start: i,
+        end: i,
+    });
+
+    scrollToCursor();
+    notepadEl.focus();
+});
 
 notepadEl.addEventListener('scrollend', event => {
     saveScrollPosition();

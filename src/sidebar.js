@@ -306,25 +306,17 @@ function getJsonByteCount(text) {
  * @returns {void}
  */
 function scrollToCursor() {
-    const cursorPos = jar.save();
-    const textBeforeCursor = jar.toString().substring(0, cursorPos.start);
-    const linesBeforeCursor = textBeforeCursor.split('\n').length;
-
-    const lineHeight = parseInt(window.getComputedStyle(notepadEl).lineHeight);
-    const visibleHeight = notepadEl.clientHeight;
-    const scrollPosition = notepadEl.scrollTop;
-
-    const cursorY = linesBeforeCursor * lineHeight;
-
-    const isCursorAbove = cursorY < scrollPosition;
-    const isCursorBelow = cursorY > scrollPosition + visibleHeight - lineHeight;
-
-    if (isCursorAbove) {
-        notepadEl.scrollTop = cursorY;
-    } else if (isCursorBelow) {
-        notepadEl.scrollTop = cursorY - visibleHeight + lineHeight;
+    const selection = window.getSelection();
+    if (!selection || selection.rangeCount === 0) {
+        // there isn't even a caret
+        return;
     }
-    // if the cursor is already visible, don't scroll
+
+    const range = selection.getRangeAt(0);
+    const span = document.createElement('span');
+    range.insertNode(span);
+    span.scrollIntoView({ block: 'center' });
+    span.remove();
 }
 
 /**

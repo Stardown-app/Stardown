@@ -126,6 +126,7 @@ browser.runtime.onMessage.addListener(async message => {
             }
             break;
         case 'sendToNotepad':
+            console.log('Text received by sidebar from content');
             const newText = message.text.trim();
             if (newText) {
                 await receiveToNotepad(newText);

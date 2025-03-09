@@ -25,6 +25,7 @@ import { getSetting } from './getSetting.js';
 const notepadEl = document.getElementById('notepad');
 const byteCountEl = document.getElementById('byteCount');
 const syncLimitMessageEl = document.getElementById('syncLimitMessage');
+const syncLimitButton = document.getElementById('syncLimitButton');
 const saveErrorIconEl = document.getElementById('saveErrorIcon');
 
 const jar = CodeJar(notepadEl, codejarHighlight);
@@ -54,6 +55,19 @@ async function main() {
     const copySelectionShortcut = cmds.find(cmd => cmd.name === 'copySelection')?.shortcut || 'Alt+C';
     notepadEl.setAttribute('data-placeholder', `Press ${copySelectionShortcut} to copy and paste.`);
 }
+
+syncLimitButton.addEventListener('click', () => {
+    // move the cursor to where syncing ends
+    const byteLimit = getByteLimit();
+    const i = getSubstringByJsonBytes(jar.toString(), byteLimit).length;
+    jar.restore({
+        start: i,
+        end: i,
+    });
+
+    scrollToCursor();
+    notepadEl.focus();
+});
 
 notepadEl.addEventListener('scrollend', event => {
     saveScrollPosition();
@@ -205,11 +219,15 @@ function highlight(text) {
             '$1<span style="background-color: rgb(224, 224, 224); display: block;">$2</span>\n'
         )
 
-        // bold and/or italic
+        // bold, or both bold and italic
         .replaceAll(
-            /((\*\*\*|___|\*\*|__|\*|_)\S(?:[^\n]*?\S)?\2)/g,
+            /((\*\*\*|___|\*\*|__)\S(?:[^\n]*?\S)?\2)/g,
             '<span style="color: rgb(6, 117, 15)">$1</span>'
         )
+    // Text that is only italic is not highlighted. Otherwise, many characters that
+    // are not italic would also be highlighted since URLs often have at least one
+    // underscore. There's no easy way to prevent that when using regex in this way.
+    // Highlighting italic text isn't really important anyways.
 }
 
 let notepadSaveTimeout = 0;
@@ -288,25 +306,17 @@ function getJsonByteCount(text) {
  * @returns {void}
  */
 function scrollToCursor() {
-    const cursorPos = jar.save();
-    const textBeforeCursor = jar.toString().substring(0, cursorPos.start);
-    const linesBeforeCursor = textBeforeCursor.split('\n').length;
-
-    const lineHeight = parseInt(window.getComputedStyle(notepadEl).lineHeight);
-    const visibleHeight = notepadEl.clientHeight;
-    const scrollPosition = notepadEl.scrollTop;
-
-    const cursorY = linesBeforeCursor * lineHeight;
-
-    const isCursorAbove = cursorY < scrollPosition;
-    const isCursorBelow = cursorY > scrollPosition + visibleHeight - lineHeight;
-
-    if (isCursorAbove) {
-        notepadEl.scrollTop = cursorY;
-    } else if (isCursorBelow) {
-        notepadEl.scrollTop = cursorY - visibleHeight + lineHeight;
+    const selection = window.getSelection();
+    if (!selection || selection.rangeCount === 0) {
+        // there isn't even a caret
+        return;
     }
-    // if the cursor is already visible, don't scroll
+
+    const range = selection.getRangeAt(0);
+    const span = document.createElement('span');
+    range.insertNode(span);
+    span.scrollIntoView({ block: 'center' });
+    span.remove();
 }
 
 /**

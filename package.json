@@ -6,6 +6,7 @@
   "scripts": {
     "test": "node --test",
     "md-diff": "echo Open md.diff.html to see test output && nodemon ./test/diffMd.js --ext html,md,js --ignore *.diff.html",
+    "check-version": "node ./scripts/check-version.js",
     "build-firefox": "rollup --config rollup.config.firefox.mjs",
     "build-chrome": "rollup --config rollup.config.chrome.mjs"
   },

@@ -14,25 +14,12 @@
    limitations under the License.
 */
 
+import { VERSION, stableReleaseTagPattern, prereleaseTagPattern } from './version.js';
 import { browser, sleep, getShortcutInstructions } from './browserSpecific.js';
 import { getSetting } from './getSetting.js';
 
-/**
- * VERSION is Stardown's version. The value must match one of the regex patterns below;
- * you might want to copy & paste this block of code into a new REPL session to check.
- * This variable exists because the "version" properties in the manifests only support
- * stable release versions.
- */
-const VERSION = 'v2.0.0-alpha.2503030152';
-const stableReleaseTagPattern = /^v\d+\.\d+\.\d+$/;
-const prereleaseTagPattern = /^v\d+\.\d+\.\d+-(?:alpha|beta)\.\d{10}$/; // the last 10 digits are YYMMDDhhmm in UTC
-if (!stableReleaseTagPattern.test(VERSION) && !prereleaseTagPattern.test(VERSION)) {
-    throw "Stardown's version must match either of two regular expressions";
-} else {
-    console.log("The version's format is correct");
-}
-
 const manifest = browser.runtime.getManifest();
+
 document.querySelector('#versionNumber').innerHTML = VERSION;
 
 const SYNC_SAVE_DELAY = 500; // milliseconds // sync storage time limit: https://developer.chrome.com/docs/extensions/reference/api/storage#property-sync-sync-MAX_WRITE_OPERATIONS_PER_MINUTE

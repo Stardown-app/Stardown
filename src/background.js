@@ -78,8 +78,14 @@ browser.commands.onCommand.addListener(async command => {
             browser.sidePanel.open({ windowId: windowId });
             break;
         case 'copySelection':
-            const tabs = await browser.tabs.query({ active: true, currentWindow: true });
-            await handleInteraction(tabs[0], { category: 'copySelectionShortcut' });
+            const tabs = await browser.tabs.query({ currentWindow: true, highlighted: true });
+            if (tabs.length === 1) { // if only one tab is selected
+                // copy the selected part of the page if any, otherwise copy the tab
+                await handleInteraction(tabs[0], { category: 'copySelectionShortcut' });
+            } else { // if multiple tabs are selected
+                // copy the selected tabs
+                await handleCopyMultipleTabs(tabs);
+            }
             break;
         case 'copyEntirePage':
             const tabs1 = await browser.tabs.query({ active: true, currentWindow: true });

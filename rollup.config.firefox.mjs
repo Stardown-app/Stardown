@@ -43,7 +43,7 @@ function transform(contents, filename) {
         .replace(
             // Remove all `browser` imports because firefox/browserSpecific.js doesn't
             // define `browser` because Firefox already has a global `browser` variable.
-            /(import \{.*?)browser,?(.*?\} from ['"])/,
+            /((?:^|\n)import\s*\{(?:\s*\w+,)*)\s*browser,?((?:\s*\w+,?)*\s*\}\s*from)/,
             "$1$2",
         )
         .replace(

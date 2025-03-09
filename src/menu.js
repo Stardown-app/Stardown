@@ -15,85 +15,85 @@
 */
 
 export const pageItem = {
-    id: 'page',
-    title: 'Copy link for this page',
-    contexts: ['page', 'editable'],
+    id: "page",
+    title: "Copy link for this page",
+    contexts: ["page", "editable"],
 };
 
 export const pageSectionItem = {
-    id: 'pageSection',
-    title: 'Copy link for this section',
-    contexts: ['page', 'editable'],
+    id: "pageSection",
+    title: "Copy link for this section",
+    contexts: ["page", "editable"],
 };
 
 export const selectionItem = {
-    id: 'selection',
-    title: 'Copy selection',
-    contexts: ['selection'],
+    id: "selection",
+    title: "Copy selection",
+    contexts: ["selection"],
 };
 
 export const selectionWithSourceItem = {
-    id: 'selectionWithSource',
-    title: 'Copy selection, cite source',
-    contexts: ['selection'],
+    id: "selectionWithSource",
+    title: "Copy selection, cite source",
+    contexts: ["selection"],
 };
 
 export const selectionQuoteItem = {
-    id: 'selectionQuote',
-    title: 'Copy selection as a quote',
-    contexts: ['selection'],
+    id: "selectionQuote",
+    title: "Copy selection as a quote",
+    contexts: ["selection"],
 };
 
 export const linkItem = {
-    id: 'link',
-    title: 'Copy link',
-    contexts: ['link'],
+    id: "link",
+    title: "Copy link",
+    contexts: ["link"],
 };
 
 export const imageItem = {
-    id: 'image',
-    title: 'Copy image',
-    contexts: ['image'],
+    id: "image",
+    title: "Copy image",
+    contexts: ["image"],
 };
 
 export const videoItem = {
-    id: 'video',
-    title: 'Copy video',
-    contexts: ['video'],
+    id: "video",
+    title: "Copy video",
+    contexts: ["video"],
 };
 
 export const audioItem = {
-    id: 'audio',
-    title: 'Copy audio',
-    contexts: ['audio'],
+    id: "audio",
+    title: "Copy audio",
+    contexts: ["audio"],
 };
 
 export const markdownTableItem = {
-    id: 'markdownTable',
-    title: 'Copy markdown of table',
-    contexts: ['selection'],
+    id: "markdownTable",
+    title: "Copy markdown of table",
+    contexts: ["selection"],
 };
 
 export const tsvTableItem = {
-    id: 'tsvTable',
-    title: 'Copy TSV of table',
-    contexts: ['selection'],
+    id: "tsvTable",
+    title: "Copy TSV of table",
+    contexts: ["selection"],
 };
 
 export const csvTableItem = {
-    id: 'csvTable',
-    title: 'Copy CSV of table',
-    contexts: ['selection'],
+    id: "csvTable",
+    title: "Copy CSV of table",
+    contexts: ["selection"],
 };
 
 export const jsonTableItem = {
-    id: 'jsonTable',
-    title: 'Copy JSON of table',
-    contexts: ['selection'],
+    id: "jsonTable",
+    title: "Copy JSON of table",
+    contexts: ["selection"],
 };
 
 export const htmlTableItem = {
-    id: 'htmlTable',
-    title: 'Copy HTML of table',
-    contexts: ['selection'],
+    id: "htmlTable",
+    title: "Copy HTML of table",
+    contexts: ["selection"],
 };

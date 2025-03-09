@@ -85,7 +85,7 @@ Sample markdown tables for testing markdown renderers can be found in [./sample-
 **HTML table definition**
 
 > In this order: optionally a caption element, followed by zero or more colgroup elements, followed optionally by a thead element, followed by either zero or more tbody elements or one or more tr elements, followed optionally by a tfoot element, optionally intermixed with one or more script-supporting elements.
-> 
+>
 > — [the HTML Standard](https://html.spec.whatwg.org/multipage/tables.html)
 
 ## Releasing
@@ -96,8 +96,8 @@ Here's what I do when creating a new release:
 2. Update the `VERSION` variable in [../src/version.js](../src/version.js)
 3. Run `npm run check-version` to make sure the new version is correctly formatted.
 4. If the new version is a stable release
-   1. Update the "version" properties in the manifests
-   2. Update [../src/updated.html](../src/updated.html)
+    1. Update the "version" properties in the manifests
+    2. Update [../src/updated.html](../src/updated.html)
 5. Commit, push, make a pull request into the main branch, merge, and pull
 6. Tag the merge commit with the same value as the `VERSION` variable in settings.js
 7. Push the tag

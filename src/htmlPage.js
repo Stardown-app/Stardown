@@ -14,13 +14,13 @@
    limitations under the License.
 */
 
-import { getSetting } from './getSetting.js';
-import { sendToNotepad, handleCopyRequest } from './contentUtils.js';
-import { extractMainContent } from './extractMainContent.js';
-import { improveConvertibility } from './converters/utils/html.js';
-import { absolutizeNodeUrls } from './converters/utils/urls.js';
-import { htmlToMd } from './converters/md.js';
-import { htmlToMdAndHtml } from './converters/mdAndHtml.js';
+import { getSetting } from "./getSetting.js";
+import { sendToNotepad, handleCopyRequest } from "./contentUtils.js";
+import { extractMainContent } from "./extractMainContent.js";
+import { improveConvertibility } from "./converters/utils/html.js";
+import { absolutizeNodeUrls } from "./converters/utils/urls.js";
+import { htmlToMd } from "./converters/md.js";
+import { htmlToMdAndHtml } from "./converters/mdAndHtml.js";
 
 /**
  * @typedef {import('./contentUtils.js').ContentResponse} ContentResponse
@@ -40,12 +40,12 @@ export async function handleCopyPageRequest() {
  * @returns {Promise<string>}
  */
 async function createPageText() {
-    const markupLanguage = await getSetting('markupLanguage');
-    if (markupLanguage === 'html') {
+    const markupLanguage = await getSetting("markupLanguage");
+    if (markupLanguage === "html") {
         let frag = document.createDocumentFragment();
         frag.append(document.documentElement.cloneNode(true));
 
-        if (await getSetting('extractMainContent')) {
+        if (await getSetting("extractMainContent")) {
             frag = await extractMainContent(frag, location);
         }
 
@@ -54,7 +54,7 @@ async function createPageText() {
         absolutizeNodeUrls(frag, location.href);
 
         // convert the fragment to a string
-        const div = document.createElement('div');
+        const div = document.createElement("div");
         div.appendChild(frag.cloneNode(true));
         const html = div.innerHTML;
 
@@ -62,7 +62,10 @@ async function createPageText() {
         return html;
     }
 
-    if (markupLanguage !== 'markdown' && markupLanguage !== 'markdown with some html') {
+    if (
+        markupLanguage !== "markdown" &&
+        markupLanguage !== "markdown with some html"
+    ) {
         console.error(`Unknown markupLanguage: ${markupLanguage}`);
         throw new Error(`Unknown markupLanguage: ${markupLanguage}`);
     }
@@ -84,16 +87,16 @@ async function getSourceFormatMd(markupLanguage) {
     let frag = document.createDocumentFragment();
     frag.append(document.body.cloneNode(true));
 
-    if (await getSetting('extractMainContent')) {
+    if (await getSetting("extractMainContent")) {
         frag = await extractMainContent(frag, location);
     }
 
     await improveConvertibility(frag, location);
 
     switch (markupLanguage) {
-        case 'markdown':
+        case "markdown":
             return await htmlToMd(frag);
-        case 'markdown with some html':
+        case "markdown with some html":
             return await htmlToMdAndHtml(frag);
         default:
             console.error(`Unknown markupLanguage: ${markupLanguage}`);

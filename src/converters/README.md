@@ -9,9 +9,9 @@ Also see [../../docs/develop.md](../../docs/develop.md) for general Stardown dev
 To convert HTML to markdown:
 
 ```js
-import { htmlToMd } from './converters/md.js';
+import { htmlToMd } from "./converters/md.js";
 
-const html = '<div>...</div>';
+const html = "<div>...</div>";
 const frag = document.createRange().createContextualFragment(html);
 const markdown = await htmlToMd(frag);
 console.log(markdown);
@@ -34,21 +34,20 @@ Stardown-converters' markdown converter is implemented with a class named `MdCon
 
 ```js
 export class MdConverter {
-
     convertBR(ctx, el) {
-        return '\n';
+        return "\n";
     }
 
     convertHR(ctx, el) {
-        return '\n\n* * *\n\n';
+        return "\n\n* * *\n\n";
     }
 
     convertSCRIPT(ctx, el) {
-        return '';
+        return "";
     }
 
     convertLI(ctx, el) {
-        return '';
+        return "";
     }
 
     convertSTRONG(ctx, el) {
@@ -59,10 +58,10 @@ export class MdConverter {
 
         const text = this.convertNodes(newCtx, el.childNodes).trim();
         if (!text) {
-            return '';
+            return "";
         }
 
-        return '**' + text.replaceAll('\n', ' ') + '**';
+        return "**" + text.replaceAll("\n", " ") + "**";
     }
 }
 ```
@@ -95,8 +94,8 @@ Stardown-converters' strengths:
 - great performance
 - stateless interface
 - easier to determine context when converting an element because:
-  - context objects (see details below)
-  - Stardown-converters doesn't assume you will always want to convert everything from the innermost elements outward
+    - context objects (see details below)
+    - Stardown-converters doesn't assume you will always want to convert everything from the innermost elements outward
 
 Almost all of the functions in this package are synchronous because:
 
@@ -113,12 +112,12 @@ For example, settings and environment info could be put into `ctx` to be used th
 const ctx = {
     locationHref: location.href,
     document: document,
-    indent: '',
-    omitNav: await getSetting('omitNav'),
-    omitFooter: await getSetting('omitFooter'),
-    mdSubBrackets: await getSetting('mdSubBrackets'),
-    mdBulletPoint: await getSetting('mdBulletPoint'),
-    mdYoutube: await getSetting('mdYoutube'),
+    indent: "",
+    omitNav: await getSetting("omitNav"),
+    omitFooter: await getSetting("omitFooter"),
+    mdSubBrackets: await getSetting("mdSubBrackets"),
+    mdBulletPoint: await getSetting("mdBulletPoint"),
+    mdYoutube: await getSetting("mdYoutube"),
 };
 ```
 
@@ -138,5 +137,5 @@ The code above correctly prevents attempts to nest markdown tables since markdow
 Similarly, `ctx` can be used to help with list indentation:
 
 ```js
-const newCtx = { ...ctx, indent: ctx.indent + '    ' };
+const newCtx = { ...ctx, indent: ctx.indent + "    " };
 ```

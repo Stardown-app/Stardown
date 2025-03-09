@@ -90,17 +90,80 @@ export function isInlineElement(node) {
 
 // [HTML Block and Inline Elements | W3docs](https://www.w3docs.com/learn-html/html-block-and-inline-elements.html)
 const blockElementNames = [
-    'ADDRESS', 'ARTICLE', 'ASIDE', 'BLOCKQUOTE', 'CANVAS', 'DD', 'DIV', 'DL', 'DT',
-    'FIELDSET', 'FIGCAPTION', 'FIGURE', 'FOOTER', 'FORM', 'H1', 'H2', 'H3', 'H4', 'H5',
-    'H6', 'HEADER', 'HR', 'LI', 'MAIN', 'NAV', 'NOSCRIPT', 'OL', 'P', 'PRE', 'SECTION',
-    'TABLE', 'TFOOT', 'UL', 'VIDEO',
+    "ADDRESS",
+    "ARTICLE",
+    "ASIDE",
+    "BLOCKQUOTE",
+    "CANVAS",
+    "DD",
+    "DIV",
+    "DL",
+    "DT",
+    "FIELDSET",
+    "FIGCAPTION",
+    "FIGURE",
+    "FOOTER",
+    "FORM",
+    "H1",
+    "H2",
+    "H3",
+    "H4",
+    "H5",
+    "H6",
+    "HEADER",
+    "HR",
+    "LI",
+    "MAIN",
+    "NAV",
+    "NOSCRIPT",
+    "OL",
+    "P",
+    "PRE",
+    "SECTION",
+    "TABLE",
+    "TFOOT",
+    "UL",
+    "VIDEO",
 ];
 
 const inlineElementNames = [
-    'A', 'ABBR', 'ACRONYM', 'B', 'BDO', 'BIG', 'BR', 'BUTTON', 'CITE', 'CODE',
-    'DEL', 'DFN', 'EM', 'I', 'IMG', 'INPUT', 'INS', 'KBD', 'LABEL', 'MARK', 'MAP',
-    'OBJECT', 'OUTPUT', 'Q', 'S', 'SAMP', 'SCRIPT', 'SELECT', 'SMALL', 'SPAN',
-    'STRONG', 'SUB', 'SUP', 'TEXTAREA', 'TIME', 'TT', 'VAR',
+    "A",
+    "ABBR",
+    "ACRONYM",
+    "B",
+    "BDO",
+    "BIG",
+    "BR",
+    "BUTTON",
+    "CITE",
+    "CODE",
+    "DEL",
+    "DFN",
+    "EM",
+    "I",
+    "IMG",
+    "INPUT",
+    "INS",
+    "KBD",
+    "LABEL",
+    "MARK",
+    "MAP",
+    "OBJECT",
+    "OUTPUT",
+    "Q",
+    "S",
+    "SAMP",
+    "SCRIPT",
+    "SELECT",
+    "SMALL",
+    "SPAN",
+    "STRONG",
+    "SUB",
+    "SUP",
+    "TEXTAREA",
+    "TIME",
+    "TT",
+    "VAR",
 ];
 
 /**
@@ -111,21 +174,21 @@ const inlineElementNames = [
  * @returns {Promise<void>}
  */
 export async function improveConvertibility(frag, location) {
-    if (location.hostname === 'news.ycombinator.com') {
+    if (location.hostname === "news.ycombinator.com") {
         // add the presentation role to every table
-        frag.querySelectorAll('table').forEach(
-            table => table.setAttribute('role', 'presentation')
+        frag.querySelectorAll("table").forEach((table) =>
+            table.setAttribute("role", "presentation"),
         );
     } else if (location.hostname.match(/^(.+\.)?wikipedia\.org/)) {
         // remove each image of math and unhide its corresponding math element
         frag.querySelectorAll(
-            'img.mwe-math-fallback-image-display,img.mwe-math-fallback-image-inline'
-        ).forEach(
-            img => img.remove()
+            "img.mwe-math-fallback-image-display,img.mwe-math-fallback-image-inline",
+        ).forEach((img) => img.remove());
+        frag.querySelectorAll("span.mwe-math-mathml-display").forEach(
+            (span) => {
+                span.setAttribute("style", "display: block");
+            },
         );
-        frag.querySelectorAll('span.mwe-math-mathml-display').forEach(span => {
-            span.setAttribute('style', 'display: block');
-        });
     }
 }
 
@@ -145,9 +208,9 @@ export function removeHiddenElements(frag, doc) {
         if (currentNode.nodeType === nodeTypes.ELEMENT_NODE) {
             const style = doc.defaultView.getComputedStyle(currentNode);
             if (
-                currentNode.hasAttribute('hidden') ||
-                style.getPropertyValue('display') === 'none' ||
-                style.getPropertyValue('visibility') === 'hidden'
+                currentNode.hasAttribute("hidden") ||
+                style.getPropertyValue("display") === "none" ||
+                style.getPropertyValue("visibility") === "hidden"
             ) {
                 currentNode.parentNode.removeChild(currentNode);
             }
@@ -168,8 +231,8 @@ export function removeStyles(frag) {
     const iterator = document.createNodeIterator(frag, SHOW_ELEMENT);
     let currentNode = iterator.nextNode();
     while (currentNode) {
-        currentNode.removeAttribute('style');
-        currentNode.removeAttribute('bgcolor');
+        currentNode.removeAttribute("style");
+        currentNode.removeAttribute("bgcolor");
 
         currentNode = iterator.nextNode();
     }

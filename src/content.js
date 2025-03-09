@@ -14,16 +14,24 @@
    limitations under the License.
 */
 
-import { browser } from './browserSpecific.js';
-import { createLink, createImage, createVideo, createAudio } from './generators/all.js';
-import * as htmlSelection from './htmlSelection.js';
-import { handleCopyPageRequest } from './htmlPage.js';
-import { getSetting } from './getSetting.js';
+import { browser } from "./browserSpecific.js";
 import {
-    sendToNotepad, handleCopyRequest, addIdAndTextFragment, removeIdAndTextFragment,
-} from './contentUtils.js';
-import { htmlTableToJson } from './converters/json.js';
-import { htmlTableToCsv } from './converters/csv.js';
+    createLink,
+    createImage,
+    createVideo,
+    createAudio,
+} from "./generators/all.js";
+import * as htmlSelection from "./htmlSelection.js";
+import { handleCopyPageRequest } from "./htmlPage.js";
+import { getSetting } from "./getSetting.js";
+import {
+    sendToNotepad,
+    handleCopyRequest,
+    addIdAndTextFragment,
+    removeIdAndTextFragment,
+} from "./contentUtils.js";
+import { htmlTableToJson } from "./converters/json.js";
+import { htmlTableToCsv } from "./converters/csv.js";
 
 /**
  * @typedef {import('./contentUtils.js').ContentResponse} ContentResponse
@@ -55,8 +63,7 @@ let tableSelection = null;
  * @returns {void}
  */
 function setUpListeners() {
-
-    document.addEventListener('mouseover', (event) => {
+    document.addEventListener("mouseover", (event) => {
         // This event listener detects when the mouse is over an element that is a
         // selection, image, or link and sends a message to the background script so it
         // can load the correct context menu items. This is necessary because the
@@ -64,68 +71,68 @@ function setUpListeners() {
         // than one of selection, image, and link, the one message sent will only
         // contain the first of those that was detected.
         const s = window.getSelection();
-        if (s && s.type === 'Range') {
+        if (s && s.type === "Range") {
             browser.runtime.sendMessage({
-                destination: 'background',
-                category: 'updateContextMenu',
-                context: { mouseover: 'selection' },
+                destination: "background",
+                category: "updateContextMenu",
+                context: { mouseover: "selection" },
             });
-        } else if (event.target.nodeName === 'IMG') {
+        } else if (event.target.nodeName === "IMG") {
             browser.runtime.sendMessage({
-                destination: 'background',
-                category: 'updateContextMenu',
-                context: { mouseover: 'image' },
+                destination: "background",
+                category: "updateContextMenu",
+                context: { mouseover: "image" },
             });
-        } else if (event.target.nodeName === 'A') {
+        } else if (event.target.nodeName === "A") {
             browser.runtime.sendMessage({
-                destination: 'background',
-                category: 'updateContextMenu',
-                context: { mouseover: 'link' },
+                destination: "background",
+                category: "updateContextMenu",
+                context: { mouseover: "link" },
             });
         }
     });
 
-    document.addEventListener('mouseup', async (event) => {
+    document.addEventListener("mouseup", async (event) => {
         // This event listener detects when the user has selected a table and sends a
         // message to the background script so it can load the correct context menu
         // items.
         const selection = window.getSelection();
-        if (!selection || selection.type !== 'Range') {
+        if (!selection || selection.type !== "Range") {
             return;
         }
 
         /** @type {DocumentFragment} */
         const frag = await htmlSelection.getSelectionFragment(selection);
-        const isTable = frag?.firstChild?.nodeName === 'TABLE';
+        const isTable = frag?.firstChild?.nodeName === "TABLE";
         if (isTable) {
             tableSelection = selection;
             browser.runtime.sendMessage({
-                destination: 'background',
-                category: 'updateContextMenu',
-                context: { mouseup: 'table' },
+                destination: "background",
+                category: "updateContextMenu",
+                context: { mouseup: "table" },
             });
         } else {
             tableSelection = null;
         }
     });
 
-    document.addEventListener('selectionchange', async (event) => {
+    document.addEventListener("selectionchange", async (event) => {
         // This event listener detects when the user has deselected a table and sends a
         // message to the background script so it can load the correct context menu
         // items.
         browser.runtime.sendMessage({
-            destination: 'background',
-            category: 'updateContextMenu',
-            context: { selectionchange: 'selection' },
+            destination: "background",
+            category: "updateContextMenu",
+            context: { selectionchange: "selection" },
         });
     });
 
-    document.addEventListener('contextmenu', (event) => {
+    document.addEventListener("contextmenu", (event) => {
         clickedElement = event.target;
 
-        if (event.target.nodeName === 'A') {
+        if (event.target.nodeName === "A") {
             linkText = event.target.textContent;
-        } else if (event.target.parentElement.nodeName === 'A') {
+        } else if (event.target.parentElement.nodeName === "A") {
             // Some anchors such as
             // [these](https://developer.mozilla.org/en-US/docs/Learn/HTML/Tables/Advanced#:~:text=is%20by%20using-,%3Cthead%3E%2C%20%3Ctbody%3E%2C%20and%20%3Ctfoot%3E,-%2C%20which%20allow%20you)
             // contain another element. The inner element is the event target, and the
@@ -137,14 +144,14 @@ function setUpListeners() {
     });
 
     browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
-        if (message.destination !== 'content') {
+        if (message.destination !== "content") {
             return;
         }
 
         // In Chromium, this listener must be synchronous and must send a response
         // immediately. True must be sent if the actual response will be sent
         // asynchronously.
-        console.log('content.js received message');
+        console.log("content.js received message");
 
         handleRequest(message).then((res) => {
             sendResponse(res);
@@ -194,51 +201,60 @@ async function handleRequest(message) {
         return null;
     }
     lastRequestId = message.id;
-    console.log('Handling request:', message.category);
+    console.log("Handling request:", message.category);
 
     switch (message.category) {
-        case 'copyText':
+        case "copyText":
             await sendToNotepad(message.text);
             // write to the clipboard & return a response
             return await handleCopyRequest(message.text);
-        case 'copySelectionShortcut':
+        case "copySelectionShortcut":
             // respond to use of the copy keyboard shortcut or copy button
             return await handleCopySelectionShortcut(message.category);
-        case 'copyEntirePageShortcut':
+        case "copyEntirePageShortcut":
             return await handleCopyPageRequest();
-        case 'pageRightClick':
+        case "pageRightClick":
             const url = removeIdAndTextFragment(location.href);
             return await handleCreateLink(document.title, url);
-        case 'pageSectionRightClick':
+        case "pageSectionRightClick":
             const selection = window.getSelection();
             const id1 = await getClickedElementId(clickedElement);
             return await handlePageSectionRightClick(id1, selection);
-        case 'selectionRightClick':
-        case 'selectionWithSourceRightClick':
-        case 'selectionQuoteRightClick':
+        case "selectionRightClick":
+        case "selectionWithSourceRightClick":
+        case "selectionQuoteRightClick":
             const selection1 = window.getSelection();
             const id2 = await getClickedElementId(clickedElement);
-            return await handleSelectionCopyRequest(id2, selection1, message.category);
-        case 'linkRightClick':
+            return await handleSelectionCopyRequest(
+                id2,
+                selection1,
+                message.category,
+            );
+        case "linkRightClick":
             return await handleCreateLink(linkText, message.linkUrl);
-        case 'imageRightClick':
+        case "imageRightClick":
             return await handleCreateImage(message.srcUrl);
-        case 'videoRightClick':
+        case "videoRightClick":
             return await handleCreateVideo(message.srcUrl, message.pageUrl);
-        case 'audioRightClick':
+        case "audioRightClick":
             return await handleCreateAudio(message.srcUrl, message.pageUrl);
-        case 'markdownTableRightClick':
+        case "markdownTableRightClick":
             const id3 = await getClickedElementId(clickedElement);
-            return await handleSelectionCopyRequest(id3, tableSelection, message.category);
-        case 'tsvTableRightClick':
-            return await handleCsvTableRightClick(tableSelection, '\t');
-        case 'csvTableRightClick':
-            return await handleCsvTableRightClick(tableSelection, ',');
-        case 'jsonTableRightClick':
+            return await handleSelectionCopyRequest(
+                id3,
+                tableSelection,
+                message.category,
+            );
+        case "tsvTableRightClick":
+            return await handleCsvTableRightClick(tableSelection, "\t");
+        case "csvTableRightClick":
+            return await handleCsvTableRightClick(tableSelection, ",");
+        case "jsonTableRightClick":
             return await handleJsonTableRightClick(tableSelection);
-        case 'htmlTableRightClick':
+        case "htmlTableRightClick":
             /** @type {DocumentFragment} */
-            const tableFrag = await htmlSelection.getSelectionFragment(tableSelection);
+            const tableFrag =
+                await htmlSelection.getSelectionFragment(tableSelection);
             if (tableFrag === null) {
                 return null;
             }
@@ -246,8 +262,8 @@ async function handleRequest(message) {
             await sendToNotepad(h);
             return await handleCopyRequest(h);
         default:
-            console.error('Unknown message category:', message.category);
-            throw new Error('Unknown message category:', message.category);
+            console.error("Unknown message category:", message.category);
+            throw new Error("Unknown message category:", message.category);
     }
 }
 
@@ -262,7 +278,7 @@ async function handleRequest(message) {
 async function getClickedElementId(clickedElement) {
     while (true) {
         if (!clickedElement) {
-            return '';
+            return "";
         } else if (clickedElement.id) {
             return clickedElement.id;
         } else if (clickedElement.previousElementSibling) {
@@ -281,11 +297,11 @@ async function getClickedElementId(clickedElement) {
  */
 async function handleCopySelectionShortcut(messageCategory) {
     const selection = window.getSelection();
-    if (selection && selection.type === 'Range') {
+    if (selection && selection.type === "Range") {
         // Only allow Range (and not Caret) Selections because the copy selection
         // shortcut must copy a link for the current tab when there is no Range
         // Selection (when none of the page is highlighted).
-        return await handleSelectionCopyRequest('', selection, messageCategory);
+        return await handleSelectionCopyRequest("", selection, messageCategory);
     }
 
     // none of the page is highlighted, so create a link for the page instead
@@ -316,8 +332,17 @@ async function handlePageSectionRightClick(htmlId, selection) {
  */
 async function handleSelectionCopyRequest(htmlId, selection, messageCategory) {
     const title = document.title;
-    const sourceUrl = await addIdAndTextFragment(location.href, htmlId, selection);
-    const text = await htmlSelection.createText(title, sourceUrl, selection, messageCategory);
+    const sourceUrl = await addIdAndTextFragment(
+        location.href,
+        htmlId,
+        selection,
+    );
+    const text = await htmlSelection.createText(
+        title,
+        sourceUrl,
+        selection,
+        messageCategory,
+    );
     return await handleCopyRequest(text);
 }
 
@@ -328,11 +353,11 @@ async function handleSelectionCopyRequest(htmlId, selection, messageCategory) {
  * @param {string} delimiter - what to separate fields with.
  * @returns {Promise<ContentResponse>}
  */
-async function handleCsvTableRightClick(tableSelection, delimiter = ',') {
+async function handleCsvTableRightClick(tableSelection, delimiter = ",") {
     /** @type {DocumentFragment} */
     let frag = await htmlSelection.getSelectionFragment(tableSelection);
 
-    let text = '';
+    let text = "";
     if (frag === null) {
         text = tableSelection.textContent;
     } else {
@@ -360,8 +385,8 @@ async function handleJsonTableRightClick(tableSelection) {
 
     const tableJson = await htmlTableToJson(frag);
 
-    const jsonDestination = await getSetting('jsonDestination');
-    if (jsonDestination === 'clipboard') {
+    const jsonDestination = await getSetting("jsonDestination");
+    if (jsonDestination === "clipboard") {
         await sendToNotepad(tableJson);
         return await handleCopyRequest(tableJson);
     }
@@ -369,13 +394,13 @@ async function handleJsonTableRightClick(tableSelection) {
     // Tell the background what to download because apparently `browser.downloads` is
     // always undefined in content scripts.
     browser.runtime.sendMessage({
-        destination: 'background',
-        category: 'downloadFile',
+        destination: "background",
+        category: "downloadFile",
         file: {
-            name: 'table.json',
-            type: 'json',
+            name: "table.json",
+            type: "json",
             json: tableJson,
-        }
+        },
     });
     return null;
 }
@@ -388,7 +413,7 @@ async function handleJsonTableRightClick(tableSelection) {
  * @returns {Promise<ContentResponse>}
  */
 async function handleCreateLink(title, url) {
-    const markupLanguage = await getSetting('markupLanguage');
+    const markupLanguage = await getSetting("markupLanguage");
     const link = await createLink(title, url, markupLanguage);
     await sendToNotepad(link);
     return await handleCopyRequest(link);
@@ -401,7 +426,7 @@ async function handleCreateLink(title, url) {
  * @returns {Promise<ContentResponse>}
  */
 async function handleCreateImage(url) {
-    const markupLanguage = await getSetting('markupLanguage');
+    const markupLanguage = await getSetting("markupLanguage");
     const image = await createImage(url, markupLanguage);
     await sendToNotepad(image);
     return await handleCopyRequest(image);
@@ -415,7 +440,7 @@ async function handleCreateImage(url) {
  * @returns {Promise<ContentResponse>}
  */
 async function handleCreateVideo(srcUrl, pageUrl) {
-    const markupLanguage = await getSetting('markupLanguage');
+    const markupLanguage = await getSetting("markupLanguage");
     const video = await createVideo(srcUrl, pageUrl, markupLanguage);
     await sendToNotepad(video);
     return await handleCopyRequest(video);
@@ -429,7 +454,7 @@ async function handleCreateVideo(srcUrl, pageUrl) {
  * @returns {Promise<ContentResponse>}
  */
 async function handleCreateAudio(srcUrl, pageUrl) {
-    const markupLanguage = await getSetting('markupLanguage');
+    const markupLanguage = await getSetting("markupLanguage");
     const audio = await createAudio(srcUrl, pageUrl, markupLanguage);
     await sendToNotepad(audio);
     return await handleCopyRequest(audio);

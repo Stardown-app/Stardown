@@ -14,44 +14,49 @@
    limitations under the License.
 */
 
-import { browser, sleep, createContextMenus, updateContextMenu } from './browserSpecific.js';
-import { getSetting } from './getSetting.js';
-import { createTabLink } from './generators/md.js';
+import {
+    browser,
+    sleep,
+    createContextMenus,
+    updateContextMenu,
+} from "./browserSpecific.js";
+import { getSetting } from "./getSetting.js";
+import { createTabLink } from "./generators/md.js";
 
-let jsonDestination = 'clipboard';
+let jsonDestination = "clipboard";
 let windowId = null;
 
-browser.runtime.onInstalled.addListener(async details => {
+browser.runtime.onInstalled.addListener(async (details) => {
     switch (details.reason) {
-        case 'install':
+        case "install":
             await detectMissingShortcuts();
             break;
-        case 'update':
+        case "update":
             // show the upboarding page only if the current one hasn't been shown yet
             const manifest = browser.runtime.getManifest();
-            const lastUpboardVersion = await getSetting('lastUpboardVersion');
+            const lastUpboardVersion = await getSetting("lastUpboardVersion");
 
-            const last = lastUpboardVersion?.split('.').map(n => parseInt(n));
-            const current = manifest.version.split('.').map(n => parseInt(n));
+            const last = lastUpboardVersion?.split(".").map((n) => parseInt(n));
+            const current = manifest.version.split(".").map((n) => parseInt(n));
 
             if (
-                last === undefined || last[0] > current[0] || (
-                    last[0] === current[0] && (
-                        last[1] > current[1] || (
-                            last[1] === current[1] && last[2] > current[2]
-                        )
-                    )
-                )
+                last === undefined ||
+                last[0] > current[0] ||
+                (last[0] === current[0] &&
+                    (last[1] > current[1] ||
+                        (last[1] === current[1] && last[2] > current[2])))
             ) {
                 // [tabs.create() | MDN](https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/API/tabs/create#url)
                 await browser.tabs.create({ url: `/updated.html` });
-                await browser.storage.sync.set({ lastUpboardVersion: manifest.version });
+                await browser.storage.sync.set({
+                    lastUpboardVersion: manifest.version,
+                });
             }
             break;
-        case 'browser_update':
-        case 'chrome_update':
+        case "browser_update":
+        case "chrome_update":
             break;
-        case 'shared_module_update':
+        case "shared_module_update":
             break;
         default:
             console.warn(`Unknown onInstalled reason: ${details.reason}`);
@@ -59,43 +64,58 @@ browser.runtime.onInstalled.addListener(async details => {
 });
 
 createContextMenus();
-getSetting('jsonDestination').then(value => jsonDestination = value);
-browser.tabs.query({ currentWindow: true, active: true }).then(tabs => {
+getSetting("jsonDestination").then((value) => (jsonDestination = value));
+browser.tabs.query({ currentWindow: true, active: true }).then((tabs) => {
     if (tabs[0]) {
         windowId = tabs[0].windowId;
     }
 });
-browser.windows.onFocusChanged.addListener(async newWindowId => {
+browser.windows.onFocusChanged.addListener(async (newWindowId) => {
     if (newWindowId !== -1) {
         windowId = newWindowId;
     }
 });
 
-browser.commands.onCommand.addListener(async command => {
+browser.commands.onCommand.addListener(async (command) => {
     switch (command) {
-        case 'openSidePanel':
+        case "openSidePanel":
             // Chromium only
             browser.sidePanel.open({ windowId: windowId });
             break;
-        case 'copySelection':
-            const tabs = await browser.tabs.query({ currentWindow: true, highlighted: true });
-            if (tabs.length === 1) { // if only one tab is selected
+        case "copySelection":
+            const tabs = await browser.tabs.query({
+                currentWindow: true,
+                highlighted: true,
+            });
+            if (tabs.length === 1) {
+                // if only one tab is selected
                 // copy the selected part of the page if any, otherwise copy the tab
-                await handleInteraction(tabs[0], { category: 'copySelectionShortcut' });
-            } else { // if multiple tabs are selected
+                await handleInteraction(tabs[0], {
+                    category: "copySelectionShortcut",
+                });
+            } else {
+                // if multiple tabs are selected
                 // copy the selected tabs
                 await handleCopyMultipleTabs(tabs);
             }
             break;
-        case 'copyEntirePage':
-            const tabs1 = await browser.tabs.query({ active: true, currentWindow: true });
-            await handleInteraction(tabs1[0], { category: 'copyEntirePageShortcut' });
+        case "copyEntirePage":
+            const tabs1 = await browser.tabs.query({
+                active: true,
+                currentWindow: true,
+            });
+            await handleInteraction(tabs1[0], {
+                category: "copyEntirePageShortcut",
+            });
             break;
-        case 'copyMultipleTabs':
-            const tabs2 = await browser.tabs.query({ currentWindow: true, highlighted: true });
+        case "copyMultipleTabs":
+            const tabs2 = await browser.tabs.query({
+                currentWindow: true,
+                highlighted: true,
+            });
             await handleCopyMultipleTabs(tabs2);
             break;
-        case 'openSettings':
+        case "openSettings":
             browser.runtime.openOptionsPage();
             break;
         default:
@@ -105,56 +125,75 @@ browser.commands.onCommand.addListener(async command => {
 });
 
 browser.runtime.onMessage.addListener(async (message, sender, sendResponse) => {
-    if (message.destination !== 'background') {
+    if (message.destination !== "background") {
         return;
     }
 
     switch (message.category) {
-        case 'updateContextMenu':
+        case "updateContextMenu":
             // These context menu updates are done with messages from the content script
             // because the contextMenus.update method cannot update a context menu that
             // is already open. The content script listens for mouseover and mouseup
             // events.
             await updateContextMenu(message.context);
             break;
-        case 'downloadFile':
+        case "downloadFile":
             await downloadFile(message.file);
             break;
-        case 'showStatus':
-            await showStatus(message.status, message.notifTitle, message.notifBody);
+        case "showStatus":
+            await showStatus(
+                message.status,
+                message.notifTitle,
+                message.notifBody,
+            );
             break;
-        case 'showWarning':
-            const notifyOnWarning = await getSetting('notifyOnWarning');
+        case "showWarning":
+            const notifyOnWarning = await getSetting("notifyOnWarning");
             if (notifyOnWarning) {
-                await showNotification('Warning', message.warning);
+                await showNotification("Warning", message.warning);
             }
             break;
-        case 'copySelectionButtonPressed':
-            const tabs = await browser.tabs.query({ currentWindow: true, highlighted: true });
-            if (tabs.length === 1) { // if only one tab is selected
+        case "copySelectionButtonPressed":
+            const tabs = await browser.tabs.query({
+                currentWindow: true,
+                highlighted: true,
+            });
+            if (tabs.length === 1) {
+                // if only one tab is selected
                 // copy the selected part of the page if any, otherwise copy the tab
-                await handleInteraction(tabs[0], { category: 'copySelectionShortcut' });
-            } else { // if multiple tabs are selected
+                await handleInteraction(tabs[0], {
+                    category: "copySelectionShortcut",
+                });
+            } else {
+                // if multiple tabs are selected
                 // copy the selected tabs
                 await handleCopyMultipleTabs(tabs);
             }
             break;
-        case 'copyEntirePageButtonPressed':
-            const tabs1 = await browser.tabs.query({ active: true, currentWindow: true });
-            await handleInteraction(tabs1[0], { category: 'copyEntirePageShortcut' });
+        case "copyEntirePageButtonPressed":
+            const tabs1 = await browser.tabs.query({
+                active: true,
+                currentWindow: true,
+            });
+            await handleInteraction(tabs1[0], {
+                category: "copyEntirePageShortcut",
+            });
             break;
-        case 'copyMultipleTabsButtonPressed':
-            const tabs2 = await browser.tabs.query({ currentWindow: true, highlighted: true });
+        case "copyMultipleTabsButtonPressed":
+            const tabs2 = await browser.tabs.query({
+                currentWindow: true,
+                highlighted: true,
+            });
             await handleCopyMultipleTabs(tabs2);
             break;
-        case 'sidebarButtonPressed':
+        case "sidebarButtonPressed":
             // Chromium only
             browser.sidePanel?.open({ windowId: windowId });
             break;
-        case 'settingsButtonPressed':
+        case "settingsButtonPressed":
             browser.runtime.openOptionsPage();
             break;
-        case 'jsonDestination':
+        case "jsonDestination":
             jsonDestination = message.jsonDestination;
             break;
         default:
@@ -165,92 +204,124 @@ browser.runtime.onMessage.addListener(async (message, sender, sendResponse) => {
 
 browser.contextMenus.onClicked.addListener(async (info, tab) => {
     switch (info.menuItemId) {
-        case 'page':
+        case "page":
             await handleInteraction(
-                tab, { category: 'pageRightClick' }, { frameId: info.frameId },
+                tab,
+                { category: "pageRightClick" },
+                { frameId: info.frameId },
             );
             break;
-        case 'pageSection':
+        case "pageSection":
             await handleInteraction(
-                tab, { category: 'pageSectionRightClick' }, { frameId: info.frameId },
+                tab,
+                { category: "pageSectionRightClick" },
+                { frameId: info.frameId },
             );
             break;
-        case 'selection':
+        case "selection":
             await handleInteraction(
-                tab, { category: 'selectionRightClick' }, { frameId: info.frameId },
+                tab,
+                { category: "selectionRightClick" },
+                { frameId: info.frameId },
             );
             break;
-        case 'selectionWithSource':
+        case "selectionWithSource":
             await handleInteraction(
-                tab, { category: 'selectionWithSourceRightClick' }, { frameId: info.frameId },
+                tab,
+                { category: "selectionWithSourceRightClick" },
+                { frameId: info.frameId },
             );
             break;
-        case 'selectionQuote':
+        case "selectionQuote":
             await handleInteraction(
-                tab, { category: 'selectionQuoteRightClick' }, { frameId: info.frameId },
+                tab,
+                { category: "selectionQuoteRightClick" },
+                { frameId: info.frameId },
             );
             break;
-        case 'link':
+        case "link":
             // In Chromium unlike in Firefox, `info.linkText` is undefined and no
             // property in `info` has the link's text.
+            await handleInteraction(tab, {
+                category: "linkRightClick",
+                linkUrl: info.linkUrl,
+            });
+            break;
+        case "image":
+            await handleInteraction(tab, {
+                category: "imageRightClick",
+                srcUrl: info.srcUrl,
+            });
+            break;
+        case "video":
+            await handleInteraction(tab, {
+                category: "videoRightClick",
+                srcUrl: info.srcUrl,
+                pageUrl: info.pageUrl,
+            });
+            break;
+        case "audio":
+            await handleInteraction(tab, {
+                category: "audioRightClick",
+                srcUrl: info.srcUrl,
+                pageUrl: info.pageUrl,
+            });
+            break;
+        case "markdownTable":
             await handleInteraction(
-                tab, { category: 'linkRightClick', linkUrl: info.linkUrl },
+                tab,
+                { category: "markdownTableRightClick" },
+                { frameId: info.frameId },
             );
             break;
-        case 'image':
+        case "tsvTable":
             await handleInteraction(
-                tab, { category: 'imageRightClick', srcUrl: info.srcUrl },
+                tab,
+                { category: "tsvTableRightClick" },
+                { frameId: info.frameId },
             );
             break;
-        case 'video':
+        case "csvTable":
             await handleInteraction(
-                tab, { category: 'videoRightClick', srcUrl: info.srcUrl, pageUrl: info.pageUrl },
-            )
-            break;
-        case 'audio':
-            await handleInteraction(
-                tab, { category: 'audioRightClick', srcUrl: info.srcUrl, pageUrl: info.pageUrl },
+                tab,
+                { category: "csvTableRightClick" },
+                { frameId: info.frameId },
             );
             break;
-        case 'markdownTable':
-            await handleInteraction(
-                tab, { category: 'markdownTableRightClick' }, { frameId: info.frameId },
-            );
-            break;
-        case 'tsvTable':
-            await handleInteraction(
-                tab, { category: 'tsvTableRightClick' }, { frameId: info.frameId },
-            );
-            break;
-        case 'csvTable':
-            await handleInteraction(
-                tab, { category: 'csvTableRightClick' }, { frameId: info.frameId },
-            );
-            break;
-        case 'jsonTable':
-            if (jsonDestination === 'file') {
+        case "jsonTable":
+            if (jsonDestination === "file") {
                 let havePerm;
                 try {
                     // The permissions request must be the first async function call in
                     // the event handler or it will throw an error.
-                    havePerm = await browser.permissions.request({ permissions: ['downloads'] });
+                    havePerm = await browser.permissions.request({
+                        permissions: ["downloads"],
+                    });
                 } catch (err) {
-                    await showStatus(0, 'Error', err.message);
+                    await showStatus(0, "Error", err.message);
                     return;
                 }
                 if (!havePerm) {
-                    await showStatus(0, 'Error', 'Unable to download JSON without permission');
+                    await showStatus(
+                        0,
+                        "Error",
+                        "Unable to download JSON without permission",
+                    );
                     return;
                 }
             }
 
             await handleInteraction(
-                tab, { category: 'jsonTableRightClick' }, { frameId: info.frameId },
+                tab,
+                { category: "jsonTableRightClick" },
+                { frameId: info.frameId },
             );
             break;
-        case 'htmlTable':
+        case "htmlTable":
             await handleInteraction(
-                tab, { category: 'htmlTableRightClick' }, { frameId: info.frameId },
+                tab,
+                { category: "htmlTableRightClick" },
+                { frameId: info.frameId },
             );
             break;
         default:
@@ -271,56 +342,71 @@ browser.contextMenus.onClicked.addListener(async (info, tab) => {
  * @param {number} successStatus - the status to show if the operation was successful.
  * @returns {Promise<void>}
  */
-async function handleInteraction(tab, message, options = {}, successStatus = 1) {
-    const uriScheme = tab.url.split(':')[0];
-    if (!['http', 'https', 'file'].includes(uriScheme)) {
+async function handleInteraction(
+    tab,
+    message,
+    options = {},
+    successStatus = 1,
+) {
+    const uriScheme = tab.url.split(":")[0];
+    if (!["http", "https", "file"].includes(uriScheme)) {
         await showStatus(
             0,
-            'Error',
+            "Error",
             `Stardown cannot run on pages with a URL that starts with "${uriScheme}:"`,
         );
         return;
-    } else if (tab.url.endsWith('.pdf')) {
-        await showStatus(0, 'Error', 'Stardown cannot run on PDFs');
+    } else if (tab.url.endsWith(".pdf")) {
+        await showStatus(0, "Error", "Stardown cannot run on PDFs");
         return;
     } else if (
         // it's an extension store
-        tab.url.startsWith('https://chromewebstore.google.com') ||
-        tab.url.startsWith('https://microsoftedge.microsoft.com/addons') ||
-        tab.url.startsWith('https://addons.mozilla.org') ||
-        tab.url.startsWith('https://addons.opera.com')
+        tab.url.startsWith("https://chromewebstore.google.com") ||
+        tab.url.startsWith("https://microsoftedge.microsoft.com/addons") ||
+        tab.url.startsWith("https://addons.mozilla.org") ||
+        tab.url.startsWith("https://addons.opera.com")
     ) {
-        await showStatus(0, 'Error', 'This page is protected by the browser');
+        await showStatus(0, "Error", "This page is protected by the browser");
         return;
-    } else if (tab.url.startsWith('https://support.mozilla.org')) {
-        await showStatus(0, 'Error', 'This page is protected by the browser');
+    } else if (tab.url.startsWith("https://support.mozilla.org")) {
+        await showStatus(0, "Error", "This page is protected by the browser");
         return;
     }
 
-    message.destination = 'content';
+    message.destination = "content";
     message.id = Math.random(); // why: https://github.com/Stardown-app/Stardown/issues/98
 
     let status, notifTitle, notifBody;
     try {
-        console.log('Sending message from background.js to content.js');
-        const response = await browser.tabs.sendMessage(tab.id, message, options);
+        console.log("Sending message from background.js to content.js");
+        const response = await browser.tabs.sendMessage(
+            tab.id,
+            message,
+            options,
+        );
         if (response === null) {
-            console.log('Response is null');
+            console.log("Response is null");
             return;
         } else if (response === undefined) {
-            await showStatus(0, 'Error', 'No response received from the content script');
+            await showStatus(
+                0,
+                "Error",
+                "No response received from the content script",
+            );
             return;
         }
         status = response.status;
         notifTitle = response.notifTitle;
         notifBody = response.notifBody;
     } catch (err) {
-        await showStatus(0, 'Error', err.message);
+        await showStatus(0, "Error", err.message);
         return;
     }
-    if (status === 1) { // success
+    if (status === 1) {
+        // success
         await showStatus(successStatus, notifTitle, notifBody);
-    } else { // failure
+    } else {
+        // failure
         await showStatus(status, notifTitle, notifBody);
     }
 }
@@ -333,46 +419,50 @@ async function handleInteraction(tab, message, options = {}, successStatus = 1) 
  * @returns {Promise<void>}
  */
 async function handleCopyMultipleTabs(tabs) {
-    if (tabs.length === 1) { // if only one tab is highlighted
+    if (tabs.length === 1) {
+        // if only one tab is highlighted
         // get unhighlighted tabs
-        const copyTabsWindows = await getSetting('copyTabsWindows');
-        if (copyTabsWindows === 'current') {
+        const copyTabsWindows = await getSetting("copyTabsWindows");
+        if (copyTabsWindows === "current") {
             tabs = await browser.tabs.query({ currentWindow: true });
-        } else if (copyTabsWindows === 'all') {
+        } else if (copyTabsWindows === "all") {
             tabs = await browser.tabs.query({});
         }
     }
 
     // create the links
-    let text = '';
-    const markupLanguage = await getSetting('markupLanguage');
+    let text = "";
+    const markupLanguage = await getSetting("markupLanguage");
     switch (markupLanguage) {
-        case 'html':
-            const result = ['<ul>'];
+        case "html":
+            const result = ["<ul>"];
             for (let i = 0; i < tabs.length; i++) {
                 const anchor = `  <li><a href="${tabs[i].url}">${tabs[i].title}</a></li>`;
                 result.push(anchor);
             }
-            result.push('</ul>');
-            text = result.join('\n');
+            result.push("</ul>");
+            text = result.join("\n");
             break;
-        case 'markdown':
-        case 'markdown with some html':
-            const mdSubBrackets = await getSetting('mdSubBrackets');
+        case "markdown":
+        case "markdown with some html":
+            const mdSubBrackets = await getSetting("mdSubBrackets");
             const links = await Promise.all(
-                tabs.map(tab => createTabLink(tab, mdSubBrackets))
+                tabs.map((tab) => createTabLink(tab, mdSubBrackets)),
             );
-            const mdBulletPoint = await getSetting('mdBulletPoint');
-            text = links.map(link => `${mdBulletPoint} ${link}\n`).join('');
+            const mdBulletPoint = await getSetting("mdBulletPoint");
+            text = links.map((link) => `${mdBulletPoint} ${link}\n`).join("");
             break;
         default:
-            await showStatus(0, 'Error', 'Unsupported markup language');
+            await showStatus(0, "Error", "Unsupported markup language");
             return;
     }
 
-    const message = { category: 'copyText', text: text };
+    const message = { category: "copyText", text: text };
     const options = {};
-    const activeTabs = await browser.tabs.query({ active: true, currentWindow: true });
+    const activeTabs = await browser.tabs.query({
+        active: true,
+        currentWindow: true,
+    });
     const activeTab = activeTabs[0];
     await handleInteraction(activeTab, message, options, tabs.length);
 }
@@ -388,22 +478,24 @@ async function handleCopyMultipleTabs(tabs) {
  * @returns {Promise<void>}
  */
 async function downloadFile(fileObj) {
-    if (fileObj.type === 'json' && fileObj.json) {
+    if (fileObj.type === "json" && fileObj.json) {
         const json = fileObj.json;
-        const blob = new Blob([json], { type: 'application/json' });
+        const blob = new Blob([json], { type: "application/json" });
         const url = URL.createObjectURL(blob);
-        const name = fileObj.name || 'file.json';
-        await browser.downloads.download({
-            url: url,
-            filename: name,
-            saveAs: true,
-            conflictAction: 'uniquify',
-        }).then(
-            id => console.log('Download started with ID', id),
-            err => console.error('Download failed:', err),
-        );
+        const name = fileObj.name || "file.json";
+        await browser.downloads
+            .download({
+                url: url,
+                filename: name,
+                saveAs: true,
+                conflictAction: "uniquify",
+            })
+            .then(
+                (id) => console.log("Download started with ID", id),
+                (err) => console.error("Download failed:", err),
+            );
     } else {
-        console.error('No content to download');
+        console.error("No content to download");
     }
 }
 
@@ -417,16 +509,22 @@ async function downloadFile(fileObj) {
  * @returns {Promise<void>}
  */
 async function showStatus(status, notifTitle, notifBody) {
-    if (status > 0) { // success
+    if (status > 0) {
+        // success
         await brieflyShowCheck(status);
-        const notifyOnSuccess = await getSetting('notifyOnSuccess');
+        const notifyOnSuccess = await getSetting("notifyOnSuccess");
         if (notifyOnSuccess) {
             await showNotification(notifTitle, notifBody);
         }
-    } else { // failure
+    } else {
+        // failure
         console.error(`${notifTitle}: ${notifBody}`);
-        if (notifBody === 'Could not establish connection. Receiving end does not exist.') {
-            notifBody = "Stardown wasn't ready or wasn't allowed to load into the frame.";
+        if (
+            notifBody ===
+            "Could not establish connection. Receiving end does not exist."
+        ) {
+            notifBody =
+                "Stardown wasn't ready or wasn't allowed to load into the frame.";
             // This can happen when the page wasn't finished loading when the user
             // interacted with it, or if the user tried to use Stardown within an
             // iframe.
@@ -444,13 +542,13 @@ async function showStatus(status, notifTitle, notifBody) {
  */
 async function showNotification(title, body) {
     if (title === undefined) {
-        throw new Error('title is undefined');
+        throw new Error("title is undefined");
     } else if (body === undefined) {
-        throw new Error('body is undefined');
+        throw new Error("body is undefined");
     }
-    browser.notifications.create('', {
-        type: 'basic',
-        iconUrl: 'images/stardown-128.png',
+    browser.notifications.create("", {
+        type: "basic",
+        iconUrl: "images/stardown-128.png",
         title: title,
         message: body,
     });
@@ -463,14 +561,14 @@ async function showNotification(title, body) {
  * @returns {Promise<void>}
  */
 async function brieflyShowCheck(itemCount) {
-    browser.action.setBadgeBackgroundColor({ color: 'green' });
+    browser.action.setBadgeBackgroundColor({ color: "green" });
     if (!itemCount || itemCount === 1) {
-        browser.action.setBadgeText({ text: '✓' });
+        browser.action.setBadgeText({ text: "✓" });
     } else {
         browser.action.setBadgeText({ text: `${itemCount} ✓` });
     }
     await sleep(1000); // 1 second
-    browser.action.setBadgeText({ text: '' });
+    browser.action.setBadgeText({ text: "" });
 }
 
 /**
@@ -478,10 +576,10 @@ async function brieflyShowCheck(itemCount) {
  * @returns {Promise<void>}
  */
 async function brieflyShowX() {
-    browser.action.setBadgeBackgroundColor({ color: 'red' });
-    browser.action.setBadgeText({ text: '✗' });
+    browser.action.setBadgeBackgroundColor({ color: "red" });
+    browser.action.setBadgeText({ text: "✗" });
     await sleep(1000); // 1 second
-    browser.action.setBadgeText({ text: '' });
+    browser.action.setBadgeText({ text: "" });
 }
 
 /**
@@ -511,13 +609,13 @@ async function detectMissingShortcuts() {
     const missing = [];
     for (let i = 0; i < cmds.length; i++) {
         const cmd = cmds[i];
-        if (cmd.shortcut === '' && cmdsExpectingShortcut.includes(cmd.name)) {
+        if (cmd.shortcut === "" && cmdsExpectingShortcut.includes(cmd.name)) {
             missing.push(cmd);
         }
     }
 
     if (missing.length > 0) {
-        console.log('Missing shortcuts:', missing);
+        console.log("Missing shortcuts:", missing);
 
         // [tabs.create() | MDN](https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/API/tabs/create#url)
         browser.tabs.create({ url: `/welcomeShortcutsMissing.html` });

@@ -14,160 +14,177 @@
    limitations under the License.
 -->
 
-<!DOCTYPE html>
+<!doctype html>
 
 <html>
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-  <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <style>
+            body {
+                background-color: #3c3c3c;
+                color: #dbdbdb;
+                font-family: sans-serif;
+                width: 215px;
+                margin: 0;
+            }
 
-    <style>
-      body {
-        background-color: #3c3c3c;
-        color: #dbdbdb;
-        font-family: sans-serif;
-        width: 215px;
-        margin: 0;
-      }
+            main {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+            }
 
-      main {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-      }
+            header {
+                margin-bottom: -10px;
+                margin-left: -25px;
+            }
 
-      header {
-        margin-bottom: -10px;
-        margin-left: -25px;
-      }
+            header a {
+                display: flex;
+                align-items: center;
+                text-decoration: none;
+            }
 
-      header a {
-        display: flex;
-        align-items: center;
-        text-decoration: none;
-      }
+            img {
+                margin-right: 10px;
+            }
 
-      img {
-        margin-right: 10px;
-      }
+            h2 {
+                color: #00ddff;
+            }
 
-      h2 {
-        color: #00ddff;
-      }
+            ul {
+                margin-left: -65px;
+                margin-right: -20px;
+                margin-bottom: 10px;
+            }
 
-      ul {
-        margin-left: -65px;
-        margin-right: -20px;
-        margin-bottom: 10px;
-      }
+            li {
+                list-style-type: none;
+            }
 
-      li {
-        list-style-type: none;
-      }
+            button,
+            a.button {
+                display: flex;
+                padding: 8px;
+                width: 100%;
+                border-radius: 10px;
+                align-items: center;
+                color: #dbdbdb;
+                text-decoration: none;
+                font-size: 16px;
+                background: none;
+                border: none;
+                cursor: pointer;
+            }
 
-      button,
-      a.button {
-        display: flex;
-        padding: 8px;
-        width: 100%;
-        border-radius: 10px;
-        align-items: center;
-        color: #dbdbdb;
-        text-decoration: none;
-        font-size: 16px;
-        background: none;
-        border: none;
-        cursor: pointer;
-      }
+            button:hover,
+            a.button:hover {
+                background-color: #2c2c2c;
+            }
 
-      button:hover,
-      a.button:hover {
-        background-color: #2c2c2c;
-      }
+            button:active,
+            a.button:active {
+                background-color: #1c1c1c;
+            }
 
-      button:active,
-      a.button:active {
-        background-color: #1c1c1c;
-      }
+            a.button {
+                padding-right: 0;
+            }
+        </style>
+    </head>
 
-      a.button {
-        padding-right: 0;
-      }
-    </style>
-  </head>
+    <body>
+        <main>
+            <header>
+                <a
+                    href="https://github.com/Stardown-app/Stardown"
+                    target="_blank"
+                >
+                    <img src="./images/stardown-32.png" alt="Stardown's Icon" />
+                    <h2>Stardown</h2>
+                </a>
+            </header>
 
-  <body>
-    <main>
-      <header>
-        <a href="https://github.com/Stardown-app/Stardown" target="_blank">
-          <img src="./images/stardown-32.png" alt="Stardown's Icon" />
-          <h2>Stardown</h2>
-        </a>
-      </header>
+            <ul>
+                <li>
+                    <button id="copySelectionButton">
+                        <img src="./images/copy.svg" />
+                        <span>Copy selection</span>
+                    </button>
+                </li>
+                <li>
+                    <button id="copyEntirePageButton">
+                        <img src="./images/copy-entire-page.svg" />
+                        <span>Copy entire page</span>
+                    </button>
+                </li>
+                <li>
+                    <button id="copyMultipleTabsButton">
+                        <img src="./images/copy-multiple.svg" />
+                        <span>Copy multiple tabs</span>
+                    </button>
+                </li>
+                <li>
+                    <button id="sidebarButton">
+                        <img src="./images/sidebar.svg" />
+                        <span>Notepad</span>
+                    </button>
+                </li>
+                <li>
+                    <button id="settingsButton">
+                        <img src="./images/settings.svg" />
+                        <span>Settings</span>
+                    </button>
+                </li>
 
-      <ul>
-        <li>
-          <button id="copySelectionButton">
-            <img src="./images/copy.svg" />
-            <span>Copy selection</span>
-          </button>
-        </li>
-        <li>
-          <button id="copyEntirePageButton">
-            <img src="./images/copy-entire-page.svg" />
-            <span>Copy entire page</span>
-          </button>
-        </li>
-        <li>
-          <button id="copyMultipleTabsButton">
-            <img src="./images/copy-multiple.svg" />
-            <span>Copy multiple tabs</span>
-          </button>
-        </li>
-        <li>
-          <button id="sidebarButton">
-            <img src="./images/sidebar.svg" />
-            <span>Notepad</span>
-          </button>
-        </li>
-        <li>
-          <button id="settingsButton">
-            <img src="./images/settings.svg" />
-            <span>Settings</span>
-          </button>
-        </li>
+                <hr />
 
-        <hr />
+                <li>
+                    <a
+                        class="button"
+                        href="https://github.com/Stardown-app/Stardown/issues"
+                        target="_blank"
+                    >
+                        <img src="./images/bug.svg" />
+                        <span>Report a bug</span>
+                    </a>
+                </li>
+                <li>
+                    <a
+                        class="button"
+                        href="https://github.com/Stardown-app/Stardown/issues"
+                        target="_blank"
+                    >
+                        <img src="./images/idea.svg" />
+                        <span>Request a feature</span>
+                    </a>
+                </li>
+                <li>
+                    <a
+                        class="button"
+                        href="https://github.com/Stardown-app/Stardown/discussions"
+                        target="_blank"
+                    >
+                        <img src="./images/chat.svg" />
+                        <span>Join the discussion</span>
+                    </a>
+                </li>
+                <li>
+                    <a
+                        class="button"
+                        href="https://github.com/Stardown-app/Stardown"
+                        target="_blank"
+                    >
+                        <img src="./images/github.svg" />
+                        <span>Source code</span>
+                    </a>
+                </li>
+            </ul>
+        </main>
 
-        <li>
-          <a class="button" href="https://github.com/Stardown-app/Stardown/issues" target="_blank">
-            <img src="./images/bug.svg" />
-            <span>Report a bug</span>
-          </a>
-        </li>
-        <li>
-          <a class="button" href="https://github.com/Stardown-app/Stardown/issues" target="_blank">
-            <img src="./images/idea.svg" />
-            <span>Request a feature</span>
-          </a>
-        </li>
-        <li>
-          <a class="button" href="https://github.com/Stardown-app/Stardown/discussions" target="_blank">
-            <img src="./images/chat.svg" />
-            <span>Join the discussion</span>
-          </a>
-        </li>
-        <li>
-          <a class="button" href="https://github.com/Stardown-app/Stardown" target="_blank">
-            <img src="./images/github.svg" />
-            <span>Source code</span>
-          </a>
-        </li>
-      </ul>
-    </main>
-
-    <script src="./popup.js"></script>
-  </body>
-
+        <script src="./popup.js"></script>
+    </body>
 </html>

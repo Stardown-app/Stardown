@@ -14,8 +14,8 @@
    limitations under the License.
 */
 
-import { Readability } from './Readability.js';
-import { isProbablyReaderable } from './Readability-readerable.js'
+import { Readability } from "./Readability.js";
+import { isProbablyReaderable } from "./Readability-readerable.js";
 
 /**
  * extractMainContent attempts to remove from a document fragment all elements that are
@@ -26,15 +26,19 @@ import { isProbablyReaderable } from './Readability-readerable.js'
  */
 export async function extractMainContent(frag, location) {
     // prevent extraction of main content for certain sites
-    if (location.hostname === 'news.ycombinator.com') {
+    if (location.hostname === "news.ycombinator.com") {
         // Readability.js would remove all HN comments
         return frag;
     }
 
     let newFrag = null;
-    if (location.href.match(/^https:\/\/(?:[^\/]+\.)?wikipedia\.org\/wiki\/.*/)) {
+    if (
+        location.href.match(/^https:\/\/(?:[^\/]+\.)?wikipedia\.org\/wiki\/.*/)
+    ) {
         newFrag = extractWikipediaArticle(frag);
-    } else if (location.href.match(/^https:\/\/github\.com\/[^/]+\/[^/]+\/issues\/\d+/)) {
+    } else if (
+        location.href.match(/^https:\/\/github\.com\/[^/]+\/[^/]+\/issues\/\d+/)
+    ) {
         newFrag = extractGithubIssue(frag);
     }
     if (newFrag) {
@@ -46,19 +50,21 @@ export async function extractMainContent(frag, location) {
 
     // https://github.com/mozilla/readability
     if (isProbablyReaderable(doc)) {
-        console.log('Using Readability.js to extract the main content of the page');
+        console.log(
+            "Using Readability.js to extract the main content of the page",
+        );
 
         const article = new Readability(doc).parse();
         const htmlStr = article.content;
 
-        const div = document.createElement('div');
+        const div = document.createElement("div");
         div.innerHTML = htmlStr;
 
         frag.append(div);
         return frag;
     }
 
-    console.error('Failed to extract the main content of the page');
+    console.error("Failed to extract the main content of the page");
     frag.append(doc.body);
     return frag;
 }
@@ -68,15 +74,17 @@ export async function extractMainContent(frag, location) {
  * @returns {DocumentFragment|null}
  */
 function extractWikipediaArticle(frag) {
-    console.log('Extracting Wikipedia article');
-    const firstHeading = frag.querySelector('#firstHeading');
-    const content = frag.querySelector('#mw-content-text');
+    console.log("Extracting Wikipedia article");
+    const firstHeading = frag.querySelector("#firstHeading");
+    const content = frag.querySelector("#mw-content-text");
     if (!firstHeading || !content) {
-        console.error('Wikipedia article extractor outdated');
+        console.error("Wikipedia article extractor outdated");
         return null;
     }
 
-    content.querySelectorAll('.navbox,.mw-editsection').forEach(el => el.remove());
+    content
+        .querySelectorAll(".navbox,.mw-editsection")
+        .forEach((el) => el.remove());
 
     const newFrag = new DocumentFragment();
     newFrag.append(firstHeading, content);
@@ -88,34 +96,34 @@ function extractWikipediaArticle(frag) {
  * @returns {DocumentFragment|null}
  */
 function extractGithubIssue(frag) {
-    console.log('Extracting GitHub issue');
-    const title = frag.querySelector('.gh-header-title');
-    const content = frag.querySelector('.js-quote-selection-container');
+    console.log("Extracting GitHub issue");
+    const title = frag.querySelector(".gh-header-title");
+    const content = frag.querySelector(".js-quote-selection-container");
     if (!title || !content) {
-        console.error('GitHub issue extractor outdated');
+        console.error("GitHub issue extractor outdated");
         return null;
     }
 
     const toRemove = [
-        'img',
-        'form',
-        'button',
-        'reactions-menu',
-        '.js-minimize-comment',
-        'tool-tip',
-        '.tooltipped',
-        'dialog',
-        'dialog-helper',
-        '.js-comment-edit-history',
-        '.Details-content--hidden',
-        '.discussion-timeline-actions',
-        'div.text-right code',
-        'span.State',
+        "img",
+        "form",
+        "button",
+        "reactions-menu",
+        ".js-minimize-comment",
+        "tool-tip",
+        ".tooltipped",
+        "dialog",
+        "dialog-helper",
+        ".js-comment-edit-history",
+        ".Details-content--hidden",
+        ".discussion-timeline-actions",
+        "div.text-right code",
+        "span.State",
     ];
-    content.querySelectorAll(toRemove.join(',')).forEach(el => el.remove());
+    content.querySelectorAll(toRemove.join(",")).forEach((el) => el.remove());
 
-    content.querySelectorAll('table.d-block').forEach(table => {
-        table.setAttribute('role', 'presentation');
+    content.querySelectorAll("table.d-block").forEach((table) => {
+        table.setAttribute("role", "presentation");
     });
 
     const newFrag = new DocumentFragment();

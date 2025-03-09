@@ -14,10 +14,14 @@
    limitations under the License.
 */
 
-import { getSetting } from '../getSetting.js';
-import { absolutizeNodeUrls } from './utils/urls.js';
-import { removeHiddenElements, removeStyles, isInlineNodes } from './utils/html.js';
-import { newEscape, MdConverter } from './md.js';
+import { getSetting } from "../getSetting.js";
+import { absolutizeNodeUrls } from "./utils/urls.js";
+import {
+    removeHiddenElements,
+    removeStyles,
+    isInlineNodes,
+} from "./utils/html.js";
+import { newEscape, MdConverter } from "./md.js";
 
 /**
  * htmlToMdAndHtml converts an HTML fragment to markdown and HTML. Anything that renders
@@ -26,7 +30,7 @@ import { newEscape, MdConverter } from './md.js';
  * @returns {Promise<string>}
  */
 export async function htmlToMdAndHtml(frag) {
-    const omitHidden = await getSetting('omitHidden');
+    const omitHidden = await getSetting("omitHidden");
     if (omitHidden) {
         removeHiddenElements(frag, document);
     }
@@ -36,13 +40,13 @@ export async function htmlToMdAndHtml(frag) {
     const ctx = {
         locationHref: location.href,
         document: document,
-        omitNav: await getSetting('omitNav'),
-        omitFooter: await getSetting('omitFooter'),
-        indent: '',
+        omitNav: await getSetting("omitNav"),
+        omitFooter: await getSetting("omitFooter"),
+        indent: "",
 
-        mdSubBrackets: await getSetting('mdSubBrackets'),
-        mdBulletPoint: await getSetting('mdBulletPoint'),
-        mdYoutube: await getSetting('mdYoutube'),
+        mdSubBrackets: await getSetting("mdSubBrackets"),
+        mdBulletPoint: await getSetting("mdBulletPoint"),
+        mdYoutube: await getSetting("mdYoutube"),
     };
 
     /** @type {function(string): string} */
@@ -52,11 +56,12 @@ export async function htmlToMdAndHtml(frag) {
         ctx.dontTrimText = true;
     }
 
-    return mdAndHtmlConverter
-        .convertNodes(ctx, frag.childNodes)
-        .trim()
-        .replaceAll(/\n{3,}/g, '\n\n')
-        + '\n';
+    return (
+        mdAndHtmlConverter
+            .convertNodes(ctx, frag.childNodes)
+            .trim()
+            .replaceAll(/\n{3,}/g, "\n\n") + "\n"
+    );
 }
 
 /**
@@ -72,7 +77,7 @@ export class MdAndHtmlConverter extends MdConverter {
 
     /** @type {ElementConverter} */
     convertFIGURE(ctx, el) {
-        return '\n\n' + el.outerHTML + '\n\n';
+        return "\n\n" + el.outerHTML + "\n\n";
     }
 
     /** @type {ElementConverter} */
@@ -102,27 +107,27 @@ export class MdAndHtmlConverter extends MdConverter {
 
     /** @type {ElementConverter} */
     convertU(ctx, el) {
-        return '<ins>' + el.innerHTML + '</ins>';
+        return "<ins>" + el.innerHTML + "</ins>";
     }
 
     /** @type {ElementConverter} */
     convertAUDIO(ctx, el) {
-        return '\n\n' + el.outerHTML + '\n\n';
+        return "\n\n" + el.outerHTML + "\n\n";
     }
 
     /** @type {ElementConverter} */
     convertIMG(ctx, el) {
-        return '\n\n' + el.outerHTML + '\n\n';
+        return "\n\n" + el.outerHTML + "\n\n";
     }
 
     /** @type {ElementConverter} */
     convertVIDEO(ctx, el) {
-        return '\n\n' + el.outerHTML + '\n\n';
+        return "\n\n" + el.outerHTML + "\n\n";
     }
 
     /** @type {ElementConverter} */
     convertEMBED(ctx, el) {
-        return '\n\n' + el.outerHTML + '\n\n';
+        return "\n\n" + el.outerHTML + "\n\n";
     }
 
     // GitHub Flavored Markdown does not render iframes and Readability.js removes
@@ -134,22 +139,22 @@ export class MdAndHtmlConverter extends MdConverter {
 
     /** @type {ElementConverter} */
     convertOBJECT(ctx, el) {
-        return '\n\n' + el.outerHTML + '\n\n';
+        return "\n\n" + el.outerHTML + "\n\n";
     }
 
     /** @type {ElementConverter} */
     convertPICTURE(ctx, el) {
-        return '\n\n' + el.outerHTML + '\n\n';
+        return "\n\n" + el.outerHTML + "\n\n";
     }
 
     /** @type {ElementConverter} */
     convertPORTAL(ctx, el) {
-        return '\n\n' + el.outerHTML + '\n\n';
+        return "\n\n" + el.outerHTML + "\n\n";
     }
 
     /** @type {ElementConverter} */
     convertSVG(ctx, el) {
-        return '\n\n' + el.outerHTML + '\n\n';
+        return "\n\n" + el.outerHTML + "\n\n";
     }
 
     /** @type {ElementConverter} */
@@ -159,22 +164,22 @@ export class MdAndHtmlConverter extends MdConverter {
 
     /** @type {ElementConverter} */
     convertCANVAS(ctx, el) {
-        return '\n\n' + el.outerHTML + '\n\n';
+        return "\n\n" + el.outerHTML + "\n\n";
     }
 
     /** @type {ElementConverter} */
     convertTABLE(ctx, el) {
-        return '\n\n' + el.outerHTML + '\n\n';
+        return "\n\n" + el.outerHTML + "\n\n";
     }
 
     /** @type {ElementConverter} */
     convertMETER(ctx, el) {
-        return '\n\n' + el.outerHTML + '\n\n';
+        return "\n\n" + el.outerHTML + "\n\n";
     }
 
     /** @type {ElementConverter} */
     convertDETAILS(ctx, el) {
-        return '\n\n' + el.outerHTML + '\n\n';
+        return "\n\n" + el.outerHTML + "\n\n";
     }
 }
 

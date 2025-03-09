@@ -14,102 +14,113 @@
    limitations under the License.
 */
 
-import { browser } from './browserSpecific.js';
+import { browser } from "./browserSpecific.js";
 
-const copySelectionButton = document.querySelector('#copySelectionButton');
-const copyEntirePageButton = document.querySelector('#copyEntirePageButton');
-const copyMultipleTabsButton = document.querySelector('#copyMultipleTabsButton');
-const sidebarButton = document.querySelector('#sidebarButton');
-const settingsButton = document.querySelector('#settingsButton');
+const copySelectionButton = document.querySelector("#copySelectionButton");
+const copyEntirePageButton = document.querySelector("#copyEntirePageButton");
+const copyMultipleTabsButton = document.querySelector(
+    "#copyMultipleTabsButton",
+);
+const sidebarButton = document.querySelector("#sidebarButton");
+const settingsButton = document.querySelector("#settingsButton");
 
-copySelectionButton.addEventListener('click', async () => {
+copySelectionButton.addEventListener("click", async () => {
     browser.runtime.sendMessage({
-        destination: 'background',
-        category: 'copySelectionButtonPressed',
+        destination: "background",
+        category: "copySelectionButtonPressed",
     });
 });
 
-copyEntirePageButton.addEventListener('click', async () => {
+copyEntirePageButton.addEventListener("click", async () => {
     browser.runtime.sendMessage({
-        destination: 'background',
-        category: 'copyEntirePageButtonPressed',
+        destination: "background",
+        category: "copyEntirePageButtonPressed",
     });
 });
 
-copyMultipleTabsButton.addEventListener('click', async () => {
+copyMultipleTabsButton.addEventListener("click", async () => {
     let havePerm;
     try {
         // The permissions request must be the first async function call in the event
         // handler or it will throw an error.
-        havePerm = await browser.permissions.request({ permissions: ['tabs'] });
+        havePerm = await browser.permissions.request({ permissions: ["tabs"] });
     } catch (err) {
-        console.error('browser.permissions.request:', err);
+        console.error("browser.permissions.request:", err);
         browser.runtime.sendMessage({
-            destination: 'background',
-            category: 'showStatus',
+            destination: "background",
+            category: "showStatus",
             status: 0,
-            notifTitle: 'Error',
+            notifTitle: "Error",
             notifBody: err.message,
         });
         return;
     }
     if (!havePerm) {
-        console.log('User denied permission request.');
+        console.log("User denied permission request.");
         return;
     }
 
-    console.log('User granted permission request.');
+    console.log("User granted permission request.");
     browser.runtime.sendMessage({
-        destination: 'background',
-        category: 'copyMultipleTabsButtonPressed',
+        destination: "background",
+        category: "copyMultipleTabsButtonPressed",
     });
 });
 
-sidebarButton.addEventListener('click', async () => {
+sidebarButton.addEventListener("click", async () => {
     if (browser.sidebarAction) {
         // Firefox only
         await browser.sidebarAction.toggle();
     } else {
         // Chromium only
         browser.runtime.sendMessage({
-            destination: 'background',
-            category: 'sidebarButtonPressed',
+            destination: "background",
+            category: "sidebarButtonPressed",
         });
     }
 });
 
-settingsButton.addEventListener('click', async () => {
+settingsButton.addEventListener("click", async () => {
     browser.runtime.sendMessage({
-        destination: 'background',
-        category: 'settingsButtonPressed',
+        destination: "background",
+        category: "settingsButtonPressed",
     });
 });
 
 async function loadCommands() {
     const cmds = await browser.commands.getAll();
 
-    const copyCmd = cmds.find(cmd => cmd.name === 'copySelection');
-    const copyEntirePageCmd = cmds.find(cmd => cmd.name === 'copyEntirePage');
-    const copyMultipleTabsCmd = cmds.find(cmd => cmd.name === 'copyMultipleTabs');
-    const sidebarCmd = cmds.find(
-        cmd => cmd.name === '_execute_sidebar_action' || cmd.name === 'openSidePanel'
+    const copyCmd = cmds.find((cmd) => cmd.name === "copySelection");
+    const copyEntirePageCmd = cmds.find((cmd) => cmd.name === "copyEntirePage");
+    const copyMultipleTabsCmd = cmds.find(
+        (cmd) => cmd.name === "copyMultipleTabs",
     );
-    const settingsCmd = cmds.find(cmd => cmd.name === 'openSettings');
+    const sidebarCmd = cmds.find(
+        (cmd) =>
+            cmd.name === "_execute_sidebar_action" ||
+            cmd.name === "openSidePanel",
+    );
+    const settingsCmd = cmds.find((cmd) => cmd.name === "openSettings");
 
     if (copyCmd) {
-        copySelectionButton.title = copyCmd.shortcut || '(no keyboard shortcut set)';
+        copySelectionButton.title =
+            copyCmd.shortcut || "(no keyboard shortcut set)";
     }
     if (copyEntirePageCmd) {
-        copyEntirePageButton.title = copyEntirePageCmd.shortcut || '(no keyboard shortcut set)';
+        copyEntirePageButton.title =
+            copyEntirePageCmd.shortcut || "(no keyboard shortcut set)";
     }
     if (copyMultipleTabsCmd) {
-        copyMultipleTabsButton.title = copyMultipleTabsCmd.shortcut || '(no keyboard shortcut set)';
+        copyMultipleTabsButton.title =
+            copyMultipleTabsCmd.shortcut || "(no keyboard shortcut set)";
     }
     if (sidebarCmd) {
-        sidebarButton.title = sidebarCmd.shortcut || '(no keyboard shortcut set)';
+        sidebarButton.title =
+            sidebarCmd.shortcut || "(no keyboard shortcut set)";
     }
     if (settingsCmd) {
-        settingsButton.title = settingsCmd.shortcut || '(no keyboard shortcut set)';
+        settingsButton.title =
+            settingsCmd.shortcut || "(no keyboard shortcut set)";
     }
 }
 

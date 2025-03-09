@@ -14,7 +14,7 @@
    limitations under the License.
 */
 
-import * as md from './md.js';
+import * as md from "./md.js";
 
 /**
  * createLink creates a link in the given markup language.
@@ -25,10 +25,10 @@ import * as md from './md.js';
  */
 export async function createLink(title, url, markupLanguage) {
     switch (markupLanguage) {
-        case 'markdown':
-        case 'markdown with some html':
+        case "markdown":
+        case "markdown with some html":
             return await md.createLink(title, url);
-        case 'html':
+        case "html":
             title = htmlEncodeText(title);
             return `<a href="${url}">${title}</a>`;
         default:
@@ -45,14 +45,14 @@ export async function createLink(title, url, markupLanguage) {
  */
 export async function createImage(url, markupLanguage) {
     switch (markupLanguage) {
-        case 'markdown':
-        case 'markdown with some html':
-            return await md.createImage(url) + '\n';
-        case 'html':
+        case "markdown":
+        case "markdown with some html":
+            return (await md.createImage(url)) + "\n";
+        case "html":
             return `<img src="${url}">`;
         default:
-            console.error('Unknown markup language:', markupLanguage);
-            throw new Error('Unknown markup language:', markupLanguage);
+            console.error("Unknown markup language:", markupLanguage);
+            throw new Error("Unknown markup language:", markupLanguage);
     }
 }
 
@@ -65,16 +65,16 @@ export async function createImage(url, markupLanguage) {
  */
 export async function createVideo(srcUrl, pageUrl, markupLanguage) {
     switch (markupLanguage) {
-        case 'markdown':
-        case 'markdown with some html':
-            return await md.createVideo(srcUrl, pageUrl) + '\n';
-        case 'html':
-            const usingSrcUrl = srcUrl && !srcUrl.startsWith('blob:');
+        case "markdown":
+        case "markdown with some html":
+            return (await md.createVideo(srcUrl, pageUrl)) + "\n";
+        case "html":
+            const usingSrcUrl = srcUrl && !srcUrl.startsWith("blob:");
             const url = usingSrcUrl ? srcUrl : pageUrl;
             return `<video src="${url}">`;
         default:
-            console.error('Unknown markup language:', markupLanguage);
-            throw new Error('Unknown markup language:', markupLanguage);
+            console.error("Unknown markup language:", markupLanguage);
+            throw new Error("Unknown markup language:", markupLanguage);
     }
 }
 
@@ -87,16 +87,16 @@ export async function createVideo(srcUrl, pageUrl, markupLanguage) {
  */
 export async function createAudio(srcUrl, pageUrl, markupLanguage) {
     switch (markupLanguage) {
-        case 'markdown':
-        case 'markdown with some html':
-            return await md.createAudio(srcUrl, pageUrl) + '\n';
-        case 'html':
-            const usingSrcUrl = srcUrl && !srcUrl.startsWith('blob:');
+        case "markdown":
+        case "markdown with some html":
+            return (await md.createAudio(srcUrl, pageUrl)) + "\n";
+        case "html":
+            const usingSrcUrl = srcUrl && !srcUrl.startsWith("blob:");
             const url = usingSrcUrl ? srcUrl : pageUrl;
             return `<audio controls src="${url}">`;
         default:
-            console.error('Unknown markup language:', markupLanguage);
-            throw new Error('Unknown markup language:', markupLanguage);
+            console.error("Unknown markup language:", markupLanguage);
+            throw new Error("Unknown markup language:", markupLanguage);
     }
 }
 
@@ -106,10 +106,8 @@ export async function createAudio(srcUrl, pageUrl, markupLanguage) {
  * @returns {string}
  */
 function htmlEncodeText(str) {
-    const div = document.createElement('div');
+    const div = document.createElement("div");
     div.innerText = div.textContent = str;
-    str = div.innerHTML
-        .replaceAll(/"/g, '&quot;')
-        .replaceAll(/'/g, '&#39;')
+    str = div.innerHTML.replaceAll(/"/g, "&quot;").replaceAll(/'/g, "&#39;");
     return str;
 }

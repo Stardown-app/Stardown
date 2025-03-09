@@ -14,15 +14,15 @@
    limitations under the License.
 */
 
-import test from 'node:test'; // https://nodejs.org/api/test.html
-import assert from 'node:assert/strict'; // https://nodejs.org/api/assert.html#assert
-import { JSDOM } from 'jsdom'; // https://www.npmjs.com/package/jsdom
-import { htmlToMd } from '../src/converters/md.js';
+import test from "node:test"; // https://nodejs.org/api/test.html
+import assert from "node:assert/strict"; // https://nodejs.org/api/assert.html#assert
+import { JSDOM } from "jsdom"; // https://www.npmjs.com/package/jsdom
+import { htmlToMd } from "../src/converters/md.js";
 
-global.location = { href: 'https://example.com' };
+global.location = { href: "https://example.com" };
 
 function runTest(testName, htmlInput, mdExpected) {
-    test(testName, async t => {
+    test(testName, async (t) => {
         global.document = new JSDOM(htmlInput).window.document;
         const mdActual = await htmlToMd(global.document.body);
         assert.equal(mdActual, mdExpected);
@@ -38,14 +38,14 @@ function runTests() {
 
 const tests = [
     {
-        testName: '0x0',
+        testName: "0x0",
         htmlInput: `<table>
             </table>`,
         mdExpected: `
 `,
     },
     {
-        testName: '1x1',
+        testName: "1x1",
         htmlInput: `<table>
                 <tr>
                     <th>
@@ -58,7 +58,7 @@ const tests = [
 `,
     },
     {
-        testName: '2x1',
+        testName: "2x1",
         htmlInput: `<table>
                 <tr>
                     <th>
@@ -71,10 +71,10 @@ const tests = [
             </table>`,
         mdExpected: `| a | b |
 | --- | --- |
-`
+`,
     },
     {
-        testName: '1x2',
+        testName: "1x2",
         htmlInput: `<table>
                 <tr>
                     <th>
@@ -90,10 +90,10 @@ const tests = [
         mdExpected: `| a |
 | --- |
 | c |
-`
+`,
     },
     {
-        testName: '2x2',
+        testName: "2x2",
         htmlInput: `<table>
                 <tr>
                     <th>
@@ -115,10 +115,10 @@ const tests = [
         mdExpected: `| a | b |
 | --- | --- |
 | c | d |
-`
+`,
     },
     {
-        testName: '2x3',
+        testName: "2x3",
         htmlInput: `<table>
                 <tr>
                     <th>
@@ -149,10 +149,10 @@ const tests = [
 | --- | --- |
 | d | e |
 | g | h |
-`
+`,
     },
     {
-        testName: '3x2',
+        testName: "3x2",
         htmlInput: `<table>
                 <tr>
                     <th>
@@ -180,10 +180,10 @@ const tests = [
         mdExpected: `| a | b | c |
 | --- | --- | --- |
 | d | e | f |
-`
+`,
     },
     {
-        testName: '3x3',
+        testName: "3x3",
         htmlInput: `<table>
                 <tr>
                     <th>
@@ -223,10 +223,10 @@ const tests = [
 | --- | --- | --- |
 | d | e | f |
 | g | h | i |
-`
+`,
     },
     {
-        testName: '3x3 -1 cell in the second body row',
+        testName: "3x3 -1 cell in the second body row",
         htmlInput: `<table>
                 <tr>
                     <th>
@@ -263,10 +263,10 @@ const tests = [
 | --- | --- | --- |
 | d | e | f |
 | g | h |  |
-`
+`,
     },
     {
-        testName: '3x3 -1 cell in the first body row',
+        testName: "3x3 -1 cell in the first body row",
         htmlInput: `<table>
                 <tr>
                     <th>
@@ -303,10 +303,10 @@ const tests = [
 | --- | --- | --- |
 | d | e |  |
 | g | h | i |
-`
+`,
     },
     {
-        testName: '3x3 -1 cell in the header row',
+        testName: "3x3 -1 cell in the header row",
         htmlInput: `<table>
                 <tr>
                     <th>
@@ -343,10 +343,10 @@ const tests = [
 | --- | --- | --- |
 | d | e | f |
 | g | h | i |
-`
+`,
     },
     {
-        testName: '3x3 -2 cells in the header row',
+        testName: "3x3 -2 cells in the header row",
         htmlInput: `<table>
                 <tr>
                     <th>
@@ -380,10 +380,10 @@ const tests = [
 | --- | --- | --- |
 | d | e | f |
 | g | h | i |
-`
+`,
     },
     {
-        testName: 'thead',
+        testName: "thead",
         htmlInput: `<table>
                 <thead>
                     <tr>
@@ -401,10 +401,10 @@ const tests = [
             </table>`,
         mdExpected: `| a | b | c |
 | --- | --- | --- |
-`
+`,
     },
     {
-        testName: 'one thead and one tbody',
+        testName: "one thead and one tbody",
         htmlInput: `<table>
                 <thead>
                     <tr>
@@ -448,10 +448,10 @@ const tests = [
 | --- | --- | --- |
 | d | e | f |
 | g | h | i |
-`
+`,
     },
     {
-        testName: 'one thead and two tbodies',
+        testName: "one thead and two tbodies",
         htmlInput: `<table>
                 <thead>
                     <tr>
@@ -497,10 +497,10 @@ const tests = [
 | --- | --- | --- |
 | d | e | f |
 | g | h | i |
-`
+`,
     },
     {
-        testName: 'thead, tbodies, and a th column',
+        testName: "thead, tbodies, and a th column",
         htmlInput: `<table>
                 <thead>
                     <tr>
@@ -546,10 +546,10 @@ const tests = [
 | --- | --- | --- |
 | d | e | f |
 | g | h | i |
-`
+`,
     },
     {
-        testName: 'one tbody, no thead',
+        testName: "one tbody, no thead",
         htmlInput: `<table>
                 <tbody>
                     <tr>
@@ -579,10 +579,10 @@ const tests = [
         mdExpected: `| a | b | c |
 | --- | --- | --- |
 | d | e | f |
-`
+`,
     },
     {
-        testName: 'two tbodies, no thead',
+        testName: "two tbodies, no thead",
         htmlInput: `<table>
                 <tbody>
                     <tr>
@@ -638,10 +638,10 @@ const tests = [
 | d | e | f |
 | g | h | i |
 | j | k | l |
-`
+`,
     },
     {
-        testName: 'multiple rows in a thead',
+        testName: "multiple rows in a thead",
         htmlInput: `<table>
                 <thead>
                     <tr>
@@ -667,10 +667,10 @@ const tests = [
 | --- |
 | b |
 | c |
-`
+`,
     },
     {
-        testName: 'one tbody and one tfoot, each with one row',
+        testName: "one tbody and one tfoot, each with one row",
         htmlInput: `<table>
                 <tbody>
                     <tr>
@@ -690,10 +690,10 @@ const tests = [
         mdExpected: `| a |
 | --- |
 | b |
-`
+`,
     },
     {
-        testName: 'one tbody and one tfoot, each with two rows',
+        testName: "one tbody and one tfoot, each with two rows",
         htmlInput: `<table>
                 <tbody>
                     <tr>
@@ -725,10 +725,10 @@ const tests = [
 | b |
 | c |
 | d |
-`
+`,
     },
     {
-        testName: 'one thead with a tr, followed by one tr',
+        testName: "one thead with a tr, followed by one tr",
         htmlInput: `<table>
                 <thead>
                     <tr>
@@ -746,10 +746,10 @@ const tests = [
         mdExpected: `| a |
 | --- |
 | b |
-`
+`,
     },
     {
-        testName: 'one tr, followed by one tfoot',
+        testName: "one tr, followed by one tfoot",
         htmlInput: `<table>
                 <tr>
                     <td>
@@ -767,10 +767,10 @@ const tests = [
         mdExpected: `| a |
 | --- |
 | b |
-`
+`,
     },
     {
-        testName: 'bold and emphasis',
+        testName: "bold and emphasis",
         htmlInput: `<table>
                 <tr>
                     <td>
@@ -792,10 +792,10 @@ const tests = [
         mdExpected: `| a | *b* |
 | --- | --- |
 | **c** | ***d*** |
-`
+`,
     },
     {
-        testName: 'paragraphs and breaks',
+        testName: "paragraphs and breaks",
         htmlInput: `<table>
                     <tr>
                         <th>
@@ -823,10 +823,10 @@ const tests = [
         mdExpected: `| a b | c d |
 | --- | --- |
 | e f | g h |
-`
+`,
     },
     {
-        testName: 'h1 and h2 in rows',
+        testName: "h1 and h2 in rows",
         htmlInput: `<table>
                 <tr>
                     <th>
@@ -842,10 +842,10 @@ const tests = [
         mdExpected: `| a |
 | --- |
 | b |
-`
+`,
     },
     {
-        testName: 'table of tables',
+        testName: "table of tables",
         htmlInput: `<table>
                 <tr>
                     <td>
@@ -883,10 +883,10 @@ const tests = [
         mdExpected: `| a b |
 | --- |
 | c d |
-`
+`,
     },
     {
-        testName: 'caption',
+        testName: "caption",
         htmlInput: `<table>
                 <caption>
                     this is a caption
@@ -909,10 +909,10 @@ const tests = [
 | a |
 | --- |
 | b |
-`
+`,
     },
     {
-        testName: 'colspan',
+        testName: "colspan",
         htmlInput: `<table>
                 <tr>
                     <th colspan="2">
@@ -937,10 +937,10 @@ const tests = [
         mdExpected: `| a | a | b |
 | --- | --- | --- |
 | c | d | e |
-`
+`,
     },
     {
-        testName: 'rowspan',
+        testName: "rowspan",
         htmlInput: `<table>
                 <tr>
                     <th rowspan="2">
@@ -968,10 +968,10 @@ const tests = [
 | --- | --- |
 | a | c |
 | d | e |
-`
+`,
     },
     {
-        testName: 'parallel colspans',
+        testName: "parallel colspans",
         htmlInput: `<table>
                 <tr>
                     <td colspan="2">
@@ -996,10 +996,10 @@ const tests = [
 | --- | --- |
 | b | c |
 | d | d |
-`
+`,
     },
     {
-        testName: 'parallel rowspans',
+        testName: "parallel rowspans",
         htmlInput: `<table>
                 <tr>
                     <td rowspan="2">
@@ -1021,10 +1021,10 @@ const tests = [
         mdExpected: `| a | b | c |
 | --- | --- | --- |
 | a | d | c |
-`
+`,
     },
     {
-        testName: 'colspan and rowspan in the same cell',
+        testName: "colspan and rowspan in the same cell",
         htmlInput: `<table>
                 <tr>
                     <td>
@@ -1055,10 +1055,10 @@ const tests = [
 | --- | --- | --- |
 | d | e | e |
 | f | e | e |
-`
+`,
     },
     {
-        testName: 'colspan and rowspan in the same empty cell',
+        testName: "colspan and rowspan in the same empty cell",
         htmlInput: `<table>
                 <tr>
                     <td colspan="2" rowspan="2">
@@ -1088,10 +1088,10 @@ const tests = [
 | --- | --- | --- |
 |  |  | b |
 | c | d | e |
-`
+`,
     },
     {
-        testName: 'spaces around',
+        testName: "spaces around",
         htmlInput: `<table>
                 <tr>
                     <th>
@@ -1107,10 +1107,10 @@ const tests = [
         mdExpected: `| a |
 | --- |
 | b |
-`
+`,
     },
     {
-        testName: 'lists',
+        testName: "lists",
         htmlInput: `<table>
                     <tr>
                         <th>
@@ -1144,10 +1144,10 @@ const tests = [
         mdExpected: `| - a - b | 1. c 2. d |
 | --- | --- |
 | 1. e 2. f | - g - h |
-`
+`,
     },
     {
-        testName: 'pipe symbols',
+        testName: "pipe symbols",
         htmlInput: `<table>
                 <tr>
                     <th>
@@ -1163,7 +1163,7 @@ const tests = [
         mdExpected: `| a \\| b |
 | --- |
 | c \\| d |
-`
+`,
     },
 ];
 

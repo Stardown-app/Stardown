@@ -14,12 +14,15 @@
    limitations under the License.
 */
 
-import { getSetting } from '../getSetting.js';
-import * as tables from './utils/tables.js';
-import { absolutize } from './utils/urls.js';
+import { getSetting } from "../getSetting.js";
+import * as tables from "./utils/tables.js";
+import { absolutize } from "./utils/urls.js";
 import {
-    nodeTypes, isBlockFomattingContext, removeHiddenElements, isInlineNodes,
-} from './utils/html.js';
+    nodeTypes,
+    isBlockFomattingContext,
+    removeHiddenElements,
+    isInlineNodes,
+} from "./utils/html.js";
 
 // [CommonMark Spec](https://spec.commonmark.org/)
 // [commonmark.js demo](https://spec.commonmark.org/dingus/)
@@ -32,7 +35,7 @@ import {
  * @returns {Promise<string>}
  */
 export async function htmlToMd(frag) {
-    const omitHidden = await getSetting('omitHidden');
+    const omitHidden = await getSetting("omitHidden");
     if (omitHidden) {
         removeHiddenElements(frag, document);
     }
@@ -40,13 +43,13 @@ export async function htmlToMd(frag) {
     const ctx = {
         locationHref: location.href,
         document: document,
-        omitNav: await getSetting('omitNav'),
-        omitFooter: await getSetting('omitFooter'),
-        indent: '',
+        omitNav: await getSetting("omitNav"),
+        omitFooter: await getSetting("omitFooter"),
+        indent: "",
 
-        mdSubBrackets: await getSetting('mdSubBrackets'),
-        mdBulletPoint: await getSetting('mdBulletPoint'),
-        mdYoutube: await getSetting('mdYoutube'),
+        mdSubBrackets: await getSetting("mdSubBrackets"),
+        mdBulletPoint: await getSetting("mdBulletPoint"),
+        mdYoutube: await getSetting("mdYoutube"),
     };
 
     /** @type {function(string): string} */
@@ -56,11 +59,12 @@ export async function htmlToMd(frag) {
         ctx.dontTrimText = true;
     }
 
-    return mdConverter
-        .convertNodes(ctx, frag.childNodes)
-        .trim()
-        .replaceAll(/\n{3,}/g, '\n\n')
-        + '\n';
+    return (
+        mdConverter
+            .convertNodes(ctx, frag.childNodes)
+            .trim()
+            .replaceAll(/\n{3,}/g, "\n\n") + "\n"
+    );
 }
 
 /**
@@ -70,7 +74,10 @@ export async function htmlToMd(frag) {
  * @returns {string}
  */
 export function mdEncodeUri(uri) {
-    return uri.replaceAll('(', '%28').replaceAll(')', '%29').replaceAll(' ', '%20');
+    return uri
+        .replaceAll("(", "%28")
+        .replaceAll(")", "%29")
+        .replaceAll(" ", "%20");
 }
 
 /**
@@ -82,17 +89,17 @@ export function mdEncodeUri(uri) {
 export function newEscape(mdSubBrackets) {
     let openSqrRepl, closeSqrRepl;
     switch (mdSubBrackets) {
-        case 'underlined':
-            openSqrRepl = '⦋';
-            closeSqrRepl = '⦌';
+        case "underlined":
+            openSqrRepl = "⦋";
+            closeSqrRepl = "⦌";
             break;
-        case 'escaped':
-            openSqrRepl = '\\[';
-            closeSqrRepl = '\\]';
+        case "escaped":
+            openSqrRepl = "\\[";
+            closeSqrRepl = "\\]";
             break;
-        case 'original':
-            openSqrRepl = '[';
-            closeSqrRepl = ']';
+        case "original":
+            openSqrRepl = "[";
+            closeSqrRepl = "]";
             break;
     }
 
@@ -103,22 +110,22 @@ export function newEscape(mdSubBrackets) {
      */
     return function escape(text) {
         return text
-            .replaceAll('\\', '\\\\')
-            .replaceAll('#', '\\#') // tag, issue, atx header
-            .replaceAll('_', '\\_') // italic, horizontal rule
-            .replaceAll('*', '\\*') // bullet point, bold, italic, horizontal rule
-            .replaceAll('`', '\\`') // code, code fence
-            .replaceAll('~', '\\~') // strikethrough, code fence
-            .replaceAll('|', '\\|') // tables
-            .replaceAll(/^> /g, '\\> ') // quote
-            .replaceAll('<', '\\<') // HTML tag
-            .replaceAll(/^(=+)/g, '\\$1') // setext header
-            .replaceAll(/^-/g, '\\-') // bullet point, horizontal rule, setext header, YAML front matter fence
-            .replaceAll(/^\+/g, '\\+') // bullet point, TOML front matter fence
-            .replaceAll(/^(\d+)\. /g, '$1\\. ') // ordered list item
-            .replaceAll('[', openSqrRepl) // link, task list item
-            .replaceAll(']', closeSqrRepl) // link, task list item
-    }
+            .replaceAll("\\", "\\\\")
+            .replaceAll("#", "\\#") // tag, issue, atx header
+            .replaceAll("_", "\\_") // italic, horizontal rule
+            .replaceAll("*", "\\*") // bullet point, bold, italic, horizontal rule
+            .replaceAll("`", "\\`") // code, code fence
+            .replaceAll("~", "\\~") // strikethrough, code fence
+            .replaceAll("|", "\\|") // tables
+            .replaceAll(/^> /g, "\\> ") // quote
+            .replaceAll("<", "\\<") // HTML tag
+            .replaceAll(/^(=+)/g, "\\$1") // setext header
+            .replaceAll(/^-/g, "\\-") // bullet point, horizontal rule, setext header, YAML front matter fence
+            .replaceAll(/^\+/g, "\\+") // bullet point, TOML front matter fence
+            .replaceAll(/^(\d+)\. /g, "$1\\. ") // ordered list item
+            .replaceAll("[", openSqrRepl) // link, task list item
+            .replaceAll("]", closeSqrRepl); // link, task list item
+    };
 }
 
 /**
@@ -143,18 +150,24 @@ export class MdConverter {
         /** @type {string[]} */
         const result = [];
 
-        if (isBlockFmt) { // if it's a block formatting context
+        if (isBlockFmt) {
+            // if it's a block formatting context
             for (let i = 0; i < nodes.length; i++) {
                 result.push(this.convertNode(ctx, nodes[i]));
             }
-        } else { // if it's an inline formatting context
+        } else {
+            // if it's an inline formatting context
             // [How whitespace is handled by HTML, CSS, and in the DOM | MDN](https://developer.mozilla.org/en-US/docs/Web/API/Document_Object_Model/Whitespace)
             for (let i = 0; i < nodes.length; i++) {
                 const node = nodes[i];
                 let text = this.convertNode(ctx, node);
                 if (node.nodeType === nodeTypes.TEXT_NODE) {
-                    result.push(text.replaceAll(/\s+/g, ' '));
-                } else if (['BR', 'INPUT', 'IMG', 'TR', 'TH', 'TD'].includes(node.nodeName)) {
+                    result.push(text.replaceAll(/\s+/g, " "));
+                } else if (
+                    ["BR", "INPUT", "IMG", "TR", "TH", "TD"].includes(
+                        node.nodeName,
+                    )
+                ) {
                     result.push(text);
                 } else {
                     result.push(text.trim());
@@ -162,7 +175,7 @@ export class MdConverter {
             }
         }
 
-        return result.join('');
+        return result.join("");
     }
 
     /** @type {NodeConverter} */
@@ -172,27 +185,27 @@ export class MdConverter {
             case nodeTypes.ELEMENT_NODE:
                 return this.convertElement(ctx, node);
             case nodeTypes.ATTRIBUTE_NODE:
-                return '';
+                return "";
             case nodeTypes.TEXT_NODE:
                 return this.convertText(ctx, node);
             case nodeTypes.CDATA_SECTION_NODE:
-                return '';
+                return "";
             case nodeTypes.ENTITY_REFERENCE_NODE: // deprecated
-                return '';
+                return "";
             case nodeTypes.ENTITY_NODE: // deprecated
-                return '';
+                return "";
             case nodeTypes.PROCESSING_INSTRUCTION_NODE:
-                return '';
+                return "";
             case nodeTypes.COMMENT_NODE:
-                return '';
+                return "";
             case nodeTypes.DOCUMENT_NODE:
                 return this.convertDocument(ctx, node);
             case nodeTypes.DOCUMENT_TYPE_NODE:
-                return '';
+                return "";
             case nodeTypes.DOCUMENT_FRAGMENT_NODE:
                 return this.convertDocumentFragment(ctx, node);
             case nodeTypes.NOTATION_NODE: // deprecated
-                return '';
+                return "";
             default:
                 return this.convertNodes(ctx, node.childNodes);
         }
@@ -205,7 +218,7 @@ export class MdConverter {
         // lowercase in HTML documents!
 
         /** @type {ElementConverter} */
-        const convert = this['convert' + el.tagName.toUpperCase()];
+        const convert = this["convert" + el.tagName.toUpperCase()];
         if (convert === undefined) {
             return this.convertNodes(ctx, el.childNodes);
         }
@@ -217,31 +230,31 @@ export class MdConverter {
         const newCtx = { ...ctx, dontTrimText: true };
 
         /** @type {string[]} */
-        const result = ['\n\n'];
+        const result = ["\n\n"];
         result.push(
             this.convertNodes(newCtx, el.childNodes)
                 .trim()
-                .replaceAll(/\n\s*\n\s*/g, '\n\n')
-                .replace(/^([-+*] \[[xX ]\] ) /, '$1')
+                .replaceAll(/\n\s*\n\s*/g, "\n\n")
+                .replace(/^([-+*] \[[xX ]\] ) /, "$1"),
         );
         if (!ctx.inList) {
-            result.push('\n\n');
+            result.push("\n\n");
         }
 
-        return result.join('');
+        return result.join("");
     }
 
     /** @type {NodeConverter} */
     convertText(ctx, node) {
         if (!node.textContent) {
-            return '';
+            return "";
         }
 
         let content = ctx.escape(node.textContent);
         if (!ctx.dontTrimText) {
             content = content.trim();
         }
-        content = content.replaceAll(/\s+/g, ' ');
+        content = content.replaceAll(/\s+/g, " ");
 
         return content;
     }
@@ -266,7 +279,7 @@ export class MdConverter {
 
     /** @type {ElementConverter} */
     convertBASE(ctx, el) {
-        const href = el.getAttribute('href');
+        const href = el.getAttribute("href");
         if (href) {
             ctx.locationHref = href; // mutate the context
         }
@@ -274,27 +287,27 @@ export class MdConverter {
 
     /** @type {ElementConverter} */
     convertHEAD(ctx, el) {
-        return '';
+        return "";
     }
 
     /** @type {ElementConverter} */
     convertLINK(ctx, el) {
-        return '';
+        return "";
     }
 
     /** @type {ElementConverter} */
     convertMETA(ctx, el) {
-        return '';
+        return "";
     }
 
     /** @type {ElementConverter} */
     convertSTYLE(ctx, el) {
-        return '';
+        return "";
     }
 
     /** @type {ElementConverter} */
     convertTITLE(ctx, el) {
-        return '';
+        return "";
     }
 
     // sectioning root elements
@@ -324,7 +337,7 @@ export class MdConverter {
     /** @type {ElementConverter} */
     convertFOOTER(ctx, el) {
         if (ctx.omitFooter) {
-            return '';
+            return "";
         }
         return this.convertNodes(ctx, el.childNodes);
     }
@@ -348,18 +361,18 @@ export class MdConverter {
         const newCtx = { ...ctx, dontTrimText: true };
 
         /** @type {string[]} */
-        const result = ['\n\n'];
+        const result = ["\n\n"];
         for (let i = 0; i < headerLevel; i++) {
-            result.push('#');
+            result.push("#");
         }
         const text = this.convertNodes(newCtx, el.childNodes).trim();
         if (!text) {
-            return '';
+            return "";
         }
 
-        result.push(' ' + text.replaceAll('\n', ' '));
+        result.push(" " + text.replaceAll("\n", " "));
 
-        return result.join('') + '\n\n';
+        return result.join("") + "\n\n";
     }
 
     /** @type {ElementConverter} */
@@ -405,9 +418,9 @@ export class MdConverter {
     /** @type {ElementConverter} */
     convertNAV(ctx, el) {
         if (ctx.omitNav) {
-            return '';
+            return "";
         }
-        return this.convertNodes(ctx, el.childNodes) + '\n';
+        return this.convertNodes(ctx, el.childNodes) + "\n";
     }
 
     /** @type {ElementConverter} */
@@ -427,21 +440,23 @@ export class MdConverter {
         const newCtx = { ...ctx, dontTrimText: true };
 
         /** @type {string[]} */
-        const result = ['\n\n'];
+        const result = ["\n\n"];
         if (ctx.inList) {
-            result.push('\n\n' + ctx.indent);
+            result.push("\n\n" + ctx.indent);
         }
-        result.push('> ');
+        result.push("> ");
         result.push(
             this.convertNodes(newCtx, el.childNodes)
-                .trim().replaceAll('\n', '\n>').replaceAll('> \n>\n>', '> ')
+                .trim()
+                .replaceAll("\n", "\n>")
+                .replaceAll("> \n>\n>", "> "),
         );
-        result.push('\n');
+        result.push("\n");
         if (!ctx.inList) {
-            result.push('\n');
+            result.push("\n");
         }
 
-        return result.join('');
+        return result.join("");
     }
 
     /** @type {ElementConverter} */
@@ -449,10 +464,10 @@ export class MdConverter {
         const newCtx = { ...ctx, dontTrimText: true };
         const text = this.convertNodes(newCtx, el.childNodes).trim();
         if (!text) {
-            return '';
+            return "";
         }
 
-        return ': ' + text.replaceAll('\n', ' ') + '\n';
+        return ": " + text.replaceAll("\n", " ") + "\n";
     }
 
     /** @type {ElementConverter} */
@@ -463,13 +478,16 @@ export class MdConverter {
     /** @type {ElementConverter} */
     convertDL(ctx, el) {
         const newCtx = { ...ctx, dontTrimText: true };
-        return '\n\n' + this.convertNodes(newCtx, el.childNodes) + '\n\n';
+        return "\n\n" + this.convertNodes(newCtx, el.childNodes) + "\n\n";
     }
 
     /** @type {ElementConverter} */
     convertDT(ctx, el) {
         const newCtx = { ...ctx, dontTrimText: true };
-        return this.convertNodes(newCtx, el.childNodes).replaceAll('\n', ' ') + '\n';
+        return (
+            this.convertNodes(newCtx, el.childNodes).replaceAll("\n", " ") +
+            "\n"
+        );
     }
 
     /** @type {ElementConverter} */
@@ -484,7 +502,7 @@ export class MdConverter {
 
     /** @type {ElementConverter} */
     convertHR(ctx, el) {
-        return '\n\n* * *\n\n';
+        return "\n\n* * *\n\n";
     }
 
     /** @type {ElementConverter} */
@@ -492,7 +510,7 @@ export class MdConverter {
         // List items are handled by the parent list element. The selection code should
         // detect when the selection contains list items outside of a list and wrap them
         // in a list element.
-        return '';
+        return "";
     }
 
     /** @type {ElementConverter} */
@@ -508,59 +526,64 @@ export class MdConverter {
     /** @type {ElementConverter} */
     convertList(ctx, el) {
         /** @type {string[]} */
-        const result = ['\n'];
+        const result = ["\n"];
         if (!ctx.inList) {
-            result.push('\n');
+            result.push("\n");
         }
 
         const newCtx = {
-            ...ctx, indent: ctx.indent + '    ', inList: true, dontTrimText: true,
+            ...ctx,
+            indent: ctx.indent + "    ",
+            inList: true,
+            dontTrimText: true,
         };
 
-        let liNum = Number(el.getAttribute('start') || 1);
-        const reversedAttr = el.getAttribute('reversed');
-        const reversed = reversedAttr !== null && reversedAttr === 'true';
+        let liNum = Number(el.getAttribute("start") || 1);
+        const reversedAttr = el.getAttribute("reversed");
+        const reversed = reversedAttr !== null && reversedAttr === "true";
 
         const children = el.childNodes;
         for (let i = 0; i < children.length; i++) {
             const child = children[i];
-            if (child.nodeName === 'HR') {
+            if (child.nodeName === "HR") {
                 result.push(this.convertHR(newCtx, child));
                 continue;
             } else if (
                 child.nodeType === nodeTypes.TEXT_NODE ||
                 child.nodeType === nodeTypes.COMMENT_NODE ||
-                child.nodeName === 'TEMPLATE' ||
+                child.nodeName === "TEMPLATE" ||
                 child.childNodes.length === 0 ||
                 child.textContent?.match(/^\s+$/)
             ) {
                 continue;
-            } else if (child.nodeName === 'UL' || child.nodeName === 'MENU') {
-                result.push(this.convertUL(newCtx, child).slice(1) + '\n');
+            } else if (child.nodeName === "UL" || child.nodeName === "MENU") {
+                result.push(this.convertUL(newCtx, child).slice(1) + "\n");
                 continue;
-            } else if (child.nodeName === 'OL') {
-                result.push(this.convertOL(newCtx, child).slice(1) + '\n');
+            } else if (child.nodeName === "OL") {
+                result.push(this.convertOL(newCtx, child).slice(1) + "\n");
                 continue;
-            } else if (child.nodeName !== 'LI') {
-                console.warn(`Ignoring unexpected ${child.nodeName} in ${el.nodeName}`);
+            } else if (child.nodeName !== "LI") {
+                console.warn(
+                    `Ignoring unexpected ${child.nodeName} in ${el.nodeName}`,
+                );
                 continue;
             }
 
-            if (el.nodeName === 'OL') {
-                result.push(ctx.indent + String(liNum) + '. ');
+            if (el.nodeName === "OL") {
+                result.push(ctx.indent + String(liNum) + ". ");
             } else {
-                result.push(ctx.indent + ctx.mdBulletPoint + ' ');
+                result.push(ctx.indent + ctx.mdBulletPoint + " ");
             }
             result.push(
                 this.convertNodes(newCtx, child.childNodes)
-                    .replace(/^ /, '')
-                    .replace(/^\n+/, '')
-                    .replace(/ \n/, '\n')
-                    .replace(/ $/, '')
-                    .replace(/^(\[[xX ]\] ) /, '$1')
+                    .replace(/^ /, "")
+                    .replace(/^\n+/, "")
+                    .replace(/ \n/, "\n")
+                    .replace(/ $/, "")
+                    .replace(/^(\[[xX ]\] ) /, "$1"),
             );
             if (!ctx.inList || i < children.length - 2) {
-                result.push('\n');
+                result.push("\n");
             }
 
             if (reversed) {
@@ -571,10 +594,10 @@ export class MdConverter {
         }
 
         if (!ctx.inList) {
-            result.push('\n');
+            result.push("\n");
         }
 
-        return result.join('');
+        return result.join("");
     }
 
     /** @type {ElementConverter} */
@@ -582,62 +605,69 @@ export class MdConverter {
         const newCtx = { ...ctx, dontTrimText: true };
 
         /** @type {string[]} */
-        const result = ['\n\n'];
+        const result = ["\n\n"];
         result.push(
             this.convertNodes(newCtx, el.childNodes)
                 .trim()
-                .replaceAll(/\n\s+/g, '\n')
-                .replace(/^([-+*] \[[xX ]\] ) /, '$1')
+                .replaceAll(/\n\s+/g, "\n")
+                .replace(/^([-+*] \[[xX ]\] ) /, "$1"),
         );
         if (!ctx.inList) {
-            result.push('\n\n');
+            result.push("\n\n");
         }
 
-        return result.join('');
+        return result.join("");
     }
 
     /** @type {ElementConverter} */
     convertPRE(ctx, el) {
         if (el.childNodes.length === 0) {
-            return '';
+            return "";
         }
 
-        let text = '';
-        let language = el.getAttribute('syntax') || '';
+        let text = "";
+        let language = el.getAttribute("syntax") || "";
         if (el.childNodes.length > 1) {
             const result = [];
             for (let i = 0; i < el.childNodes.length; i++) {
                 const child = el.childNodes[i];
-                if (child.nodeName === 'BR') {
-                    result.push('\n');
+                if (child.nodeName === "BR") {
+                    result.push("\n");
                 } else {
                     const t = child.textContent;
                     if (!t) {
                         continue;
                     }
-                    result.push(t.replaceAll('\n\n', ' '));
+                    result.push(t.replaceAll("\n\n", " "));
                 }
             }
             if (result.length === 0) {
-                return '';
+                return "";
             }
-            text = result.join('');
-        } else { // if there is only one child
+            text = result.join("");
+        } else {
+            // if there is only one child
             /** @type {Node} */
             const child = el.firstChild;
-            if (child.nodeName === 'SAMP' || child.nodeName === 'KBD') {
+            if (child.nodeName === "SAMP" || child.nodeName === "KBD") {
                 return this.convertCODE(ctx, child);
-            } else if (child.nodeType !== nodeTypes.TEXT_NODE && child.nodeName !== 'CODE') {
-                console.warn(`Unexpected nodeName of only child in a PRE: "${child.nodeName}"`);
+            } else if (
+                child.nodeType !== nodeTypes.TEXT_NODE &&
+                child.nodeName !== "CODE"
+            ) {
+                console.warn(
+                    `Unexpected nodeName of only child in a PRE: "${child.nodeName}"`,
+                );
             }
 
             text = child.textContent;
             if (!text) {
-                return '';
+                return "";
             }
 
-            if (!language && child.getAttribute) { // if the child is not a text node
-                const class_ = child.getAttribute('class') || '';
+            if (!language && child.getAttribute) {
+                // if the child is not a text node
+                const class_ = child.getAttribute("class") || "";
                 const languageMatch = class_.match(/language-(\S+)/);
                 if (languageMatch) {
                     language = languageMatch[1];
@@ -645,10 +675,10 @@ export class MdConverter {
             }
         }
 
-        const result = ['\n\n'];
+        const result = ["\n\n"];
 
         if (ctx.inList) {
-            result.push('\n\n' + ctx.indent);
+            result.push("\n\n" + ctx.indent);
         }
 
         let backtickCount = 3;
@@ -658,23 +688,23 @@ export class MdConverter {
         }
 
         for (let i = 0; i < backtickCount; i++) {
-            result.push('`');
+            result.push("`");
         }
 
-        result.push(language + '\n');
+        result.push(language + "\n");
 
-        text = text.replaceAll('\n', '\n' + ctx.indent);
-        result.push(ctx.indent + text + '\n' + ctx.indent);
+        text = text.replaceAll("\n", "\n" + ctx.indent);
+        result.push(ctx.indent + text + "\n" + ctx.indent);
 
         for (let i = 0; i < backtickCount; i++) {
-            result.push('`');
+            result.push("`");
         }
-        result.push('\n');
+        result.push("\n");
         if (!ctx.inList) {
-            result.push('\n');
+            result.push("\n");
         }
 
-        return result.join('');
+        return result.join("");
     }
 
     /** @type {ElementConverter} */
@@ -686,27 +716,30 @@ export class MdConverter {
 
     /** @type {ElementConverter} */
     convertA(ctx, el) {
-        let href = el.getAttribute('href') || '';
+        let href = el.getAttribute("href") || "";
         href = absolutize(href, ctx.locationHref);
         href = mdEncodeUri(href);
 
-        let text = this.convertNodes(ctx, el.childNodes).trim().replaceAll('\n', ' ');
+        let text = this.convertNodes(ctx, el.childNodes)
+            .trim()
+            .replaceAll("\n", " ");
         if (!text) {
-            return '';
+            return "";
         } else if (!href) {
             return text;
-        } else if (text.startsWith('^')) {
-            text = '\\^' + text.slice(1);
+        } else if (text.startsWith("^")) {
+            text = "\\^" + text.slice(1);
         }
 
-        const title = ctx.escape(el.getAttribute('title') || '')
+        const title = ctx
+            .escape(el.getAttribute("title") || "")
             .replaceAll('"', '\\"')
-            .replaceAll('\n', ' ');
+            .replaceAll("\n", " ");
 
         if (title) {
-            return '[' + text + '](' + href + ' "' + title + '")';
+            return "[" + text + "](" + href + ' "' + title + '")';
         }
-        return '[' + text + '](' + href + ')';
+        return "[" + text + "](" + href + ")";
     }
 
     /** @type {ElementConverter} */
@@ -731,7 +764,7 @@ export class MdConverter {
 
     /** @type {ElementConverter} */
     convertBR(ctx, el) {
-        return '\n';
+        return "\n";
     }
 
     /** @type {ElementConverter} */
@@ -742,7 +775,7 @@ export class MdConverter {
     /** @type {ElementConverter} */
     convertCODE(ctx, el) {
         if (!el.textContent) {
-            return '';
+            return "";
         }
 
         let textOnly = true;
@@ -758,17 +791,17 @@ export class MdConverter {
 
         const result = [];
 
-        let backticks = '`';
+        let backticks = "`";
         const backtickCount = el.textContent.match(/(`+)/)?.[1].length || 0;
         for (let i = 0; i < backtickCount; i++) {
-            backticks += '`';
+            backticks += "`";
         }
 
         result.push(backticks);
-        result.push(el.textContent.replaceAll('\n', ' '));
+        result.push(el.textContent.replaceAll("\n", " "));
         result.push(backticks);
 
-        return result.join('');
+        return result.join("");
     }
 
     /** @type {ElementConverter} */
@@ -790,10 +823,10 @@ export class MdConverter {
 
         const text = this.convertNodes(newCtx, el.childNodes).trim();
         if (!text) {
-            return '';
+            return "";
         }
 
-        return '*' + text.replaceAll('\n', ' ') + '*';
+        return "*" + text.replaceAll("\n", " ") + "*";
     }
 
     /** @type {ElementConverter} */
@@ -810,10 +843,10 @@ export class MdConverter {
     convertMARK(ctx, el) {
         const text = this.convertNodes(ctx, el.childNodes).trim();
         if (!text) {
-            return '';
+            return "";
         }
 
-        return '==' + text.replaceAll('\n', ' ') + '==';
+        return "==" + text.replaceAll("\n", " ") + "==";
     }
 
     /** @type {ElementConverter} */
@@ -821,18 +854,18 @@ export class MdConverter {
         if (ctx.inEm) {
             const text = this.convertNodes(ctx, el.childNodes)
                 .trim()
-                .replaceAll('\n', ' ')
-                .replaceAll('"', '\\"')
+                .replaceAll("\n", " ")
+                .replaceAll('"', '\\"');
             return '"' + text + '"';
         }
         const newCtx = { ...ctx, inEm: true };
 
         const text = this.convertNodes(newCtx, el.childNodes).trim();
         if (!text) {
-            return '';
+            return "";
         }
 
-        return '*"' + text.replaceAll('\n', ' ').replaceAll('"', '\\"') + '"*';
+        return '*"' + text.replaceAll("\n", " ").replaceAll('"', '\\"') + '"*';
     }
 
     /** @type {ElementConverter} */
@@ -859,10 +892,10 @@ export class MdConverter {
 
         const text = this.convertNodes(newCtx, el.childNodes).trim();
         if (!text) {
-            return '';
+            return "";
         }
 
-        return '~~' + text.replaceAll('\n', ' ').replaceAll('~', '\\~') + '~~';
+        return "~~" + text.replaceAll("\n", " ").replaceAll("~", "\\~") + "~~";
     }
 
     /** @type {ElementConverter} */
@@ -889,10 +922,10 @@ export class MdConverter {
 
         const text = this.convertNodes(newCtx, el.childNodes).trim();
         if (!text) {
-            return '';
+            return "";
         }
 
-        return '**' + text.replaceAll('\n', ' ') + '**';
+        return "**" + text.replaceAll("\n", " ") + "**";
     }
 
     /** @type {ElementConverter} */
@@ -921,52 +954,52 @@ export class MdConverter {
         const result = [];
 
         if (!ctx.inEm) {
-            result.push('*');
+            result.push("*");
         }
         if (!ctx.inB) {
-            result.push('**');
+            result.push("**");
         }
 
         const newCtx = { ...ctx, inEm: true, inB: true };
         const text = this.convertNodes(newCtx, el.childNodes).trim();
         if (!text) {
-            return '';
+            return "";
         }
 
-        result.push(text.replaceAll('\n', ' '));
+        result.push(text.replaceAll("\n", " "));
 
         if (!ctx.inB) {
-            result.push('**');
+            result.push("**");
         }
         if (!ctx.inEm) {
-            result.push('*');
+            result.push("*");
         }
 
-        return result.join('');
+        return result.join("");
     }
 
     /** @type {ElementConverter} */
     convertWBR(ctx, el) {
-        return '';
+        return "";
     }
 
     // image and multimedia elements
 
     /** @type {ElementConverter} */
     convertAREA(ctx, el) {
-        return '';
+        return "";
     }
 
     /** @type {ElementConverter} */
     convertAUDIO(ctx, el) {
-        let src = el.getAttribute('src');
-        if (!src || src.startsWith('blob:')) {
-            const sourceEl = el.querySelector('source');
+        let src = el.getAttribute("src");
+        if (!src || src.startsWith("blob:")) {
+            const sourceEl = el.querySelector("source");
             if (sourceEl) {
-                src = sourceEl.getAttribute('src');
+                src = sourceEl.getAttribute("src");
             }
         }
-        if (!src || src.startsWith('blob:')) {
+        if (!src || src.startsWith("blob:")) {
             if (el.childNodes.length > 0) {
                 return this.convertNodes(ctx, el.childNodes);
             }
@@ -975,16 +1008,18 @@ export class MdConverter {
         src = absolutize(src, ctx.locationHref);
         src = mdEncodeUri(src);
 
-        return '[audio](' + src + ')';
+        return "[audio](" + src + ")";
     }
 
     /** @type {ElementConverter} */
     convertIMG(ctx, el) {
-        const alt = ctx.escape(el.getAttribute('alt') || '').replaceAll('\n', ' ');
+        const alt = ctx
+            .escape(el.getAttribute("alt") || "")
+            .replaceAll("\n", " ");
 
-        let src = el.getAttribute('src') || '';
-        if (!src || src.startsWith('data:')) {
-            src = el.getAttribute('data-srcset') || '';
+        let src = el.getAttribute("src") || "";
+        if (!src || src.startsWith("data:")) {
+            src = el.getAttribute("data-srcset") || "";
             if (!src) {
                 return alt;
             }
@@ -992,48 +1027,50 @@ export class MdConverter {
         src = absolutize(src, ctx.locationHref);
         src = mdEncodeUri(src);
 
-        const title = ctx.escape(el.getAttribute('title') || '').replaceAll('"', '\\"');
+        const title = ctx
+            .escape(el.getAttribute("title") || "")
+            .replaceAll('"', '\\"');
 
         /** @type {string[]} */
         const result = [];
         if (ctx.inList) {
-            result.push('\n\n' + ctx.indent);
+            result.push("\n\n" + ctx.indent);
         }
-        result.push('![' + alt + '](' + src);
+        result.push("![" + alt + "](" + src);
         if (title) {
             result.push(' "' + title + '"');
         }
-        result.push(')');
+        result.push(")");
         if (ctx.inList) {
-            result.push('\n');
+            result.push("\n");
         }
 
-        return result.join('');
+        return result.join("");
     }
 
     /** @type {ElementConverter} */
     convertMAP(ctx, el) {
-        return '';
+        return "";
     }
 
     /** @type {ElementConverter} */
     convertTRACK(ctx, el) {
-        const label = ctx.escape(el.getAttribute('label') || 'track');
+        const label = ctx.escape(el.getAttribute("label") || "track");
 
-        let src = el.getAttribute('src');
+        let src = el.getAttribute("src");
         if (!src) {
             return label;
         }
         src = absolutize(src, ctx.locationHref);
         src = mdEncodeUri(src);
 
-        return '[' + label + '](' + src + ')';
+        return "[" + label + "](" + src + ")";
     }
 
     /** @type {ElementConverter} */
     convertVIDEO(ctx, el) {
-        const src = el.getAttribute('src');
-        const usingSrcUrl = src && !src.startsWith('blob:');
+        const src = el.getAttribute("src");
+        const usingSrcUrl = src && !src.startsWith("blob:");
         let url = usingSrcUrl ? src : ctx.locationHref;
         url = absolutize(url, ctx.locationHref);
         url = mdEncodeUri(url);
@@ -1041,13 +1078,13 @@ export class MdConverter {
         let youtubeId; // TODO
         let isYoutube = false; // TODO
 
-        if (isYoutube && ctx.mdYoutube === 'GitHub') {
+        if (isYoutube && ctx.mdYoutube === "GitHub") {
             // TODO: use fwd-microservice
         } else {
             if (usingSrcUrl) {
-                return '[video](' + url + ')';
+                return "[video](" + url + ")";
             } else {
-                return '![video](' + url + ')';
+                return "![video](" + url + ")";
             }
         }
     }
@@ -1056,14 +1093,14 @@ export class MdConverter {
 
     /** @type {ElementConverter} */
     convertEMBED(ctx, el) {
-        let src = el.getAttribute('src');
+        let src = el.getAttribute("src");
         if (!src) {
-            return '';
+            return "";
         }
         src = absolutize(src, ctx.locationHref);
         src = mdEncodeUri(src);
-        const type = ctx.escape(el.getAttribute('type') || 'embed');
-        return '[' + type + '](' + src + ')';
+        const type = ctx.escape(el.getAttribute("type") || "embed");
+        return "[" + type + "](" + src + ")";
     }
 
     /** @type {ElementConverter} */
@@ -1072,38 +1109,38 @@ export class MdConverter {
         console.log(`iframe.contentDocument: ${el.contentDocument}`); // always null?
         console.log(`iframe.contentWindow: ${el.contentWindow}`); // always null?
 
-        const srcdoc = el.getAttribute('srcdoc');
+        const srcdoc = el.getAttribute("srcdoc");
         if (srcdoc && DOMParser) {
-            const doc = new DOMParser().parseFromString(srcdoc, 'text/html');
+            const doc = new DOMParser().parseFromString(srcdoc, "text/html");
             // The iframe uses the embedding document's URL as its base URL when
             // resolving any relative URLs.
             return this.convertDocument(ctx, doc);
         }
 
-        let src = el.getAttribute('src');
-        if (src && src !== 'about:blank') {
+        let src = el.getAttribute("src");
+        if (src && src !== "about:blank") {
             src = absolutize(src, ctx.locationHref);
             src = mdEncodeUri(src);
             const title = ctx.escape(
-                el.getAttribute('title') ||
-                el.getAttribute('name') ||
-                el.getAttribute('id') ||
-                'iframe'
+                el.getAttribute("title") ||
+                    el.getAttribute("name") ||
+                    el.getAttribute("id") ||
+                    "iframe",
             );
-            return '[' + title + '](' + src + ')';
+            return "[" + title + "](" + src + ")";
         }
 
-        return '';
+        return "";
     }
 
     /** @type {ElementConverter} */
     convertOBJECT(ctx, el) {
-        let data = el.getAttribute('data');
+        let data = el.getAttribute("data");
         if (data) {
             data = absolutize(data, ctx.locationHref);
             data = mdEncodeUri(data);
-            const type = ctx.escape(el.getAttribute('type') || 'object');
-            return '[' + type + '](' + data + ')';
+            const type = ctx.escape(el.getAttribute("type") || "object");
+            return "[" + type + "](" + data + ")";
         }
         return this.convertNodes(ctx, el.childNodes);
     }
@@ -1115,57 +1152,57 @@ export class MdConverter {
 
     /** @type {ElementConverter} */
     convertPORTAL(ctx, el) {
-        let src = el.getAttribute('src');
+        let src = el.getAttribute("src");
         if (!src) {
-            return '';
+            return "";
         }
         src = absolutize(src, ctx.locationHref);
         src = mdEncodeUri(src);
-        const id = ctx.escape(el.getAttribute('id') || 'portal');
-        return '[' + id + '](' + src + ')';
+        const id = ctx.escape(el.getAttribute("id") || "portal");
+        return "[" + id + "](" + src + ")";
     }
 
     /** @type {ElementConverter} */
     convertSOURCE(ctx, el) {
-        return '';
+        return "";
     }
 
     // SVG and MathMl elements
 
     /** @type {ElementConverter} */
     convertSVG(ctx, el) {
-        return '';
+        return "";
     }
 
     /** @type {ElementConverter} */
     convertMATH(ctx, el) {
-        const alttext = el.getAttribute('alttext') || '';
+        const alttext = el.getAttribute("alttext") || "";
         if (!alttext) {
-            return '';
+            return "";
         }
 
-        const display = el.getAttribute('display') || '';
-        if (display === 'block') {
-            return '\n\n$$\n' + alttext + '\n$$\n\n';
+        const display = el.getAttribute("display") || "";
+        if (display === "block") {
+            return "\n\n$$\n" + alttext + "\n$$\n\n";
         }
-        return '$' + alttext + '$';
+        return "$" + alttext + "$";
     }
 
     // scripting elements
 
     /** @type {ElementConverter} */
     convertCANVAS(ctx, el) {
-        return '';
+        return "";
     }
 
     /** @type {ElementConverter} */
     convertNOSCRIPT(ctx, el) {
-        return '';
+        return "";
     }
 
     /** @type {ElementConverter} */
     convertSCRIPT(ctx, el) {
-        return '';
+        return "";
     }
 
     // demarcating edits elements
@@ -1189,29 +1226,29 @@ export class MdConverter {
 
     /** @type {ElementConverter} */
     convertCOL(ctx, el) {
-        return '';
+        return "";
     }
 
     /** @type {ElementConverter} */
     convertCOLGROUP(ctx, el) {
-        return '';
+        return "";
     }
 
     /** @type {ElementConverter} */
     convertTABLE(ctx, el) {
         if (ctx.inTable) {
             return this.convertText(ctx, el);
-        } else if (el.getAttribute('role') === 'presentation') {
-            return '\n\n' + this.convertNodes(ctx, el.childNodes) + '\n\n';
+        } else if (el.getAttribute("role") === "presentation") {
+            return "\n\n" + this.convertNodes(ctx, el.childNodes) + "\n\n";
         }
         const newCtx = { ...ctx, inTable: true, dontTrimText: true };
 
         /** @type {string[]} */
-        let result = ['\n\n'];
+        let result = ["\n\n"];
 
-        const caption = el.querySelector('caption');
+        const caption = el.querySelector("caption");
         if (caption) {
-            result.push(this.convertSTRONG(ctx, caption) + '\n\n');
+            result.push(this.convertSTRONG(ctx, caption) + "\n\n");
         }
 
         /** @type {Element[][]} */
@@ -1222,39 +1259,40 @@ export class MdConverter {
         // for each row
         for (let y = 0; y < table2d.length; y++) {
             const row = table2d[y];
-            result.push('|');
+            result.push("|");
 
             // for each cell
             for (let x = 0; x < row.length; x++) {
                 const cell = row[x]; // a `<th>` or `<td>` element
                 const cellStr = this.convertNodes(newCtx, cell.childNodes)
-                    .trim().replaceAll(/\s+/g, ' ');
+                    .trim()
+                    .replaceAll(/\s+/g, " ");
                 result.push(` ${cellStr} |`);
             }
 
-            result.push('\n');
+            result.push("\n");
 
             // if this is the first row, add a separator row
             if (y === 0) {
-                result.push('|');
+                result.push("|");
                 for (let x = 0; x < row.length; x++) {
-                    result.push(' --- |');
+                    result.push(" --- |");
                 }
-                result.push('\n');
+                result.push("\n");
             }
         }
 
-        return result.join('') + '\n';
+        return result.join("") + "\n";
     }
 
     /** @type {ElementConverter} */
     convertTBODY(ctx, el) {
-        return this.convertNodes(ctx, el.childNodes).replace(/^\s+/, '');
+        return this.convertNodes(ctx, el.childNodes).replace(/^\s+/, "");
     }
 
     /** @type {ElementConverter} */
     convertTD(ctx, el) {
-        return this.convertNodes(ctx, el.childNodes).trim() + ' ';
+        return this.convertNodes(ctx, el.childNodes).trim() + " ";
     }
 
     /** @type {ElementConverter} */
@@ -1264,17 +1302,17 @@ export class MdConverter {
 
     /** @type {ElementConverter} */
     convertTH(ctx, el) {
-        return this.convertNodes(ctx, el.childNodes).trim() + ' ';
+        return this.convertNodes(ctx, el.childNodes).trim() + " ";
     }
 
     /** @type {ElementConverter} */
     convertTHEAD(ctx, el) {
-        return this.convertNodes(ctx, el.childNodes).replace(/^\s+/, '');
+        return this.convertNodes(ctx, el.childNodes).replace(/^\s+/, "");
     }
 
     /** @type {ElementConverter} */
     convertTR(ctx, el) {
-        return this.convertNodes(ctx, el.childNodes).trim() + '\n';
+        return this.convertNodes(ctx, el.childNodes).trim() + "\n";
     }
 
     // form elements
@@ -1301,28 +1339,28 @@ export class MdConverter {
 
     /** @type {ElementConverter} */
     convertINPUT(ctx, el) {
-        const type = el.getAttribute('type');
-        if (type !== 'checkbox' && type !== 'radio') {
-            return '';
+        const type = el.getAttribute("type");
+        if (type !== "checkbox" && type !== "radio") {
+            return "";
         }
-        const ariaHasPopup = el.getAttribute('aria-haspopup');
+        const ariaHasPopup = el.getAttribute("aria-haspopup");
         if (ariaHasPopup) {
-            return '';
+            return "";
         }
 
         /** @type {string[]} */
         const result = [];
 
         if (!ctx.inList) {
-            result.push('\n' + ctx.mdBulletPoint + ' ');
+            result.push("\n" + ctx.mdBulletPoint + " ");
         }
         if (el.checked) {
-            result.push('[x] ');
+            result.push("[x] ");
         } else {
-            result.push('[ ] ');
+            result.push("[ ] ");
         }
 
-        return result.join('');
+        return result.join("");
     }
 
     /** @type {ElementConverter} */
@@ -1396,7 +1434,7 @@ export class MdConverter {
 
     /** @type {ElementConverter} */
     convertTEMPLATE(ctx, el) {
-        return '';
+        return "";
     }
 
     // deprecated elements
@@ -1423,7 +1461,7 @@ export class MdConverter {
 
     /** @type {ElementConverter} */
     convertDIR(ctx, el) {
-        return '';
+        return "";
     }
 
     /** @type {ElementConverter} */
@@ -1433,67 +1471,67 @@ export class MdConverter {
 
     /** @type {ElementConverter} */
     convertFRAME(ctx, el) {
-        return '';
+        return "";
     }
 
     /** @type {ElementConverter} */
     convertFRAMESET(ctx, el) {
-        return '';
+        return "";
     }
 
     /** @type {ElementConverter} */
     convertIMAGE(ctx, el) {
-        return '';
+        return "";
     }
 
     /** @type {ElementConverter} */
     convertMARQUEE(ctx, el) {
-        return '';
+        return "";
     }
 
     /** @type {ElementConverter} */
     convertMENUITEM(ctx, el) {
-        return '';
+        return "";
     }
 
     /** @type {ElementConverter} */
     convertNOBR(ctx, el) {
-        return '';
+        return "";
     }
 
     /** @type {ElementConverter} */
     convertNOEMBED(ctx, el) {
-        return '';
+        return "";
     }
 
     /** @type {ElementConverter} */
     convertNOFRAMES(ctx, el) {
-        return '';
+        return "";
     }
 
     /** @type {ElementConverter} */
     convertPARAM(ctx, el) {
-        return '';
+        return "";
     }
 
     /** @type {ElementConverter} */
     convertPLAINTEXT(ctx, el) {
-        return '';
+        return "";
     }
 
     /** @type {ElementConverter} */
     convertRB(ctx, el) {
-        return '';
+        return "";
     }
 
     /** @type {ElementConverter} */
     convertRTC(ctx, el) {
-        return '';
+        return "";
     }
 
     /** @type {ElementConverter} */
     convertSHADOW(ctx, el) {
-        return '';
+        return "";
     }
 
     /** @type {ElementConverter} */
@@ -1503,12 +1541,12 @@ export class MdConverter {
 
     /** @type {ElementConverter} */
     convertTT(ctx, el) {
-        return '';
+        return "";
     }
 
     /** @type {ElementConverter} */
     convertXMP(ctx, el) {
-        return '';
+        return "";
     }
 }
 

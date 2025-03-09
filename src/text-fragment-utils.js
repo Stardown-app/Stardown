@@ -28,20 +28,55 @@
  * @property {string} [suffix]
  */
 
-const FRAGMENT_DIRECTIVES = ['text'];
+const FRAGMENT_DIRECTIVES = ["text"];
 
 // Block elements. elements of a text fragment cannot cross the boundaries of a
 // block element. Source for the list:
 // https://developer.mozilla.org/en-US/docs/Web/HTML/Block-level_elements#Elements
 const BLOCK_ELEMENTS = [
-    'ADDRESS', 'ARTICLE', 'ASIDE', 'BLOCKQUOTE', 'BR', 'DETAILS',
-    'DIALOG', 'DD', 'DIV', 'DL', 'DT', 'FIELDSET',
-    'FIGCAPTION', 'FIGURE', 'FOOTER', 'FORM', 'H1', 'H2',
-    'H3', 'H4', 'H5', 'H6', 'HEADER', 'HGROUP',
-    'HR', 'LI', 'MAIN', 'NAV', 'OL', 'P',
-    'PRE', 'SECTION', 'TABLE', 'UL', 'TR', 'TH',
-    'TD', 'COLGROUP', 'COL', 'CAPTION', 'THEAD', 'TBODY',
-    'TFOOT',
+    "ADDRESS",
+    "ARTICLE",
+    "ASIDE",
+    "BLOCKQUOTE",
+    "BR",
+    "DETAILS",
+    "DIALOG",
+    "DD",
+    "DIV",
+    "DL",
+    "DT",
+    "FIELDSET",
+    "FIGCAPTION",
+    "FIGURE",
+    "FOOTER",
+    "FORM",
+    "H1",
+    "H2",
+    "H3",
+    "H4",
+    "H5",
+    "H6",
+    "HEADER",
+    "HGROUP",
+    "HR",
+    "LI",
+    "MAIN",
+    "NAV",
+    "OL",
+    "P",
+    "PRE",
+    "SECTION",
+    "TABLE",
+    "UL",
+    "TR",
+    "TH",
+    "TD",
+    "COLGROUP",
+    "COL",
+    "CAPTION",
+    "THEAD",
+    "TBODY",
+    "TFOOT",
 ];
 
 // Characters that indicate a word boundary. Use the script
@@ -58,8 +93,7 @@ const NON_BOUNDARY_CHARS =
 /**
  * Text fragments CSS class name.
  */
-const TEXT_FRAGMENT_CSS_CLASS_NAME =
-    'text-fragments-polyfill-target-text';
+const TEXT_FRAGMENT_CSS_CLASS_NAME = "text-fragments-polyfill-target-text";
 
 /**
  * Searches the document for a given text fragment.
@@ -74,166 +108,206 @@ const TEXT_FRAGMENT_CSS_CLASS_NAME =
  *     document).
  */
 
-const processTextFragmentDirective =
-    (textFragment, t0, timeoutDurationMs, documentToProcess = document) => {
-        const results = [];
+const processTextFragmentDirective = (
+    textFragment,
+    t0,
+    timeoutDurationMs,
+    documentToProcess = document,
+) => {
+    const results = [];
 
-        const searchRange = documentToProcess.createRange();
-        searchRange.selectNodeContents(documentToProcess.body);
+    const searchRange = documentToProcess.createRange();
+    searchRange.selectNodeContents(documentToProcess.body);
 
-        while (!searchRange.collapsed && results.length < 2) {
-            if (Date.now() - t0 > timeoutDurationMs) {
-                return [];
+    while (!searchRange.collapsed && results.length < 2) {
+        if (Date.now() - t0 > timeoutDurationMs) {
+            return [];
+        }
+
+        let potentialMatch;
+        if (textFragment.prefix) {
+            const prefixMatch = findTextInRange(
+                textFragment.prefix,
+                searchRange,
+            );
+            if (prefixMatch == null) {
+                break;
+            }
+            // Future iterations, if necessary, should start after the first
+            // character of the prefix match.
+            advanceRangeStartPastOffset(
+                searchRange,
+                prefixMatch.startContainer,
+                prefixMatch.startOffset,
+            );
+
+            // The search space for textStart is everything after the prefix and
+            // before the end of the top-level search range, starting at the next
+            // non- whitespace position.
+            const matchRange = documentToProcess.createRange();
+            matchRange.setStart(
+                prefixMatch.endContainer,
+                prefixMatch.endOffset,
+            );
+            matchRange.setEnd(searchRange.endContainer, searchRange.endOffset);
+
+            advanceRangeStartToNonWhitespace(matchRange);
+            if (matchRange.collapsed) {
+                break;
             }
 
-            let potentialMatch;
-            if (textFragment.prefix) {
-                const prefixMatch = findTextInRange(textFragment.prefix, searchRange);
-                if (prefixMatch == null) {
-                    break;
-                }
-                // Future iterations, if necessary, should start after the first
-                // character of the prefix match.
-                advanceRangeStartPastOffset(
-                    searchRange,
-                    prefixMatch.startContainer,
-                    prefixMatch.startOffset,
-                );
+            potentialMatch = findTextInRange(
+                textFragment.textStart,
+                matchRange,
+            );
+            // If textStart wasn't found anywhere in the matchRange, then there's
+            // no possible match and we can stop early.
+            if (potentialMatch == null) {
+                break;
+            }
 
-                // The search space for textStart is everything after the prefix and
-                // before the end of the top-level search range, starting at the next
-                // non- whitespace position.
-                const matchRange = documentToProcess.createRange();
-                matchRange.setStart(prefixMatch.endContainer, prefixMatch.endOffset);
-                matchRange.setEnd(searchRange.endContainer, searchRange.endOffset);
-
-                advanceRangeStartToNonWhitespace(matchRange);
-                if (matchRange.collapsed) {
-                    break;
-                }
-
-                potentialMatch = findTextInRange(textFragment.textStart, matchRange);
-                // If textStart wasn't found anywhere in the matchRange, then there's
-                // no possible match and we can stop early.
-                if (potentialMatch == null) {
-                    break;
-                }
-
-                // If potentialMatch is immediately after the prefix (i.e., its start
-                // equals matchRange's start), this is a candidate and we should keep
-                // going with this iteration. Otherwise, we'll need to find the next
-                // instance (if any) of the prefix.
-                if (potentialMatch.compareBoundaryPoints(
+            // If potentialMatch is immediately after the prefix (i.e., its start
+            // equals matchRange's start), this is a candidate and we should keep
+            // going with this iteration. Otherwise, we'll need to find the next
+            // instance (if any) of the prefix.
+            if (
+                potentialMatch.compareBoundaryPoints(
                     Range.START_TO_START,
                     matchRange,
-                ) !== 0) {
-                    continue;
+                ) !== 0
+            ) {
+                continue;
+            }
+        } else {
+            // With no prefix, just look directly for textStart.
+            potentialMatch = findTextInRange(
+                textFragment.textStart,
+                searchRange,
+            );
+            if (potentialMatch == null) {
+                break;
+            }
+            advanceRangeStartPastOffset(
+                searchRange,
+                potentialMatch.startContainer,
+                potentialMatch.startOffset,
+            );
+        }
+
+        if (textFragment.textEnd) {
+            const textEndRange = documentToProcess.createRange();
+            textEndRange.setStart(
+                potentialMatch.endContainer,
+                potentialMatch.endOffset,
+            );
+            textEndRange.setEnd(
+                searchRange.endContainer,
+                searchRange.endOffset,
+            );
+
+            // Keep track of matches of the end term followed by suffix term
+            // (if needed).
+            // If no matches are found then there's no point in keeping looking
+            // for matches of the start term after the current start term
+            // occurrence.
+            let matchFound = false;
+
+            // Search through the rest of the document to find a textEnd match.
+            // This may take multiple iterations if a suffix needs to be found.
+            while (!textEndRange.collapsed && results.length < 2) {
+                if (Date.now() - t0 > timeoutDurationMs) {
+                    return [];
                 }
-            } else {
-                // With no prefix, just look directly for textStart.
-                potentialMatch = findTextInRange(textFragment.textStart, searchRange);
-                if (potentialMatch == null) {
+
+                const textEndMatch = findTextInRange(
+                    textFragment.textEnd,
+                    textEndRange,
+                );
+                if (textEndMatch == null) {
                     break;
                 }
+
                 advanceRangeStartPastOffset(
-                    searchRange,
-                    potentialMatch.startContainer,
-                    potentialMatch.startOffset,
+                    textEndRange,
+                    textEndMatch.startContainer,
+                    textEndMatch.startOffset,
                 );
-            }
 
-            if (textFragment.textEnd) {
-                const textEndRange = documentToProcess.createRange();
-                textEndRange.setStart(
-                    potentialMatch.endContainer, potentialMatch.endOffset);
-                textEndRange.setEnd(searchRange.endContainer, searchRange.endOffset);
+                potentialMatch.setEnd(
+                    textEndMatch.endContainer,
+                    textEndMatch.endOffset,
+                );
 
-                // Keep track of matches of the end term followed by suffix term
-                // (if needed).
-                // If no matches are found then there's no point in keeping looking
-                // for matches of the start term after the current start term
-                // occurrence.
-                let matchFound = false;
-
-                // Search through the rest of the document to find a textEnd match.
-                // This may take multiple iterations if a suffix needs to be found.
-                while (!textEndRange.collapsed && results.length < 2) {
-                    if (Date.now() - t0 > timeoutDurationMs) {
-                        return [];
-                    }
-
-                    const textEndMatch =
-                        findTextInRange(textFragment.textEnd, textEndRange);
-                    if (textEndMatch == null) {
+                if (textFragment.suffix) {
+                    // If there's supposed to be a suffix, check if it appears after
+                    // the textEnd we just found.
+                    const suffixResult = checkSuffix(
+                        textFragment.suffix,
+                        potentialMatch,
+                        searchRange,
+                        documentToProcess,
+                    );
+                    if (suffixResult === CheckSuffixResult.NO_SUFFIX_MATCH) {
                         break;
-                    }
-
-                    advanceRangeStartPastOffset(
-                        textEndRange, textEndMatch.startContainer,
-                        textEndMatch.startOffset);
-
-                    potentialMatch.setEnd(
-                        textEndMatch.endContainer, textEndMatch.endOffset);
-
-                    if (textFragment.suffix) {
-                        // If there's supposed to be a suffix, check if it appears after
-                        // the textEnd we just found.
-                        const suffixResult = checkSuffix(
-                            textFragment.suffix, potentialMatch, searchRange,
-                            documentToProcess);
-                        if (suffixResult === CheckSuffixResult.NO_SUFFIX_MATCH) {
-                            break;
-                        } else if (suffixResult === CheckSuffixResult.SUFFIX_MATCH) {
-                            matchFound = true;
-                            results.push(potentialMatch.cloneRange());
-                            continue;
-                        } else if (suffixResult === CheckSuffixResult.MISPLACED_SUFFIX) {
-                            continue;
-                        }
-                    } else {
-                        // If we've found textEnd and there's no suffix, then it's a
-                        // match!
+                    } else if (
+                        suffixResult === CheckSuffixResult.SUFFIX_MATCH
+                    ) {
                         matchFound = true;
                         results.push(potentialMatch.cloneRange());
+                        continue;
+                    } else if (
+                        suffixResult === CheckSuffixResult.MISPLACED_SUFFIX
+                    ) {
+                        continue;
                     }
-                }
-                // Stopping match search because suffix or textEnd are missing from
-                // the rest of the search space.
-                if (!matchFound) {
-                    break;
-                }
-
-            } else if (textFragment.suffix) {
-                // If there's no textEnd but there is a suffix, search for the suffix
-                // after potentialMatch
-                const suffixResult = checkSuffix(
-                    textFragment.suffix, potentialMatch, searchRange,
-                    documentToProcess);
-                if (suffixResult === CheckSuffixResult.NO_SUFFIX_MATCH) {
-                    break;
-                } else if (suffixResult === CheckSuffixResult.SUFFIX_MATCH) {
+                } else {
+                    // If we've found textEnd and there's no suffix, then it's a
+                    // match!
+                    matchFound = true;
                     results.push(potentialMatch.cloneRange());
-                    advanceRangeStartPastOffset(
-                        searchRange, searchRange.startContainer,
-                        searchRange.startOffset);
-                    continue;
-                } else if (suffixResult === CheckSuffixResult.MISPLACED_SUFFIX) {
-                    continue;
                 }
-            } else {
-                results.push(potentialMatch.cloneRange());
             }
+            // Stopping match search because suffix or textEnd are missing from
+            // the rest of the search space.
+            if (!matchFound) {
+                break;
+            }
+        } else if (textFragment.suffix) {
+            // If there's no textEnd but there is a suffix, search for the suffix
+            // after potentialMatch
+            const suffixResult = checkSuffix(
+                textFragment.suffix,
+                potentialMatch,
+                searchRange,
+                documentToProcess,
+            );
+            if (suffixResult === CheckSuffixResult.NO_SUFFIX_MATCH) {
+                break;
+            } else if (suffixResult === CheckSuffixResult.SUFFIX_MATCH) {
+                results.push(potentialMatch.cloneRange());
+                advanceRangeStartPastOffset(
+                    searchRange,
+                    searchRange.startContainer,
+                    searchRange.startOffset,
+                );
+                continue;
+            } else if (suffixResult === CheckSuffixResult.MISPLACED_SUFFIX) {
+                continue;
+            }
+        } else {
+            results.push(potentialMatch.cloneRange());
         }
-        return results;
-    };
+    }
+    return results;
+};
 
 /**
  * Enum indicating the result of the checkSuffix function.
  */
 const CheckSuffixResult = {
-    NO_SUFFIX_MATCH: 0,   // Suffix wasn't found at all. Search should halt.
-    SUFFIX_MATCH: 1,      // The suffix matches the expectation.
-    MISPLACED_SUFFIX: 2,  // The suffix was found, but not in the right place.
+    NO_SUFFIX_MATCH: 0, // Suffix wasn't found at all. Search should halt.
+    SUFFIX_MATCH: 1, // The suffix matches the expectation.
+    MISPLACED_SUFFIX: 2, // The suffix was found, but not in the right place.
 };
 
 /**
@@ -250,33 +324,36 @@ const CheckSuffixResult = {
  *     should be accepted, that the search should continue, or that the search
  *     should halt.
  */
-const checkSuffix =
-    (suffix, potentialMatch, searchRange, documentToProcess) => {
-        const suffixRange = documentToProcess.createRange();
-        suffixRange.setStart(
-            potentialMatch.endContainer,
-            potentialMatch.endOffset,
-        );
-        suffixRange.setEnd(searchRange.endContainer, searchRange.endOffset);
-        advanceRangeStartToNonWhitespace(suffixRange);
+const checkSuffix = (
+    suffix,
+    potentialMatch,
+    searchRange,
+    documentToProcess,
+) => {
+    const suffixRange = documentToProcess.createRange();
+    suffixRange.setStart(potentialMatch.endContainer, potentialMatch.endOffset);
+    suffixRange.setEnd(searchRange.endContainer, searchRange.endOffset);
+    advanceRangeStartToNonWhitespace(suffixRange);
 
-        const suffixMatch = findTextInRange(suffix, suffixRange);
-        // If suffix wasn't found anywhere in the suffixRange, then there's no
-        // possible match and we can stop early.
-        if (suffixMatch == null) {
-            return CheckSuffixResult.NO_SUFFIX_MATCH;
-        }
+    const suffixMatch = findTextInRange(suffix, suffixRange);
+    // If suffix wasn't found anywhere in the suffixRange, then there's no
+    // possible match and we can stop early.
+    if (suffixMatch == null) {
+        return CheckSuffixResult.NO_SUFFIX_MATCH;
+    }
 
-        // If suffixMatch is immediately after potentialMatch (i.e., its start
-        // equals suffixRange's start), this is a match. If not, we have to
-        // start over from the beginning.
-        if (suffixMatch.compareBoundaryPoints(
-            Range.START_TO_START, suffixRange) !== 0) {
-            return CheckSuffixResult.MISPLACED_SUFFIX;
-        }
+    // If suffixMatch is immediately after potentialMatch (i.e., its start
+    // equals suffixRange's start), this is a match. If not, we have to
+    // start over from the beginning.
+    if (
+        suffixMatch.compareBoundaryPoints(Range.START_TO_START, suffixRange) !==
+        0
+    ) {
+        return CheckSuffixResult.MISPLACED_SUFFIX;
+    }
 
-        return CheckSuffixResult.SUFFIX_MATCH;
-    };
+    return CheckSuffixResult.SUFFIX_MATCH;
+};
 
 /**
  * Sets the start of |range| to be the first boundary point after |offset| in
@@ -333,18 +410,17 @@ const advanceRangeStartToNonWhitespace = (range) => {
  * @param {Range} range - Range to be traversed by the walker
  * @return {TreeWalker}
  */
-const makeTextNodeWalker =
-    (range) => {
-        const walker = document.createTreeWalker(
-            range.commonAncestorContainer,
-            NodeFilter.SHOW_TEXT | NodeFilter.SHOW_ELEMENT,
-            (node) => {
-                return acceptTextNodeIfVisibleInRange(node, range);
-            },
-        );
+const makeTextNodeWalker = (range) => {
+    const walker = document.createTreeWalker(
+        range.commonAncestorContainer,
+        NodeFilter.SHOW_TEXT | NodeFilter.SHOW_ELEMENT,
+        (node) => {
+            return acceptTextNodeIfVisibleInRange(node, range);
+        },
+    );
 
-        return walker;
-    }
+    return walker;
+};
 
 /**
  * Helper function to calculate the visibility of a Node based on its CSS
@@ -358,23 +434,26 @@ const makeTextNodeWalker =
  *  - visibility not hidden
  *  - display not none
  */
-const isNodeVisible =
-    (node) => {
-        // Find an HTMLElement (this node or an ancestor) so we can check
-        // visibility.
-        let elt = node;
-        while (elt != null && !(elt instanceof HTMLElement)) elt = elt.parentNode;
-        if (elt != null) {
-            const nodeStyle = window.getComputedStyle(elt);
-            // If the node is not rendered, just skip it.
-            if (nodeStyle.visibility === 'hidden' || nodeStyle.display === 'none' ||
-                nodeStyle.height === 0 || nodeStyle.width === 0 ||
-                nodeStyle.opacity === 0) {
-                return false;
-            }
+const isNodeVisible = (node) => {
+    // Find an HTMLElement (this node or an ancestor) so we can check
+    // visibility.
+    let elt = node;
+    while (elt != null && !(elt instanceof HTMLElement)) elt = elt.parentNode;
+    if (elt != null) {
+        const nodeStyle = window.getComputedStyle(elt);
+        // If the node is not rendered, just skip it.
+        if (
+            nodeStyle.visibility === "hidden" ||
+            nodeStyle.display === "none" ||
+            nodeStyle.height === 0 ||
+            nodeStyle.width === 0 ||
+            nodeStyle.opacity === 0
+        ) {
+            return false;
         }
-        return true;
     }
+    return true;
+};
 
 /**
  * Filter function for use with TreeWalkers. Rejects nodes that aren't in the
@@ -389,8 +468,9 @@ const acceptNodeIfVisibleInRange = (node, range) => {
     if (range != null && !range.intersectsNode(node))
         return NodeFilter.FILTER_REJECT;
 
-    return isNodeVisible(node) ? NodeFilter.FILTER_ACCEPT :
-        NodeFilter.FILTER_REJECT;
+    return isNodeVisible(node)
+        ? NodeFilter.FILTER_ACCEPT
+        : NodeFilter.FILTER_REJECT;
 };
 
 /**
@@ -415,8 +495,9 @@ const acceptTextNodeIfVisibleInRange = (node, range) => {
         return NodeFilter.FILTER_REJECT;
     }
 
-    return node.nodeType === Node.TEXT_NODE ? NodeFilter.FILTER_ACCEPT :
-        NodeFilter.FILTER_SKIP;
+    return node.nodeType === Node.TEXT_NODE
+        ? NodeFilter.FILTER_ACCEPT
+        : NodeFilter.FILTER_SKIP;
 };
 
 /**
@@ -432,19 +513,19 @@ const getAllTextNodes = (root, range) => {
     let tmp = [];
 
     const nodes = Array.from(
-        getElementsIn(
-            root,
-            (node) => {
-                return acceptNodeIfVisibleInRange(node, range);
-            }),
+        getElementsIn(root, (node) => {
+            return acceptNodeIfVisibleInRange(node, range);
+        }),
     );
 
     for (const node of nodes) {
         if (node.nodeType === Node.TEXT_NODE) {
             tmp.push(node);
         } else if (
-            node instanceof HTMLElement && BLOCK_ELEMENTS.includes(node.tagName) &&
-            tmp.length > 0) {
+            node instanceof HTMLElement &&
+            BLOCK_ELEMENTS.includes(node.tagName) &&
+            tmp.length > 0
+        ) {
             // If this is a block element, the current set of text nodes in |tmp| is
             // complete, and we need to move on to a new one.
             blocks.push(tmp);
@@ -466,15 +547,16 @@ const getAllTextNodes = (root, range) => {
  *     normalized.
  */
 const getTextContent = (nodes, startOffset, endOffset) => {
-    let str = '';
+    let str = "";
     if (nodes.length === 1) {
         str = nodes[0].textContent.substring(startOffset, endOffset);
     } else {
-        str = nodes[0].textContent.substring(startOffset) +
-            nodes.slice(1, -1).reduce((s, n) => s + n.textContent, '') +
+        str =
+            nodes[0].textContent.substring(startOffset) +
+            nodes.slice(1, -1).reduce((s, n) => s + n.textContent, "") +
             nodes.slice(-1)[0].textContent.substring(0, endOffset);
     }
-    return str.replace(/[\t\n\r ]+/g, ' ');
+    return str.replace(/[\t\n\r ]+/g, " ");
 };
 
 /**
@@ -544,12 +626,18 @@ const findRangeFromNodeList = (query, range, textNodes, segmenter) => {
     while (searchStart < data.length) {
         const matchIndex = data.indexOf(normalizedQuery, searchStart);
         if (matchIndex === -1) return undefined;
-        if (isWordBounded(data, matchIndex, normalizedQuery.length, segmenter)) {
-            start = getBoundaryPointAtIndex(matchIndex, textNodes, /* isEnd=*/ false);
+        if (
+            isWordBounded(data, matchIndex, normalizedQuery.length, segmenter)
+        ) {
+            start = getBoundaryPointAtIndex(
+                matchIndex,
+                textNodes,
+                /* isEnd=*/ false,
+            );
             end = getBoundaryPointAtIndex(
                 matchIndex + normalizedQuery.length,
                 textNodes,
-          /* isEnd=*/ true,
+                /* isEnd=*/ true,
             );
         }
 
@@ -559,8 +647,11 @@ const findRangeFromNodeList = (query, range, textNodes, segmenter) => {
             foundRange.setEnd(end.node, end.offset);
 
             // Verify that |foundRange| is a subrange of |range|
-            if (range.compareBoundaryPoints(Range.START_TO_START, foundRange) <= 0 &&
-                range.compareBoundaryPoints(Range.END_TO_END, foundRange) >= 0) {
+            if (
+                range.compareBoundaryPoints(Range.START_TO_START, foundRange) <=
+                    0 &&
+                range.compareBoundaryPoints(Range.END_TO_END, foundRange) >= 0
+            ) {
                 return foundRange;
             }
         }
@@ -599,36 +690,44 @@ const getBoundaryPointAtIndex = (index, textNodes, isEnd) => {
             // |index| falls within this node, but we need to turn the offset in the
             // normalized data into an offset in the real node data.
             const normalizedOffset = index - counted;
-            let denormalizedOffset = Math.min(index - counted, node.data.length);
+            let denormalizedOffset = Math.min(
+                index - counted,
+                node.data.length,
+            );
 
             // Walk through the string until denormalizedOffset produces a substring
             // that corresponds to the target from the normalized data.
-            const targetSubstring = isEnd ?
-                normalizedData.substring(0, normalizedOffset) :
-                normalizedData.substring(normalizedOffset);
+            const targetSubstring = isEnd
+                ? normalizedData.substring(0, normalizedOffset)
+                : normalizedData.substring(normalizedOffset);
 
-            let candidateSubstring = isEnd ?
-                normalizeString(node.data.substring(0, denormalizedOffset)) :
-                normalizeString(node.data.substring(denormalizedOffset));
+            let candidateSubstring = isEnd
+                ? normalizeString(node.data.substring(0, denormalizedOffset))
+                : normalizeString(node.data.substring(denormalizedOffset));
 
             // We will either lengthen or shrink the candidate string to approach the
             // length of the target string. If we're looking for the start, adding 1
             // makes the candidate shorter; if we're looking for the end, it makes the
             // candidate longer.
-            const direction = (isEnd ? -1 : 1) *
+            const direction =
+                (isEnd ? -1 : 1) *
                 (targetSubstring.length > candidateSubstring.length ? -1 : 1);
 
-            while (denormalizedOffset >= 0 &&
-                denormalizedOffset <= node.data.length) {
+            while (
+                denormalizedOffset >= 0 &&
+                denormalizedOffset <= node.data.length
+            ) {
                 if (candidateSubstring.length === targetSubstring.length) {
                     return { node: node, offset: denormalizedOffset };
                 }
 
                 denormalizedOffset += direction;
 
-                candidateSubstring = isEnd ?
-                    normalizeString(node.data.substring(0, denormalizedOffset)) :
-                    normalizeString(node.data.substring(denormalizedOffset));
+                candidateSubstring = isEnd
+                    ? normalizeString(
+                          node.data.substring(0, denormalizedOffset),
+                      )
+                    : normalizeString(node.data.substring(denormalizedOffset));
             }
         }
         counted += normalizedData.length;
@@ -638,8 +737,10 @@ const getBoundaryPointAtIndex = (index, textNodes, isEnd) => {
             // node starts with one, they'll be double-counted relative to the
             // normalized version. Subtract 1 from |counted| to compensate.
             const nextNormalizedData = normalizeString(textNodes[i + 1].data);
-            if (normalizedData.slice(-1) === ' ' &&
-                nextNormalizedData.slice(0, 1) === ' ') {
+            if (
+                normalizedData.slice(-1) === " " &&
+                nextNormalizedData.slice(0, 1) === " "
+            ) {
                 counted -= 1;
             }
             // Since we already normalized the next node's data, hold on to it for the
@@ -674,8 +775,12 @@ const getBoundaryPointAtIndex = (index, textNodes, isEnd) => {
  *     substring of |text|.
  */
 const isWordBounded = (text, startPos, length, segmenter) => {
-    if (startPos < 0 || startPos >= text.length || length <= 0 ||
-        startPos + length > text.length) {
+    if (
+        startPos < 0 ||
+        startPos >= text.length ||
+        length <= 0 ||
+        startPos + length > text.length
+    ) {
         return false;
     }
 
@@ -689,7 +794,8 @@ const isWordBounded = (text, startPos, length, segmenter) => {
         // If the start index is inside a word segment but not the first character
         // in that segment, it's not word-bounded. If it's not a word segment, then
         // it's punctuation, etc., so that counts for word bounding.
-        if (startSegment.isWordLike && startSegment.index != startPos) return false;
+        if (startSegment.isWordLike && startSegment.index != startPos)
+            return false;
 
         // |endPos| points to the first character outside the target substring.
         const endPos = startPos + length;
@@ -725,11 +831,13 @@ const isWordBounded = (text, startPos, length, segmenter) => {
             }
         }
 
-        if (startPos !== 0 && (!text[startPos - 1].match(BOUNDARY_CHARS)))
+        if (startPos !== 0 && !text[startPos - 1].match(BOUNDARY_CHARS))
             return false;
 
-        if (startPos + length !== text.length &&
-            !text[startPos + length].match(BOUNDARY_CHARS))
+        if (
+            startPos + length !== text.length &&
+            !text[startPos + length].match(BOUNDARY_CHARS)
+        )
             return false;
     }
 
@@ -747,10 +855,10 @@ const normalizeString = (str) => {
     // consecutive whitespace characters into a standard " ", and strip out
     // anything in the Unicode U+0300..U+036F (Combining Diacritical Marks) range.
     // This may change the length of the string.
-    return (str || '')
-        .normalize('NFKD')
-        .replace(/\s+/g, ' ')
-        .replace(/[\u0300-\u036f]/g, '')
+    return (str || "")
+        .normalize("NFKD")
+        .replace(/\s+/g, " ")
+        .replace(/[\u0300-\u036f]/g, "")
         .toLowerCase();
 };
 
@@ -765,7 +873,7 @@ const makeNewSegmenter = () => {
         if (!lang) {
             lang = navigator.languages;
         }
-        return new Intl.Segmenter(lang, { granularity: 'word' });
+        return new Intl.Segmenter(lang, { granularity: "word" });
     }
     return undefined;
 };
@@ -861,5 +969,5 @@ const internal = {
     forwardTraverse: forwardTraverse,
     backwardTraverse: backwardTraverse,
     makeTextNodeWalker: makeTextNodeWalker,
-    isNodeVisible: isNodeVisible
-}
+    isNodeVisible: isNodeVisible,
+};

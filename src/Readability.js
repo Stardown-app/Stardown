@@ -38,7 +38,7 @@ export function Readability(doc, options) {
         options = arguments[2];
     } else if (!doc || !doc.documentElement) {
         throw new Error(
-            "First argument to Readability constructor should be a document object."
+            "First argument to Readability constructor should be a document object.",
         );
     }
     options = options || {};
@@ -60,7 +60,7 @@ export function Readability(doc, options) {
         options.nbTopCandidates || this.DEFAULT_N_TOP_CANDIDATES;
     this._charThreshold = options.charThreshold || this.DEFAULT_CHAR_THRESHOLD;
     this._classesToPreserve = this.CLASSES_TO_PRESERVE.concat(
-        options.classesToPreserve || []
+        options.classesToPreserve || [],
     );
     this._keepClasses = !!options.keepClasses;
     this._serializer =
@@ -91,7 +91,7 @@ export function Readability(doc, options) {
         };
         this.log = function () {
             if (typeof console !== "undefined") {
-                let args = Array.from(arguments, arg => {
+                let args = Array.from(arguments, (arg) => {
                     if (arg && arg.nodeType == this.ELEMENT_NODE) {
                         return logNode(arg);
                     }
@@ -111,7 +111,7 @@ export function Readability(doc, options) {
             }
         };
     } else {
-        this.log = function () { };
+        this.log = function () {};
     }
 }
 
@@ -157,8 +157,7 @@ Readability.prototype = {
         byline: /byline|author|dateline|writtenby|p-author/i,
         replaceFonts: /<(\/?)font[^>]*>/gi,
         normalize: /\s{2,}/g,
-        videos:
-            /\/\/(www\.)?((dailymotion|youtube|youtube-nocookie|player\.vimeo|v\.qq)\.com|(archive|upload\.wikimedia)\.org|player\.twitch\.tv)/i,
+        videos: /\/\/(www\.)?((dailymotion|youtube|youtube-nocookie|player\.vimeo|v\.qq)\.com|(archive|upload\.wikimedia)\.org|player\.twitch\.tv)/i,
         shareElements: /(\b|_)(share|sharedaddy)(\b|_)/i,
         nextLink: /(next|weiter|continue|>([^\|]|$)|»([^\|]|$))/i,
         prevLink: /(prev|earl|old|new|<|«)/i,
@@ -408,8 +407,10 @@ Readability.prototype = {
             [],
             tagNames.map(function (tag) {
                 var collection = node.getElementsByTagName(tag);
-                return Array.isArray(collection) ? collection : Array.from(collection);
-            })
+                return Array.isArray(collection)
+                    ? collection
+                    : Array.from(collection);
+            }),
         );
     },
 
@@ -425,7 +426,7 @@ Readability.prototype = {
         var classesToPreserve = this._classesToPreserve;
         var className = (node.getAttribute("class") || "")
             .split(/\s+/)
-            .filter(cls => classesToPreserve.includes(cls))
+            .filter((cls) => classesToPreserve.includes(cls))
             .join(" ");
 
         if (className) {
@@ -434,7 +435,11 @@ Readability.prototype = {
             node.removeAttribute("class");
         }
 
-        for (node = node.firstElementChild; node; node = node.nextElementSibling) {
+        for (
+            node = node.firstElementChild;
+            node;
+            node = node.nextElementSibling
+        ) {
             this._cleanClasses(node);
         }
     },
@@ -519,7 +524,7 @@ Readability.prototype = {
                     this.REGEXPS.srcsetUrl,
                     function (_, p1, p2, p3) {
                         return toAbsoluteURI(p1) + (p2 || "") + p3;
-                    }
+                    },
                 );
 
                 media.setAttribute("srcset", newSrcset);
@@ -547,7 +552,7 @@ Readability.prototype = {
                     for (var i = 0; i < node.attributes.length; i++) {
                         child.setAttribute(
                             node.attributes[i].name,
-                            node.attributes[i].value
+                            node.attributes[i].value,
                         );
                     }
                     node.parentNode.replaceChild(child, node);
@@ -576,7 +581,7 @@ Readability.prototype = {
             // If they had an element with id "title" in their HTML
             if (typeof curTitle !== "string") {
                 curTitle = origTitle = this._getInnerText(
-                    doc.getElementsByTagName("title")[0]
+                    doc.getElementsByTagName("title")[0],
                 );
             }
         } catch (e) {
@@ -595,7 +600,10 @@ Readability.prototype = {
 
             // If the resulting title is too short, remove the first part instead:
             if (wordCount(curTitle) < 3) {
-                curTitle = origTitle.replace(/[^\|\-\\\/>»]*[\|\-\\\/>»](.*)/gi, "$1");
+                curTitle = origTitle.replace(
+                    /[^\|\-\\\/>»]*[\|\-\\\/>»](.*)/gi,
+                    "$1",
+                );
             }
         } else if (curTitle.includes(": ")) {
             // Check if we have an heading containing this exact string, so we
@@ -615,7 +623,10 @@ Readability.prototype = {
                     curTitle = origTitle.substring(origTitle.indexOf(":") + 1);
                     // But if we have too many words before the colon there's something weird
                     // with the titles and the H tags so let's just use the original title instead
-                } else if (wordCount(origTitle.substring(0, origTitle.indexOf(":"))) > 5) {
+                } else if (
+                    wordCount(origTitle.substring(0, origTitle.indexOf(":"))) >
+                    5
+                ) {
                     curTitle = origTitle;
                 }
             }
@@ -637,7 +648,7 @@ Readability.prototype = {
             curTitleWordCount <= 4 &&
             (!titleHadHierarchicalSeparators ||
                 curTitleWordCount !=
-                wordCount(origTitle.replace(/[\|\-\\\/>»]+/g, "")) - 1)
+                    wordCount(origTitle.replace(/[\|\-\\\/>»]+/g, "")) - 1)
         ) {
             curTitle = origTitle;
         }
@@ -689,59 +700,62 @@ Readability.prototype = {
      *   <div>foo<br>bar<p>abc</p></div>
      */
     _replaceBrs(elem) {
-        this._forEachNode(this._getAllNodesWithTag(elem, ["br"]), function (br) {
-            var next = br.nextSibling;
+        this._forEachNode(
+            this._getAllNodesWithTag(elem, ["br"]),
+            function (br) {
+                var next = br.nextSibling;
 
-            // Whether 2 or more <br> elements have been found and replaced with a
-            // <p> block.
-            var replaced = false;
+                // Whether 2 or more <br> elements have been found and replaced with a
+                // <p> block.
+                var replaced = false;
 
-            // If we find a <br> chain, remove the <br>s until we hit another node
-            // or non-whitespace. This leaves behind the first <br> in the chain
-            // (which will be replaced with a <p> later).
-            while ((next = this._nextNode(next)) && next.tagName == "BR") {
-                replaced = true;
-                var brSibling = next.nextSibling;
-                next.remove();
-                next = brSibling;
-            }
+                // If we find a <br> chain, remove the <br>s until we hit another node
+                // or non-whitespace. This leaves behind the first <br> in the chain
+                // (which will be replaced with a <p> later).
+                while ((next = this._nextNode(next)) && next.tagName == "BR") {
+                    replaced = true;
+                    var brSibling = next.nextSibling;
+                    next.remove();
+                    next = brSibling;
+                }
 
-            // If we removed a <br> chain, replace the remaining <br> with a <p>. Add
-            // all sibling nodes as children of the <p> until we hit another <br>
-            // chain.
-            if (replaced) {
-                var p = this._doc.createElement("p");
-                br.parentNode.replaceChild(p, br);
+                // If we removed a <br> chain, replace the remaining <br> with a <p>. Add
+                // all sibling nodes as children of the <p> until we hit another <br>
+                // chain.
+                if (replaced) {
+                    var p = this._doc.createElement("p");
+                    br.parentNode.replaceChild(p, br);
 
-                next = p.nextSibling;
-                while (next) {
-                    // If we've hit another <br><br>, we're done adding children to this <p>.
-                    if (next.tagName == "BR") {
-                        var nextElem = this._nextNode(next.nextSibling);
-                        if (nextElem && nextElem.tagName == "BR") {
+                    next = p.nextSibling;
+                    while (next) {
+                        // If we've hit another <br><br>, we're done adding children to this <p>.
+                        if (next.tagName == "BR") {
+                            var nextElem = this._nextNode(next.nextSibling);
+                            if (nextElem && nextElem.tagName == "BR") {
+                                break;
+                            }
+                        }
+
+                        if (!this._isPhrasingContent(next)) {
                             break;
                         }
+
+                        // Otherwise, make this node a child of the new <p>.
+                        var sibling = next.nextSibling;
+                        p.appendChild(next);
+                        next = sibling;
                     }
 
-                    if (!this._isPhrasingContent(next)) {
-                        break;
+                    while (p.lastChild && this._isWhitespace(p.lastChild)) {
+                        p.lastChild.remove();
                     }
 
-                    // Otherwise, make this node a child of the new <p>.
-                    var sibling = next.nextSibling;
-                    p.appendChild(next);
-                    next = sibling;
+                    if (p.parentNode.tagName === "P") {
+                        this._setNodeTag(p.parentNode, "DIV");
+                    }
                 }
-
-                while (p.lastChild && this._isWhitespace(p.lastChild)) {
-                    p.lastChild.remove();
-                }
-
-                if (p.parentNode.tagName === "P") {
-                    this._setNodeTag(p.parentNode, "DIV");
-                }
-            }
-        });
+            },
+        );
     },
 
     _setNodeTag(node, tag) {
@@ -765,7 +779,7 @@ Readability.prototype = {
             try {
                 replacement.setAttribute(
                     node.attributes[i].name,
-                    node.attributes[i].value
+                    node.attributes[i].value,
                 );
             } catch (ex) {
                 /* it's possible for setAttribute() to throw if the attribute name
@@ -835,7 +849,7 @@ Readability.prototype = {
         // replace H1 with H2 as H1 should be only title that is displayed separately
         this._replaceNodeTags(
             this._getAllNodesWithTag(articleContent, ["h1"]),
-            "h2"
+            "h2",
         );
 
         // Remove extra paragraphs
@@ -844,13 +858,18 @@ Readability.prototype = {
             function (paragraph) {
                 var imgCount = paragraph.getElementsByTagName("img").length;
                 var embedCount = paragraph.getElementsByTagName("embed").length;
-                var objectCount = paragraph.getElementsByTagName("object").length;
+                var objectCount =
+                    paragraph.getElementsByTagName("object").length;
                 // At this point, nasty iframes have been removed, only remain embedded video ones.
-                var iframeCount = paragraph.getElementsByTagName("iframe").length;
-                var totalCount = imgCount + embedCount + objectCount + iframeCount;
+                var iframeCount =
+                    paragraph.getElementsByTagName("iframe").length;
+                var totalCount =
+                    imgCount + embedCount + objectCount + iframeCount;
 
-                return totalCount === 0 && !this._getInnerText(paragraph, false);
-            }
+                return (
+                    totalCount === 0 && !this._getInnerText(paragraph, false)
+                );
+            },
         );
 
         this._forEachNode(
@@ -860,7 +879,7 @@ Readability.prototype = {
                 if (next && next.tagName == "P") {
                     br.remove();
                 }
-            }
+            },
         );
 
         // Remove single-cell tables
@@ -876,14 +895,17 @@ Readability.prototype = {
                         var cell = row.firstElementChild;
                         cell = this._setNodeTag(
                             cell,
-                            this._everyNode(cell.childNodes, this._isPhrasingContent)
+                            this._everyNode(
+                                cell.childNodes,
+                                this._isPhrasingContent,
+                            )
                                 ? "P"
-                                : "DIV"
+                                : "DIV",
                         );
                         table.parentNode.replaceChild(cell, table);
                     }
                 }
-            }
+            },
         );
     },
 
@@ -980,7 +1002,7 @@ Readability.prototype = {
         if (!tokensA.length || !tokensB.length) {
             return 0;
         }
-        var uniqTokensB = tokensB.filter(token => !tokensA.includes(token));
+        var uniqTokensB = tokensB.filter((token) => !tokensA.includes(token));
         var distanceB = uniqTokensB.join(" ").length / tokensB.join(" ").length;
         return 1 - distanceB;
     },
@@ -1045,7 +1067,7 @@ Readability.prototype = {
         while (true) {
             this.log("Starting grabArticle loop");
             var stripUnlikelyCandidates = this._flagIsActive(
-                this.FLAG_STRIP_UNLIKELYS
+                this.FLAG_STRIP_UNLIKELYS,
             );
 
             // First, node prepping. Trash nodes that look cruddy (like ones with the
@@ -1089,11 +1111,14 @@ Readability.prototype = {
                     continue;
                 }
 
-                if (shouldRemoveTitleHeader && this._headerDuplicatesTitle(node)) {
+                if (
+                    shouldRemoveTitleHeader &&
+                    this._headerDuplicatesTitle(node)
+                ) {
                     this.log(
                         "Removing header: ",
                         node.textContent.trim(),
-                        this._articleTitle.trim()
+                        this._articleTitle.trim(),
                     );
                     shouldRemoveTitleHeader = false;
                     node = this._removeAndGetNext(node);
@@ -1110,17 +1135,21 @@ Readability.prototype = {
                         node.tagName !== "BODY" &&
                         node.tagName !== "A"
                     ) {
-                        this.log("Removing unlikely candidate - " + matchString);
+                        this.log(
+                            "Removing unlikely candidate - " + matchString,
+                        );
                         node = this._removeAndGetNext(node);
                         continue;
                     }
 
-                    if (this.UNLIKELY_ROLES.includes(node.getAttribute("role"))) {
+                    if (
+                        this.UNLIKELY_ROLES.includes(node.getAttribute("role"))
+                    ) {
                         this.log(
                             "Removing content with role " +
-                            node.getAttribute("role") +
-                            " - " +
-                            matchString
+                                node.getAttribute("role") +
+                                " - " +
+                                matchString,
                         );
                         node = this._removeAndGetNext(node);
                         continue;
@@ -1164,7 +1193,10 @@ Readability.prototype = {
                                 p.appendChild(childNode);
                             }
                         } else if (p !== null) {
-                            while (p.lastChild && this._isWhitespace(p.lastChild)) {
+                            while (
+                                p.lastChild &&
+                                this._isWhitespace(p.lastChild)
+                            ) {
                                 p.lastChild.remove();
                             }
                             p = null;
@@ -1256,7 +1288,8 @@ Readability.prototype = {
                     } else {
                         scoreDivider = level * 3;
                     }
-                    ancestor.readability.contentScore += contentScore / scoreDivider;
+                    ancestor.readability.contentScore +=
+                        contentScore / scoreDivider;
                 });
             });
 
@@ -1274,7 +1307,11 @@ Readability.prototype = {
                     (1 - this._getLinkDensity(candidate));
                 candidate.readability.contentScore = candidateScore;
 
-                this.log("Candidate:", candidate, "with score " + candidateScore);
+                this.log(
+                    "Candidate:",
+                    candidate,
+                    "with score " + candidateScore,
+                );
 
                 for (var t = 0; t < this._nbTopCandidates; t++) {
                     var aTopCandidate = topCandidates[t];
@@ -1319,32 +1356,38 @@ Readability.prototype = {
                 for (var i = 1; i < topCandidates.length; i++) {
                     if (
                         topCandidates[i].readability.contentScore /
-                        topCandidate.readability.contentScore >=
+                            topCandidate.readability.contentScore >=
                         0.75
                     ) {
                         alternativeCandidateAncestors.push(
-                            this._getNodeAncestors(topCandidates[i])
+                            this._getNodeAncestors(topCandidates[i]),
                         );
                     }
                 }
                 var MINIMUM_TOPCANDIDATES = 3;
-                if (alternativeCandidateAncestors.length >= MINIMUM_TOPCANDIDATES) {
+                if (
+                    alternativeCandidateAncestors.length >=
+                    MINIMUM_TOPCANDIDATES
+                ) {
                     parentOfTopCandidate = topCandidate.parentNode;
                     while (parentOfTopCandidate.tagName !== "BODY") {
                         var listsContainingThisAncestor = 0;
                         for (
                             var ancestorIndex = 0;
-                            ancestorIndex < alternativeCandidateAncestors.length &&
+                            ancestorIndex <
+                                alternativeCandidateAncestors.length &&
                             listsContainingThisAncestor < MINIMUM_TOPCANDIDATES;
                             ancestorIndex++
                         ) {
                             listsContainingThisAncestor += Number(
-                                alternativeCandidateAncestors[ancestorIndex].includes(
-                                    parentOfTopCandidate
-                                )
+                                alternativeCandidateAncestors[
+                                    ancestorIndex
+                                ].includes(parentOfTopCandidate),
                             );
                         }
-                        if (listsContainingThisAncestor >= MINIMUM_TOPCANDIDATES) {
+                        if (
+                            listsContainingThisAncestor >= MINIMUM_TOPCANDIDATES
+                        ) {
                             topCandidate = parentOfTopCandidate;
                             break;
                         }
@@ -1371,7 +1414,8 @@ Readability.prototype = {
                         parentOfTopCandidate = parentOfTopCandidate.parentNode;
                         continue;
                     }
-                    var parentScore = parentOfTopCandidate.readability.contentScore;
+                    var parentScore =
+                        parentOfTopCandidate.readability.contentScore;
                     if (parentScore < scoreThreshold) {
                         break;
                     }
@@ -1409,7 +1453,7 @@ Readability.prototype = {
 
             var siblingScoreThreshold = Math.max(
                 10,
-                topCandidate.readability.contentScore * 0.2
+                topCandidate.readability.contentScore * 0.2,
             );
             // Keep potential top candidate's parent node to try to get text direction of it later.
             parentOfTopCandidate = topCandidate.parentNode;
@@ -1424,11 +1468,13 @@ Readability.prototype = {
                     sibling,
                     sibling.readability
                         ? "with score " + sibling.readability.contentScore
-                        : ""
+                        : "",
                 );
                 this.log(
                     "Sibling has score",
-                    sibling.readability ? sibling.readability.contentScore : "Unknown"
+                    sibling.readability
+                        ? sibling.readability.contentScore
+                        : "Unknown",
                 );
 
                 if (sibling === topCandidate) {
@@ -1441,13 +1487,14 @@ Readability.prototype = {
                         sibling.className === topCandidate.className &&
                         topCandidate.className !== ""
                     ) {
-                        contentBonus += topCandidate.readability.contentScore * 0.2;
+                        contentBonus +=
+                            topCandidate.readability.contentScore * 0.2;
                     }
 
                     if (
                         sibling.readability &&
                         sibling.readability.contentScore + contentBonus >=
-                        siblingScoreThreshold
+                            siblingScoreThreshold
                     ) {
                         append = true;
                     } else if (sibling.nodeName === "P") {
@@ -1471,7 +1518,9 @@ Readability.prototype = {
                 if (append) {
                     this.log("Appending node:", sibling);
 
-                    if (!this.ALTER_TO_DIV_EXCEPTIONS.includes(sibling.nodeName)) {
+                    if (
+                        !this.ALTER_TO_DIV_EXCEPTIONS.includes(sibling.nodeName)
+                    ) {
                         // We have a node that isn't a common block level element, like a form or td tag.
                         // Turn it into a div so it doesn't get filtered out later by accident.
                         this.log("Altering sibling:", sibling, "to div.");
@@ -1493,12 +1542,16 @@ Readability.prototype = {
             }
 
             if (this._debug) {
-                this.log("Article content pre-prep: " + articleContent.innerHTML);
+                this.log(
+                    "Article content pre-prep: " + articleContent.innerHTML,
+                );
             }
             // So we have all of the content that we need. Now we clean it up for presentation.
             this._prepArticle(articleContent);
             if (this._debug) {
-                this.log("Article content post-prep: " + articleContent.innerHTML);
+                this.log(
+                    "Article content post-prep: " + articleContent.innerHTML,
+                );
             }
 
             if (neededToCreateTopCandidate) {
@@ -1519,7 +1572,9 @@ Readability.prototype = {
             }
 
             if (this._debug) {
-                this.log("Article content after paging: " + articleContent.innerHTML);
+                this.log(
+                    "Article content after paging: " + articleContent.innerHTML,
+                );
             }
 
             var parseSuccessful = true;
@@ -1565,7 +1620,7 @@ Readability.prototype = {
             if (parseSuccessful) {
                 // Find out text direction from ancestors of final top candidate.
                 var ancestors = [parentOfTopCandidate, topCandidate].concat(
-                    this._getNodeAncestors(parentOfTopCandidate)
+                    this._getNodeAncestors(parentOfTopCandidate),
                 );
                 this._someNode(ancestors, function (ancestor) {
                     if (!ancestor.tagName) {
@@ -1599,16 +1654,23 @@ Readability.prototype = {
             .replace(/&(quot|amp|apos|lt|gt);/g, function (_, tag) {
                 return htmlEscapeMap[tag];
             })
-            .replace(/&#(?:x([0-9a-f]+)|([0-9]+));/gi, function (_, hex, numStr) {
-                var num = parseInt(hex || numStr, hex ? 16 : 10);
+            .replace(
+                /&#(?:x([0-9a-f]+)|([0-9]+));/gi,
+                function (_, hex, numStr) {
+                    var num = parseInt(hex || numStr, hex ? 16 : 10);
 
-                // these character references are replaced by a conforming HTML parser
-                if (num == 0 || num > 0x10ffff || (num >= 0xd800 && num <= 0xdfff)) {
-                    num = 0xfffd;
-                }
+                    // these character references are replaced by a conforming HTML parser
+                    if (
+                        num == 0 ||
+                        num > 0x10ffff ||
+                        (num >= 0xd800 && num <= 0xdfff)
+                    ) {
+                        num = 0xfffd;
+                    }
 
-                return String.fromCodePoint(num);
-            });
+                    return String.fromCodePoint(num);
+                },
+            );
     },
 
     /**
@@ -1630,19 +1692,23 @@ Readability.prototype = {
                     // Strip CDATA markers if present
                     var content = jsonLdElement.textContent.replace(
                         /^\s*<!\[CDATA\[|\]\]>\s*$/g,
-                        ""
+                        "",
                     );
                     var parsed = JSON.parse(content);
                     if (
                         !parsed["@context"] ||
-                        !parsed["@context"].match(/^https?\:\/\/schema\.org\/?$/)
+                        !parsed["@context"].match(
+                            /^https?\:\/\/schema\.org\/?$/,
+                        )
                     ) {
                         return;
                     }
 
                     if (!parsed["@type"] && Array.isArray(parsed["@graph"])) {
-                        parsed = parsed["@graph"].find(it => {
-                            return (it["@type"] || "").match(this.REGEXPS.jsonLdArticleTypes);
+                        parsed = parsed["@graph"].find((it) => {
+                            return (it["@type"] || "").match(
+                                this.REGEXPS.jsonLdArticleTypes,
+                            );
                         });
                     }
 
@@ -1666,7 +1732,8 @@ Readability.prototype = {
                         // "name" or "headline" closely matches the html title, and if so, use that one. If not, then we use "name" by default.
 
                         var title = this._getArticleTitle();
-                        var nameMatches = this._textSimilarity(parsed.name, title) > 0.75;
+                        var nameMatches =
+                            this._textSimilarity(parsed.name, title) > 0.75;
                         var headlineMatches =
                             this._textSimilarity(parsed.headline, title) > 0.75;
 
@@ -1690,7 +1757,10 @@ Readability.prototype = {
                         ) {
                             metadata.byline = parsed.author
                                 .filter(function (author) {
-                                    return author && typeof author.name === "string";
+                                    return (
+                                        author &&
+                                        typeof author.name === "string"
+                                    );
                                 })
                                 .map(function (author) {
                                     return author.name.trim();
@@ -1701,7 +1771,10 @@ Readability.prototype = {
                     if (typeof parsed.description === "string") {
                         metadata.excerpt = parsed.description.trim();
                     }
-                    if (parsed.publisher && typeof parsed.publisher.name === "string") {
+                    if (
+                        parsed.publisher &&
+                        typeof parsed.publisher.name === "string"
+                    ) {
                         metadata.siteName = parsed.publisher.name.trim();
                     }
                     if (typeof parsed.datePublished === "string") {
@@ -1762,7 +1835,10 @@ Readability.prototype = {
                 if (content) {
                     // Convert to lowercase, remove any whitespace, and convert dots
                     // to colons so we can match below.
-                    name = name.toLowerCase().replace(/\s/g, "").replace(/\./g, ":");
+                    name = name
+                        .toLowerCase()
+                        .replace(/\s/g, "")
+                        .replace(/\./g, ":");
                     values[name] = content.trim();
                 }
             }
@@ -1819,7 +1895,9 @@ Readability.prototype = {
         metadata.byline = this._unescapeHtmlEntities(metadata.byline);
         metadata.excerpt = this._unescapeHtmlEntities(metadata.excerpt);
         metadata.siteName = this._unescapeHtmlEntities(metadata.siteName);
-        metadata.publishedTime = this._unescapeHtmlEntities(metadata.publishedTime);
+        metadata.publishedTime = this._unescapeHtmlEntities(
+            metadata.publishedTime,
+        );
 
         return metadata;
     },
@@ -1924,7 +2002,10 @@ Readability.prototype = {
                     }
                 }
 
-                noscript.parentNode.replaceChild(tmp.firstElementChild, prevElement);
+                noscript.parentNode.replaceChild(
+                    tmp.firstElementChild,
+                    prevElement,
+                );
             }
         });
     },
@@ -1935,7 +2016,9 @@ Readability.prototype = {
      * @param Element
      **/
     _removeScripts(doc) {
-        this._removeNodes(this._getAllNodesWithTag(doc, ["script", "noscript"]));
+        this._removeNodes(
+            this._getAllNodesWithTag(doc, ["script", "noscript"]),
+        );
     },
 
     /**
@@ -1948,7 +2031,10 @@ Readability.prototype = {
      **/
     _hasSingleTagInsideElement(element, tag) {
         // There should be exactly 1 element child with given tag
-        if (element.children.length != 1 || element.children[0].tagName !== tag) {
+        if (
+            element.children.length != 1 ||
+            element.children[0].tagName !== tag
+        ) {
             return false;
         }
 
@@ -1967,8 +2053,8 @@ Readability.prototype = {
             !node.textContent.trim().length &&
             (!node.children.length ||
                 node.children.length ==
-                node.getElementsByTagName("br").length +
-                node.getElementsByTagName("hr").length)
+                    node.getElementsByTagName("br").length +
+                        node.getElementsByTagName("hr").length)
         );
     },
 
@@ -2085,11 +2171,15 @@ Readability.prototype = {
         var linkLength = 0;
 
         // XXX implement _reduceNodeList?
-        this._forEachNode(element.getElementsByTagName("a"), function (linkNode) {
-            var href = linkNode.getAttribute("href");
-            var coefficient = href && this.REGEXPS.hashUrl.test(href) ? 0.3 : 1;
-            linkLength += this._getInnerText(linkNode).length * coefficient;
-        });
+        this._forEachNode(
+            element.getElementsByTagName("a"),
+            function (linkNode) {
+                var href = linkNode.getAttribute("href");
+                var coefficient =
+                    href && this.REGEXPS.hashUrl.test(href) ? 0.3 : 1;
+                linkLength += this._getInnerText(linkNode).length * coefficient;
+            },
+        );
 
         return linkLength / textLength;
     },
@@ -2144,27 +2234,34 @@ Readability.prototype = {
     _clean(e, tag) {
         var isEmbed = ["object", "embed", "iframe"].includes(tag);
 
-        this._removeNodes(this._getAllNodesWithTag(e, [tag]), function (element) {
-            // Allow youtube and vimeo videos through as people usually want to see those.
-            if (isEmbed) {
-                // First, check the elements attributes to see if any of them contain youtube or vimeo
-                for (var i = 0; i < element.attributes.length; i++) {
-                    if (this._allowedVideoRegex.test(element.attributes[i].value)) {
+        this._removeNodes(
+            this._getAllNodesWithTag(e, [tag]),
+            function (element) {
+                // Allow youtube and vimeo videos through as people usually want to see those.
+                if (isEmbed) {
+                    // First, check the elements attributes to see if any of them contain youtube or vimeo
+                    for (var i = 0; i < element.attributes.length; i++) {
+                        if (
+                            this._allowedVideoRegex.test(
+                                element.attributes[i].value,
+                            )
+                        ) {
+                            return false;
+                        }
+                    }
+
+                    // For embed with <object> tag, check inner HTML as well.
+                    if (
+                        element.tagName === "object" &&
+                        this._allowedVideoRegex.test(element.innerHTML)
+                    ) {
                         return false;
                     }
                 }
 
-                // For embed with <object> tag, check inner HTML as well.
-                if (
-                    element.tagName === "object" &&
-                    this._allowedVideoRegex.test(element.innerHTML)
-                ) {
-                    return false;
-                }
-            }
-
-            return true;
-        });
+                return true;
+            },
+        );
     },
 
     /**
@@ -2257,7 +2354,13 @@ Readability.prototype = {
             }
 
             // If the table has a descendant with any of these tags, consider a data table:
-            var dataTableDescendants = ["col", "colgroup", "tfoot", "thead", "th"];
+            var dataTableDescendants = [
+                "col",
+                "colgroup",
+                "tfoot",
+                "thead",
+                "th",
+            ];
             var descendantExists = function (tag) {
                 return !!table.getElementsByTagName(tag)[0];
             };
@@ -2350,16 +2453,22 @@ Readability.prototype = {
                     var copyTo = null;
                     if (/\.(jpg|jpeg|png|webp)\s+\d/.test(attr.value)) {
                         copyTo = "srcset";
-                    } else if (/^\s*\S+\.(jpg|jpeg|png|webp)\S*\s*$/.test(attr.value)) {
+                    } else if (
+                        /^\s*\S+\.(jpg|jpeg|png|webp)\S*\s*$/.test(attr.value)
+                    ) {
                         copyTo = "src";
                     }
                     if (copyTo) {
                         //if this is an img or picture, set the attribute directly
-                        if (elem.tagName === "IMG" || elem.tagName === "PICTURE") {
+                        if (
+                            elem.tagName === "IMG" ||
+                            elem.tagName === "PICTURE"
+                        ) {
                             elem.setAttribute(copyTo, attr.value);
                         } else if (
                             elem.tagName === "FIGURE" &&
-                            !this._getAllNodesWithTag(elem, ["img", "picture"]).length
+                            !this._getAllNodesWithTag(elem, ["img", "picture"])
+                                .length
                         ) {
                             //if the item is a <figure> that does not contain an image or picture, create one and place it inside the figure
                             //see the nytimes-3 testcase for an example
@@ -2369,7 +2478,7 @@ Readability.prototype = {
                         }
                     }
                 }
-            }
+            },
         );
     },
 
@@ -2382,7 +2491,8 @@ Readability.prototype = {
         var children = this._getAllNodesWithTag(e, tags);
         this._forEachNode(
             children,
-            child => (childrenLength += this._getInnerText(child, true).length)
+            (child) =>
+                (childrenLength += this._getInnerText(child, true).length),
         );
         return childrenLength / textLength;
     },
@@ -2415,7 +2525,7 @@ Readability.prototype = {
                 var listNodes = this._getAllNodesWithTag(node, ["ul", "ol"]);
                 this._forEachNode(
                     listNodes,
-                    list => (listLength += this._getInnerText(list).length)
+                    (list) => (listLength += this._getInnerText(list).length),
                 );
                 isList = listLength / this._getInnerText(node).length > 0.9;
             }
@@ -2436,7 +2546,7 @@ Readability.prototype = {
             // keep element if it has a data tables
             if (
                 [...node.getElementsByTagName("table")].some(
-                    tbl => tbl._readabilityDataTable
+                    (tbl) => tbl._readabilityDataTable,
                 )
             ) {
                 return false;
@@ -2479,7 +2589,11 @@ Readability.prototype = {
                 for (var i = 0; i < embeds.length; i++) {
                     // If this embed has attribute that matches video regex, don't delete it.
                     for (var j = 0; j < embeds[i].attributes.length; j++) {
-                        if (this._allowedVideoRegex.test(embeds[i].attributes[j].value)) {
+                        if (
+                            this._allowedVideoRegex.test(
+                                embeds[i].attributes[j].value,
+                            )
+                        ) {
                             return false;
                         }
                     }
@@ -2508,7 +2622,7 @@ Readability.prototype = {
                 var contentLength = innerText.length;
                 var linkDensity = this._getLinkDensity(node);
                 var textishTags = ["SPAN", "LI", "TD"].concat(
-                    Array.from(this.DIV_TO_P_ELEMS)
+                    Array.from(this.DIV_TO_P_ELEMS),
                 );
                 var textDensity = this._getTextDensity(node, textishTags);
                 var isFigureChild = this._hasAncestorTag(node, "figure");
@@ -2520,10 +2634,14 @@ Readability.prototype = {
                         errs.push(`Bad p to img ratio (img=${img}, p=${p})`);
                     }
                     if (!isList && li > p) {
-                        errs.push(`Too many li's outside of a list. (li=${li} > p=${p})`);
+                        errs.push(
+                            `Too many li's outside of a list. (li=${li} > p=${p})`,
+                        );
                     }
                     if (input > Math.floor(p / 3)) {
-                        errs.push(`Too many inputs per p. (input=${input}, p=${p})`);
+                        errs.push(
+                            `Too many inputs per p. (input=${input}, p=${p})`,
+                        );
                     }
                     if (
                         !isList &&
@@ -2534,7 +2652,7 @@ Readability.prototype = {
                         linkDensity > 0
                     ) {
                         errs.push(
-                            `Suspiciously short. (headingDensity=${headingDensity}, img=${img}, linkDensity=${linkDensity})`
+                            `Suspiciously short. (headingDensity=${headingDensity}, img=${img}, linkDensity=${linkDensity})`,
                         );
                     }
                     if (
@@ -2543,22 +2661,28 @@ Readability.prototype = {
                         linkDensity > 0.2 + this._linkDensityModifier
                     ) {
                         errs.push(
-                            `Low weight and a little linky. (linkDensity=${linkDensity})`
+                            `Low weight and a little linky. (linkDensity=${linkDensity})`,
                         );
                     }
-                    if (weight >= 25 && linkDensity > 0.5 + this._linkDensityModifier) {
+                    if (
+                        weight >= 25 &&
+                        linkDensity > 0.5 + this._linkDensityModifier
+                    ) {
                         errs.push(
-                            `High weight and mostly links. (linkDensity=${linkDensity})`
+                            `High weight and mostly links. (linkDensity=${linkDensity})`,
                         );
                     }
-                    if ((embedCount === 1 && contentLength < 75) || embedCount > 1) {
+                    if (
+                        (embedCount === 1 && contentLength < 75) ||
+                        embedCount > 1
+                    ) {
                         errs.push(
-                            `Suspicious embed. (embedCount=${embedCount}, contentLength=${contentLength})`
+                            `Suspicious embed. (embedCount=${embedCount}, contentLength=${contentLength})`,
                         );
                     }
                     if (img === 0 && textDensity === 0) {
                         errs.push(
-                            `No useful content. (img=${img}, textDensity=${textDensity})`
+                            `No useful content. (img=${img}, textDensity=${textDensity})`,
                         );
                     }
 
@@ -2641,7 +2765,11 @@ Readability.prototype = {
             return false;
         }
         var heading = this._getInnerText(node, false);
-        this.log("Evaluating similarity of header:", heading, this._articleTitle);
+        this.log(
+            "Evaluating similarity of header:",
+            heading,
+            this._articleTitle,
+        );
         return this._textSimilarity(this._articleTitle, heading) > 0.75;
     },
 
@@ -2686,7 +2814,7 @@ Readability.prototype = {
             var numTags = this._doc.getElementsByTagName("*").length;
             if (numTags > this._maxElemsToParse) {
                 throw new Error(
-                    "Aborting parsing document; " + numTags + " elements found"
+                    "Aborting parsing document; " + numTags + " elements found",
                 );
             }
         }

@@ -14,75 +14,71 @@
    limitations under the License.
 -->
 
-<!DOCTYPE html>
+<!doctype html>
 <html>
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Stardown</title>
+        <link rel="icon" type="image/x-icon" href="./images/favicon.ico" />
+        <style>
+            body {
+                font-family: sans-serif;
+                font-size: 12pt;
+            }
 
-  <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Stardown</title>
-    <link rel="icon" type="image/x-icon" href="./images/favicon.ico" />
-    <style>
-      body {
-        font-family: sans-serif;
-        font-size: 12pt;
-      }
+            #notepad {
+                width: 100%;
+                min-height: 100%;
+                box-sizing: border-box;
+                overflow-y: auto;
+                overflow-x: hidden;
+            }
 
-      #notepad {
-        width: 100%;
-        min-height: 100%;
-        box-sizing: border-box;
-        overflow-y: auto;
-        overflow-x: hidden;
-      }
+            #notepad:empty::before {
+                content: attr(data-placeholder);
+                color: gray;
+            }
 
-      #notepad:empty::before {
-        content: attr(data-placeholder);
-        color: gray;
-      }
+            #notepadContainer {
+                display: flex;
+                justify-content: center;
+                align-items: stretch;
+                height: 89vh;
+                padding: 10px;
+            }
 
-      #notepadContainer {
-        display: flex;
-        justify-content: center;
-        align-items: stretch;
-        height: 89vh;
-        padding: 10px;
-      }
+            #infoContainer {
+                height: 10vh;
+            }
 
-      #infoContainer {
-        height: 10vh;
-      }
+            hr {
+                margin-top: -10px;
+            }
 
-      hr {
-        margin-top: -10px;
-      }
+            p {
+                margin-left: 20px;
+            }
+        </style>
+    </head>
 
-      p {
-        margin-left: 20px;
-      }
-    </style>
-  </head>
-
-  <body>
-    <main>
-      <div id="notepadContainer">
-        <div id="notepad"></div>
-      </div>
-      <hr />
-      <div id="infoContainer">
-        <p id="byteCount"></p>
-        <p id="syncLimitMessage" style="visibility: hidden; color: red;">
-          The highlighted text is over the sync limit.
-          <button id="syncLimitButton" type="button">
-            Show where syncing stops
-          </button>
-        </p>
-        <p id="saveErrorIcon" style="visibility: hidden">
-          ⛔
-        </p>
-      </div>
-    </main>
-    <script src="./sidebar.js"></script>
-  </body>
-
+    <body>
+        <main>
+            <div id="notepadContainer">
+                <div id="notepad"></div>
+            </div>
+            <hr />
+            <div id="infoContainer">
+                <p id="byteCount"></p>
+                <p id="syncLimitMessage" style="visibility: hidden; color: red">
+                    The highlighted text is over the sync limit.
+                    <button id="syncLimitButton" type="button">
+                        Show where syncing stops
+                    </button>
+                </p>
+                <p id="saveErrorIcon" style="visibility: hidden">⛔</p>
+            </div>
+        </main>
+        <script src="./sidebar.js"></script>
+    </body>
 </html>

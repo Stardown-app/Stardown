@@ -14,17 +14,17 @@
    limitations under the License.
 */
 
-import test from 'node:test'; // https://nodejs.org/api/test.html
-import assert from 'node:assert/strict'; // https://nodejs.org/api/assert.html#assert
-import { JSDOM } from 'jsdom'; // https://www.npmjs.com/package/jsdom
-import { htmlTableToCsv } from '../src/converters/csv.js';
+import test from "node:test"; // https://nodejs.org/api/test.html
+import assert from "node:assert/strict"; // https://nodejs.org/api/assert.html#assert
+import { JSDOM } from "jsdom"; // https://www.npmjs.com/package/jsdom
+import { htmlTableToCsv } from "../src/converters/csv.js";
 
-global.location = { href: 'https://example.com' };
+global.location = { href: "https://example.com" };
 
 function runTest(testName, htmlInput, csvExpected) {
-    test(testName, async t => {
+    test(testName, async (t) => {
         global.document = new JSDOM(htmlInput).window.document;
-        const csvActual = await htmlTableToCsv(global.document.body, ',');
+        const csvActual = await htmlTableToCsv(global.document.body, ",");
         assert.equal(csvActual, csvExpected);
     });
 }
@@ -38,13 +38,13 @@ function runTests() {
 
 const tests = [
     {
-        testName: '0x0',
+        testName: "0x0",
         htmlInput: `<table>
             </table>`,
         csvExpected: ``,
     },
     {
-        testName: '1x1',
+        testName: "1x1",
         htmlInput: `<table>
                 <tr>
                     <th>
@@ -56,7 +56,7 @@ const tests = [
 `,
     },
     {
-        testName: '2x1',
+        testName: "2x1",
         htmlInput: `<table>
                 <tr>
                     <th>
@@ -68,10 +68,10 @@ const tests = [
                 </tr>
             </table>`,
         csvExpected: `a,b\r
-`
+`,
     },
     {
-        testName: '1x2',
+        testName: "1x2",
         htmlInput: `<table>
                 <tr>
                     <th>
@@ -86,10 +86,10 @@ const tests = [
             </table>`,
         csvExpected: `a\r
 c\r
-`
+`,
     },
     {
-        testName: '2x2',
+        testName: "2x2",
         htmlInput: `<table>
                 <tr>
                     <th>
@@ -110,10 +110,10 @@ c\r
             </table>`,
         csvExpected: `a,b\r
 c,d\r
-`
+`,
     },
     {
-        testName: '2x3',
+        testName: "2x3",
         htmlInput: `<table>
                 <tr>
                     <th>
@@ -143,10 +143,10 @@ c,d\r
         csvExpected: `a,b\r
 d,e\r
 g,h\r
-`
+`,
     },
     {
-        testName: '3x2',
+        testName: "3x2",
         htmlInput: `<table>
                 <tr>
                     <th>
@@ -173,10 +173,10 @@ g,h\r
             </table>`,
         csvExpected: `a,b,c\r
 d,e,f\r
-`
+`,
     },
     {
-        testName: '3x3',
+        testName: "3x3",
         htmlInput: `<table>
                 <tr>
                     <th>
@@ -215,10 +215,10 @@ d,e,f\r
         csvExpected: `a,b,c\r
 d,e,f\r
 g,h,i\r
-`
+`,
     },
     {
-        testName: '3x3 -1 cell in the second body row',
+        testName: "3x3 -1 cell in the second body row",
         htmlInput: `<table>
                 <tr>
                     <th>
@@ -254,10 +254,10 @@ g,h,i\r
         csvExpected: `a,b,c\r
 d,e,f\r
 g,h,\r
-`
+`,
     },
     {
-        testName: '3x3 -1 cell in the first body row',
+        testName: "3x3 -1 cell in the first body row",
         htmlInput: `<table>
                 <tr>
                     <th>
@@ -293,10 +293,10 @@ g,h,\r
         csvExpected: `a,b,c\r
 d,e,\r
 g,h,i\r
-`
+`,
     },
     {
-        testName: '3x3 -1 cell in the header row',
+        testName: "3x3 -1 cell in the header row",
         htmlInput: `<table>
                 <tr>
                     <th>
@@ -332,10 +332,10 @@ g,h,i\r
         csvExpected: `a,b,\r
 d,e,f\r
 g,h,i\r
-`
+`,
     },
     {
-        testName: '3x3 -2 cells in the header row',
+        testName: "3x3 -2 cells in the header row",
         htmlInput: `<table>
                 <tr>
                     <th>
@@ -368,10 +368,10 @@ g,h,i\r
         csvExpected: `a,,\r
 d,e,f\r
 g,h,i\r
-`
+`,
     },
     {
-        testName: 'thead',
+        testName: "thead",
         htmlInput: `<table>
                 <thead>
                     <tr>
@@ -388,10 +388,10 @@ g,h,i\r
                 </thead>
             </table>`,
         csvExpected: `a,b,c\r
-`
+`,
     },
     {
-        testName: 'one thead and one tbody',
+        testName: "one thead and one tbody",
         htmlInput: `<table>
                 <thead>
                     <tr>
@@ -434,10 +434,10 @@ g,h,i\r
         csvExpected: `a,b,c\r
 d,e,f\r
 g,h,i\r
-`
+`,
     },
     {
-        testName: 'one thead and two tbodies',
+        testName: "one thead and two tbodies",
         htmlInput: `<table>
                 <thead>
                     <tr>
@@ -482,10 +482,10 @@ g,h,i\r
         csvExpected: `a,b,c\r
 d,e,f\r
 g,h,i\r
-`
+`,
     },
     {
-        testName: 'thead, tbodies, and a th column',
+        testName: "thead, tbodies, and a th column",
         htmlInput: `<table>
                 <thead>
                     <tr>
@@ -530,10 +530,10 @@ g,h,i\r
         csvExpected: `a,b,c\r
 d,e,f\r
 g,h,i\r
-`
+`,
     },
     {
-        testName: 'one tbody, no thead',
+        testName: "one tbody, no thead",
         htmlInput: `<table>
                 <tbody>
                     <tr>
@@ -562,10 +562,10 @@ g,h,i\r
             </table>`,
         csvExpected: `a,b,c\r
 d,e,f\r
-`
+`,
     },
     {
-        testName: 'two tbodies, no thead',
+        testName: "two tbodies, no thead",
         htmlInput: `<table>
                 <tbody>
                     <tr>
@@ -620,10 +620,10 @@ d,e,f\r
 d,e,f\r
 g,h,i\r
 j,k,l\r
-`
+`,
     },
     {
-        testName: 'multiple rows in a thead',
+        testName: "multiple rows in a thead",
         htmlInput: `<table>
                 <thead>
                     <tr>
@@ -648,10 +648,10 @@ j,k,l\r
         csvExpected: `a\r
 b\r
 c\r
-`
+`,
     },
     {
-        testName: 'one tbody and one tfoot, each with one row',
+        testName: "one tbody and one tfoot, each with one row",
         htmlInput: `<table>
                 <tbody>
                     <tr>
@@ -670,10 +670,10 @@ c\r
             </table>`,
         csvExpected: `a\r
 b\r
-`
+`,
     },
     {
-        testName: 'one tbody and one tfoot, each with two rows',
+        testName: "one tbody and one tfoot, each with two rows",
         htmlInput: `<table>
                 <tbody>
                     <tr>
@@ -704,10 +704,10 @@ b\r
 b\r
 c\r
 d\r
-`
+`,
     },
     {
-        testName: 'one thead with a tr, followed by one tr',
+        testName: "one thead with a tr, followed by one tr",
         htmlInput: `<table>
                 <thead>
                     <tr>
@@ -724,10 +724,10 @@ d\r
             </table>`,
         csvExpected: `a\r
 b\r
-`
+`,
     },
     {
-        testName: 'one tr, followed by one tfoot',
+        testName: "one tr, followed by one tfoot",
         htmlInput: `<table>
                 <tr>
                     <td>
@@ -744,10 +744,10 @@ b\r
             </table>`,
         csvExpected: `a\r
 b\r
-`
+`,
     },
     {
-        testName: 'bold and emphasis',
+        testName: "bold and emphasis",
         htmlInput: `<table>
                 <tr>
                     <td>
@@ -768,10 +768,10 @@ b\r
             </table>`,
         csvExpected: `a,b\r
 c,d\r
-`
+`,
     },
     {
-        testName: 'paragraphs and breaks',
+        testName: "paragraphs and breaks",
         htmlInput: `<table>
                     <tr>
                         <th>
@@ -798,10 +798,10 @@ c,d\r
                 </table>`,
         csvExpected: `a b,c d\r
 e f,g h\r
-`
+`,
     },
     {
-        testName: 'h1 and h2 in rows',
+        testName: "h1 and h2 in rows",
         htmlInput: `<table>
                 <tr>
                     <th>
@@ -816,10 +816,10 @@ e f,g h\r
             </table>`,
         csvExpected: `a\r
 b\r
-`
+`,
     },
     {
-        testName: 'table of tables',
+        testName: "table of tables",
         htmlInput: `<table>
                 <tr>
                     <td>
@@ -856,10 +856,10 @@ b\r
             </table>`,
         csvExpected: `a b\r
 c d\r
-`
+`,
     },
     {
-        testName: 'caption',
+        testName: "caption",
         htmlInput: `<table>
                 <caption>
                     this is a caption
@@ -879,10 +879,10 @@ c d\r
             </table>`,
         csvExpected: `a\r
 b\r
-`
+`,
     },
     {
-        testName: 'colspan',
+        testName: "colspan",
         htmlInput: `<table>
                 <tr>
                     <th colspan="2">
@@ -906,10 +906,10 @@ b\r
             </table>`,
         csvExpected: `a,a,b\r
 c,d,e\r
-`
+`,
     },
     {
-        testName: 'rowspan',
+        testName: "rowspan",
         htmlInput: `<table>
                 <tr>
                     <th rowspan="2">
@@ -936,10 +936,10 @@ c,d,e\r
         csvExpected: `a,b\r
 a,c\r
 d,e\r
-`
+`,
     },
     {
-        testName: 'parallel colspans',
+        testName: "parallel colspans",
         htmlInput: `<table>
                 <tr>
                     <td colspan="2">
@@ -963,10 +963,10 @@ d,e\r
         csvExpected: `a,a\r
 b,c\r
 d,d\r
-`
+`,
     },
     {
-        testName: 'parallel rowspans',
+        testName: "parallel rowspans",
         htmlInput: `<table>
                 <tr>
                     <td rowspan="2">
@@ -987,10 +987,10 @@ d,d\r
             </table>`,
         csvExpected: `a,b,c\r
 a,d,c\r
-`
+`,
     },
     {
-        testName: 'colspan and rowspan in the same cell',
+        testName: "colspan and rowspan in the same cell",
         htmlInput: `<table>
                 <tr>
                     <td>
@@ -1020,10 +1020,10 @@ a,d,c\r
         csvExpected: `a,b,c\r
 d,e,e\r
 f,e,e\r
-`
+`,
     },
     {
-        testName: 'colspan and rowspan in the same empty cell',
+        testName: "colspan and rowspan in the same empty cell",
         htmlInput: `<table>
                 <tr>
                     <td colspan="2" rowspan="2">
@@ -1052,10 +1052,10 @@ f,e,e\r
         csvExpected: `,,a\r
 ,,b\r
 c,d,e\r
-`
+`,
     },
     {
-        testName: 'encapsulated delimiters',
+        testName: "encapsulated delimiters",
         htmlInput: `<table>
                 <tr>
                     <th>
@@ -1070,10 +1070,10 @@ c,d,e\r
             </table>`,
         csvExpected: `"a,b"\r
 "c,d"\r
-`
+`,
     },
     {
-        testName: 'encapsulated encapsulators',
+        testName: "encapsulated encapsulators",
         htmlInput: `<table>
                 <tr>
                     <th>
@@ -1088,10 +1088,10 @@ c,d,e\r
             </table>`,
         csvExpected: `"""a"""\r
 "They said ""wow"" twice."\r
-`
+`,
     },
     {
-        testName: 'encapsulated line terminators',
+        testName: "encapsulated line terminators",
         htmlInput: `<table>
                 <tr>
                     <th>
@@ -1111,7 +1111,7 @@ c,d,e\r
             </table>`,
         csvExpected: `a b\r
 This has four lines.\r
-`
+`,
     },
 ];
 

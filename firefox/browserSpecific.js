@@ -14,7 +14,7 @@
    limitations under the License.
 */
 
-import * as menu from './menu.js';
+import * as menu from "./menu.js";
 
 browser.action = browser.browserAction; // for manifest v2 compatibility
 
@@ -25,7 +25,7 @@ browser.action = browser.browserAction; // for manifest v2 compatibility
  * @returns {Promise<void>}
  */
 export async function sleep(ms) {
-    return new Promise(resolve => setTimeout(resolve, ms));
+    return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
 /**
@@ -59,11 +59,11 @@ export function createContextMenus() {
         browser.contextMenus.create(menu.jsonTableItem);
         browser.contextMenus.create(menu.htmlTableItem);
 
-        browser.contextMenus.update('markdownTable', { visible: false });
-        browser.contextMenus.update('tsvTable', { visible: false });
-        browser.contextMenus.update('csvTable', { visible: false });
-        browser.contextMenus.update('jsonTable', { visible: false });
-        browser.contextMenus.update('htmlTable', { visible: false });
+        browser.contextMenus.update("markdownTable", { visible: false });
+        browser.contextMenus.update("tsvTable", { visible: false });
+        browser.contextMenus.update("csvTable", { visible: false });
+        browser.contextMenus.update("jsonTable", { visible: false });
+        browser.contextMenus.update("htmlTable", { visible: false });
     });
 }
 
@@ -76,41 +76,41 @@ export function createContextMenus() {
  */
 export async function updateContextMenu(context) {
     switch (context.mouseover) {
-        case 'selection':
-            browser.contextMenus.update('link', { visible: false });
-            browser.contextMenus.update('image', { visible: false });
+        case "selection":
+            browser.contextMenus.update("link", { visible: false });
+            browser.contextMenus.update("image", { visible: false });
             break;
-        case 'image':
-            browser.contextMenus.update('link', { visible: false });
-            browser.contextMenus.update('image', { visible: true });
+        case "image":
+            browser.contextMenus.update("link", { visible: false });
+            browser.contextMenus.update("image", { visible: true });
             break;
-        case 'link':
-            browser.contextMenus.update('link', { visible: true });
-            browser.contextMenus.update('image', { visible: false });
+        case "link":
+            browser.contextMenus.update("link", { visible: true });
+            browser.contextMenus.update("image", { visible: false });
             break;
     }
 
-    if (context.mouseup === 'table') {
+    if (context.mouseup === "table") {
         await sleep(100); // wait for the context menu
 
-        browser.contextMenus.update('selection', { visible: false });
-        browser.contextMenus.update('selectionWithSource', { visible: false });
-        browser.contextMenus.update('selectionQuote', { visible: false });
+        browser.contextMenus.update("selection", { visible: false });
+        browser.contextMenus.update("selectionWithSource", { visible: false });
+        browser.contextMenus.update("selectionQuote", { visible: false });
 
-        browser.contextMenus.update('markdownTable', { visible: true });
-        browser.contextMenus.update('tsvTable', { visible: true });
-        browser.contextMenus.update('csvTable', { visible: true });
-        browser.contextMenus.update('jsonTable', { visible: true });
-        browser.contextMenus.update('htmlTable', { visible: true });
+        browser.contextMenus.update("markdownTable", { visible: true });
+        browser.contextMenus.update("tsvTable", { visible: true });
+        browser.contextMenus.update("csvTable", { visible: true });
+        browser.contextMenus.update("jsonTable", { visible: true });
+        browser.contextMenus.update("htmlTable", { visible: true });
     } else if (context.selectionchange) {
-        browser.contextMenus.update('selection', { visible: true });
-        browser.contextMenus.update('selectionWithSource', { visible: true });
-        browser.contextMenus.update('selectionQuote', { visible: true });
+        browser.contextMenus.update("selection", { visible: true });
+        browser.contextMenus.update("selectionWithSource", { visible: true });
+        browser.contextMenus.update("selectionQuote", { visible: true });
 
-        browser.contextMenus.update('markdownTable', { visible: false });
-        browser.contextMenus.update('tsvTable', { visible: false });
-        browser.contextMenus.update('csvTable', { visible: false });
-        browser.contextMenus.update('jsonTable', { visible: false });
-        browser.contextMenus.update('htmlTable', { visible: false });
+        browser.contextMenus.update("markdownTable", { visible: false });
+        browser.contextMenus.update("tsvTable", { visible: false });
+        browser.contextMenus.update("csvTable", { visible: false });
+        browser.contextMenus.update("jsonTable", { visible: false });
+        browser.contextMenus.update("htmlTable", { visible: false });
     }
 }

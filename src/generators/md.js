@@ -14,8 +14,8 @@
    limitations under the License.
 */
 
-import { getSetting } from '../getSetting.js';
-import { mdEncodeUri, newEscape } from '../converters/md.js';
+import { getSetting } from "../getSetting.js";
+import { mdEncodeUri, newEscape } from "../converters/md.js";
 
 /**
  * createLink creates a markdown link.
@@ -35,7 +35,7 @@ export async function createLink(title, uri, mdSubBrackets = null) {
 
     uri = mdEncodeUri(uri);
 
-    return '[' + title + '](' + uri + ')';
+    return "[" + title + "](" + uri + ")";
 }
 
 /**
@@ -49,11 +49,11 @@ export async function createLink(title, uri, mdSubBrackets = null) {
  */
 export async function createLinkTitle(title, mdSubBrackets = null) {
     if (mdSubBrackets === null) {
-        mdSubBrackets = await getSetting('mdSubBrackets');
+        mdSubBrackets = await getSetting("mdSubBrackets");
     }
 
     if (title === null) {
-        title = 'link';
+        title = "link";
     } else {
         const escape = newEscape(mdSubBrackets);
         title = escape(title);
@@ -72,9 +72,9 @@ export async function createLinkTitle(title, mdSubBrackets = null) {
  * @returns {Promise<string>}
  */
 export async function createAlert(type, text) {
-    let alert = '> [!' + type + ']';
+    let alert = "> [!" + type + "]";
     if (text) {
-        alert += '\n> ' + text.replaceAll('\n', '\n> ');
+        alert += "\n> " + text.replaceAll("\n", "\n> ");
     }
 
     return alert;
@@ -88,7 +88,7 @@ export async function createAlert(type, text) {
  * @returns {Promise<string>}
  */
 export async function createBlockquote(body, title, url) {
-    body = body.trim().replaceAll('\n', '\n> ');
+    body = body.trim().replaceAll("\n", "\n> ");
     const link = await createLink(title, url);
     const now = new Date();
     const year = now.getFullYear();
@@ -103,9 +103,9 @@ export async function createBlockquote(body, title, url) {
  * @returns {Promise<string>}
  */
 export async function createImage(url) {
-    const fileName = url.split('/').pop() || 'image';
+    const fileName = url.split("/").pop() || "image";
     const link = await createLink(fileName, url);
-    return '!' + link;
+    return "!" + link;
 }
 
 /**
@@ -117,21 +117,21 @@ export async function createImage(url) {
  * @returns {Promise<string>}
  */
 export async function createVideo(srcUrl, pageUrl) {
-    const usingSrcUrl = srcUrl && !srcUrl.startsWith('blob:');
+    const usingSrcUrl = srcUrl && !srcUrl.startsWith("blob:");
     const url = usingSrcUrl ? srcUrl : pageUrl;
 
     let youtubeId; // TODO
     let isYoutube = false; // TODO
-    const mdYoutube = await getSetting('mdYoutube');
+    const mdYoutube = await getSetting("mdYoutube");
 
-    if (isYoutube && mdYoutube === 'GitHub') {
+    if (isYoutube && mdYoutube === "GitHub") {
         // TODO: use fwd-microservice
     } else {
-        const link = await createLink('video', url);
+        const link = await createLink("video", url);
         if (usingSrcUrl) {
             return link;
         } else {
-            return '!' + link;
+            return "!" + link;
         }
     }
 }
@@ -144,9 +144,9 @@ export async function createVideo(srcUrl, pageUrl) {
  * @returns {Promise<string>}
  */
 export async function createAudio(srcUrl, pageUrl) {
-    const usingSrcUrl = srcUrl && !srcUrl.startsWith('blob:');
+    const usingSrcUrl = srcUrl && !srcUrl.startsWith("blob:");
     const url = usingSrcUrl ? srcUrl : pageUrl;
-    return await createLink('audio', url);
+    return await createLink("audio", url);
 }
 
 /**
@@ -160,8 +160,8 @@ export async function createAudio(srcUrl, pageUrl) {
  */
 export async function createTabLink(tab, mdSubBrackets) {
     if (tab.title === undefined) {
-        console.error('tab.title is undefined');
-        throw new Error('tab.title is undefined');
+        console.error("tab.title is undefined");
+        throw new Error("tab.title is undefined");
         // Were the necessary permissions granted?
     }
 

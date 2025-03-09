@@ -14,40 +14,47 @@
    limitations under the License.
 */
 
-import { VERSION, stableReleaseTagPattern, prereleaseTagPattern } from './version.js';
-import { browser, sleep, getShortcutInstructions } from './browserSpecific.js';
-import { getSetting } from './getSetting.js';
+import {
+    VERSION,
+    stableReleaseTagPattern,
+    prereleaseTagPattern,
+} from "./version.js";
+import { browser, sleep, getShortcutInstructions } from "./browserSpecific.js";
+import { getSetting } from "./getSetting.js";
 
 const manifest = browser.runtime.getManifest();
 
-document.querySelector('#versionNumber').innerHTML = VERSION;
+document.querySelector("#versionNumber").innerHTML = VERSION;
 
 const SYNC_SAVE_DELAY = 500; // milliseconds // sync storage time limit: https://developer.chrome.com/docs/extensions/reference/api/storage#property-sync-sync-MAX_WRITE_OPERATIONS_PER_MINUTE
 
-document.querySelector('#shortcutInstructions').innerHTML = getShortcutInstructions();
+document.querySelector("#shortcutInstructions").innerHTML =
+    getShortcutInstructions();
 
-const checkForUpdatesButton = document.querySelector('#checkForUpdates');
-const updateCheckResultEl = document.querySelector('#updateCheckResult');
+const checkForUpdatesButton = document.querySelector("#checkForUpdates");
+const updateCheckResultEl = document.querySelector("#updateCheckResult");
 // Unfortunately, the browser APIs don't provide any way to tell whether the browser will
 // automatically install available updates. As a result, the update check button must be
 // visible even if updates are automatic. For now at least, I don't think it would be
 // worth it to create new build commands that remove the button just for the extension
 // stores, especially since some browsers let users choose whether each extension
 // installed from their extension store updates automatically.
-checkForUpdatesButton.addEventListener('click', async () => {
+checkForUpdatesButton.addEventListener("click", async () => {
     // check for updates
-    updateCheckResultEl.innerText = 'Checking for updates...';
+    updateCheckResultEl.innerText = "Checking for updates...";
     checkForUpdatesButton.disabled = true;
 
-    let latestStableVersion = '';
-    let latestPrereleaseVersion = '';
+    let latestStableVersion = "";
+    let latestPrereleaseVersion = "";
 
     let page = 1;
     while (!latestStableVersion) {
         // request a page of Git tags from the GitHub API
         let response;
         try {
-            response = await fetch(`https://api.github.com/repos/Stardown-app/Stardown/tags?page=${page}`); // https://docs.github.com/en/rest/repos/repos?apiVersion=2022-11-28#list-repository-tags
+            response = await fetch(
+                `https://api.github.com/repos/Stardown-app/Stardown/tags?page=${page}`,
+            ); // https://docs.github.com/en/rest/repos/repos?apiVersion=2022-11-28#list-repository-tags
         } catch (err) {
             console.error(`fetch error: ${err.message}`);
             updateCheckResultEl.innerText = `Error: ${err.message}`;
@@ -55,7 +62,9 @@ checkForUpdatesButton.addEventListener('click', async () => {
             return;
         }
         if (!response.ok) {
-            console.error(`The GitHub API responded with error status ${response.status}`);
+            console.error(
+                `The GitHub API responded with error status ${response.status}`,
+            );
             updateCheckResultEl.innerText = `The GitHub API responded with error status ${response.status}`;
             checkForUpdatesButton.disabled = false;
             return;
@@ -81,13 +90,18 @@ checkForUpdatesButton.addEventListener('click', async () => {
 
         if (!latestStableVersion) {
             if (page === 10) {
-                console.error('Failed to find the latest stable release tag after 10 attempts. Stopping.');
-                updateCheckResultEl.innerText = 'Failed to check for updates after 10 attempts';
+                console.error(
+                    "Failed to find the latest stable release tag after 10 attempts. Stopping.",
+                );
+                updateCheckResultEl.innerText =
+                    "Failed to check for updates after 10 attempts";
                 return;
             }
 
-            console.warn('Failed to find the latest stable release tag. Trying again in half a second.');
-            updateCheckResultEl.innerText += '.';
+            console.warn(
+                "Failed to find the latest stable release tag. Trying again in half a second.",
+            );
+            updateCheckResultEl.innerText += ".";
             page++;
             await sleep(500);
         }
@@ -99,7 +113,9 @@ checkForUpdatesButton.addEventListener('click', async () => {
     if (latestPrereleaseVersion) {
         console.log(`Latest prerelease version: ${latestPrereleaseVersion}`);
     } else {
-        console.log('There are no prerelease versions newer than the latest stable version');
+        console.log(
+            "There are no prerelease versions newer than the latest stable version",
+        );
     }
 
     const updateInstructionsHtml = `
@@ -108,7 +124,8 @@ checkForUpdatesButton.addEventListener('click', async () => {
 
     if (latestPrereleaseVersion) {
         if (VERSION === latestPrereleaseVersion) {
-            updateCheckResultEl.innerHTML = 'You have the latest version of Stardown.';
+            updateCheckResultEl.innerHTML =
+                "You have the latest version of Stardown.";
         } else if (VERSION === latestStableVersion) {
             updateCheckResultEl.innerHTML = `
                 You have the latest stable version of Stardown. A newer prerelease version is available. ${updateInstructionsHtml} if you're interested.
@@ -116,62 +133,75 @@ checkForUpdatesButton.addEventListener('click', async () => {
         } else {
             updateCheckResultEl.innerHTML = `An update is available! ${updateInstructionsHtml}.`;
         }
-    } else { // if the latest release is a stable version
+    } else {
+        // if the latest release is a stable version
         if (VERSION === latestStableVersion) {
-            updateCheckResultEl.innerHTML = 'You have the latest version of Stardown.';
+            updateCheckResultEl.innerHTML =
+                "You have the latest version of Stardown.";
         } else {
             updateCheckResultEl.innerHTML = `An update is available! ${updateInstructionsHtml}.`;
         }
     }
 });
 
-const form = document.querySelector('form');
+const form = document.querySelector("form");
 
-const markupLanguageEl = document.querySelector('#markupLanguage');
-const selectionFormatEl = document.querySelector('#selectionFormat');
-const copyTabsWindowsEl = document.querySelector('#copyTabsWindows');
-const createTextFragmentEl = document.querySelector('#createTextFragment');
-const notepadFontSizeEl = document.querySelector('#notepadFontSize');
-const notepadAppendOrInsertEl = document.querySelector('#notepadAppendOrInsert');
-const notepadStorageLocationEl = document.querySelector('#notepadStorageLocation');
-const extractMainContentEl = document.querySelector('#extractMainContent');
-const omitNavEl = document.querySelector('#omitNav');
-const omitFooterEl = document.querySelector('#omitFooter');
-const omitHiddenEl = document.querySelector('#omitHidden');
-const notifyOnWarningEl = document.querySelector('#notifyOnWarning');
-const notifyOnSuccessEl = document.querySelector('#notifyOnSuccess');
+const markupLanguageEl = document.querySelector("#markupLanguage");
+const selectionFormatEl = document.querySelector("#selectionFormat");
+const copyTabsWindowsEl = document.querySelector("#copyTabsWindows");
+const createTextFragmentEl = document.querySelector("#createTextFragment");
+const notepadFontSizeEl = document.querySelector("#notepadFontSize");
+const notepadAppendOrInsertEl = document.querySelector(
+    "#notepadAppendOrInsert",
+);
+const notepadStorageLocationEl = document.querySelector(
+    "#notepadStorageLocation",
+);
+const extractMainContentEl = document.querySelector("#extractMainContent");
+const omitNavEl = document.querySelector("#omitNav");
+const omitFooterEl = document.querySelector("#omitFooter");
+const omitHiddenEl = document.querySelector("#omitHidden");
+const notifyOnWarningEl = document.querySelector("#notifyOnWarning");
+const notifyOnSuccessEl = document.querySelector("#notifyOnSuccess");
 
-const mdYoutubeEl = document.querySelector('#mdYoutube');
-const templateEl = document.querySelector('#template');
-const templateErrorEl = document.querySelector('#templateError');
-const mdSubBracketsEl = document.querySelector('#mdSubBrackets');
-const mdBulletPointEl = document.querySelector('#mdBulletPoint');
+const mdYoutubeEl = document.querySelector("#mdYoutube");
+const templateEl = document.querySelector("#template");
+const templateErrorEl = document.querySelector("#templateError");
+const mdSubBracketsEl = document.querySelector("#mdSubBrackets");
+const mdBulletPointEl = document.querySelector("#mdBulletPoint");
 
-const jsonEmptyCellEl = document.querySelector('#jsonEmptyCell');
-const jsonDestinationEl = document.querySelector('#jsonDestination');
+const jsonEmptyCellEl = document.querySelector("#jsonEmptyCell");
+const jsonDestinationEl = document.querySelector("#jsonDestination");
 
 // set up setting autosaving
-initAutosave('markupLanguage', markupLanguageEl, 'value');
-initAutosave('selectionFormat', selectionFormatEl, 'value');
-initAutosave('copyTabsWindows', copyTabsWindowsEl, 'value');
-initAutosave('createTextFragment', createTextFragmentEl, 'checked');
-initAutosave('notepadFontSize', notepadFontSizeEl, 'value', 0, ['sidebar']);
-initAutosave('notepadAppendOrInsert', notepadAppendOrInsertEl, 'value');
-initAutosave('notepadStorageLocation', notepadStorageLocationEl, 'value', 0, ['sidebar']);
-initAutosave('extractMainContent', extractMainContentEl, 'checked');
-initAutosave('omitNav', omitNavEl, 'checked');
-initAutosave('omitFooter', omitFooterEl, 'checked');
-initAutosave('omitHidden', omitHiddenEl, 'checked');
-initAutosave('notifyOnWarning', notifyOnWarningEl, 'checked');
-initAutosave('notifyOnSuccess', notifyOnSuccessEl, 'checked');
+initAutosave("markupLanguage", markupLanguageEl, "value");
+initAutosave("selectionFormat", selectionFormatEl, "value");
+initAutosave("copyTabsWindows", copyTabsWindowsEl, "value");
+initAutosave("createTextFragment", createTextFragmentEl, "checked");
+initAutosave("notepadFontSize", notepadFontSizeEl, "value", 0, ["sidebar"]);
+initAutosave("notepadAppendOrInsert", notepadAppendOrInsertEl, "value");
+initAutosave("notepadStorageLocation", notepadStorageLocationEl, "value", 0, [
+    "sidebar",
+]);
+initAutosave("extractMainContent", extractMainContentEl, "checked");
+initAutosave("omitNav", omitNavEl, "checked");
+initAutosave("omitFooter", omitFooterEl, "checked");
+initAutosave("omitHidden", omitHiddenEl, "checked");
+initAutosave("notifyOnWarning", notifyOnWarningEl, "checked");
+initAutosave("notifyOnSuccess", notifyOnSuccessEl, "checked");
 
-initAutosave('mdYoutube', mdYoutubeEl, 'value');
-initAutosave('mdSelectionWithSourceTemplate', templateEl, 'value', SYNC_SAVE_DELAY);
-initAutosave('mdSubBrackets', mdSubBracketsEl, 'value');
-initAutosave('mdBulletPoint', mdBulletPointEl, 'value');
+initAutosave("mdYoutube", mdYoutubeEl, "value");
+initAutosave(
+    "mdSelectionWithSourceTemplate",
+    templateEl,
+    "value",
+    SYNC_SAVE_DELAY,
+);
+initAutosave("mdSubBrackets", mdSubBracketsEl, "value");
+initAutosave("mdBulletPoint", mdBulletPointEl, "value");
 
-initAutosave('jsonEmptyCell', jsonEmptyCellEl, 'value');
-initAutosave('jsonDestination', jsonDestinationEl, 'value', 0, ['background']);
+initAutosave("jsonEmptyCell", jsonEmptyCellEl, "value");
+initAutosave("jsonDestination", jsonDestinationEl, "value", 0, ["background"]);
 
 /**
  * initAutosave initializes autosaving for a setting.
@@ -203,7 +233,7 @@ function initAutosave(settingName, el, valueProperty, wait, ctxNames) {
     };
 
     let timeout = 0;
-    el.addEventListener('input', async event => {
+    el.addEventListener("input", async (event) => {
         if (wait) {
             clearTimeout(timeout);
             timeout = setTimeout(async () => {
@@ -220,27 +250,31 @@ function initAutosave(settingName, el, valueProperty, wait, ctxNames) {
  */
 async function loadSettings() {
     try {
-        markupLanguageEl.value = await getSetting('markupLanguage');
-        selectionFormatEl.value = await getSetting('selectionFormat');
-        copyTabsWindowsEl.value = await getSetting('copyTabsWindows');
-        createTextFragmentEl.checked = await getSetting('createTextFragment');
-        notepadFontSizeEl.value = await getSetting('notepadFontSize');
-        notepadAppendOrInsertEl.value = await getSetting('notepadAppendOrInsert');
-        notepadStorageLocationEl.value = await getSetting('notepadStorageLocation');
-        extractMainContentEl.checked = await getSetting('extractMainContent');
-        omitNavEl.checked = await getSetting('omitNav');
-        omitFooterEl.checked = await getSetting('omitFooter');
-        omitHiddenEl.checked = await getSetting('omitHidden');
-        notifyOnWarningEl.checked = await getSetting('notifyOnWarning');
-        notifyOnSuccessEl.checked = await getSetting('notifyOnSuccess');
+        markupLanguageEl.value = await getSetting("markupLanguage");
+        selectionFormatEl.value = await getSetting("selectionFormat");
+        copyTabsWindowsEl.value = await getSetting("copyTabsWindows");
+        createTextFragmentEl.checked = await getSetting("createTextFragment");
+        notepadFontSizeEl.value = await getSetting("notepadFontSize");
+        notepadAppendOrInsertEl.value = await getSetting(
+            "notepadAppendOrInsert",
+        );
+        notepadStorageLocationEl.value = await getSetting(
+            "notepadStorageLocation",
+        );
+        extractMainContentEl.checked = await getSetting("extractMainContent");
+        omitNavEl.checked = await getSetting("omitNav");
+        omitFooterEl.checked = await getSetting("omitFooter");
+        omitHiddenEl.checked = await getSetting("omitHidden");
+        notifyOnWarningEl.checked = await getSetting("notifyOnWarning");
+        notifyOnSuccessEl.checked = await getSetting("notifyOnSuccess");
 
-        mdYoutubeEl.value = await getSetting('mdYoutube');
-        templateEl.value = await getSetting('mdSelectionWithSourceTemplate');
-        mdSubBracketsEl.value = await getSetting('mdSubBrackets');
-        mdBulletPointEl.value = await getSetting('mdBulletPoint');
+        mdYoutubeEl.value = await getSetting("mdYoutube");
+        templateEl.value = await getSetting("mdSelectionWithSourceTemplate");
+        mdSubBracketsEl.value = await getSetting("mdSubBrackets");
+        mdBulletPointEl.value = await getSetting("mdBulletPoint");
 
-        jsonEmptyCellEl.value = await getSetting('jsonEmptyCell') || 'null';
-        jsonDestinationEl.value = await getSetting('jsonDestination');
+        jsonEmptyCellEl.value = (await getSetting("jsonEmptyCell")) || "null";
+        jsonDestinationEl.value = await getSetting("jsonDestination");
     } catch (err) {
         console.error(err);
         throw err;
@@ -253,10 +287,10 @@ async function loadSettings() {
  * @returns {Promise<void>}
  */
 async function validateTemplateVariables() {
-    const title = 'page title';
-    const sourceUrl = 'https://example.com';
-    const YYYYMMDD = '2024-01-01';
-    const text = 'converted text';
+    const title = "page title";
+    const sourceUrl = "https://example.com";
+    const YYYYMMDD = "2024-01-01";
+    const text = "converted text";
     const templateVars = {
         page: { title: title },
         source: { url: sourceUrl },
@@ -271,11 +305,11 @@ async function validateTemplateVariables() {
 
     for (const match of matches) {
         const [full, group] = match;
-        const tokens = group.split('.');
+        const tokens = group.split(".");
 
         let value = templateVars;
         for (const token of tokens) {
-            if (token.includes(' ')) {
+            if (token.includes(" ")) {
                 value = undefined;
                 break;
             }
@@ -287,17 +321,17 @@ async function validateTemplateVariables() {
 
         if (value === undefined) {
             templateErrorEl.textContent = `Unknown variable "${group}"`;
-            templateErrorEl.style.display = 'inline-block';
+            templateErrorEl.style.display = "inline-block";
             return;
         }
     }
 
-    templateErrorEl.textContent = '';
-    templateErrorEl.style.display = 'none';
+    templateErrorEl.textContent = "";
+    templateErrorEl.style.display = "none";
 }
 
-templateEl.addEventListener('input', async function () {
+templateEl.addEventListener("input", async function () {
     await validateTemplateVariables();
 });
 
-document.addEventListener('DOMContentLoaded', loadSettings);
+document.addEventListener("DOMContentLoaded", loadSettings);

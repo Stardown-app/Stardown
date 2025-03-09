@@ -224,10 +224,10 @@ function highlight(text) {
             /((\*\*\*|___|\*\*|__)\S(?:[^\n]*?\S)?\2)/g,
             '<span style="color: rgb(6, 117, 15)">$1</span>'
         )
-        // Text that is only italic is not highlighted. Otherwise, many characters that
-        // are not italic would also be highlighted since URLs often have at least one
-        // underscore. There's no easy way to prevent that when using regex in this way.
-        // Highlighting italic text isn't really important anyways.
+    // Text that is only italic is not highlighted. Otherwise, many characters that
+    // are not italic would also be highlighted since URLs often have at least one
+    // underscore. There's no easy way to prevent that when using regex in this way.
+    // Highlighting italic text isn't really important anyways.
 }
 
 let notepadSaveTimeout = 0;

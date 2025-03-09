@@ -205,11 +205,15 @@ function highlight(text) {
             '$1<span style="background-color: rgb(224, 224, 224); display: block;">$2</span>\n'
         )
 
-        // bold and/or italic
+        // bold, or both bold and italic
         .replaceAll(
-            /((\*\*\*|___|\*\*|__|\*|_)\S(?:[^\n]*?\S)?\2)/g,
+            /((\*\*\*|___|\*\*|__)\S(?:[^\n]*?\S)?\2)/g,
             '<span style="color: rgb(6, 117, 15)">$1</span>'
         )
+        // Text that is only italic is not highlighted. Otherwise, many characters that
+        // are not italic would also be highlighted since URLs often have at least one
+        // underscore. There's no easy way to prevent that when using regex in this way.
+        // Highlighting italic text isn't really important anyways.
 }
 
 let notepadSaveTimeout = 0;

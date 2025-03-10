@@ -8,7 +8,7 @@ Stardown's main goal is to be so simple, fast, reliable, and flexible that peopl
 
 ## Tests
 
-Run the tests with `npm run test`.
+Run the tests with `npm test`.
 
 If a certain test fails, its error message will tell you to run `npm run md-diff`. See [../src/converters/README.md#testing](../src/converters/README.md#testing) for more details.
 
@@ -17,6 +17,8 @@ Manual testing is often helpful too. When testing manually, see [./manual-testin
 ## Git workflow
 
 Let's create feature branches with descriptive names and make pull requests as described in [Getting started with Git and GitHub](https://chriswheeler.dev/posts/getting-started-with-git-and-github/#git-workflows).
+
+This project uses [Prettier](https://prettier.io/) to format code. The formatting is enforced on each pull request, so you might want to [install Prettier](https://prettier.io/docs/install#set-up-your-editor) into your editor and as a Git hook.
 
 ## Writing import statements
 

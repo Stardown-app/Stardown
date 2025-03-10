@@ -133,7 +133,6 @@ browser.runtime.onMessage.addListener(async (message) => {
             }
             break;
         case "sendToNotepad":
-            console.log("Text received by sidebar from content");
             const newText = message.text.trim();
             if (newText) {
                 await receiveToNotepad(newText);
@@ -364,7 +363,12 @@ async function receiveToNotepad(newText) {
             end: notepadEl.textContent.length,
         });
     } else if (notepadAppendOrInsert === "insert") {
-        const cursorPos = jar.save();
+        let cursorPos;
+        try {
+            cursorPos = jar.save();
+        } catch (err) {
+            cursorPos = { start: 0, end: 0, dir: undefined };
+        }
         const before = jar.toString().slice(0, cursorPos.start).trim();
         const after = jar.toString().slice(cursorPos.end).trim();
         jar.updateCode((before + "\n\n" + newText + "\n\n" + after).trim());

@@ -33,7 +33,6 @@ import { createTextFragmentArg } from "./createTextFragmentArg.js";
  * @returns {Promise<void>}
  */
 export async function sendToNotepad(text) {
-    console.log("Sending text from content to sidebar");
     browser.runtime.sendMessage({
         destination: "sidebar",
         category: "sendToNotepad",

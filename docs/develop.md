@@ -24,9 +24,9 @@ This project uses [Prettier](https://prettier.io/) to format code. The formattin
 
 Stardown uses several different execution contexts as described in [./execution-contexts.md](./execution-contexts.md), and development of Stardown uses the [Rollup](https://rollupjs.org/) bundler to combine the files for each context. Rollup copies an entire file's content (and the content of all files that file imports) into another file even if the import statement only asks for specific things. For this reason, try to avoid putting functions and imports for one execution context in a file that is only for a different execution context, or else the resulting bundled code will have a lot of duplicate unused code that might go unnoticed except by extension reviewers.
 
-## Writing documentation
+## Type annotations
 
-This project uses [JSDoc](https://en.wikipedia.org/wiki/JSDoc) to annotate types. In VS Code you can type `/**` above a function and press enter to auto-generate part of its JSDoc comment.
+This project uses [JSDoc](https://www.typescriptlang.org/docs/handbook/intro-to-js-ts.html) to annotate types. Run `npm run check-types` to check the types. In VS Code, you can type `/**` above a function and press enter to auto-generate part of its JSDoc comment. ([Here's how I set up the type checking.](https://til.chriswheeler.dev/setting-up-type-checking-for-javascript/))
 
 ## Improving Stardown's output
 

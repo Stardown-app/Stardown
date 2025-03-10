@@ -15,8 +15,8 @@
 */
 
 // https://rollupjs.org/
-import copy from 'rollup-plugin-copy'; // https://www.npmjs.com/package/rollup-plugin-copy
-import del from 'rollup-plugin-delete'; // https://www.npmjs.com/package/rollup-plugin-delete
+import copy from "rollup-plugin-copy"; // https://www.npmjs.com/package/rollup-plugin-copy
+import del from "rollup-plugin-delete"; // https://www.npmjs.com/package/rollup-plugin-delete
 
 // This is a Rollup configuration file for building the Chrome extension. It first
 // copies all the necessary files from `src` to the `chrome` directory, then replaces
@@ -29,10 +29,10 @@ import del from 'rollup-plugin-delete'; // https://www.npmjs.com/package/rollup-
 
 export default [
     {
-        input: 'chrome/background.js',
+        input: "chrome/background.js",
         output: {
-            file: 'chrome/background.js',
-            format: 'iife', // immediately-invoked function expression
+            file: "chrome/background.js",
+            format: "iife", // immediately-invoked function expression
         },
         plugins: [
             copy({
@@ -41,68 +41,68 @@ export default [
                         src: [
                             // Copy everything from `src` to `chrome` except the
                             // browserSpecific.js that is for testing.
-                            'src/*',
-                            '!src/browserSpecific.js',
+                            "src/*",
+                            "!src/browserSpecific.js",
                         ],
-                        dest: 'chrome',
+                        dest: "chrome",
                     },
                 ],
-                hook: 'buildStart', // run the copy before the build starts
+                hook: "buildStart", // run the copy before the build starts
             }),
-        ]
+        ],
     },
     {
-        input: 'chrome/content.js',
+        input: "chrome/content.js",
         output: {
-            file: 'chrome/content.js',
-            format: 'iife', // immediately-invoked function expression
+            file: "chrome/content.js",
+            format: "iife", // immediately-invoked function expression
         },
     },
     {
-        input: 'chrome/popup.js',
+        input: "chrome/popup.js",
         output: {
-            file: 'chrome/popup.js',
-            format: 'iife', // immediately-invoked function expression
+            file: "chrome/popup.js",
+            format: "iife", // immediately-invoked function expression
         },
     },
     {
-        input: 'chrome/sidebar.js',
+        input: "chrome/sidebar.js",
         output: {
-            file: 'chrome/sidebar.js',
-            format: 'iife', // immediately-invoked function expression
+            file: "chrome/sidebar.js",
+            format: "iife", // immediately-invoked function expression
         },
     },
     {
-        input: 'chrome/settings.js',
+        input: "chrome/settings.js",
         output: {
-            file: 'chrome/settings.js',
-            format: 'iife', // immediately-invoked function expression
+            file: "chrome/settings.js",
+            format: "iife", // immediately-invoked function expression
         },
         plugins: [
             del({
                 // Delete all files in the `chrome` directory that were imported into
                 // other files there and are no longer needed.
                 targets: [
-                    'chrome/*', // delete all files except the ones below
+                    "chrome/*", // delete all files except the ones below
 
-                    '!chrome/images',
+                    "!chrome/images",
 
-                    '!chrome/manifest.json',
+                    "!chrome/manifest.json",
 
-                    '!chrome/**/*.html',
-                    '!chrome/**/*.css',
+                    "!chrome/**/*.html",
+                    "!chrome/**/*.css",
 
-                    '!chrome/browserSpecific.js',
-                    '!chrome/background.js',
-                    '!chrome/content.js',
-                    '!chrome/popup.js',
-                    '!chrome/sidebar.js',
-                    '!chrome/settings.js',
-                    '!chrome/text-fragment-utils.js',
-                    '!chrome/fragment-generation-utils.js',
+                    "!chrome/browserSpecific.js",
+                    "!chrome/background.js",
+                    "!chrome/content.js",
+                    "!chrome/popup.js",
+                    "!chrome/sidebar.js",
+                    "!chrome/settings.js",
+                    "!chrome/text-fragment-utils.js",
+                    "!chrome/fragment-generation-utils.js",
                 ],
-                hook: 'buildEnd', // run the delete after the build ends
-            })
-        ]
-    }
+                hook: "buildEnd", // run the delete after the build ends
+            }),
+        ],
+    },
 ];

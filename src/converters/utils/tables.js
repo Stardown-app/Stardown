@@ -32,12 +32,12 @@ export function to2dArray(table, doc) {
         // for each cell in the row
         for (let x = 0; x < tr.children.length; x++) {
             const cell = tr.children[x];
-            if (cell.nodeName !== 'TH' && cell.nodeName !== 'TD') {
+            if (cell.nodeName !== "TH" && cell.nodeName !== "TD") {
                 continue;
             }
 
-            const colspan = Number(cell.getAttribute('colspan') || 1);
-            const rowspan = Number(cell.getAttribute('rowspan') || 1);
+            const colspan = Number(cell.getAttribute("colspan") || 1);
+            const rowspan = Number(cell.getAttribute("rowspan") || 1);
 
             tableConv.addCell(cell, colspan, rowspan);
         }
@@ -54,7 +54,10 @@ export function to2dArray(table, doc) {
  * @returns {Element[][]}
  */
 export function removeEmptyRows(table) {
-    return table.filter(row => row.length > 0 && row.some(cell => cell.childNodes.length > 0));
+    return table.filter(
+        (row) =>
+            row.length > 0 && row.some((cell) => cell.childNodes.length > 0),
+    );
 }
 
 /**
@@ -76,7 +79,7 @@ export function rectangularize(table, doc) {
     for (let y = 0; y < table.length; y++) {
         const row = table[y];
         for (let x = row.length; x < maxRowSize; x++) {
-            row.push(doc.createElement('td'));
+            row.push(doc.createElement("td"));
         }
     }
 
@@ -119,14 +122,17 @@ class TableConverter {
      */
     addCell(cell, colspan = 1, rowspan = 1) {
         // while before the end of the row and not on a null cell
-        while (this.X < this.table[this.Y].length && this.table[this.Y][this.X] !== null) {
+        while (
+            this.X < this.table[this.Y].length &&
+            this.table[this.Y][this.X] !== null
+        ) {
             this.X++;
         }
 
         const hasMedia = Boolean(
-            cell.querySelector('img') ||
-            cell.querySelector('svg') ||
-            cell.querySelector('video')
+            cell.querySelector("img") ||
+                cell.querySelector("svg") ||
+                cell.querySelector("video"),
         );
 
         // for each row and column the cell spans
@@ -148,13 +154,13 @@ class TableConverter {
                 // assign the cell
                 if (x === row.length) {
                     if (hasMedia && x > this.X) {
-                        row.push(this.doc.createElement('td'));
+                        row.push(this.doc.createElement("td"));
                     } else {
                         row.push(cell);
                     }
                 } else {
                     if (hasMedia && x > this.X) {
-                        row[x] = this.doc.createElement('td');
+                        row[x] = this.doc.createElement("td");
                     } else {
                         row[x] = cell;
                     }
@@ -177,16 +183,16 @@ function getTableTrs(table) {
     const trs = [];
     for (let i = 0; i < table.children.length; i++) {
         const child = table.children[i];
-        if (child.nodeName === 'TR') {
+        if (child.nodeName === "TR") {
             trs.push(child);
         } else if (
-            child.nodeName === 'TBODY' ||
-            child.nodeName === 'THEAD' ||
-            child.nodeName === 'TFOOT'
+            child.nodeName === "TBODY" ||
+            child.nodeName === "THEAD" ||
+            child.nodeName === "TFOOT"
         ) {
             for (let j = 0; j < child.children.length; j++) {
                 const grandchild = child.children[j];
-                if (grandchild.nodeName === 'TR') {
+                if (grandchild.nodeName === "TR") {
                     trs.push(grandchild);
                 }
             }

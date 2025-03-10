@@ -14,37 +14,37 @@
    limitations under the License.
 */
 
-import { browser } from './browserSpecific.js';
+import { browser } from "./browserSpecific.js";
 
 const defaultSettings = {
-    markupLanguage: 'markdown',
+    markupLanguage: "markdown",
     createTextFragment: true,
-    notepadFontSize: '12pt',
-    notepadAppendOrInsert: 'append',
-    notepadStorageLocation: 'sync',
+    notepadFontSize: "12pt",
+    notepadAppendOrInsert: "append",
+    notepadStorageLocation: "sync",
     extractMainContent: true,
     omitNav: true,
     omitFooter: true,
     omitHidden: true,
     notifyOnWarning: false,
     notifyOnSuccess: false,
-    selectionFormat: 'Copy selection',
-    copyTabsWindows: 'current',
-    notepadContent: '',
+    selectionFormat: "Copy selection",
+    copyTabsWindows: "current",
+    notepadContent: "",
     notepadScrollPosition: 0,
     lastUpboardVersion: null,
 
-    mdYoutube: 'almost everywhere',
-    mdSubBrackets: 'underlined',
-    mdBulletPoint: '-',
+    mdYoutube: "almost everywhere",
+    mdSubBrackets: "underlined",
+    mdBulletPoint: "-",
     mdSelectionWithSourceTemplate: `> [!note]
 > from [{{page.title}}]({{source.url}}) on {{date.YYYYMMDD}}
 
 {{text}}
 `,
 
-    jsonEmptyCell: 'null',
-    jsonDestination: 'clipboard',
+    jsonEmptyCell: "null",
+    jsonDestination: "clipboard",
 };
 
 /**

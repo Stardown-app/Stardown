@@ -14,9 +14,9 @@
    limitations under the License.
 */
 
-import { browser } from './browserSpecific.js';
-import { getSetting } from './getSetting.js';
-import { createTextFragmentArg } from './createTextFragmentArg.js';
+import { browser } from "./browserSpecific.js";
+import { getSetting } from "./getSetting.js";
+import { createTextFragmentArg } from "./createTextFragmentArg.js";
 
 /**
  * A response object sent from a content script to a background script.
@@ -34,8 +34,8 @@ import { createTextFragmentArg } from './createTextFragmentArg.js';
  */
 export async function sendToNotepad(text) {
     browser.runtime.sendMessage({
-        destination: 'sidebar',
-        category: 'sendToNotepad',
+        destination: "sidebar",
+        category: "sendToNotepad",
         text: text,
     });
 }
@@ -58,27 +58,27 @@ export async function handleCopyRequest(text) {
 
     try {
         await navigator.clipboard.writeText(text);
-        console.log('Successfully wrote text to the clipboard.');
+        console.log("Successfully wrote text to the clipboard.");
     } catch (err) {
-        console.warn('navigator.clipboard.writeText:', err.message);
-        console.log('Using fallback method to write text to the clipboard.');
+        console.warn("navigator.clipboard.writeText:", err.message);
+        console.log("Using fallback method to write text to the clipboard.");
 
-        const textarea = document.createElement('textarea');
+        const textarea = document.createElement("textarea");
         textarea.value = text;
         document.body.appendChild(textarea);
         textarea.select();
 
         try {
-            document.execCommand('copy');
-            console.log('No error thrown by the fallback method.');
+            document.execCommand("copy");
+            console.log("No error thrown by the fallback method.");
         } catch (fallbackError) {
             console.error(
-                'Failed to write text to the clipboard using fallback method because:',
+                "Failed to write text to the clipboard using fallback method because:",
                 fallbackError.message,
             );
             return {
                 status: 0, // failure
-                notifTitle: 'Failed to copy text',
+                notifTitle: "Failed to copy text",
                 notifBody: fallbackError.message,
             };
         } finally {
@@ -88,8 +88,8 @@ export async function handleCopyRequest(text) {
 
     return {
         status: 1, // successfully copied one item
-        notifTitle: 'Text copied',
-        notifBody: 'Your text can now be pasted',
+        notifTitle: "Text copied",
+        notifBody: "Your text can now be pasted",
     };
 }
 
@@ -103,7 +103,12 @@ export async function handleCopyRequest(text) {
  */
 export async function applyTemplate(template, title, sourceUrl, text) {
     const today = new Date();
-    const YYYYMMDD = today.getFullYear() + '/' + (today.getMonth() + 1) + '/' + today.getDate();
+    const YYYYMMDD =
+        today.getFullYear() +
+        "/" +
+        (today.getMonth() + 1) +
+        "/" +
+        today.getDate();
     const templateVars = {
         page: { title: title },
         source: { url: sourceUrl },
@@ -113,7 +118,9 @@ export async function applyTemplate(template, title, sourceUrl, text) {
 
     try {
         return template.replaceAll(/{{([\w.]+)}}/g, (match, group) => {
-            return group.split('.').reduce((vars, token) => vars[token], templateVars);
+            return group
+                .split(".")
+                .reduce((vars, token) => vars[token], templateVars);
         });
     } catch (err) {
         // an error message should have been shown when the user changed the template
@@ -134,9 +141,9 @@ export function removeIdAndTextFragment(url) {
     // element ID, the text fragment may be in the `pathname` attribute of its URL
     // object along with part of the URL that should not be removed.
     const urlObj = new URL(url);
-    urlObj.hash = ''; // remove HTML element ID and maybe text fragment
-    if (urlObj.pathname.includes(':~:text=')) {
-        urlObj.pathname = urlObj.pathname.split(':~:text=')[0]; // definitely remove text fragment
+    urlObj.hash = ""; // remove HTML element ID and maybe text fragment
+    if (urlObj.pathname.includes(":~:text=")) {
+        urlObj.pathname = urlObj.pathname.split(":~:text=")[0]; // definitely remove text fragment
     }
     return urlObj.toString();
 }
@@ -153,14 +160,14 @@ export function removeIdAndTextFragment(url) {
 export async function addIdAndTextFragment(url, htmlId, selection) {
     url = removeIdAndTextFragment(url);
 
-    let arg = ''; // the text fragment argument
-    const createTextFragment = await getSetting('createTextFragment');
+    let arg = ""; // the text fragment argument
+    const createTextFragment = await getSetting("createTextFragment");
     if (createTextFragment && selection) {
         arg = createTextFragmentArg(selection);
     }
 
     if (htmlId || arg) {
-        url += '#';
+        url += "#";
         if (htmlId) {
             url += htmlId;
         }

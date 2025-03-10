@@ -8,17 +8,17 @@ Extensions can have multiple **execution contexts** such as:
 - options page
 - sidebar (a.k.a. side panel)
 
-Each of these components generally doesn't have direct access to data in the others and must use [message passing](https://developer.chrome.com/docs/extensions/develop/concepts/messaging) to communicate. The *popup*, *options page*, and *sidebar* are each an HTML file that may or may not use JavaScript and are loaded when the user opens them. *Content scripts* are injected into each web page visited (for sites the extension's manifest specifies). *Background scripts* run for a while but may pause when the user hasn't interacted with the extension for a while.
+Each of these components generally doesn't have direct access to data in the others and must use [message passing](https://developer.chrome.com/docs/extensions/develop/concepts/messaging) to communicate. The _popup_, _options page_, and _sidebar_ are each an HTML file that may or may not use JavaScript and are loaded when the user opens them. _Content scripts_ are injected into each web page visited (for sites the extension's manifest specifies). _Background scripts_ run for a while but may pause when the user hasn't interacted with the extension for a while.
 
 Most of Stardown's user interactions are received in the background, which then sends a request to the content and receives a response. You can think of it like client-server architecture where the background is the client and the content is the server.
 
-In Stardown, every ***request*** from the background to the content must have `destination`, `category`, and `id` properties and may optionally have other properties.
+In Stardown, every **_request_** from the background to the content must have `destination`, `category`, and `id` properties and may optionally have other properties.
 
 - `destination`: a string of the context the message should be sent to, such as "background" or "content".
 - `category`: a string describing what is being requested.
 - `id`: a unique pseudorandom number for detecting [duplicate requests](https://github.com/Stardown-app/Stardown/issues/98).
 
-Every ***response*** from the content to the background is either null or an object with the properties `status`, `notifTitle`, and `notifBody`.
+Every **_response_** from the content to the background is either null or an object with the properties `status`, `notifTitle`, and `notifBody`.
 
 - `status`: the number of markdown items successfully created and written to the clipboard. Zero means failure, and one or above means success.
 - `notifTitle`: the title of the notification to show to the user.

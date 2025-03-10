@@ -14,190 +14,324 @@
    limitations under the License.
 -->
 
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <title>Stardown install and update instructions</title>
+        <link
+            rel="icon"
+            type="image/x-icon"
+            href="../../src/images/favicon.ico"
+        />
+        <link rel="stylesheet" href="./style.css" />
+    </head>
 
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Stardown install and update instructions</title>
-    <link rel="icon" type="image/x-icon" href="../../src/images/favicon.ico" />
-    <link rel="stylesheet" href="./style.css" />
-  </head>
+    <body>
+        <header>
+            <h1>
+                <a
+                    href="https://github.com/Stardown-app/Stardown"
+                    style="text-decoration: none"
+                >
+                    <img src="../../src/images/stardown-48.png" />
+                    Stardown
+                </a>
+            </h1>
+        </header>
 
-  <body>
-    <header>
-      <h1>
-        <a href="https://github.com/Stardown-app/Stardown" style="text-decoration: none;">
-          <img src="../../src/images/stardown-48.png" />
-          Stardown
-        </a>
-      </h1>
-    </header>
+        <main>
+            <p id="latestVersion"></p>
 
-    <main>
-      <p id="latestVersion"></p>
+            <noscript>
+                <p>
+                    You can install Stardown from
+                    <a
+                        href="https://chrome.google.com/webstore/detail/clicknohlhfdlfjfkaeongkbdgbmkbhb"
+                        target="_blank"
+                    >
+                        the Chrome Web Store</a
+                    >
+                    or from
+                    <a
+                        href="https://addons.mozilla.org/en-US/firefox/addon/stardown/"
+                        target="_blank"
+                    >
+                        Add-ons for Firefox</a
+                    >.
+                </p>
+                <p>
+                    If you would prefer to install from source, there are two
+                    methods:
+                </p>
+                <h2>
+                    Install with <a href="https://git-scm.com">Git</a> and
+                    <a href="https://nodejs.org">Node v14+</a>
+                </h2>
+                <ol>
+                    <li>
+                        Run
+                        <code
+                            >git clone
+                            https://github.com/Stardown-app/Stardown.git && cd
+                            Stardown</code
+                        >
+                    </li>
+                    <li>Run <code>npm install</code></li>
+                    <li>
+                        Then run <code>npm run build-firefox</code> for Firefox
+                        or <code>npm run build-chrome</code> for a Chromium
+                        browser (Chrome, Edge, Brave, Vivaldi, Opera, Arc, etc.)
+                    </li>
+                    <li>
+                        In your browser, open
+                        <code>about:debugging#/runtime/this-firefox</code> in
+                        Firefox or <code>chrome://extensions/</code> in a
+                        Chromium browser
+                    </li>
+                    <li>
+                        If you're using a Chromium browser, turn on developer
+                        mode
+                    </li>
+                    <li>Click "Load Temporary Add-on..." or "Load unpacked"</li>
+                    <li>
+                        If in Firefox, select Stardown's
+                        <code>firefox/manifest.json</code> file. If in a
+                        Chromium browser, select Stardown's
+                        <code>chrome</code> folder.
+                    </li>
+                </ol>
+                <h2>Install with a zip file</h2>
+                <ol>
+                    <li>
+                        <a
+                            href="https://github.com/Stardown-app/Stardown/releases/latest"
+                            target="_blank"
+                        >
+                            Download the zip file</a
+                        >
+                        named after your browser
+                    </li>
+                    <li>Unzip the zip file</li>
+                    <li>
+                        If in Firefox, select the
+                        <code>manifest.json</code> file. If in a Chromium
+                        browser, select the folder.
+                    </li>
+                </ol>
+                <hr />
+                <p>The form below only works when JavaScript is enabled.</p>
+                <hr />
+            </noscript>
 
-      <noscript>
-        <p>
-          You can install Stardown from
-          <a href="https://chrome.google.com/webstore/detail/clicknohlhfdlfjfkaeongkbdgbmkbhb" target="_blank">
-            the Chrome Web Store</a>
-          or from
-          <a href="https://addons.mozilla.org/en-US/firefox/addon/stardown/" target="_blank">
-            Add-ons for Firefox</a>.
-        </p>
-        <p>If you would prefer to install from source, there are two methods:</p>
-        <h2>
-          Install with <a href="https://git-scm.com">Git</a>
-          and <a href="https://nodejs.org">Node v14+</a>
-        </h2>
-        <ol>
-          <li>
-            Run <code>git clone https://github.com/Stardown-app/Stardown.git && cd Stardown</code>
-          </li>
-          <li>
-            Run <code>npm install</code>
-          </li>
-          <li>
-            Then run <code>npm run build-firefox</code> for Firefox or <code>npm run
-              build-chrome</code> for a Chromium browser (Chrome, Edge, Brave, Vivaldi, Opera, Arc, etc.)
-          </li>
-          <li>
-            In your browser, open <code>about:debugging#/runtime/this-firefox</code>
-            in Firefox or <code>chrome://extensions/</code> in a Chromium browser
-          </li>
-          <li>If you're using a Chromium browser, turn on developer mode</li>
-          <li>Click "Load Temporary Add-on..." or "Load unpacked"</li>
-          <li>
-            If in Firefox, select Stardown's <code>firefox/manifest.json</code> file.
-            If in a Chromium browser, select Stardown's <code>chrome</code> folder.
-          </li>
-        </ol>
-        <h2>Install with a zip file</h2>
-        <ol>
-          <li>
-            <a href="https://github.com/Stardown-app/Stardown/releases/latest" target="_blank">
-              Download the zip file</a> named after your browser
-          </li>
-          <li>Unzip the zip file</li>
-          <li>
-            If in Firefox, select the <code>manifest.json</code> file.
-            If in a Chromium browser, select the folder.
-          </li>
-        </ol>
-        <hr />
-        <p>The form below only works when JavaScript is enabled.</p>
-        <hr />
-      </noscript>
+            <form>
+                <fieldset>
+                    <ul>
+                        <li>
+                            <input
+                                type="radio"
+                                id="installing"
+                                name="installingOrUpdating"
+                                value="installing"
+                                checked
+                            />
+                            <label for="installing">Install Stardown</label>
+                        </li>
+                        <li>
+                            <input
+                                type="radio"
+                                id="updating"
+                                name="installingOrUpdating"
+                                value="updating"
+                            />
+                            <label for="updating">Update Stardown</label>
+                        </li>
+                    </ul>
+                </fieldset>
 
-      <form>
-        <fieldset>
-          <ul>
-            <li>
-              <input type="radio" id="installing" name="installingOrUpdating" value="installing" checked />
-              <label for="installing">Install Stardown</label>
-            </li>
-            <li>
-              <input type="radio" id="updating" name="installingOrUpdating" value="updating" />
-              <label for="updating">Update Stardown</label>
-            </li>
-          </ul>
-        </fieldset>
+                <fieldset>
+                    <legend>Browser</legend>
+                    <ul>
+                        <li>
+                            <input
+                                type="radio"
+                                id="chromium"
+                                name="browser"
+                                value="chromium"
+                                checked
+                            />
+                            <label for="chromium"
+                                >Chromium (Chrome, Edge, Brave, Vivaldi, Opera,
+                                Arc, etc.)</label
+                            >
+                        </li>
+                        <li>
+                            <input
+                                type="radio"
+                                id="firefox"
+                                name="browser"
+                                value="firefox"
+                            />
+                            <label for="firefox">Firefox</label>
+                        </li>
+                        <li>
+                            <input
+                                type="radio"
+                                id="safari"
+                                name="browser"
+                                value="safari"
+                            />
+                            <label for="safari">Safari</label>
+                        </li>
+                    </ul>
+                </fieldset>
 
-        <fieldset>
-          <legend>Browser</legend>
-          <ul>
-            <li>
-              <input type="radio" id="chromium" name="browser" value="chromium" checked />
-              <label for="chromium">Chromium (Chrome, Edge, Brave, Vivaldi, Opera, Arc, etc.)</label>
-            </li>
-            <li>
-              <input type="radio" id="firefox" name="browser" value="firefox" />
-              <label for="firefox">Firefox</label>
-            </li>
-            <li>
-              <input type="radio" id="safari" name="browser" value="safari" />
-              <label for="safari">Safari</label>
-            </li>
-          </ul>
-        </fieldset>
+                <!-- if updating -->
+                <fieldset id="installedWith">
+                    <legend>How did you install Stardown?</legend>
+                    <ul>
+                        <li>
+                            <input
+                                type="radio"
+                                id="installedWithStore"
+                                name="installedWith"
+                                value="installedWithStore"
+                            />
+                            <label for="installedWithStore"
+                                >extension store</label
+                            >
+                        </li>
+                        <li>
+                            <input
+                                type="radio"
+                                id="installedWithZip"
+                                name="installedWith"
+                                value="installedWithZip"
+                            />
+                            <label for="installedWithZip"
+                                >with a zip file</label
+                            >
+                        </li>
+                        <li>
+                            <input
+                                type="radio"
+                                id="installedWithTerminal"
+                                name="installedWith"
+                                value="installedWithTerminal"
+                            />
+                            <label for="installedWithTerminal"
+                                >with a terminal</label
+                            >
+                        </li>
+                    </ul>
+                </fieldset>
 
-        <!-- if updating -->
-        <fieldset id="installedWith">
-          <legend>How did you install Stardown?</legend>
-          <ul>
-            <li>
-              <input type="radio" id="installedWithStore" name="installedWith" value="installedWithStore" />
-              <label for="installedWithStore">extension store</label>
-            </li>
-            <li>
-              <input type="radio" id="installedWithZip" name="installedWith" value="installedWithZip" />
-              <label for="installedWithZip">with a zip file</label>
-            </li>
-            <li>
-              <input type="radio" id="installedWithTerminal" name="installedWith" value="installedWithTerminal" />
-              <label for="installedWithTerminal">with a terminal</label>
-            </li>
-          </ul>
-        </fieldset>
+                <!-- if installing -->
+                <fieldset id="willInstallWith">
+                    <legend>How would you like to install Stardown?</legend>
+                    <ul>
+                        <li>
+                            <input
+                                type="radio"
+                                id="willInstallWithStore"
+                                name="willInstallWith"
+                                value="willInstallWithStore"
+                            />
+                            <label for="willInstallWithStore"
+                                >extension store</label
+                            >
+                        </li>
+                        <li>
+                            <input
+                                type="radio"
+                                id="willInstallWithZip"
+                                name="willInstallWith"
+                                value="willInstallWithZip"
+                            />
+                            <label for="willInstallWithZip"
+                                >with a zip file</label
+                            >
+                        </li>
+                        <li>
+                            <input
+                                type="radio"
+                                id="willInstallWithTerminal"
+                                name="willInstallWith"
+                                value="willInstallWithTerminal"
+                            />
+                            <label for="willInstallWithTerminal"
+                                >with a terminal</label
+                            >
+                        </li>
+                    </ul>
+                </fieldset>
 
-        <!-- if installing -->
-        <fieldset id="willInstallWith">
-          <legend>How would you like to install Stardown?</legend>
-          <ul>
-            <li>
-              <input type="radio" id="willInstallWithStore" name="willInstallWith" value="willInstallWithStore" />
-              <label for="willInstallWithStore">extension store</label>
-            </li>
-            <li>
-              <input type="radio" id="willInstallWithZip" name="willInstallWith" value="willInstallWithZip" />
-              <label for="willInstallWithZip">with a zip file</label>
-            </li>
-            <li>
-              <input type="radio" id="willInstallWithTerminal" name="willInstallWith" value="willInstallWithTerminal" />
-              <label for="willInstallWithTerminal">with a terminal</label>
-            </li>
-          </ul>
-        </fieldset>
-
-        <!-- if installing and using a terminal -->
-        <fieldset id="hasNodeV14Plus">
-          <legend>Do you have Node v14+ installed? You can check with <code>node --version</code></legend>
-          <!-- v14+ because Stardown uses Rollup for bundling, and Rollup uses features
+                <!-- if installing and using a terminal -->
+                <fieldset id="hasNodeV14Plus">
+                    <legend>
+                        Do you have Node v14+ installed? You can check with
+                        <code>node --version</code>
+                    </legend>
+                    <!-- v14+ because Stardown uses Rollup for bundling, and Rollup uses features
           only available in Node v14+. -->
-          <ul>
-            <li>
-              <input type="radio" id="yesNodeV14Plus" name="hasNodeV14Plus" value="yesNodeV14Plus" />
-              <label for="yesNodeV14Plus">yes</label>
-            </li>
-            <li>
-              <input type="radio" id="noNodeV14Plus" name="hasNodeV14Plus" value="noNodeV14Plus" />
-              <label for="noNodeV14Plus">no</label>
-            </li>
-          </ul>
-        </fieldset>
+                    <ul>
+                        <li>
+                            <input
+                                type="radio"
+                                id="yesNodeV14Plus"
+                                name="hasNodeV14Plus"
+                                value="yesNodeV14Plus"
+                            />
+                            <label for="yesNodeV14Plus">yes</label>
+                        </li>
+                        <li>
+                            <input
+                                type="radio"
+                                id="noNodeV14Plus"
+                                name="hasNodeV14Plus"
+                                value="noNodeV14Plus"
+                            />
+                            <label for="noNodeV14Plus">no</label>
+                        </li>
+                    </ul>
+                </fieldset>
 
-        <!-- if (installing or updating) a zip file and there's a prerelease newer than the latest stable release -->
-         <fieldset id="wantsStableOrPrerelease">
-          <legend>Which version of Stardown do you want?</legend>
-          <ul>
-            <li>
-              <input type="radio" id="wantsStable" name="wantsStableOrPrerelease" value="wantsStable" />
-              <label id="wantsStableLabel" for="wantsStable">the latest stable version</label>
-            </li>
-            <li>
-              <input type="radio" id="wantsPrerelease" name="wantsStableOrPrerelease" value="wantsPrerelease" />
-              <label id="wantsPrereleaseLabel" for="wantsPrerelease">the newer prerelease version</label>
-            </li>
-          </ul>
-         </fieldset>
-      </form>
+                <!-- if (installing or updating) a zip file and there's a prerelease newer than the latest stable release -->
+                <fieldset id="wantsStableOrPrerelease">
+                    <legend>Which version of Stardown do you want?</legend>
+                    <ul>
+                        <li>
+                            <input
+                                type="radio"
+                                id="wantsStable"
+                                name="wantsStableOrPrerelease"
+                                value="wantsStable"
+                            />
+                            <label id="wantsStableLabel" for="wantsStable"
+                                >the latest stable version</label
+                            >
+                        </li>
+                        <li>
+                            <input
+                                type="radio"
+                                id="wantsPrerelease"
+                                name="wantsStableOrPrerelease"
+                                value="wantsPrerelease"
+                            />
+                            <label
+                                id="wantsPrereleaseLabel"
+                                for="wantsPrerelease"
+                                >the newer prerelease version</label
+                            >
+                        </li>
+                    </ul>
+                </fieldset>
+            </form>
 
-      <div id="instructions"></div>
-    </main>
+            <div id="instructions"></div>
+        </main>
 
-    <script src="./script.js"></script>
-  </body>
-
+        <script src="./script.js"></script>
+    </body>
 </html>

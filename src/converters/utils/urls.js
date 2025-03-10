@@ -22,7 +22,7 @@
  * @returns {string}
  */
 export function absolutize(url, locationHref) {
-    if (url === '' || url.startsWith('http://') || url.startsWith('https://')) {
+    if (url === "" || url.startsWith("http://") || url.startsWith("https://")) {
         return url;
     }
     const locationUrl = new URL(locationHref);
@@ -36,7 +36,7 @@ export function absolutize(url, locationHref) {
  * @returns {void}
  */
 export function absolutizeNodeUrls(node, locationHref) {
-    const hrefEls = node.querySelectorAll('[href]');
+    const hrefEls = node.querySelectorAll("[href]");
     for (let i = 0; i < hrefEls.length; i++) {
         const hrefEl = hrefEls[i];
         if (hrefEl.href) {
@@ -44,7 +44,7 @@ export function absolutizeNodeUrls(node, locationHref) {
         }
     }
 
-    const srcEls = node.querySelectorAll('[src]');
+    const srcEls = node.querySelectorAll("[src]");
     for (let i = 0; i < srcEls.length; i++) {
         const srcEl = srcEls[i];
         if (srcEl.src) {

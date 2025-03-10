@@ -14,17 +14,17 @@
    limitations under the License.
 */
 
-import test from 'node:test'; // https://nodejs.org/api/test.html
-import assert from 'node:assert/strict'; // https://nodejs.org/api/assert.html#assert
-import { JSDOM } from 'jsdom'; // https://www.npmjs.com/package/jsdom
-import { htmlTableToCsv } from '../src/converters/csv.js';
+import test from "node:test"; // https://nodejs.org/api/test.html
+import assert from "node:assert/strict"; // https://nodejs.org/api/assert.html#assert
+import { JSDOM } from "jsdom"; // https://www.npmjs.com/package/jsdom
+import { htmlTableToCsv } from "../src/converters/csv.js";
 
-global.location = { href: 'https://example.com' };
+global.location = { href: "https://example.com" };
 
 function runTest(testName, htmlInput, csvExpected) {
-    test(testName, async t => {
+    test(testName, async (t) => {
         global.document = new JSDOM(htmlInput).window.document;
-        const csvActual = await htmlTableToCsv(global.document.body, '\t');
+        const csvActual = await htmlTableToCsv(global.document.body, "\t");
         assert.equal(csvActual, csvExpected);
     });
 }
@@ -38,13 +38,13 @@ function runTests() {
 
 const tests = [
     {
-        testName: '0x0',
+        testName: "0x0",
         htmlInput: `<table>
             </table>`,
         csvExpected: ``,
     },
     {
-        testName: '1x1',
+        testName: "1x1",
         htmlInput: `<table>
                 <tr>
                     <th>
@@ -56,7 +56,7 @@ const tests = [
 `,
     },
     {
-        testName: '2x1',
+        testName: "2x1",
         htmlInput: `<table>
                 <tr>
                     <th>
@@ -68,10 +68,10 @@ const tests = [
                 </tr>
             </table>`,
         csvExpected: `a\tb\r
-`
+`,
     },
     {
-        testName: '1x2',
+        testName: "1x2",
         htmlInput: `<table>
                 <tr>
                     <th>
@@ -86,10 +86,10 @@ const tests = [
             </table>`,
         csvExpected: `a\r
 c\r
-`
+`,
     },
     {
-        testName: '2x2',
+        testName: "2x2",
         htmlInput: `<table>
                 <tr>
                     <th>
@@ -110,10 +110,10 @@ c\r
             </table>`,
         csvExpected: `a\tb\r
 c\td\r
-`
+`,
     },
     {
-        testName: 'caption',
+        testName: "caption",
         htmlInput: `<table>
                 <caption>
                     this is a caption
@@ -133,10 +133,10 @@ c\td\r
             </table>`,
         csvExpected: `a\r
 b\r
-`
+`,
     },
     {
-        testName: 'colspan',
+        testName: "colspan",
         htmlInput: `<table>
                 <tr>
                     <th colspan="2">
@@ -160,10 +160,10 @@ b\r
             </table>`,
         csvExpected: `a\ta\tb\r
 c\td\te\r
-`
+`,
     },
     {
-        testName: 'rowspan',
+        testName: "rowspan",
         htmlInput: `<table>
                 <tr>
                     <th rowspan="2">
@@ -190,10 +190,10 @@ c\td\te\r
         csvExpected: `a\tb\r
 a\tc\r
 d\te\r
-`
+`,
     },
     {
-        testName: 'parallel colspans',
+        testName: "parallel colspans",
         htmlInput: `<table>
                 <tr>
                     <td colspan="2">
@@ -217,10 +217,10 @@ d\te\r
         csvExpected: `a\ta\r
 b\tc\r
 d\td\r
-`
+`,
     },
     {
-        testName: 'parallel rowspans',
+        testName: "parallel rowspans",
         htmlInput: `<table>
                 <tr>
                     <td rowspan="2">
@@ -241,10 +241,10 @@ d\td\r
             </table>`,
         csvExpected: `a\tb\tc\r
 a\td\tc\r
-`
+`,
     },
     {
-        testName: 'colspan and rowspan in the same cell',
+        testName: "colspan and rowspan in the same cell",
         htmlInput: `<table>
                 <tr>
                     <td>
@@ -274,10 +274,10 @@ a\td\tc\r
         csvExpected: `a\tb\tc\r
 d\te\te\r
 f\te\te\r
-`
+`,
     },
     {
-        testName: 'colspan and rowspan in the same leading empty cell',
+        testName: "colspan and rowspan in the same leading empty cell",
         htmlInput: `<table>
                 <tr>
                     <td colspan="2" rowspan="2">
@@ -306,10 +306,10 @@ f\te\te\r
         csvExpected: `\t\ta\r
 \t\tb\r
 c\td\te\r
-`
+`,
     },
     {
-        testName: 'colspan and rowspan in the same middle empty cell',
+        testName: "colspan and rowspan in the same middle empty cell",
         htmlInput: `<table>
                 <tr>
                     <td>
@@ -338,7 +338,7 @@ c\td\te\r
         csvExpected: `a\tb\tc\r
 d\t\t\r
 e\t\t\r
-`
+`,
     },
 ];
 

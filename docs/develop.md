@@ -8,7 +8,7 @@ Stardown's main goal is to be so simple, fast, reliable, and flexible that peopl
 
 ## Tests
 
-Run the tests with `npm run test`.
+Run the tests with `npm test`.
 
 If a certain test fails, its error message will tell you to run `npm run md-diff`. See [../src/converters/README.md#testing](../src/converters/README.md#testing) for more details.
 
@@ -17,6 +17,8 @@ Manual testing is often helpful too. When testing manually, see [./manual-testin
 ## Git workflow
 
 Let's create feature branches with descriptive names and make pull requests as described in [Getting started with Git and GitHub](https://chriswheeler.dev/posts/getting-started-with-git-and-github/#git-workflows).
+
+This project uses [Prettier](https://prettier.io/) to format code. The formatting is enforced on each pull request, so you might want to [install Prettier](https://prettier.io/docs/install#set-up-your-editor) into your editor and as a Git hook.
 
 ## Writing import statements
 
@@ -85,7 +87,7 @@ Sample markdown tables for testing markdown renderers can be found in [./sample-
 **HTML table definition**
 
 > In this order: optionally a caption element, followed by zero or more colgroup elements, followed optionally by a thead element, followed by either zero or more tbody elements or one or more tr elements, followed optionally by a tfoot element, optionally intermixed with one or more script-supporting elements.
-> 
+>
 > — [the HTML Standard](https://html.spec.whatwg.org/multipage/tables.html)
 
 ## Releasing
@@ -96,8 +98,8 @@ Here's what I do when creating a new release:
 2. Update the `VERSION` variable in [../src/version.js](../src/version.js)
 3. Run `npm run check-version` to make sure the new version is correctly formatted.
 4. If the new version is a stable release
-   1. Update the "version" properties in the manifests
-   2. Update [../src/updated.html](../src/updated.html)
+    1. Update the "version" properties in the manifests
+    2. Update [../src/updated.html](../src/updated.html)
 5. Commit, push, make a pull request into the main branch, merge, and pull
 6. Tag the merge commit with the same value as the `VERSION` variable in settings.js
 7. Push the tag

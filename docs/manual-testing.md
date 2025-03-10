@@ -43,9 +43,9 @@ When the user right-clicks part of a web page, their browser detects the type of
 - **link**: any clickable link on a page. However, for a link that is also an image, Stardown should show only the image copy option.
 - **image**: types supported include png, jpg, svg, webp, gif, and base64-encoded. Types not supported include background images, `canvas` HTML elements, inline `svg` HTML elements, and sometimes images within `a` HTML elements for some reason.
 - **video**: a video rendered with the `video` HTML element, such as YouTube videos and mp4 files hosted by GitHub ([example on this page](https://github.com/wheelercj/zq)). This option doesn't appear for some video sites like [Vimeo](https://player.vimeo.com/video/55073825) probably because their `video` HTML element is buried under many other things, and [Asciinema](https://asciinema.org/) because they don't use the `video` HTML element.
-  - Markdown of YouTube videos is expected to render well in Obsidian and Discord, but not in GitHub by default.
-  - Markdown of GitHub mp4s is expected to render well only in GitHub.
-  - If the user changes the setting "Optimize markdown of YouTube videos for __" to "GitHub", then the output should render well in at least GitHub, Obsidian, and VS Code.
+    - Markdown of YouTube videos is expected to render well in Obsidian and Discord, but not in GitHub by default.
+    - Markdown of GitHub mp4s is expected to render well only in GitHub.
+    - If the user changes the setting "Optimize markdown of YouTube videos for \_" to "GitHub", then the output should render well in at least GitHub, Obsidian, and VS Code.
 - **audio**: an audio player rendered with the `audio` HTML element. Some good examples are the first two audio players on [New Audio HTML Element: Master It Out Now With Our Code Example »](https://html.com/tags/audio/).
 - **table**: a table of data rendered with the `table` HTML element. Browsers do not offer a built-in context type for this, so Stardown has its own table detection code that runs each time the user makes a selection.
 
@@ -62,13 +62,13 @@ When the user right-clicks part of a web page, their browser detects the type of
 - [ ] **Right-clicking an audio player** shows the "Copy audio" option.
 - [ ] **Selecting the contents of a table and right-clicking the selection** shows several options: "Copy markdown of table", "Copy TSV of table", "Copy CSV of table", "Copy JSON of table", and "Copy HTML of table". Each option should result in a table with everything aligned correctly, leaving some cells empty and others duplicated as necessary.
 - [ ] Context menu options
-  - [ ] "Copy link for this page" copies a markdown link for the page. The link is guaranteed to not have an HTML element ID nor a text fragment.
-  - [ ] "Copy link for this section" copies a markdown link for the page with the nearest HTML element ID above (*above* in the HTML element tree sense) where the page was right-clicked.
-  - [ ] "Copy selection" copies markdown of the selection (including all of the page's formatting that markdown supports).
-  - [ ] "Copy selection, cite source" does the same as "Copy selection" but also includes a markdown link containing a text fragment and possibly an HTML element ID.
-  - [ ] "Copy selection as a quote" does the same as "Copy selection, cite source" but formats the output as a markdown block quote.
-  - [ ] "Copy image" copies markdown of the image using the image's URL and any alt text.
-  - [ ] "Copy link" copies markdown of the link, using the same title and URL as the link in the page (except for any character escapes or encodings).
-  - [ ] "Copy video" copies markdown of the video using the video source's URL.
-  - [ ] "Copy audio" copies a markdown link to either an audio file or a site that plays the audio.
+    - [ ] "Copy link for this page" copies a markdown link for the page. The link is guaranteed to not have an HTML element ID nor a text fragment.
+    - [ ] "Copy link for this section" copies a markdown link for the page with the nearest HTML element ID above (_above_ in the HTML element tree sense) where the page was right-clicked.
+    - [ ] "Copy selection" copies markdown of the selection (including all of the page's formatting that markdown supports).
+    - [ ] "Copy selection, cite source" does the same as "Copy selection" but also includes a markdown link containing a text fragment and possibly an HTML element ID.
+    - [ ] "Copy selection as a quote" does the same as "Copy selection, cite source" but formats the output as a markdown block quote.
+    - [ ] "Copy image" copies markdown of the image using the image's URL and any alt text.
+    - [ ] "Copy link" copies markdown of the link, using the same title and URL as the link in the page (except for any character escapes or encodings).
+    - [ ] "Copy video" copies markdown of the video using the video source's URL.
+    - [ ] "Copy audio" copies a markdown link to either an audio file or a site that plays the audio.
 - [ ] **Change settings and repeat as necessary**

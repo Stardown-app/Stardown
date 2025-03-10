@@ -19,6 +19,6 @@
  * use `npm run check-version` to validate the version's format. This variable exists
  * because the "version" properties in the manifests only support stable release versions.
  */
-export const VERSION = 'v2.0.0-alpha.2503030152';
+export const VERSION = "v2.0.0-alpha.2503030152";
 export const stableReleaseTagPattern = /^v\d+\.\d+\.\d+$/;
 export const prereleaseTagPattern = /^v\d+\.\d+\.\d+-(?:alpha|beta)\.\d{10}$/; // the last 10 digits are YYMMDDhhmm in UTC

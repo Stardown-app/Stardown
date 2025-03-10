@@ -12,7 +12,7 @@
    governing permissions and limitations under the License.
 */
 
-import * as tables from './utils/tables.js';
+import * as tables from "./utils/tables.js";
 
 // - RFC 4180: https://datatracker.ietf.org/doc/html/rfc4180
 // - Comma-separated values - Wikipedia:
@@ -26,15 +26,15 @@ import * as tables from './utils/tables.js';
  * @param {string} delimiter - what to separate fields with.
  * @returns {Promise<string>}
  */
-export async function htmlTableToCsv(frag, delimiter = ',') {
+export async function htmlTableToCsv(frag, delimiter = ",") {
     const table = frag.firstChild;
 
     const ctx = {
         document: document,
-        delimiter: delimiter,   // what to separate fields with
-        encapsulator: '"',      // what to encapsulate fields with
-        escaper: '"',           // what to escape the encapsulator within fields with
-        lineTerminator: '\r\n', // what to separate rows with
+        delimiter: delimiter, // what to separate fields with
+        encapsulator: '"', // what to encapsulate fields with
+        escaper: '"', // what to escape the encapsulator within fields with
+        lineTerminator: "\r\n", // what to separate rows with
     };
 
     return convertTable(ctx, table);
@@ -69,14 +69,19 @@ function convertTable(ctx, table) {
             const cell = row[x];
 
             /** @type {string} */
-            let cellStr = (cell.textContent || '').trim().replaceAll(/\s+/g, ' ');
+            let cellStr = (cell.textContent || "")
+                .trim()
+                .replaceAll(/\s+/g, " ");
 
             if (
                 cellStr.includes(ctx.encapsulator) ||
                 cellStr.includes(ctx.delimiter) ||
                 cellStr.includes(ctx.lineTerminator)
             ) {
-                cellStr = cellStr.replaceAll(ctx.encapsulator, ctx.escaper + ctx.encapsulator);
+                cellStr = cellStr.replaceAll(
+                    ctx.encapsulator,
+                    ctx.escaper + ctx.encapsulator,
+                );
                 csv.push(ctx.encapsulator, cellStr, ctx.encapsulator);
             } else {
                 csv.push(cellStr);
@@ -90,5 +95,5 @@ function convertTable(ctx, table) {
         csv.push(ctx.lineTerminator);
     }
 
-    return csv.join('');
+    return csv.join("");
 }

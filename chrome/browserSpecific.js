@@ -14,7 +14,7 @@
    limitations under the License.
 */
 
-import * as menu from './menu.js';
+import * as menu from "./menu.js";
 
 export const browser = chrome;
 
@@ -25,7 +25,7 @@ export const browser = chrome;
  * @returns {Promise<void>}
  */
 export async function sleep(ms) {
-    return new Promise(resolve => setTimeout(resolve, ms));
+    return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
 /**
@@ -71,7 +71,7 @@ export async function updateContextMenu(context) {
     if (!isTableSelected) {
         browser.contextMenus.removeAll();
 
-        if (context.mouseup === 'table') {
+        if (context.mouseup === "table") {
             isTableSelected = true;
             browser.contextMenus.create(menu.markdownTableItem);
             browser.contextMenus.create(menu.tsvTableItem);
@@ -79,9 +79,9 @@ export async function updateContextMenu(context) {
             browser.contextMenus.create(menu.jsonTableItem);
             browser.contextMenus.create(menu.htmlTableItem);
         } else {
-            if (context.mouseover === 'image') {
+            if (context.mouseover === "image") {
                 browser.contextMenus.create(menu.imageItem);
-            } else if (context.mouseover === 'link') {
+            } else if (context.mouseover === "link") {
                 browser.contextMenus.create(menu.linkItem);
             }
 

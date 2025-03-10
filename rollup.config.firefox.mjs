@@ -15,8 +15,8 @@
 */
 
 // https://rollupjs.org/
-import copy from 'rollup-plugin-copy'; // https://www.npmjs.com/package/rollup-plugin-copy
-import del from 'rollup-plugin-delete'; // https://www.npmjs.com/package/rollup-plugin-delete
+import copy from "rollup-plugin-copy"; // https://www.npmjs.com/package/rollup-plugin-copy
+import del from "rollup-plugin-delete"; // https://www.npmjs.com/package/rollup-plugin-delete
 
 // This is a Rollup configuration file for building the Firefox extension. It first
 // copies all the necessary files from `src` to the `firefox` directory, then replaces
@@ -34,7 +34,7 @@ import del from 'rollup-plugin-delete'; // https://www.npmjs.com/package/rollup-
  * @returns {any}
  */
 function transform(contents, filename) {
-    if (!filename.endsWith('.js')) {
+    if (!filename.endsWith(".js")) {
         return contents;
     }
 
@@ -43,23 +43,24 @@ function transform(contents, filename) {
         .replace(
             // Remove all `browser` imports because firefox/browserSpecific.js doesn't
             // define `browser` because Firefox already has a global `browser` variable.
-            /(import \{.*?)browser,?(.*?\} from ['"])/,
-            '$1$2',
-        ).replace(
+            /((?:^|\n)import\s*\{(?:\s*\w+,)*)\s*browser,?((?:\s*\w+,?)*\s*\}\s*from)/,
+            "$1$2",
+        )
+        .replace(
             // Comment out `window.onload = setUpListeners` because although Chrome
             // needs it, in Firefox it causes a "Clipboard write is not allowed" error
             // on some sites despite not preventing clipboard writes.
             /window\.onload = setUpListeners/,
-            '// window.onload = setUpListeners',
+            "// window.onload = setUpListeners",
         );
 }
 
 export default [
     {
-        input: 'firefox/background.js',
+        input: "firefox/background.js",
         output: {
-            file: 'firefox/background.js',
-            format: 'iife', // immediately-invoked function expression
+            file: "firefox/background.js",
+            format: "iife", // immediately-invoked function expression
         },
         plugins: [
             copy({
@@ -70,73 +71,73 @@ export default [
                 targets: [
                     {
                         // copy the images folder and html & css files
-                        src: ['src/images', 'src/**/*.html', 'src/**/*.css'],
-                        dest: 'firefox',
+                        src: ["src/images", "src/**/*.html", "src/**/*.css"],
+                        dest: "firefox",
                     },
                     {
                         // copy js files and transform them
-                        src: ['src/**/*.js', '!src/browserSpecific.js'],
-                        dest: 'firefox',
+                        src: ["src/**/*.js", "!src/browserSpecific.js"],
+                        dest: "firefox",
                         transform: transform,
                     },
                 ],
                 flatten: false, // don't combine all nested folders into one flat folder
-                hook: 'buildStart', // run the copy before the build starts
+                hook: "buildStart", // run the copy before the build starts
             }),
-        ]
+        ],
     },
     {
-        input: 'firefox/content.js',
+        input: "firefox/content.js",
         output: {
-            file: 'firefox/content.js',
-            format: 'iife', // immediately-invoked function expression
+            file: "firefox/content.js",
+            format: "iife", // immediately-invoked function expression
         },
     },
     {
-        input: 'firefox/popup.js',
+        input: "firefox/popup.js",
         output: {
-            file: 'firefox/popup.js',
-            format: 'iife', // immediately-invoked function expression
+            file: "firefox/popup.js",
+            format: "iife", // immediately-invoked function expression
         },
     },
     {
-        input: 'firefox/sidebar.js',
+        input: "firefox/sidebar.js",
         output: {
-            file: 'firefox/sidebar.js',
-            format: 'iife', // immediately-invoked function expression
+            file: "firefox/sidebar.js",
+            format: "iife", // immediately-invoked function expression
         },
     },
     {
-        input: 'firefox/settings.js',
+        input: "firefox/settings.js",
         output: {
-            file: 'firefox/settings.js',
-            format: 'iife', // immediately-invoked function expression
+            file: "firefox/settings.js",
+            format: "iife", // immediately-invoked function expression
         },
         plugins: [
             del({
                 // Delete all files in the `firefox` directory that were imported into
                 // other files there and are no longer needed.
                 targets: [
-                    'firefox/*', // delete all files except the ones below
+                    "firefox/*", // delete all files except the ones below
 
-                    '!firefox/images',
+                    "!firefox/images",
 
-                    '!firefox/manifest.json',
+                    "!firefox/manifest.json",
 
-                    '!firefox/**/*.html',
-                    '!firefox/**/*.css',
+                    "!firefox/**/*.html",
+                    "!firefox/**/*.css",
 
-                    '!firefox/browserSpecific.js',
-                    '!firefox/background.js',
-                    '!firefox/content.js',
-                    '!firefox/popup.js',
-                    '!firefox/sidebar.js',
-                    '!firefox/settings.js',
-                    '!firefox/text-fragment-utils.js',
-                    '!firefox/fragment-generation-utils.js',
+                    "!firefox/browserSpecific.js",
+                    "!firefox/background.js",
+                    "!firefox/content.js",
+                    "!firefox/popup.js",
+                    "!firefox/sidebar.js",
+                    "!firefox/settings.js",
+                    "!firefox/text-fragment-utils.js",
+                    "!firefox/fragment-generation-utils.js",
                 ],
-                hook: 'buildEnd', // run the delete after the build ends
-            })
-        ]
-    }
+                hook: "buildEnd", // run the delete after the build ends
+            }),
+        ],
+    },
 ];

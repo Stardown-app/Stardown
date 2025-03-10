@@ -14,12 +14,12 @@
    limitations under the License.
 */
 
-import fs from 'node:fs/promises';
-import { JSDOM } from 'jsdom'; // https://www.npmjs.com/package/jsdom
-import { diffChars } from 'diff'; // https://www.npmjs.com/package/diff
-import { htmlToMd } from '../src/converters/md.js';
+import fs from "node:fs/promises";
+import { JSDOM } from "jsdom"; // https://www.npmjs.com/package/jsdom
+import { diffChars } from "diff"; // https://www.npmjs.com/package/diff
+import { htmlToMd } from "../src/converters/md.js";
 
-global.location = { href: 'https://example.com' };
+global.location = { href: "https://example.com" };
 
 /**
  * diffMd creates a file with the differences between the actual and expected markdown
@@ -27,8 +27,12 @@ global.location = { href: 'https://example.com' };
  * @returns {Promise<number>}
  */
 export async function diffMd() {
-    const htmlInput = await fs.readFile('./test/inputForMd.html', { encoding: 'utf8' });
-    const mdExpected = await fs.readFile('./test/expected.md', { encoding: 'utf8' });
+    const htmlInput = await fs.readFile("./test/inputForMd.html", {
+        encoding: "utf8",
+    });
+    const mdExpected = await fs.readFile("./test/expected.md", {
+        encoding: "utf8",
+    });
 
     global.document = new JSDOM(htmlInput).window.document;
     const mdActual = await htmlToMd(global.document.body);
@@ -67,36 +71,36 @@ export async function diffMd() {
     `);
 
     // add at the top the numbers of characters that are unexpected and missing
-    result.push(`<div id="countsDiv"><div style="color: red; display: inline"><div id="unexpectedCount" style="display: inline"></div> unexpected</div>   <div style="color: green; display: inline"><div id="missingCount" style="display: inline"></div> missing</div></div><br>`);
+    result.push(
+        `<div id="countsDiv"><div style="color: red; display: inline"><div id="unexpectedCount" style="display: inline"></div> unexpected</div>   <div style="color: green; display: inline"><div id="missingCount" style="display: inline"></div> missing</div></div><br>`,
+    );
 
     let unexpectedCount = 0;
     let missingCount = 0;
 
-    diff.forEach(part => {
+    diff.forEach((part) => {
         if (!part || !part.value) {
             return;
         }
 
-        let value = part.value
-            .replaceAll('<', '&lt;')
-            .replaceAll('>', '&gt;')
+        let value = part.value.replaceAll("<", "&lt;").replaceAll(">", "&gt;");
 
         if (part.added) {
             missingCount += part.value.length;
             value = value
-                .replaceAll('\n', '\\n\n')
-                .replaceAll('\t', '\\t\t')
-                .replaceAll('\r', '\\r\r')
-            result.push('<span class="missing">' + value + '</span>');
+                .replaceAll("\n", "\\n\n")
+                .replaceAll("\t", "\\t\t")
+                .replaceAll("\r", "\\r\r");
+            result.push('<span class="missing">' + value + "</span>");
         } else if (part.removed) {
             unexpectedCount += part.value.length;
             value = value
-                .replaceAll('\n', '\\n\n')
-                .replaceAll('\t', '\\t\t')
-                .replaceAll('\r', '\\r\r')
-            result.push('<span class="unexpected">' + value + '</span>');
+                .replaceAll("\n", "\\n\n")
+                .replaceAll("\t", "\\t\t")
+                .replaceAll("\r", "\\r\r");
+            result.push('<span class="unexpected">' + value + "</span>");
         } else {
-            result.push('<span>' + value + '</span>');
+            result.push("<span>" + value + "</span>");
         }
     });
 
@@ -114,7 +118,7 @@ export async function diffMd() {
         </html>
     `);
 
-    await fs.writeFile('./test/md.diff.html', result.join(''));
+    await fs.writeFile("./test/md.diff.html", result.join(""));
 
     return unexpectedCount + missingCount;
 }

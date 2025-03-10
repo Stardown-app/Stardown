@@ -14,14 +14,14 @@
    limitations under the License.
 */
 
-import { getSetting } from './getSetting.js';
-import { sendToNotepad, applyTemplate } from './contentUtils.js';
-import { absolutizeNodeUrls } from './converters/utils/urls.js';
-import { nodeTypes, improveConvertibility } from './converters/utils/html.js';
-import { createLink } from './generators/all.js';
-import * as md from './generators/md.js';
-import { htmlToMd, mdEncodeUri } from './converters/md.js';
-import { htmlToMdAndHtml } from './converters/mdAndHtml.js';
+import { getSetting } from "./getSetting.js";
+import { sendToNotepad, applyTemplate } from "./contentUtils.js";
+import { absolutizeNodeUrls } from "./converters/utils/urls.js";
+import { nodeTypes, improveConvertibility } from "./converters/utils/html.js";
+import { createLink } from "./generators/all.js";
+import * as md from "./generators/md.js";
+import { htmlToMd, mdEncodeUri } from "./converters/md.js";
+import { htmlToMdAndHtml } from "./converters/mdAndHtml.js";
 
 /**
  * createText creates text of the selected part of the page. The output markup language
@@ -34,7 +34,7 @@ import { htmlToMdAndHtml } from './converters/mdAndHtml.js';
  * @returns {Promise<string>}
  */
 export async function createText(title, sourceUrl, selection, messageCategory) {
-    const markupLanguage = await getSetting('markupLanguage');
+    const markupLanguage = await getSetting("markupLanguage");
 
     const selectedText = selection?.toString().trim();
     if (!selectedText) {
@@ -43,7 +43,7 @@ export async function createText(title, sourceUrl, selection, messageCategory) {
         return link;
     }
 
-    if (markupLanguage === 'html') {
+    if (markupLanguage === "html") {
         /** @type {DocumentFragment|null} */
         const frag = await getSelectionFragment(selection);
         if (frag === null) {
@@ -56,7 +56,7 @@ export async function createText(title, sourceUrl, selection, messageCategory) {
         absolutizeNodeUrls(frag, sourceUrl);
 
         // convert the fragment to a string
-        const div = document.createElement('div');
+        const div = document.createElement("div");
         div.appendChild(frag.cloneNode(true));
         const result = div.innerHTML || selectedText;
 
@@ -64,32 +64,52 @@ export async function createText(title, sourceUrl, selection, messageCategory) {
         return result;
     }
 
-    if (markupLanguage !== 'markdown' && markupLanguage !== 'markdown with some html') {
+    if (
+        markupLanguage !== "markdown" &&
+        markupLanguage !== "markdown with some html"
+    ) {
         console.error(`Unknown markupLanguage: ${markupLanguage}`);
         throw new Error(`Unknown markupLanguage: ${markupLanguage}`);
     }
 
     switch (messageCategory) {
-        case 'copySelectionShortcut':
+        case "copySelectionShortcut":
             const selectionMd = await formatSelection(
-                title, sourceUrl, selection, selectedText, markupLanguage,
+                title,
+                sourceUrl,
+                selection,
+                selectedText,
+                markupLanguage,
             );
             await sendToNotepad(selectionMd);
             return selectionMd;
-        case 'selectionRightClick':
-        case 'markdownTableRightClick':
-            const srcMd = await getSourceFormatMd(selection, selectedText, markupLanguage);
+        case "selectionRightClick":
+        case "markdownTableRightClick":
+            const srcMd = await getSourceFormatMd(
+                selection,
+                selectedText,
+                markupLanguage,
+            );
             await sendToNotepad(srcMd);
             return srcMd;
-        case 'selectionWithSourceRightClick':
+        case "selectionWithSourceRightClick":
             const templateMd = await getTemplatedMd(
-                title, sourceUrl, selection, selectedText, markupLanguage,
+                title,
+                sourceUrl,
+                selection,
+                selectedText,
+                markupLanguage,
             );
             await sendToNotepad(templateMd);
             return templateMd;
-        case 'selectionQuoteRightClick':
-            const body = await getSourceFormatMd(selection, selectedText, markupLanguage);
-            const blockquote = await md.createBlockquote(body, title, sourceUrl) + '\n';
+        case "selectionQuoteRightClick":
+            const body = await getSourceFormatMd(
+                selection,
+                selectedText,
+                markupLanguage,
+            );
+            const blockquote =
+                (await md.createBlockquote(body, title, sourceUrl)) + "\n";
             await sendToNotepad(blockquote);
             return blockquote;
         default:
@@ -107,11 +127,11 @@ export async function createText(title, sourceUrl, selection, messageCategory) {
  * @returns {Promise<DocumentFragment|null>}
  */
 export async function getSelectionFragment(selection) {
-    if (selection === null || selection.type === 'None') {
-        console.error('Failed to get a selection');
+    if (selection === null || selection.type === "None") {
+        console.error("Failed to get a selection");
         return null;
     } else if (selection.rangeCount === 0) {
-        console.error('Selection range count is zero');
+        console.error("Selection range count is zero");
         return null;
     }
 
@@ -147,18 +167,36 @@ export async function getSelectionFragment(selection) {
  * @param {string} markupLanguage
  * @returns {Promise<string>}
  */
-async function formatSelection(title, sourceUrl, selection, selectedText, markupLanguage) {
-    const selectionFormat = await getSetting('selectionFormat');
+async function formatSelection(
+    title,
+    sourceUrl,
+    selection,
+    selectedText,
+    markupLanguage,
+) {
+    const selectionFormat = await getSetting("selectionFormat");
     switch (selectionFormat) {
-        case 'Copy selection':
-            return await getSourceFormatMd(selection, selectedText, markupLanguage);
-        case 'Copy selection, cite source':
-            return await getTemplatedMd(
-                title, sourceUrl, selection, selectedText, markupLanguage,
+        case "Copy selection":
+            return await getSourceFormatMd(
+                selection,
+                selectedText,
+                markupLanguage,
             );
-        case 'Copy selection as a quote':
-            const body = await getSourceFormatMd(selection, selectedText, markupLanguage);
-            return await md.createBlockquote(body, title, sourceUrl) + '\n';
+        case "Copy selection, cite source":
+            return await getTemplatedMd(
+                title,
+                sourceUrl,
+                selection,
+                selectedText,
+                markupLanguage,
+            );
+        case "Copy selection as a quote":
+            const body = await getSourceFormatMd(
+                selection,
+                selectedText,
+                markupLanguage,
+            );
+            return (await md.createBlockquote(body, title, sourceUrl)) + "\n";
         default:
             console.error(`Unknown selectionFormat: ${selectionFormat}`);
             throw new Error(`Unknown selectionFormat: ${selectionFormat}`);
@@ -184,9 +222,9 @@ async function getSourceFormatMd(selection, selectedText, markupLanguage) {
     await improveConvertibility(frag, location);
 
     switch (markupLanguage) {
-        case 'markdown':
+        case "markdown":
             return await htmlToMd(frag);
-        case 'markdown with some html':
+        case "markdown with some html":
             return await htmlToMdAndHtml(frag);
         default:
             console.error(`Unknown markupLanguage: ${markupLanguage}`);
@@ -205,11 +243,21 @@ async function getSourceFormatMd(selection, selectedText, markupLanguage) {
  * @param {string} markupLanguage - the user's chosen markup language.
  * @returns {Promise<string>}
  */
-async function getTemplatedMd(title, sourceUrl, selection, selectedText, markupLanguage) {
+async function getTemplatedMd(
+    title,
+    sourceUrl,
+    selection,
+    selectedText,
+    markupLanguage,
+) {
     title = await md.createLinkTitle(title);
     sourceUrl = mdEncodeUri(sourceUrl);
-    const text = await getSourceFormatMd(selection, selectedText, markupLanguage);
-    const template = await getSetting('mdSelectionWithSourceTemplate');
+    const text = await getSourceFormatMd(
+        selection,
+        selectedText,
+        markupLanguage,
+    );
+    const template = await getSetting("mdSelectionWithSourceTemplate");
 
     return await applyTemplate(template, title, sourceUrl, text);
 }
@@ -248,10 +296,10 @@ function combineRanges(selection) {
                     currentRange.START_TO_END,
                     combinedRange,
                 ) >= 0 &&
-                currentRange.compareBoundaryPoints(
-                    currentRange.END_TO_START,
-                    combinedRange,
-                ) <= 0
+                    currentRange.compareBoundaryPoints(
+                        currentRange.END_TO_START,
+                        combinedRange,
+                    ) <= 0,
             );
 
             if (rangesOverlap) {
@@ -260,16 +308,26 @@ function combineRanges(selection) {
 
                 const isStartEqualToEnd = Boolean(
                     currentRange.startContainer === combinedEnd &&
-                    currentRange.startOffset === combinedEndOffset
+                        currentRange.startOffset === combinedEndOffset,
                 );
 
                 if (isStartEqualToEnd) {
-                    combinedRange.setEnd(currentRange.endContainer, currentRange.endOffset);
+                    combinedRange.setEnd(
+                        currentRange.endContainer,
+                        currentRange.endOffset,
+                    );
                 } else {
-                    combinedRange.setEnd(currentRange.startContainer, currentRange.startOffset);
+                    combinedRange.setEnd(
+                        currentRange.startContainer,
+                        currentRange.startOffset,
+                    );
                 }
-            } else { // if the ranges don't overlap
-                combinedRange.setEnd(currentRange.endContainer, currentRange.endOffset);
+            } else {
+                // if the ranges don't overlap
+                combinedRange.setEnd(
+                    currentRange.endContainer,
+                    currentRange.endOffset,
+                );
             }
         }
     }
@@ -311,10 +369,10 @@ function startBeforeAncestorHeader(startRange, startNode) {
     const parent = startNode.parentNode;
     if (parent) {
         const grandparent = parent.parentNode;
-        if (grandparent && grandparent.nodeName.startsWith('H')) {
+        if (grandparent && grandparent.nodeName.startsWith("H")) {
             startNode = grandparent;
             startRange.setStartBefore(startNode);
-        } else if (parent.nodeName.startsWith('H')) {
+        } else if (parent.nodeName.startsWith("H")) {
             startNode = parent;
             startRange.setStartBefore(startNode);
         }
@@ -331,11 +389,11 @@ function startBeforeAncestorHeader(startRange, startNode) {
  * @returns {Node} - the new start node.
  */
 function startBeforeAncestorTable(startRange, startNode) {
-    const tableTags = ['TABLE', 'THEAD', 'TBODY', 'TR', 'TH', 'TD'];
+    const tableTags = ["TABLE", "THEAD", "TBODY", "TR", "TH", "TD"];
 
     // While there is a parent node and it's a table tag...
     while (
-        startNode.nodeName !== 'TABLE' &&
+        startNode.nodeName !== "TABLE" &&
         startNode.parentNode &&
         tableTags.includes(startNode.parentNode.nodeName)
     ) {
@@ -362,7 +420,7 @@ function startBeforeAncestorCode(startRange, startNode) {
         return startNode;
     }
 
-    if (parent.nodeName === 'CODE') {
+    if (parent.nodeName === "CODE") {
         startRange.setStartBefore(parent);
         return parent;
     }
@@ -371,11 +429,11 @@ function startBeforeAncestorCode(startRange, startNode) {
     // the start of the selection to include the code tag. This makes code blocks easier
     // to copy.
     let temp = parent;
-    while (temp && temp.nodeName === 'SPAN') {
+    while (temp && temp.nodeName === "SPAN") {
         temp = temp.parentNode;
     }
 
-    if (temp && temp.nodeName === 'CODE') {
+    if (temp && temp.nodeName === "CODE") {
         startNode = temp;
         startRange.setStartBefore(startNode);
     }
@@ -396,17 +454,17 @@ function startBeforeAncestorPre(startRange, startNode) {
         return startNode;
     }
 
-    if (parent.nodeName === 'PRE') {
+    if (parent.nodeName === "PRE") {
         startRange.setStartBefore(parent);
         return parent;
     }
 
     let temp = parent;
-    while (temp && temp.nodeName === 'SPAN') {
+    while (temp && temp.nodeName === "SPAN") {
         temp = temp.parentNode;
     }
 
-    if (temp && temp.nodeName === 'PRE') {
+    if (temp && temp.nodeName === "PRE") {
         startNode = temp;
         startRange.setStartBefore(startNode);
     }
@@ -426,7 +484,7 @@ function isSelectionInList(frag) {
 
         if (node.nodeType === nodeTypes.COMMENT_NODE) {
             continue;
-        } else if (node.nodeName === 'LI') {
+        } else if (node.nodeName === "LI") {
             return true;
         }
     }
@@ -444,10 +502,14 @@ function isSelectionInList(frag) {
 function getList(startRange) {
     /** @type {Element} */
     let list = startRange.startContainer.parentNode;
-    for (let i = 0; i < 10 && list && !['OL', 'UL', 'MENU'].includes(list.nodeName); i++) {
+    for (
+        let i = 0;
+        i < 10 && list && !["OL", "UL", "MENU"].includes(list.nodeName);
+        i++
+    ) {
         list = list.parentNode;
     }
-    if (!['OL', 'UL', 'MENU'].includes(list.nodeName)) {
+    if (!["OL", "UL", "MENU"].includes(list.nodeName)) {
         return null;
     }
     return list;
@@ -463,43 +525,46 @@ function getList(startRange) {
 function wrapRangeContentWithList(startRange, list) {
     /** @type {Element} */
     let firstSelectedLi = startRange.startContainer;
-    while (firstSelectedLi.nodeName !== 'LI') {
+    while (firstSelectedLi.nodeName !== "LI") {
         firstSelectedLi = firstSelectedLi.parentNode;
     }
 
     let newList;
-    if (list.nodeName === 'OL') {
-        newList = document.createElement('ol');
+    if (list.nodeName === "OL") {
+        newList = document.createElement("ol");
 
-        const originalId = firstSelectedLi.getAttribute('id');
-        firstSelectedLi.setAttribute('id', 'list-selection-start');
+        const originalId = firstSelectedLi.getAttribute("id");
+        firstSelectedLi.setAttribute("id", "list-selection-start");
 
-        let startAttr = list.getAttribute('start') || '1';
+        let startAttr = list.getAttribute("start") || "1";
         for (let i = 0; i < list.children.length; i++) {
             const child = list.children[i];
             if (
                 child.nodeType === nodeTypes.ELEMENT_NODE &&
-                child.getAttribute('id') === 'list-selection-start'
+                child.getAttribute("id") === "list-selection-start"
             ) {
                 startAttr = String(i + 1);
                 break;
             }
         }
         if (originalId !== null) {
-            firstSelectedLi.setAttribute('id', originalId);
+            firstSelectedLi.setAttribute("id", originalId);
         } else {
-            firstSelectedLi.removeAttribute('id');
+            firstSelectedLi.removeAttribute("id");
         }
 
-        newList.setAttribute('start', startAttr);
-        newList.setAttribute('reversed', list.getAttribute('reversed') || 'false');
-        newList.setAttribute('type', list.getAttribute('type') || '1');
-    } else if (list.nodeName === 'UL') {
-        newList = document.createElement('ul');
-    } else if (list.nodeName === 'MENU') {
-        newList = document.createElement('menu');
+        newList.setAttribute("start", startAttr);
+        newList.setAttribute(
+            "reversed",
+            list.getAttribute("reversed") || "false",
+        );
+        newList.setAttribute("type", list.getAttribute("type") || "1");
+    } else if (list.nodeName === "UL") {
+        newList = document.createElement("ul");
+    } else if (list.nodeName === "MENU") {
+        newList = document.createElement("menu");
     } else {
-        throw new Error('Unknown list type');
+        throw new Error("Unknown list type");
     }
 
     startRange.setStartBefore(firstSelectedLi);

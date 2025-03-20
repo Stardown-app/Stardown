@@ -22,7 +22,7 @@ This project uses [Prettier](https://prettier.io/) to format code. The formattin
 
 ## Writing import statements
 
-Stardown uses several different execution contexts as described in [./execution-contexts.md](./execution-contexts.md), and development of Stardown uses the [Rollup](https://rollupjs.org/) bundler to combine the files for each context. Rollup copies an entire file's content (and the content of all files that file imports) into another file even if the import statement only asks for specific things. For this reason, try to avoid putting functions and imports for one execution context in a file that is only for a different execution context, or else the resulting bundled code will have a lot of duplicate unused code that might go unnoticed except by extension reviewers.
+Stardown uses several different execution contexts as described in [./execution-contexts.md](./execution-contexts.md), and development of Stardown uses the [Rollup](https://rollupjs.org/) bundler to combine the files for each context. [Rollup's tree-shaking](https://rollupjs.org/introduction/#tree-shaking) doesn't seem to always work, so try to avoid putting functions and imports for one execution context in a file that is only for a different execution context, or else the resulting bundled code might have a lot of duplicate unused code that might go unnoticed except by extension reviewers.
 
 ## Writing documentation
 

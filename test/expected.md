@@ -151,6 +151,14 @@ doSomething(
 )
 ```
 
+> Below is a code block in this block quote.
+>
+> ```
+> \<h1>
+>   Sample HTML
+> \</h1>
+> ```
+
 1. reference
 2. litigation
 3. west

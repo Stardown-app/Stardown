@@ -5,7 +5,7 @@
     "type": "module",
     "scripts": {
         "test": "node --test",
-        "md-diff": "echo Open md.diff.html to see test output && nodemon ./test/diffMd.js --ext html,md,js --ignore *.diff.html",
+        "md-diff": "code test/md.diff.html && nodemon ./test/diffMd.js --ext html,md,js --ignore *.diff.html",
         "format": "npx prettier . --write",
         "check-format": "npx prettier . --check",
         "check-version": "node ./scripts/check-version.js",

@@ -63,6 +63,28 @@ boldAndEmphasizedLetters***Within***String
 
 anchor with no href
 
+Paragraph with spaces before [the anchor](https://www.example.com) and after.
+
+Paragraph with spaces inside [the anchor](https://www.example.com) and not after.
+
+Some [anchor](https://www.example.com)s should not have spaces on both sides.
+
+Maybe some should[not have](https://www.example.com)a space on neither side.
+
+Maybe[only](https://www.example.com) after.
+
+Paragraph with space [in start and](https://www.example.com) after end.
+
+Paragraph with space before [start and before](https://www.example.com) end.
+
+After start [and after](https://www.example.com) end.
+
+Before [and after start and before](https://www.example.com) end.
+
+After [and before and after](https://www.example.com) end.
+
+What if there's spaces [both inside](https://www.example.com) and outside?
+
 ![Grapefruit slice](https://example.com/grapefruit-slice.jpg)
 
 - [ ] Checkbox on its own

@@ -32,15 +32,17 @@ import {
  * htmlToMd converts an HTML fragment to pure markdown without any HTML. This function
  * otherwise supports a superset of the CommonMark specification.
  * @param {DocumentFragment} frag
+ * @param {object|null|undefined} ctx
  * @returns {Promise<string>}
  */
-export async function htmlToMd(frag) {
+export async function htmlToMd(frag, ctx) {
     const omitHidden = await getSetting("omitHidden");
     if (omitHidden) {
         removeHiddenElements(frag, document);
     }
 
-    const ctx = {
+    const newCtx = {
+        ...ctx,
         locationHref: location.href,
         document: document,
         omitNav: await getSetting("omitNav"),
@@ -53,18 +55,24 @@ export async function htmlToMd(frag) {
     };
 
     /** @type {function(string): string} */
-    ctx.escape = newEscape(ctx.mdSubBrackets);
+    newCtx.escape = newEscape(newCtx.mdSubBrackets);
 
     if (isInlineNodes(frag.childNodes)) {
-        ctx.dontTrimText = true;
+        newCtx.dontTrimText = true;
     }
 
-    return (
-        mdConverter
-            .convertNodes(ctx, frag.childNodes)
-            .trim()
-            .replaceAll(/\n{3,}/g, "\n\n") + "\n"
-    );
+    const result = mdConverter
+        .convertNodes(newCtx, frag.childNodes)
+        .trim()
+        .replaceAll(/\n{3,}/g, "\n\n")
+        .replaceAll(/(\S)\[␞(.*?\w.*?)␟\]\((.+?)\)(\S)/g, "$1 [$2]($3) $4")
+        .replaceAll(/ \[␞(.*?\w.*?)␟\]\((.+?)\) /g, " [$1]($2) ")
+        .replaceAll(/(\S)\[␞(.*?\w.*?)␟\]\((.+?)\) /g, "$1 [$2]($3) ")
+        .replaceAll(/ \[␞(.*?\w.*?)␟\]\((.+?)\)(\S)/g, " [$1]($2) $3")
+        .replaceAll(/(\S)\[␞␟(.*?)\]\((.+?)\)/g, "$1 [$2]($3)")
+        .replaceAll(/\[(.*?)␞␟\]\((.+?)\)(\S)/g, "[$1]($2) $3");
+
+    return result + "\n";
 }
 
 /**
@@ -163,14 +171,8 @@ export class MdConverter {
                 let text = this.convertNode(ctx, node);
                 if (node.nodeType === nodeTypes.TEXT_NODE) {
                     result.push(text.replaceAll(/\s+/g, " "));
-                } else if (
-                    ["BR", "INPUT", "IMG", "TR", "TH", "TD"].includes(
-                        node.nodeName,
-                    )
-                ) {
-                    result.push(text);
                 } else {
-                    result.push(text.trim());
+                    result.push(text);
                 }
             }
         }
@@ -370,7 +372,7 @@ export class MdConverter {
             return "";
         }
 
-        result.push(" " + text.replaceAll("\n", " "));
+        result.push(" " + text.replaceAll("\n", " ").replaceAll(/\s+/g, " "));
 
         return result.join("") + "\n\n";
     }
@@ -437,7 +439,7 @@ export class MdConverter {
 
     /** @type {ElementConverter} */
     convertBLOCKQUOTE(ctx, el) {
-        const newCtx = { ...ctx, dontTrimText: true };
+        const newCtx = { ...ctx, inBlockquote: true, dontTrimText: true };
 
         /** @type {string[]} */
         const result = ["\n\n"];
@@ -687,14 +689,27 @@ export class MdConverter {
             backtickCount = match[1].length + 1;
         }
 
+        if (ctx.inBlockquote) {
+            result.push(" ");
+        }
+
         for (let i = 0; i < backtickCount; i++) {
             result.push("`");
         }
 
         result.push(language + "\n");
 
+        if (ctx.inBlockquote) {
+            text = text.replaceAll("<", "\\<"); // escape any HTML elements
+            text = " " + text.replaceAll("\n", "\n ");
+        }
+
         text = text.replaceAll("\n", "\n" + ctx.indent);
         result.push(ctx.indent + text + "\n" + ctx.indent);
+
+        if (ctx.inBlockquote) {
+            result.push(" ");
+        }
 
         for (let i = 0; i < backtickCount; i++) {
             result.push("`");
@@ -720,14 +735,39 @@ export class MdConverter {
         href = absolutize(href, ctx.locationHref);
         href = mdEncodeUri(href);
 
-        let text = this.convertNodes(ctx, el.childNodes)
-            .trim()
-            .replaceAll("\n", " ");
-        if (!text) {
+        let text = this.convertNodes(ctx, el.childNodes);
+
+        // remove surrounding newlines
+        while (text.length > 0 && text[0] === "\n") {
+            text = text.slice(1);
+        }
+        while (text.length > 0 && text.slice(-1) === "\n") {
+            text = text.slice(0, -1);
+        }
+
+        // if there's at least one non-whitespace character in the text
+        if (/\S/.test(text)) {
+            if (text.startsWith(" ") && text.endsWith(" ")) {
+                // maybe spaces will need to be added before and after the markdown link
+                text = "␞" + text.trim() + "␟";
+            } else if (text.startsWith(" ")) {
+                // maybe a space will need to be added before the markdown link
+                text = "␞␟" + text.trim();
+            } else if (text.endsWith(" ")) {
+                // maybe a space will need to be added after the markdown link
+                text = text.trim() + "␞␟";
+            } else {
+                text = text.trim();
+            }
+        } else {
+            // there are no non-whitespace characters in the text
             return "";
-        } else if (!href) {
+        }
+        if (!href) {
             return text;
-        } else if (text.startsWith("^")) {
+        }
+
+        if (text.startsWith("^")) {
             text = "\\^" + text.slice(1);
         }
 

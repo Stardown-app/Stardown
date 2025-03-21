@@ -309,7 +309,7 @@ function installWithTerminal(instructions) {
 
     if (noNodeV14PlusEl.checked) {
         instructions.steps.push(`
-            Install Node v14+ from <a href="https://nodejs.org">nodejs.org</a> or with a dev tool manager like
+            Install Node v14+, such as from <a href="https://nodejs.org">nodejs.org</a> or with a dev tool manager like
             <a href="https://github.com/jdx/mise">
                 mise</a>
             (<code>mise use node@lts</code>)

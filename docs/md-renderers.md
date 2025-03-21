@@ -5,6 +5,8 @@
 - [GitLab](https://docs.gitlab.com/ee/user/markdown.html)
 - [Pandoc](https://pandoc.org/MANUAL.html) (related: [Pandoc Python library](https://boisgera.github.io/pandoc/markdown/))
 - [VS Code](https://code.visualstudio.com/docs/languages/markdown#_markdown-preview)
+- [Docs](https://github.com/suitenumerique/docs), created by the governments of France, Germany, and the Netherlands
+- [Cherry Markdown](https://github.com/Tencent/cherry-markdown), created by Tencent
 - [Edna](https://edna.arslexis.io/), which was created by Krzysztof Kowalczyk, the creator of SumatraPDF
 - [Foam](https://github.com/foambubble/foam)
 - [Zettlr](https://docs.zettlr.com/en/core/writing-markdown/)

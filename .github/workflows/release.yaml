@@ -5,59 +5,59 @@ name: Build and release zip files
 # [Store information in variables - GitHub Docs](https://docs.github.com/en/actions/writing-workflows/choosing-what-your-workflow-does/store-information-in-variables#default-environment-variables:~:text=feature%2Dbranch%2D1.-,github_ref_name,-The%20short%20ref)
 
 on:
-    push:
-        tags:
-            - "v[0-9]+.[0-9]+.[0-9]+"
-            - "v[0-9]+.[0-9]+.[0-9]+-alpha.[0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]"
-            - "v[0-9]+.[0-9]+.[0-9]+-beta.[0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]"
+  push:
+    tags:
+      - "v[0-9]+.[0-9]+.[0-9]+"
+      - "v[0-9]+.[0-9]+.[0-9]+-alpha.[0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]"
+      - "v[0-9]+.[0-9]+.[0-9]+-beta.[0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]"
 
 permissions:
-    contents: write
+  contents: write
 
 jobs:
-    release:
-        runs-on: ubuntu-latest
-        steps:
-            - name: Checkout
-              uses: actions/checkout@v4
-            - name: Set up Node
-              uses: actions/setup-node@v4
-              with:
-                  node-version: 22
-                  cache: "npm"
-            - name: Install dependencies
-              run: npm ci
-            - name: Build for Firefox
-              run: |
-                  npm run build-firefox
-                  echo "Copying readme and license into folder"
-                  cp README.md LICENSE firefox
-                  echo "Copying docs into folder"
-                  cp -r docs firefox/docs
-                  cd firefox
-                  echo "Zipping folder into stardown-${{ github.ref_name }}-firefox.zip"
-                  zip -r "stardown-${{ github.ref_name }}-firefox.zip" .
-            - name: Build for Chrome
-              run: |
-                  npm run build-chrome
-                  echo "Copying readme and license into folder"
-                  cp README.md LICENSE chrome
-                  echo "Copying docs into folder"
-                  cp -r docs chrome/docs
-                  cd chrome
-                  echo "Zipping folder into stardown-${{ github.ref_name }}-chrome.zip"
-                  zip -r "stardown-${{ github.ref_name }}-chrome.zip" .
-            - name: Release
-              uses: softprops/action-gh-release@v2
-              if: startsWith(github.ref, 'refs/tags/')
-              with:
-                  generate_release_notes: true
-                  files: |
-                      firefox/stardown-${{ github.ref_name }}-firefox.zip
-                      chrome/stardown-${{ github.ref_name }}-chrome.zip
-                  body: |
-                      If you installed Stardown from an extensions store, it will update automatically when the new version is available there if you didn't turn automatic updates off. Only stable releases are published to the extensions stores, and they could take hours or days to be approved.
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: "npm"
+      - name: Install dependencies
+        run: npm ci
+      - name: Build for Firefox
+        run: |
+          npm run build-firefox
+          echo "Copying readme and license into folder"
+          cp README.md LICENSE firefox
+          echo "Copying docs into folder"
+          cp -r docs firefox/docs
+          cd firefox
+          echo "Zipping folder into stardown-${{ github.ref_name }}-firefox.zip"
+          zip -r "stardown-${{ github.ref_name }}-firefox.zip" .
+      - name: Build for Chrome
+        run: |
+          npm run build-chrome
+          echo "Copying readme and license into folder"
+          cp README.md LICENSE chrome
+          echo "Copying docs into folder"
+          cp -r docs chrome/docs
+          cd chrome
+          echo "Zipping folder into stardown-${{ github.ref_name }}-chrome.zip"
+          zip -r "stardown-${{ github.ref_name }}-chrome.zip" .
+      - name: Release
+        uses: softprops/action-gh-release@v2
+        if: startsWith(github.ref, 'refs/tags/')
+        with:
+          generate_release_notes: true
+          files: |
+            firefox/stardown-${{ github.ref_name }}-firefox.zip
+            chrome/stardown-${{ github.ref_name }}-chrome.zip
+          body: |
+            If you installed Stardown from an extensions store, it will update automatically when the new version is available there if you didn't turn automatic updates off. Only stable releases are published to the extensions stores, and they could take hours or days to be approved.
 
-                      Otherwise, you can find [instructions to install or update here](https://stardown-app.github.io/Stardown/docs/install-and-update-instructions/).
+            Otherwise, you can find [instructions to install or update here](https://stardown-app.github.io/Stardown/docs/install-and-update-instructions/).
 
-                      ---
+            ---

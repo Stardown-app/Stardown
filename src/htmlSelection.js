@@ -195,6 +195,7 @@ async function formatSelection(
                 selection,
                 selectedText,
                 markupLanguage,
+                { inBlockquote: true },
             );
             return (await md.createBlockquote(body, title, sourceUrl)) + "\n";
         default:
@@ -210,9 +211,10 @@ async function formatSelection(
  * @param {Selection|null} selection - a selection object.
  * @param {string} selectedText - the selected text.
  * @param {string} markupLanguage - the user's chosen markup language.
+ * @param {object|null|undefined} ctx
  * @returns {Promise<string>}
  */
-async function getSourceFormatMd(selection, selectedText, markupLanguage) {
+async function getSourceFormatMd(selection, selectedText, markupLanguage, ctx) {
     /** @type {DocumentFragment} */
     const frag = await getSelectionFragment(selection);
     if (frag === null) {
@@ -223,7 +225,7 @@ async function getSourceFormatMd(selection, selectedText, markupLanguage) {
 
     switch (markupLanguage) {
         case "markdown":
-            return await htmlToMd(frag);
+            return await htmlToMd(frag, ctx);
         case "markdown with some html":
             return await htmlToMdAndHtml(frag);
         default:

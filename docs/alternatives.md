@@ -35,6 +35,7 @@ You can use this [bookmarklet](https://en.wikipedia.org/wiki/Bookmarklet) I made
 
 - [Slurp](https://github.com/inhumantsar/slurp) saves webpages directly to Obsidian.
 - [Obsidian-NetClip](https://github.com/Elhary/Obsidian-NetClip) lets you browse the web from within Obsidian, and save webpages as markdown files from there.
+- [obsidian-paper-clipper](https://github.com/ras0q/obsidian-paper-clipper) captures and manages academic papers.
 - [import-github-readme](https://github.com/chasebank87/import-github-readme) downloads GitHub readme files directly into Obsidian.
 
 ### Bookmarks managers

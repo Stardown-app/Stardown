@@ -3,13 +3,14 @@
     Where this code came from:
 
     1. Copy https://github.com/antonmedv/codejar/blob/master/codejar.ts
-    2. Transpile from TypeScript to JavaScript using `tsc src/codejar.ts` with the
-       tsconfig.json file in this folder
+    2. Transpile from TypeScript to JavaScript with `tsc src/codejar.ts` (no tsconfig.json
+       is needed)
     3. Add `export` to the `CodeJar` function
     4. Comment-out the lines with `exports`
     5. Replace each instance of `this` with `undefined` and delete unnecessary ones
 
-    [Compiling TypeScript](https://code.visualstudio.com/docs/typescript/typescript-compiling)
+    Compiling TypeScript:
+    https://code.visualstudio.com/docs/typescript/typescript-compiling
 */
 
 /*

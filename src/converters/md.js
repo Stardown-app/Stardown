@@ -171,14 +171,8 @@ export class MdConverter {
                 let text = this.convertNode(ctx, node);
                 if (node.nodeType === nodeTypes.TEXT_NODE) {
                     result.push(text.replaceAll(/\s+/g, " "));
-                } else if (
-                    ["BR", "INPUT", "IMG", "TR", "TH", "TD"].includes(
-                        node.nodeName,
-                    )
-                ) {
-                    result.push(text);
                 } else {
-                    result.push(text.trim());
+                    result.push(text);
                 }
             }
         }
@@ -378,7 +372,7 @@ export class MdConverter {
             return "";
         }
 
-        result.push(" " + text.replaceAll("\n", " "));
+        result.push(" " + text.replaceAll("\n", " ").replaceAll(/\s+/g, " "));
 
         return result.join("") + "\n\n";
     }

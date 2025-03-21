@@ -85,6 +85,14 @@ After [and before and after](https://www.example.com) end.
 
 What if there's spaces [both inside](https://www.example.com) and outside?
 
+[No](https://www.example.com) span.
+
+[Span](https://www.example.com) after.
+
+Span before [and](https://www.example.com) after.
+
+Span [before](https://www.example.com).
+
 ![Grapefruit slice](https://example.com/grapefruit-slice.jpg)
 
 - [ ] Checkbox on its own

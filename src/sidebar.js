@@ -153,7 +153,6 @@ function escapeHtml(text) {
         .replaceAll("&", "&amp;")
         .replaceAll("<", "&lt;")
         .replaceAll(">", "&gt;")
-        .replaceAll('"', "&quot;")
         .replaceAll("'", "&#039;");
 }
 
@@ -214,7 +213,7 @@ function highlight(text) {
 
             // link
             .replaceAll(
-                /\[([^\^]?[^\[\]\n]*)\]\(([^\(\)\n]+)\)/g,
+                /\[([^\^]?[^\[\]\n]*)\]\(([^\(\)\s]+(?: "[^"\n]+")?)\)/g,
                 '[<span style="color: rgb(50, 116, 240)">$1</span>](<span style="color: rgb(150, 150, 150)">$2</span>)',
             )
 

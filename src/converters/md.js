@@ -169,7 +169,10 @@ export class MdConverter {
             for (let i = 0; i < nodes.length; i++) {
                 const node = nodes[i];
                 let text = this.convertNode(ctx, node);
-                if (node.nodeType === nodeTypes.TEXT_NODE) {
+                if (
+                    node.nodeType === nodeTypes.TEXT_NODE &&
+                    !ctx.preformatted
+                ) {
                     result.push(text.replaceAll(/\s+/g, " "));
                 } else {
                     result.push(text);
@@ -253,10 +256,12 @@ export class MdConverter {
         }
 
         let content = ctx.escape(node.textContent);
-        if (!ctx.dontTrimText) {
+        if (!ctx.dontTrimText && !ctx.preformatted) {
             content = content.trim();
         }
-        content = content.replaceAll(/\s+/g, " ");
+        if (!ctx.preformatted) {
+            content = content.replaceAll(/\s+/g, " ");
+        }
 
         return content;
     }
@@ -625,6 +630,14 @@ export class MdConverter {
     convertPRE(ctx, el) {
         if (el.childNodes.length === 0) {
             return "";
+        }
+
+        // if the PRE contains any anchors, don't convert it to a code block but keep
+        // the formatting
+        const hasAnchor = Boolean(el.querySelector("a"));
+        if (hasAnchor) {
+            const newCtx = { ...ctx, preformatted: true };
+            return this.convertNodes(newCtx, el.childNodes);
         }
 
         let text = "";

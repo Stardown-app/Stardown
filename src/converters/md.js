@@ -1066,6 +1066,13 @@ export class MdConverter {
 
     /** @type {ElementConverter} */
     convertIMG(ctx, el) {
+        const height = el.getAttribute("height");
+        const width = el.getAttribute("width");
+        if ((height && Number(height) <= 1) || (width && Number(width) <= 1)) {
+            console.log("Skipping an image that's probably a tracking pixel");
+            return;
+        }
+
         const alt = ctx
             .escape(el.getAttribute("alt") || "")
             .replaceAll("\n", " ");

@@ -54,6 +54,7 @@ You can use this [bookmarklet](https://en.wikipedia.org/wiki/Bookmarklet) I made
 
 ## Convert between markup languages
 
+- [TableConvert.com](https://tableconvert.com/) converts tables between many formats, file types, and encodings.
 - [Pandoc](https://pandoc.org/) offers a command-line tool and a Haskell library that can convert between almost any two markup languages.
 - [MarkItDown](https://news.ycombinator.com/item?id=42410803) is a Python tool for converting files and office documents to Markdown.
 - [Docling](https://github.com/DS4SD/docling) is another Python tool that can convert many file types to markdown.

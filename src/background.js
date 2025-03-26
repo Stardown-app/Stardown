@@ -34,9 +34,13 @@ browser.runtime.onInstalled.addListener(async (details) => {
         case "update":
             // show the upboarding page only if the current one hasn't been shown yet
             const manifest = browser.runtime.getManifest();
-            const lastUpboardVersion = await getSetting("lastUpboardVersion");
+            const lastUpboardVersionShown = await getSetting(
+                "lastUpboardVersionShown",
+            );
 
-            const last = lastUpboardVersion?.split(".").map((n) => parseInt(n));
+            const last = lastUpboardVersionShown
+                ?.split(".")
+                .map((n) => parseInt(n));
             const current = manifest.version.split(".").map((n) => parseInt(n));
 
             if (
@@ -49,7 +53,7 @@ browser.runtime.onInstalled.addListener(async (details) => {
                 // [tabs.create() | MDN](https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/API/tabs/create#url)
                 await browser.tabs.create({ url: `/updated.html` });
                 await browser.storage.sync.set({
-                    lastUpboardVersion: manifest.version,
+                    lastUpboardVersionShown: manifest.version,
                 });
             }
             break;

@@ -32,7 +32,7 @@ const defaultSettings = {
     copyTabsWindows: "current",
     notepadContent: "",
     notepadScrollPosition: 0,
-    lastUpboardVersion: null,
+    lastUpboardVersionShown: null,
 
     mdYoutube: "almost everywhere",
     mdSubBrackets: "underlined",

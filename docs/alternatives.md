@@ -56,7 +56,8 @@ You can use this [bookmarklet](https://en.wikipedia.org/wiki/Bookmarklet) I made
 ## Convert between markup languages
 
 - [TableConvert.com](https://tableconvert.com/) converts tables between many formats, file types, and encodings.
-- [Pandoc](https://pandoc.org/) offers a command-line tool and a Haskell library that can convert between almost any two markup languages.
+- [Pandoc](https://pandoc.org/) offers a command line tool and a Haskell library that can convert between almost any two markup languages.
+- [Nushell](https://www.nushell.sh/commands/docs/to_md.html) is another command line tool that can convert between many markup languages.
 - [MarkItDown](https://news.ycombinator.com/item?id=42410803) is a Python tool for converting files and office documents to Markdown.
 - [Docling](https://github.com/DS4SD/docling) is another Python tool that can convert many file types to markdown.
 - [Marker](https://github.com/vikparuchuri/marker) converts PDF to markdown, optionally using OCRmyPDF.
@@ -72,7 +73,7 @@ You can use this [bookmarklet](https://en.wikipedia.org/wiki/Bookmarklet) I made
 - [UrlToMarkdown.com](https://urltomarkdown.com/)
 - [RedditToMarkdown](https://farnots.github.io/RedditToMarkdown/) export reddit posts to markdown.
 - [Mealie](https://github.com/mealie-recipes/mealie) is a self hosted recipe manager and meal planner.
-- [you-get](https://github.com/soimort/you-get) is a tiny command-line utility to download media contents (videos, audios, images) from the Web.
+- [you-get](https://github.com/soimort/you-get) is a tiny command line utility to download media contents (videos, audios, images) from the Web.
 - [Reader-LM](https://jina.ai/news/reader-lm-small-language-models-for-cleaning-and-converting-html-to-markdown/?nocache=1) is small language models that convert HTML to markdown.
 - [Epublifier](https://github.com/maoserr/epublifier) converts some webnovels to epub format.
 - [FanFicFare](https://github.com/JimmXinu/FanFicFare) is a tool for making eBooks from stories on fanfiction and other websites.

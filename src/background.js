@@ -32,30 +32,7 @@ browser.runtime.onInstalled.addListener(async (details) => {
             await detectMissingShortcuts();
             break;
         case "update":
-            // show the upboarding page only if the current one hasn't been shown yet
-            const manifest = browser.runtime.getManifest();
-            const lastUpboardVersionShown = await getSetting(
-                "lastUpboardVersionShown",
-            );
-
-            const last = lastUpboardVersionShown
-                ?.split(".")
-                .map((n) => parseInt(n));
-            const current = manifest.version.split(".").map((n) => parseInt(n));
-
-            if (
-                last === undefined ||
-                last[0] > current[0] ||
-                (last[0] === current[0] &&
-                    (last[1] > current[1] ||
-                        (last[1] === current[1] && last[2] > current[2])))
-            ) {
-                // [tabs.create() | MDN](https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/API/tabs/create#url)
-                await browser.tabs.create({ url: `/updated.html` });
-                await browser.storage.sync.set({
-                    lastUpboardVersionShown: manifest.version,
-                });
-            }
+            await showUpboardingPage();
             break;
         case "browser_update":
         case "chrome_update":
@@ -469,6 +446,70 @@ async function handleCopyMultipleTabs(tabs) {
     });
     const activeTab = activeTabs[0];
     await handleInteraction(activeTab, message, options, tabs.length);
+}
+
+/**
+ * showUpboardingPage shows the upboarding page for the version in the manifest if the
+ * page exists and hasn't been shown yet.
+ * @returns {Promise<void>}
+ * @throws {Error}
+ */
+async function showUpboardingPage() {
+    const manifest = browser.runtime.getManifest();
+
+    const filePath = `/upboard/${manifest.version}.html`;
+    if (!filePath.startsWith("/")) {
+        throw new Error("The upboarding page path should start with a slash");
+        // tabs.create becomes unpredictable without the leading slash for files
+        // packaged with an extension:
+        // https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/API/tabs/create#:~:text=if%20you%20omit%20the%20leading%20%27%2F%27%2C%20the%20url%20is%20treated%20as%20a%20relative%20url%2C%20and%20different%20browsers%20may%20construct%20different%20absolute%20urls.
+    }
+    if (!(await fileExists(filePath))) {
+        console.log(
+            `There does not appear to be an upboarding page for v${manifest.version}`,
+        );
+        return;
+    }
+
+    // check whether the upboarding page has been shown yet
+    const lastUpboardVersionShown = await getSetting("lastUpboardVersionShown");
+
+    const last = lastUpboardVersionShown?.split(".").map((n) => parseInt(n));
+    const current = manifest.version.split(".").map((n) => parseInt(n));
+
+    if (
+        last === undefined ||
+        last[0] > current[0] ||
+        (last[0] === current[0] &&
+            (last[1] > current[1] ||
+                (last[1] === current[1] && last[2] > current[2])))
+    ) {
+        // show the upboarding page
+        await browser.tabs.create({ url: filePath });
+        await browser.storage.sync.set({
+            lastUpboardVersionShown: manifest.version,
+        });
+    }
+}
+
+/**
+ * fileExists reports whether a file exists within the browser extension's files.
+ * @param {string} filePath
+ * @returns {Promise<boolean>}
+ */
+async function fileExists(filePath) {
+    const fileUrl = browser.runtime.getURL(filePath);
+    try {
+        const response = await fetch(fileUrl);
+        if (!response.ok) {
+            console.error(`response not ok for ${fileUrl}`);
+            return false;
+        }
+        await response.text(); // throws an error for nonexistent files
+        return true;
+    } catch (error) {
+        return false;
+    }
 }
 
 /**

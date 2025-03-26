@@ -99,7 +99,8 @@ Here's what I do when creating a new release:
 3. Run `npm run check-version` to make sure the new version is correctly formatted
 4. If the new version is a stable release
     1. Update the "version" properties in the manifests
-    2. Update [../src/updated.html](../src/updated.html)
+    2. If the new version includes some interesting changes and is not just bug fixes
+        1. Create a new HTML file in the [../src/upboard/](../src/upboard/) folder
 5. Commit, push, make a pull request into the main branch, merge, and pull
 6. Tag the merge commit with the same value as the `VERSION` variable in settings.js
 7. Push the tag

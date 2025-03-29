@@ -71,7 +71,8 @@ You can use this [bookmarklet](https://en.wikipedia.org/wiki/Bookmarklet) I made
 - [Crawl4AI](https://github.com/unclecode/crawl4ai) is a Python library.
 - [HTML-to-Markdown](https://news.ycombinator.com/item?id=42093511) a REST API, command line tool, and Go library.
 - [UrlToMarkdown.com](https://urltomarkdown.com/)
-- [RedditToMarkdown](https://farnots.github.io/RedditToMarkdown/) export reddit posts to markdown.
+- [RedditToMarkdown](https://farnots.github.io/RedditToMarkdown/) export Reddit posts to markdown.
+- [reddit-markdown](https://github.com/chauduyphanvu/reddit-markdown) is another tool for exporting Reddit posts to markdown.
 - [Mealie](https://github.com/mealie-recipes/mealie) is a self hosted recipe manager and meal planner.
 - [you-get](https://github.com/soimort/you-get) is a tiny command line utility to download media contents (videos, audios, images) from the Web.
 - [Reader-LM](https://jina.ai/news/reader-lm-small-language-models-for-cleaning-and-converting-html-to-markdown/?nocache=1) is small language models that convert HTML to markdown.

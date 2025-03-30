@@ -755,6 +755,9 @@ export class MdConverter {
             text = text.slice(0, -1);
         }
 
+        // replace inner newlines with spaces
+        text = text.replaceAll("\n", " ");
+
         // if there's at least one non-whitespace character in the text
         if (/\S/.test(text)) {
             if (text.startsWith(" ") && text.endsWith(" ")) {

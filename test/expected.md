@@ -240,6 +240,12 @@ $ go1.24.0 download
     }
     ```
 
+- another code block
+
+    ```python
+    print("hi")
+    ```
+
 - image
 
     ![Lime slice](https://example.com/lime-slice.jpg)

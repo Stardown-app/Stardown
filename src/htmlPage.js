@@ -45,6 +45,9 @@ async function createPageText() {
         let frag = document.createDocumentFragment();
         frag.append(document.documentElement.cloneNode(true));
 
+        // remove all script elements
+        frag.querySelectorAll("script").forEach((script) => script.remove());
+
         if (await getSetting("extractMainContent")) {
             frag = await extractMainContent(frag, location);
         }

@@ -51,6 +51,9 @@ export async function createText(title, sourceUrl, selection, messageCategory) {
             return selectedText;
         }
 
+        // remove all script elements
+        frag.querySelectorAll("script").forEach((script) => script.remove());
+
         await improveConvertibility(frag, location);
 
         absolutizeNodeUrls(frag, sourceUrl);

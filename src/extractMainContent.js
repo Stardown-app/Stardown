@@ -40,6 +40,8 @@ export async function extractMainContent(frag, location) {
         location.href.match(/^https:\/\/github\.com\/[^/]+\/[^/]+\/issues\/\d+/)
     ) {
         newFrag = extractGithubIssue(frag);
+    } else if (location.href.match(/^https:\/\/www.reddit.com(?:\/.+)?/)) {
+        newFrag = extractRedditPage(frag);
     }
     if (newFrag) {
         return newFrag;
@@ -128,5 +130,26 @@ function extractGithubIssue(frag) {
 
     const newFrag = new DocumentFragment();
     newFrag.append(title, content);
+    return newFrag;
+}
+
+/**
+ * @param {DocumentFragment} frag
+ * @returns {DocumentFragment|null}
+ */
+function extractRedditPage(frag) {
+    console.log("Extracting Reddit page");
+    const main = frag.querySelector("main");
+
+    const toRemove = [
+        "button",
+        "shreddit-async-loader",
+        "img[role=presentation]",
+        "zoomable-img",
+    ];
+    main.querySelectorAll(toRemove.join(",")).forEach((el) => el.remove());
+
+    const newFrag = new DocumentFragment();
+    newFrag.append(main);
     return newFrag;
 }

@@ -632,77 +632,56 @@ export class MdConverter {
             return "";
         }
 
-        // if the PRE contains any anchors, don't convert it to a code block but keep
-        // the formatting
-        const hasAnchor = Boolean(el.querySelector("a"));
-        if (hasAnchor) {
-            const newCtx = { ...ctx, preformatted: true };
-            return this.convertNodes(newCtx, el.childNodes);
+        // if the PRE contains any non-empty anchors, don't convert it to a code block
+        // but keep the formatting
+        const anchors = el.querySelectorAll("a");
+        for (let i = 0; i < anchors.length; i++) {
+            if (anchors.textContent) {
+                const newCtx = { ...ctx, preformatted: true };
+                return this.convertNodes(newCtx, el.childNodes);
+            }
         }
 
-        let language = "";
-        const id = el.getAttribute("id") || "";
-        if (/__code_\d+/.test(id)) {
-            // it's probably a MkDocs page, like this one:
-            // https://squidfunk.github.io/mkdocs-material/reference/
-            const parentClass = el.parentElement?.getAttribute("class") || "";
-            const languageMatch = parentClass.match(/language-(\S+)/);
-            if (languageMatch) {
-                language = languageMatch[1];
-            }
-        }
-        if (!language) {
-            language = el.getAttribute("syntax") || "";
-        }
-
-        let text = "";
-        if (el.childNodes.length > 1) {
-            const result = [];
-            for (let i = 0; i < el.childNodes.length; i++) {
-                const child = el.childNodes[i];
-                if (child.nodeName === "BR") {
-                    result.push("\n");
-                } else {
-                    const t = child.textContent;
-                    if (!t) {
-                        continue;
-                    }
-                    result.push(t.replaceAll("\n\n", " "));
-                }
-            }
-            if (result.length === 0) {
-                return "";
-            }
-            text = result.join("");
-        } else {
-            // if there is only one child
-            /** @type {Node} */
-            const child = el.firstChild;
-            if (child.nodeName === "SAMP" || child.nodeName === "KBD") {
-                return this.convertCODE(ctx, child);
-            } else if (
-                child.nodeType !== nodeTypes.TEXT_NODE &&
-                child.nodeName !== "CODE"
-            ) {
-                console.warn(
-                    `Unexpected nodeName of only child in a PRE: "${child.nodeName}"`,
+        const preContent = [];
+        let language = el.getAttribute("syntax") || "";
+        for (let i = 0; i < el.childNodes.length; i++) {
+            const child = el.childNodes[i];
+            if (child.nodeType === nodeTypes.TEXT_NODE) {
+                preContent.push(
+                    child.textContent?.replaceAll("\n\n", " ") || "",
                 );
+                continue;
             }
 
-            text = child.textContent;
-            if (!text) {
-                return "";
-            }
+            switch (child.nodeName) {
+                case "BR":
+                    preContent.push("\n");
+                    break;
+                case "SAMP":
+                case "KBD":
+                    return this.convertCODE(ctx, child);
+                case "SPAN":
+                    preContent.push(child.textContent || "");
+                    break;
+                case "CODE":
+                    preContent.push(child.textContent || "");
 
-            if (!language && child.getAttribute) {
-                // if the child is not a text node
-                const class_ = child.getAttribute("class") || "";
-                const languageMatch = class_.match(/language-(\S+)/);
-                if (languageMatch) {
-                    language = languageMatch[1];
-                }
+                    if (!language && child.getAttribute) {
+                        // if the child is not a text node
+                        const class_ = child.getAttribute("class") || "";
+                        const languageMatch = class_.match(/language-(\S+)/);
+                        if (languageMatch) {
+                            language = languageMatch[1];
+                        }
+                    }
+                    break;
+                default:
+                    console.warn(
+                        `Ignoring unexpected node in a PRE: "${child.nodeName}"`,
+                    );
             }
         }
+        let text = preContent.join("");
 
         const result = ["\n\n"];
 

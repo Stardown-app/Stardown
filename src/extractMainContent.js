@@ -64,7 +64,7 @@ export async function extractMainContent(frag, location) {
         return frag;
     }
 
-    console.error("Failed to extract the main content of the page");
+    console.warn("Failed to extract the main content of the page");
     frag.append(doc.body);
     return frag;
 }

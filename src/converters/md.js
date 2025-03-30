@@ -673,8 +673,7 @@ export class MdConverter {
                 case "CODE":
                     preContent.push(child.textContent || "");
 
-                    if (!language && child.getAttribute) {
-                        // if the child is not a text node
+                    if (!language && child.nodeType !== nodeTypes.TEXT_NODE) {
                         const class_ = child.getAttribute("class") || "";
                         const languageMatch = class_.match(/language-(\S+)/);
                         if (languageMatch) {

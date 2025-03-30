@@ -19,9 +19,6 @@
         "storage",
         "notifications"
     ],
-    "host_permissions": [
-        "https://api.github.com/repos/Stardown-app/Stardown/*"
-    ],
     "optional_permissions": ["tabs", "downloads"],
     "options_page": "settings.html",
     "background": {

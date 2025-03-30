@@ -640,8 +640,22 @@ export class MdConverter {
             return this.convertNodes(newCtx, el.childNodes);
         }
 
+        let language = "";
+        const id = el.getAttribute("id") || "";
+        if (/__code_\d+/.test(id)) {
+            // it's probably a MkDocs page, like this one:
+            // https://squidfunk.github.io/mkdocs-material/reference/
+            const parentClass = el.parentElement?.getAttribute("class") || "";
+            const languageMatch = parentClass.match(/language-(\S+)/);
+            if (languageMatch) {
+                language = languageMatch[1];
+            }
+        }
+        if (!language) {
+            language = el.getAttribute("syntax") || "";
+        }
+
         let text = "";
-        let language = el.getAttribute("syntax") || "";
         if (el.childNodes.length > 1) {
             const result = [];
             for (let i = 0; i < el.childNodes.length; i++) {

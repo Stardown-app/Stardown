@@ -667,6 +667,7 @@ export class MdConverter {
                 case "KBD":
                     return this.convertCODE(ctx, child);
                 case "SPAN":
+                case "DIV":
                     preContent.push(child.textContent || "");
                     break;
                 case "CODE":

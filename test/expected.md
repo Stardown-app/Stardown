@@ -189,6 +189,11 @@ doSomething(
 > \</h1>
 > ```
 
+```
+$ go install golang.org/dl/go1.24.0@latest
+$ go1.24.0 download
+```
+
 1. reference
 2. litigation
 3. west

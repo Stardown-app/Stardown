@@ -25,6 +25,7 @@ Here are a bunch of web pages with interesting features for testing.
 - [code blocks that use `<pre>` but not `<code>`](https://www.cnblogs.com/unity2018/p/8492463.html)
 - [code blocks with inline element headers](https://developer.mozilla.org/en-US/docs/Learn/HTML/Tables/Advanced#the_scope_attribute)
 - [MS doc code blocks](https://devblogs.microsoft.com/dotnet/csharp-13-explore-preview-features/)
+- [MkDocs code blocks](https://squidfunk.github.io/mkdocs-material/reference/)
 - [block quote](https://markdownguide.offshoot.io/basic-syntax/#blockquotes-1)
 - [definition list](https://developer.mozilla.org/en-US/docs/Web/API/Window/setTimeout#Legend)
 - [several definition lists](https://forgottenrealms.fandom.com/wiki/Template:Location)

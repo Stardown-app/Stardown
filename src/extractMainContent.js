@@ -40,6 +40,8 @@ export async function extractMainContent(frag, location) {
         location.href.match(/^https:\/\/github\.com\/[^/]+\/[^/]+\/issues\/\d+/)
     ) {
         newFrag = extractGithubIssue(frag);
+    } else if (location.href.match(/^https:\/\/discord.com\/channels\/.+/)) {
+        newFrag = extractDiscordPage(frag);
     } else if (location.href.match(/^https:\/\/www.reddit.com(?:\/.+)?/)) {
         newFrag = extractRedditPage(frag);
     }
@@ -137,9 +139,31 @@ function extractGithubIssue(frag) {
  * @param {DocumentFragment} frag
  * @returns {DocumentFragment|null}
  */
+function extractDiscordPage(frag) {
+    console.log("Extracting Discord page");
+    const content = frag.querySelector('ol[data-list-id="chat-messages"]');
+    if (!content) {
+        console.warn(
+            "Discord page extractor outdated, or this isn't a chat messages channel",
+        );
+        return null;
+    }
+
+    const newFrag = new DocumentFragment();
+    for (let i = 0; i < content.childNodes.length; i++) {
+        newFrag.appendChild(content.childNodes[i].cloneNode(true));
+    }
+
+    return newFrag;
+}
+
+/**
+ * @param {DocumentFragment} frag
+ * @returns {DocumentFragment|null}
+ */
 function extractRedditPage(frag) {
     console.log("Extracting Reddit page");
-    const main = frag.querySelector("main");
+    const content = frag.querySelector("main");
 
     const toRemove = [
         "button",
@@ -147,9 +171,9 @@ function extractRedditPage(frag) {
         "img[role=presentation]",
         "zoomable-img",
     ];
-    main.querySelectorAll(toRemove.join(",")).forEach((el) => el.remove());
+    content.querySelectorAll(toRemove.join(",")).forEach((el) => el.remove());
 
     const newFrag = new DocumentFragment();
-    newFrag.append(main);
+    newFrag.append(content);
     return newFrag;
 }

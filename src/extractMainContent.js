@@ -40,6 +40,8 @@ export async function extractMainContent(frag, location) {
         location.href.match(/^https:\/\/github\.com\/[^/]+\/[^/]+\/issues\/\d+/)
     ) {
         newFrag = extractGithubIssue(frag);
+    } else if (location.href.match(/^https:\/\/mastodon.social\/.+/)) {
+        newFrag = extractMastodonPage(frag);
     } else if (location.href.match(/^https:\/\/discord.com\/channels\/.+/)) {
         newFrag = extractDiscordPage(frag);
     } else if (location.href.match(/^https:\/\/www.reddit.com(?:\/.+)?/)) {
@@ -132,6 +134,23 @@ function extractGithubIssue(frag) {
 
     const newFrag = new DocumentFragment();
     newFrag.append(title, content);
+    return newFrag;
+}
+
+/**
+ * @param {DocumentFragment} frag
+ * @returns {DocumentFragment|null}
+ */
+function extractMastodonPage(frag) {
+    console.log("Extracting Mastodon page");
+    const content = frag.querySelector("div.scrollable");
+    if (!content) {
+        console.error("Mastodon extractor outdated");
+        return null;
+    }
+
+    const newFrag = new DocumentFragment();
+    newFrag.append(content);
     return newFrag;
 }
 

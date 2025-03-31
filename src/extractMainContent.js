@@ -88,9 +88,12 @@ function extractWikipediaArticle(frag) {
         return null;
     }
 
-    content
-        .querySelectorAll(".navbox,.mw-editsection")
-        .forEach((el) => el.remove());
+    const toRemove = [
+        ".navbox",
+        ".mw-editsection",
+        "span.citation-comment",
+    ];
+    content.querySelectorAll(toRemove.join(",")).forEach((el) => el.remove());
 
     const newFrag = new DocumentFragment();
     newFrag.append(firstHeading, content);

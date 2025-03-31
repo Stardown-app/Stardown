@@ -5,8 +5,9 @@
     2. extract the files
     3. copy purify.js
     4. delete the ESLint directives
-    5. npm run format
-    6. take all the code out of the IIFE and delete the return statement at the end
+    5. take all the code out of the IIFE and delete the return statement at the end
+    6. npm run format
+    7. export DOMPurify
 */
 
 /*! @license DOMPurify 3.2.4 | (c) Cure53 and other contributors | Released under the Apache license 2.0 and Mozilla Public License 2.0 | github.com/cure53/DOMPurify/blob/3.2.4/LICENSE */
@@ -2311,4 +2312,4 @@ function createDOMPurify() {
     };
     return DOMPurify;
 }
-var purify = createDOMPurify();
+export var DOMPurify = createDOMPurify();

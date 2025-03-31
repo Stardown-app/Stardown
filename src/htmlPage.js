@@ -46,16 +46,20 @@ async function createPageText() {
         let frag = document.createDocumentFragment();
         frag.append(document.documentElement.cloneNode(true));
 
-        try {
-            frag = DOMPurify.sanitize(frag, {
-                IN_PLACE: true,
-                RETURN_DOM_FRAGMENT: true,
-                ADD_TAGS: ["#document-fragment"],
-            });
-            console.log("HTML sanitized by DOMPurify");
-        } catch (err) {
-            console.error("DOMPurify: " + err.message);
-            return null;
+        if (await getSetting("sanitizeInput")) {
+            try {
+                frag = DOMPurify.sanitize(frag, {
+                    IN_PLACE: true,
+                    RETURN_DOM_FRAGMENT: true,
+                    ADD_TAGS: ["#document-fragment"],
+                });
+                console.log("HTML sanitized by DOMPurify");
+            } catch (err) {
+                console.error("DOMPurify: " + err.message);
+                return null;
+            }
+        } else {
+            console.warn("html NOT sanitized");
         }
 
         // remove all script elements
@@ -103,16 +107,20 @@ async function getSourceFormatMd(markupLanguage) {
     let frag = document.createDocumentFragment();
     frag.append(document.body.cloneNode(true));
 
-    try {
-        frag = DOMPurify.sanitize(frag, {
-            IN_PLACE: true,
-            RETURN_DOM_FRAGMENT: true,
-            ADD_TAGS: ["#document-fragment"],
-        });
-        console.log("HTML sanitized by DOMPurify");
-    } catch (err) {
-        console.error("DOMPurify: " + err.message);
-        return null;
+    if (await getSetting("sanitizeInput")) {
+        try {
+            frag = DOMPurify.sanitize(frag, {
+                IN_PLACE: true,
+                RETURN_DOM_FRAGMENT: true,
+                ADD_TAGS: ["#document-fragment"],
+            });
+            console.log("HTML sanitized by DOMPurify");
+        } catch (err) {
+            console.error("DOMPurify: " + err.message);
+            return null;
+        }
+    } else {
+        console.warn("html NOT sanitized");
     }
 
     if (await getSetting("extractMainContent")) {

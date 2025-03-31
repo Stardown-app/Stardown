@@ -161,16 +161,20 @@ export async function getSelectionFragment(selection, unsanitized) {
     }
 
     if (unsanitized !== "unsanitized") {
-        try {
-            frag = DOMPurify.sanitize(frag, {
-                IN_PLACE: true,
-                RETURN_DOM_FRAGMENT: true,
-                ADD_TAGS: ["#document-fragment"],
-            });
-            console.log("HTML sanitized by DOMPurify");
-        } catch (err) {
-            console.error("DOMPurify: " + err.message);
-            return null;
+        if (await getSetting("sanitizeInput")) {
+            try {
+                frag = DOMPurify.sanitize(frag, {
+                    IN_PLACE: true,
+                    RETURN_DOM_FRAGMENT: true,
+                    ADD_TAGS: ["#document-fragment"],
+                });
+                console.log("HTML sanitized by DOMPurify");
+            } catch (err) {
+                console.error("DOMPurify: " + err.message);
+                return null;
+            }
+        } else {
+            console.warn("html NOT sanitized");
         }
     }
 

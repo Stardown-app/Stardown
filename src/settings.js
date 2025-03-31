@@ -163,6 +163,7 @@ const omitFooterEl = document.querySelector("#omitFooter");
 const omitHiddenEl = document.querySelector("#omitHidden");
 const notifyOnWarningEl = document.querySelector("#notifyOnWarning");
 const notifyOnSuccessEl = document.querySelector("#notifyOnSuccess");
+const sanitizeInputEl = document.querySelector("#sanitizeInput");
 
 const mdYoutubeEl = document.querySelector("#mdYoutube");
 const templateEl = document.querySelector("#template");
@@ -189,6 +190,7 @@ initAutosave("omitFooter", omitFooterEl, "checked");
 initAutosave("omitHidden", omitHiddenEl, "checked");
 initAutosave("notifyOnWarning", notifyOnWarningEl, "checked");
 initAutosave("notifyOnSuccess", notifyOnSuccessEl, "checked");
+initAutosave("sanitizeInput", sanitizeInputEl, "checked");
 
 initAutosave("mdYoutube", mdYoutubeEl, "value");
 initAutosave(
@@ -267,6 +269,7 @@ async function loadSettings() {
         omitHiddenEl.checked = await getSetting("omitHidden");
         notifyOnWarningEl.checked = await getSetting("notifyOnWarning");
         notifyOnSuccessEl.checked = await getSetting("notifyOnSuccess");
+        sanitizeInputEl.checked = await getSetting("sanitizeInput");
 
         mdYoutubeEl.value = await getSetting("mdYoutube");
         templateEl.value = await getSetting("mdSelectionWithSourceTemplate");

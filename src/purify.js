@@ -4,6 +4,7 @@
     1. https://github.com/cure53/DOMPurify/archive/refs/tags/3.2.4.zip
     2. extract the files
     3. copy purify.js
+    4. delete the ESLint directives
 */
 
 /*! @license DOMPurify 3.2.4 | (c) Cure53 and other contributors | Released under the Apache license 2.0 and Mozilla Public License 2.0 | github.com/cure53/DOMPurify/blob/3.2.4/LICENSE */
@@ -25,7 +26,7 @@
       freeze,
       seal,
       create
-    } = Object; // eslint-disable-line import/no-mutable-exports
+    } = Object;
     let {
       apply,
       construct
@@ -207,16 +208,15 @@
     const mathMl = freeze(['accent', 'accentunder', 'align', 'bevelled', 'close', 'columnsalign', 'columnlines', 'columnspan', 'denomalign', 'depth', 'dir', 'display', 'displaystyle', 'encoding', 'fence', 'frame', 'height', 'href', 'id', 'largeop', 'length', 'linethickness', 'lspace', 'lquote', 'mathbackground', 'mathcolor', 'mathsize', 'mathvariant', 'maxsize', 'minsize', 'movablelimits', 'notation', 'numalign', 'open', 'rowalign', 'rowlines', 'rowspacing', 'rowspan', 'rspace', 'rquote', 'scriptlevel', 'scriptminsize', 'scriptsizemultiplier', 'selection', 'separator', 'separators', 'stretchy', 'subscriptshift', 'supscriptshift', 'symmetric', 'voffset', 'width', 'xmlns']);
     const xml = freeze(['xlink:href', 'xml:id', 'xlink:title', 'xml:space', 'xmlns:xlink']);
   
-    // eslint-disable-next-line unicorn/better-regex
     const MUSTACHE_EXPR = seal(/\{\{[\w\W]*|[\w\W]*\}\}/gm); // Specify template detection regex for SAFE_FOR_TEMPLATES mode
     const ERB_EXPR = seal(/<%[\w\W]*|[\w\W]*%>/gm);
-    const TMPLIT_EXPR = seal(/\$\{[\w\W]*/gm); // eslint-disable-line unicorn/better-regex
-    const DATA_ATTR = seal(/^data-[\-\w.\u00B7-\uFFFF]+$/); // eslint-disable-line no-useless-escape
-    const ARIA_ATTR = seal(/^aria-[\-\w]+$/); // eslint-disable-line no-useless-escape
-    const IS_ALLOWED_URI = seal(/^(?:(?:(?:f|ht)tps?|mailto|tel|callto|sms|cid|xmpp):|[^a-z]|[a-z+.\-]+(?:[^a-z+.\-:]|$))/i // eslint-disable-line no-useless-escape
+    const TMPLIT_EXPR = seal(/\$\{[\w\W]*/gm);
+    const DATA_ATTR = seal(/^data-[\-\w.\u00B7-\uFFFF]+$/);
+    const ARIA_ATTR = seal(/^aria-[\-\w]+$/);
+    const IS_ALLOWED_URI = seal(/^(?:(?:(?:f|ht)tps?|mailto|tel|callto|sms|cid|xmpp):|[^a-z]|[a-z+.\-]+(?:[^a-z+.\-:]|$))/i
     );
     const IS_SCRIPT_OR_DATA = seal(/^(?:\w+script|data):/i);
-    const ATTR_WHITESPACE = seal(/[\u0000-\u0020\u00A0\u1680\u180E\u2000-\u2029\u205F\u3000]/g // eslint-disable-line no-control-regex
+    const ATTR_WHITESPACE = seal(/[\u0000-\u0020\u00A0\u1680\u180E\u2000-\u2029\u205F\u3000]/g
     );
     const DOCTYPE_NAME = seal(/^html$/i);
     const CUSTOM_ELEMENT = seal(/^[a-z][.\w]*(-[.\w]+)+$/i);
@@ -235,7 +235,6 @@
       TMPLIT_EXPR: TMPLIT_EXPR
     });
   
-    /* eslint-disable @typescript-eslint/indent */
     // https://developer.mozilla.org/en-US/docs/Web/API/Node/nodeType
     const NODE_TYPE = {
       element: 1,
@@ -525,7 +524,6 @@
        *
        * @param cfg optional config literal
        */
-      // eslint-disable-next-line complexity
       const _parseConfig = function _parseConfig() {
         let cfg = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
         if (CONFIG && CONFIG === cfg) {
@@ -538,7 +536,6 @@
         /* Shield configuration object from prototype pollution */
         cfg = clone(cfg);
         PARSER_MEDIA_TYPE =
-        // eslint-disable-next-line unicorn/prefer-includes
         SUPPORTED_PARSER_MEDIA_TYPES.indexOf(cfg.PARSER_MEDIA_TYPE) === -1 ? DEFAULT_PARSER_MEDIA_TYPE : cfg.PARSER_MEDIA_TYPE;
         // HTML tags and attributes are not case-sensitive, converting to lowercase. Keeping XHTML as is.
         transformCaseFunc = PARSER_MEDIA_TYPE === 'application/xhtml+xml' ? stringToString : stringToLowerCase;
@@ -767,7 +764,6 @@
           element: node
         });
         try {
-          // eslint-disable-next-line unicorn/prefer-dom-node-remove
           getParentNode(node).removeChild(node);
         } catch (_) {
           remove(node);
@@ -863,7 +859,6 @@
        */
       const _createNodeIterator = function _createNodeIterator(root) {
         return createNodeIterator.call(root.ownerDocument || root, root,
-        // eslint-disable-next-line no-bitwise
         NodeFilter.SHOW_ELEMENT | NodeFilter.SHOW_COMMENT | NodeFilter.SHOW_TEXT | NodeFilter.SHOW_PROCESSING_INSTRUCTION | NodeFilter.SHOW_CDATA_SECTION, null);
       };
       /**
@@ -992,7 +987,6 @@
        * @param value Attribute value.
        * @return Returns true if `value` is valid, otherwise false.
        */
-      // eslint-disable-next-line complexity
       const _isValidAttribute = function _isValidAttribute(lcTag, lcName, value) {
         /* Make sure attribute cannot clobber */
         if (SANITIZE_DOM && (lcName === 'id' || lcName === 'name') && (value in document || value in formElement)) {
@@ -1175,7 +1169,6 @@
         /* Execute a hook if present */
         _executeHooks(hooks.afterSanitizeShadowDOM, fragment, null);
       };
-      // eslint-disable-next-line complexity
       DOMPurify.sanitize = function (dirty) {
         let cfg = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
         let body = null;
@@ -1233,13 +1226,11 @@
           } else if (importedNode.nodeName === 'HTML') {
             body = importedNode;
           } else {
-            // eslint-disable-next-line unicorn/prefer-dom-node-append
             body.appendChild(importedNode);
           }
         } else {
           /* Exit directly if we have nothing to do */
           if (!RETURN_DOM && !SAFE_FOR_TEMPLATES && !WHOLE_DOCUMENT &&
-          // eslint-disable-next-line unicorn/prefer-includes
           dirty.indexOf('<') === -1) {
             return trustedTypesPolicy && RETURN_TRUSTED_TYPE ? trustedTypesPolicy.createHTML(dirty) : dirty;
           }
@@ -1276,7 +1267,6 @@
           if (RETURN_DOM_FRAGMENT) {
             returnNode = createDocumentFragment.call(body.ownerDocument);
             while (body.firstChild) {
-              // eslint-disable-next-line unicorn/prefer-dom-node-append
               returnNode.appendChild(body.firstChild);
             }
           } else {

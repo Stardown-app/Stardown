@@ -17,7 +17,7 @@
         "diff": "^6.0.0-beta",
         "eslint-config-prettier": "^10.1.1",
         "husky": "^9.1.7",
-        "jsdom": "^25.0.1",
+        "jsdom": "^26.0.0",
         "lint-staged": "^15.4.3",
         "prettier": "3.5.3",
         "rollup": "^4.18.0",

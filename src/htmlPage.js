@@ -21,6 +21,7 @@ import { improveConvertibility } from "./converters/utils/html.js";
 import { absolutizeNodeUrls } from "./converters/utils/urls.js";
 import { htmlToMd } from "./converters/md.js";
 import { htmlToMdAndHtml } from "./converters/mdAndHtml.js";
+import { DOMPurify } from "./purify.js";
 
 /**
  * @typedef {import('./contentUtils.js').ContentResponse} ContentResponse
@@ -44,6 +45,18 @@ async function createPageText() {
     if (markupLanguage === "html") {
         let frag = document.createDocumentFragment();
         frag.append(document.documentElement.cloneNode(true));
+
+        try {
+            frag = DOMPurify.sanitize(frag, {
+                IN_PLACE: true,
+                RETURN_DOM_FRAGMENT: true,
+                ADD_TAGS: ["#document-fragment"],
+            });
+            console.log("HTML sanitized by DOMPurify");
+        } catch (err) {
+            console.error("DOMPurify: " + err.message);
+            return null;
+        }
 
         // remove all script elements
         frag.querySelectorAll("script").forEach((script) => script.remove());
@@ -89,6 +102,18 @@ async function getSourceFormatMd(markupLanguage) {
     /** @type {DocumentFragment} */
     let frag = document.createDocumentFragment();
     frag.append(document.body.cloneNode(true));
+
+    try {
+        frag = DOMPurify.sanitize(frag, {
+            IN_PLACE: true,
+            RETURN_DOM_FRAGMENT: true,
+            ADD_TAGS: ["#document-fragment"],
+        });
+        console.log("HTML sanitized by DOMPurify");
+    } catch (err) {
+        console.error("DOMPurify: " + err.message);
+        return null;
+    }
 
     if (await getSetting("extractMainContent")) {
         frag = await extractMainContent(frag, location);

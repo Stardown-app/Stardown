@@ -22,6 +22,7 @@ import { createLink } from "./generators/all.js";
 import * as md from "./generators/md.js";
 import { htmlToMd, mdEncodeUri } from "./converters/md.js";
 import { htmlToMdAndHtml } from "./converters/mdAndHtml.js";
+import { DOMPurify } from "./purify.js";
 
 /**
  * createText creates text of the selected part of the page. The output markup language
@@ -127,9 +128,10 @@ export async function createText(title, sourceUrl, selection, messageCategory) {
  * expanded to include certain elements that are ancestors of the selection to make
  * copying easier.
  * @param {Selection|null} selection
+ * @param {undefined|string} unsanitized
  * @returns {Promise<DocumentFragment|null>}
  */
-export async function getSelectionFragment(selection) {
+export async function getSelectionFragment(selection, unsanitized) {
     if (selection === null || selection.type === "None") {
         console.error("Failed to get a selection");
         return null;
@@ -155,6 +157,20 @@ export async function getSelectionFragment(selection) {
         const list = getList(startRange); // either an OL, UL, or MENU element
         if (list !== null) {
             frag = wrapRangeContentWithList(startRange, list);
+        }
+    }
+
+    if (unsanitized !== "unsanitized") {
+        try {
+            frag = DOMPurify.sanitize(frag, {
+                IN_PLACE: true,
+                RETURN_DOM_FRAGMENT: true,
+                ADD_TAGS: ["#document-fragment"],
+            });
+            console.log("HTML sanitized by DOMPurify");
+        } catch (err) {
+            console.error("DOMPurify: " + err.message);
+            return null;
         }
     }
 

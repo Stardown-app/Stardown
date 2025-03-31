@@ -102,7 +102,7 @@ function setUpListeners() {
         }
 
         /** @type {DocumentFragment} */
-        const frag = await htmlSelection.getSelectionFragment(selection);
+        const frag = await htmlSelection.getSelectionFragment(selection, "unsanitized");
         const isTable = frag?.firstChild?.nodeName === "TABLE";
         if (isTable) {
             tableSelection = selection;

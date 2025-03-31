@@ -14,7 +14,7 @@
         "build-chrome": "rollup --config rollup.config.chrome.mjs"
     },
     "devDependencies": {
-        "diff": "^6.0.0-beta",
+        "diff": "^7.0.0",
         "eslint-config-prettier": "^10.1.1",
         "husky": "^9.1.7",
         "jsdom": "^26.0.0",

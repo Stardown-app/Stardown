@@ -174,6 +174,8 @@ const mdBulletPointEl = document.querySelector("#mdBulletPoint");
 const jsonEmptyCellEl = document.querySelector("#jsonEmptyCell");
 const jsonDestinationEl = document.querySelector("#jsonDestination");
 
+const codeOptionEl = document.querySelector("#codeOption");
+
 // set up setting autosaving
 initAutosave("markupLanguage", markupLanguageEl, "value");
 initAutosave("selectionFormat", selectionFormatEl, "value");
@@ -204,6 +206,8 @@ initAutosave("mdBulletPoint", mdBulletPointEl, "value");
 
 initAutosave("jsonEmptyCell", jsonEmptyCellEl, "value");
 initAutosave("jsonDestination", jsonDestinationEl, "value", 0, ["background"]);
+
+initAutosave("codeOption", codeOptionEl, "value");
 
 /**
  * initAutosave initializes autosaving for a setting.
@@ -278,6 +282,8 @@ async function loadSettings() {
 
         jsonEmptyCellEl.value = (await getSetting("jsonEmptyCell")) || "null";
         jsonDestinationEl.value = await getSetting("jsonDestination");
+
+        codeOptionEl.value = await getSetting("codeOption");
     } catch (err) {
         console.error(err);
         throw err;

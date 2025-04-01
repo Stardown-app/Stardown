@@ -239,16 +239,21 @@ function initAutosave(settingName, el, valueProperty, wait, ctxNames) {
     };
 
     let timeout = 0;
-    el.addEventListener("input", async (event) => {
-        if (wait) {
-            clearTimeout(timeout);
-            timeout = setTimeout(async () => {
+    try {
+        el.addEventListener("input", async (event) => {
+            if (wait) {
+                clearTimeout(timeout);
+                timeout = setTimeout(async () => {
+                    await saveSetting();
+                }, wait);
+            } else {
                 await saveSetting();
-            }, wait);
-        } else {
-            await saveSetting();
-        }
-    });
+            }
+        });
+    } catch (err) {
+        console.error(`${err}\nsetting name: ${settingName}\nel: ${el}`);
+        throw err;
+    }
 }
 
 /**

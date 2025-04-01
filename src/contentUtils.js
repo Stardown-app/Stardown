@@ -195,6 +195,7 @@ export async function sanitizeInput(frag) {
             IN_PLACE: true,
             RETURN_DOM_FRAGMENT: true,
             ADD_TAGS: ["#document-fragment"],
+            ADD_ATTR: ["alttext"],
         });
     } catch (err) {
         console.error("DOMPurify: " + err.message);

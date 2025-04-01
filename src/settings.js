@@ -165,7 +165,7 @@ const notifyOnWarningEl = document.querySelector("#notifyOnWarning");
 const notifyOnSuccessEl = document.querySelector("#notifyOnSuccess");
 const sanitizeInputEl = document.querySelector("#sanitizeInput");
 
-const mdYoutubeEl = document.querySelector("#mdYoutube");
+// const mdYoutubeEl = document.querySelector("#mdYoutube");
 const templateEl = document.querySelector("#template");
 const templateErrorEl = document.querySelector("#templateError");
 const mdSubBracketsEl = document.querySelector("#mdSubBrackets");
@@ -194,7 +194,7 @@ initAutosave("notifyOnWarning", notifyOnWarningEl, "checked");
 initAutosave("notifyOnSuccess", notifyOnSuccessEl, "checked");
 initAutosave("sanitizeInput", sanitizeInputEl, "checked");
 
-initAutosave("mdYoutube", mdYoutubeEl, "value");
+// initAutosave("mdYoutube", mdYoutubeEl, "value");
 initAutosave(
     "mdSelectionWithSourceTemplate",
     templateEl,
@@ -280,7 +280,7 @@ async function loadSettings() {
         notifyOnSuccessEl.checked = await getSetting("notifyOnSuccess");
         sanitizeInputEl.checked = await getSetting("sanitizeInput");
 
-        mdYoutubeEl.value = await getSetting("mdYoutube");
+        // mdYoutubeEl.value = await getSetting("mdYoutube");
         templateEl.value = await getSetting("mdSelectionWithSourceTemplate");
         mdSubBracketsEl.value = await getSetting("mdSubBrackets");
         mdBulletPointEl.value = await getSetting("mdBulletPoint");

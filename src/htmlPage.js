@@ -15,13 +15,12 @@
 */
 
 import { getSetting } from "./getSetting.js";
-import { sendToNotepad, handleCopyRequest } from "./contentUtils.js";
+import { sendToNotepad, handleCopyRequest, sanitizeInput } from "./contentUtils.js";
 import { extractMainContent } from "./extractMainContent.js";
 import { improveConvertibility } from "./converters/utils/html.js";
 import { absolutizeNodeUrls } from "./converters/utils/urls.js";
 import { htmlToMd } from "./converters/md.js";
 import { htmlToMdAndHtml } from "./converters/mdAndHtml.js";
-import { DOMPurify } from "./purify.js";
 
 /**
  * @typedef {import('./contentUtils.js').ContentResponse} ContentResponse
@@ -45,22 +44,7 @@ async function createPageText() {
     if (markupLanguage === "html") {
         let frag = document.createDocumentFragment();
         frag.append(document.documentElement.cloneNode(true));
-
-        if (await getSetting("sanitizeInput")) {
-            try {
-                frag = DOMPurify.sanitize(frag, {
-                    IN_PLACE: true,
-                    RETURN_DOM_FRAGMENT: true,
-                    ADD_TAGS: ["#document-fragment"],
-                });
-                console.log(`DOMPurify removed ${DOMPurify.removed.length} elements and/or attributes`);
-            } catch (err) {
-                console.error("DOMPurify: " + err.message);
-                return null;
-            }
-        } else {
-            console.warn("html NOT sanitized");
-        }
+        frag = await sanitizeInput(frag);
 
         // remove all script elements
         frag.querySelectorAll("script").forEach((script) => script.remove());
@@ -106,22 +90,7 @@ async function getSourceFormatMd(markupLanguage) {
     /** @type {DocumentFragment} */
     let frag = document.createDocumentFragment();
     frag.append(document.body.cloneNode(true));
-
-    if (await getSetting("sanitizeInput")) {
-        try {
-            frag = DOMPurify.sanitize(frag, {
-                IN_PLACE: true,
-                RETURN_DOM_FRAGMENT: true,
-                ADD_TAGS: ["#document-fragment"],
-            });
-            console.log(`DOMPurify removed ${DOMPurify.removed.length} elements and/or attributes`);
-        } catch (err) {
-            console.error("DOMPurify: " + err.message);
-            return null;
-        }
-    } else {
-        console.warn("html NOT sanitized");
-    }
+    frag = await sanitizeInput(frag);
 
     if (await getSetting("extractMainContent")) {
         frag = await extractMainContent(frag, location);

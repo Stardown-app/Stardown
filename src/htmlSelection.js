@@ -15,14 +15,13 @@
 */
 
 import { getSetting } from "./getSetting.js";
-import { sendToNotepad, applyTemplate } from "./contentUtils.js";
+import { sendToNotepad, applyTemplate, sanitizeInput } from "./contentUtils.js";
 import { absolutizeNodeUrls } from "./converters/utils/urls.js";
 import { nodeTypes, improveConvertibility } from "./converters/utils/html.js";
 import { createLink } from "./generators/all.js";
 import * as md from "./generators/md.js";
 import { htmlToMd, mdEncodeUri } from "./converters/md.js";
 import { htmlToMdAndHtml } from "./converters/mdAndHtml.js";
-import { DOMPurify } from "./purify.js";
 
 /**
  * createText creates text of the selected part of the page. The output markup language
@@ -161,21 +160,7 @@ export async function getSelectionFragment(selection, unsanitized) {
     }
 
     if (unsanitized !== "unsanitized") {
-        if (await getSetting("sanitizeInput")) {
-            try {
-                frag = DOMPurify.sanitize(frag, {
-                    IN_PLACE: true,
-                    RETURN_DOM_FRAGMENT: true,
-                    ADD_TAGS: ["#document-fragment"],
-                });
-                console.log(`DOMPurify removed ${DOMPurify.removed.length} elements and/or attributes`);
-            } catch (err) {
-                console.error("DOMPurify: " + err.message);
-                return null;
-            }
-        } else {
-            console.warn("html NOT sanitized");
-        }
+        frag = await sanitizeInput(frag);
     }
 
     return frag;

@@ -53,7 +53,7 @@ async function createPageText() {
                     RETURN_DOM_FRAGMENT: true,
                     ADD_TAGS: ["#document-fragment"],
                 });
-                console.log("HTML sanitized by DOMPurify");
+                console.log(`DOMPurify removed ${DOMPurify.removed.length} elements and/or attributes`);
             } catch (err) {
                 console.error("DOMPurify: " + err.message);
                 return null;
@@ -114,7 +114,7 @@ async function getSourceFormatMd(markupLanguage) {
                 RETURN_DOM_FRAGMENT: true,
                 ADD_TAGS: ["#document-fragment"],
             });
-            console.log("HTML sanitized by DOMPurify");
+            console.log(`DOMPurify removed ${DOMPurify.removed.length} elements and/or attributes`);
         } catch (err) {
             console.error("DOMPurify: " + err.message);
             return null;

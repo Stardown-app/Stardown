@@ -60,7 +60,7 @@ export async function extractMainContent(frag, location) {
             "Using Readability.js to extract the main content of the page",
         );
 
-        const article = new Readability(doc).parse();
+        const article = new Readability(doc, { keepClasses: true }).parse();
         const htmlStr = article.content;
 
         const div = document.createElement("div");

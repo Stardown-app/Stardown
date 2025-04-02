@@ -15,7 +15,11 @@
 */
 
 import { getSetting } from "./getSetting.js";
-import { sendToNotepad, handleCopyRequest, sanitizeInput } from "./contentUtils.js";
+import {
+    sendToNotepad,
+    handleCopyRequest,
+    sanitizeInput,
+} from "./contentUtils.js";
 import { extractMainContent } from "./extractMainContent.js";
 import { improveConvertibility } from "./converters/utils/html.js";
 import { absolutizeNodeUrls } from "./converters/utils/urls.js";

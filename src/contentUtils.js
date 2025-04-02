@@ -185,7 +185,7 @@ export async function addIdAndTextFragment(url, htmlId, selection) {
  * @returns {Promise<DocumentFragment>}
  */
 export async function sanitizeInput(frag) {
-    if (!await getSetting("sanitizeInput")) {
+    if (!(await getSetting("sanitizeInput"))) {
         console.warn("html NOT sanitized");
         return frag;
     }
@@ -203,7 +203,7 @@ export async function sanitizeInput(frag) {
     }
 
     console.log(
-        `DOMPurify removed ${DOMPurify.removed.length} elements and/or attributes`
+        `DOMPurify removed ${DOMPurify.removed.length} elements and/or attributes`,
     );
 
     return frag;

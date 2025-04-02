@@ -106,8 +106,8 @@ function extractWikipediaArticle(frag) {
  */
 function extractGithubIssue(frag) {
     console.log("Extracting GitHub issue");
-    const title = frag.querySelector(".gh-header-title");
-    const content = frag.querySelector(".js-quote-selection-container");
+    const title = frag.querySelector("div[data-testid=issue-header]");
+    const content = frag.querySelector("div[data-testid=issue-viewer-issue-container]").parentElement;
     if (!title || !content) {
         console.error("GitHub issue extractor outdated");
         return null;
@@ -117,17 +117,9 @@ function extractGithubIssue(frag) {
         "img",
         "form",
         "button",
-        "reactions-menu",
-        ".js-minimize-comment",
         "tool-tip",
-        ".tooltipped",
         "dialog",
         "dialog-helper",
-        ".js-comment-edit-history",
-        ".Details-content--hidden",
-        ".discussion-timeline-actions",
-        "div.text-right code",
-        "span.State",
     ];
     content.querySelectorAll(toRemove.join(",")).forEach((el) => el.remove());
 

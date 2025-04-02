@@ -15,7 +15,11 @@
 */
 
 import { getSetting } from "./getSetting.js";
-import { sendToNotepad, handleCopyRequest } from "./contentUtils.js";
+import {
+    sendToNotepad,
+    handleCopyRequest,
+    sanitizeInput,
+} from "./contentUtils.js";
 import { extractMainContent } from "./extractMainContent.js";
 import { improveConvertibility } from "./converters/utils/html.js";
 import { absolutizeNodeUrls } from "./converters/utils/urls.js";
@@ -44,6 +48,10 @@ async function createPageText() {
     if (markupLanguage === "html") {
         let frag = document.createDocumentFragment();
         frag.append(document.documentElement.cloneNode(true));
+        frag = await sanitizeInput(frag);
+
+        // remove all script elements
+        frag.querySelectorAll("script").forEach((script) => script.remove());
 
         if (await getSetting("extractMainContent")) {
             frag = await extractMainContent(frag, location);
@@ -86,6 +94,7 @@ async function getSourceFormatMd(markupLanguage) {
     /** @type {DocumentFragment} */
     let frag = document.createDocumentFragment();
     frag.append(document.body.cloneNode(true));
+    frag = await sanitizeInput(frag);
 
     if (await getSetting("extractMainContent")) {
         frag = await extractMainContent(frag, location);

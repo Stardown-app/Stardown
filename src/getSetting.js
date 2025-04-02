@@ -28,11 +28,12 @@ const defaultSettings = {
     omitHidden: true,
     notifyOnWarning: false,
     notifyOnSuccess: false,
+    sanitizeInput: true,
     selectionFormat: "Copy selection",
     copyTabsWindows: "current",
     notepadContent: "",
     notepadScrollPosition: 0,
-    lastUpboardVersion: null,
+    lastUpboardVersionShown: null,
 
     mdYoutube: "almost everywhere",
     mdSubBrackets: "underlined",
@@ -45,6 +46,8 @@ const defaultSettings = {
 
     jsonEmptyCell: "null",
     jsonDestination: "clipboard",
+
+    codeOption: "",
 };
 
 /**

@@ -17,6 +17,7 @@
 import { browser } from "./browserSpecific.js";
 import { getSetting } from "./getSetting.js";
 import { createTextFragmentArg } from "./createTextFragmentArg.js";
+import { DOMPurify } from "./purify.js";
 
 /**
  * A response object sent from a content script to a background script.
@@ -177,4 +178,33 @@ export async function addIdAndTextFragment(url, htmlId, selection) {
     }
 
     return url;
+}
+
+/**
+ * @param {DocumentFragment} frag
+ * @returns {Promise<DocumentFragment>}
+ */
+export async function sanitizeInput(frag) {
+    if (!(await getSetting("sanitizeInput"))) {
+        console.warn("html NOT sanitized");
+        return frag;
+    }
+
+    try {
+        frag = DOMPurify.sanitize(frag, {
+            IN_PLACE: true,
+            RETURN_DOM_FRAGMENT: true,
+            ADD_TAGS: ["#document-fragment"],
+            ADD_ATTR: ["alttext"],
+        });
+    } catch (err) {
+        console.error("DOMPurify: " + err.message);
+        return null;
+    }
+
+    console.log(
+        `DOMPurify removed ${DOMPurify.removed.length} elements and/or attributes`,
+    );
+
+    return frag;
 }

@@ -15,7 +15,7 @@
 */
 
 import { getSetting } from "./getSetting.js";
-import { sendToNotepad, applyTemplate } from "./contentUtils.js";
+import { sendToNotepad, applyTemplate, sanitizeInput } from "./contentUtils.js";
 import { absolutizeNodeUrls } from "./converters/utils/urls.js";
 import { nodeTypes, improveConvertibility } from "./converters/utils/html.js";
 import { createLink } from "./generators/all.js";
@@ -50,6 +50,9 @@ export async function createText(title, sourceUrl, selection, messageCategory) {
             await sendToNotepad(selectedText);
             return selectedText;
         }
+
+        // remove all script elements
+        frag.querySelectorAll("script").forEach((script) => script.remove());
 
         await improveConvertibility(frag, location);
 
@@ -124,9 +127,10 @@ export async function createText(title, sourceUrl, selection, messageCategory) {
  * expanded to include certain elements that are ancestors of the selection to make
  * copying easier.
  * @param {Selection|null} selection
+ * @param {undefined|string} unsanitized
  * @returns {Promise<DocumentFragment|null>}
  */
-export async function getSelectionFragment(selection) {
+export async function getSelectionFragment(selection, unsanitized) {
     if (selection === null || selection.type === "None") {
         console.error("Failed to get a selection");
         return null;
@@ -153,6 +157,10 @@ export async function getSelectionFragment(selection) {
         if (list !== null) {
             frag = wrapRangeContentWithList(startRange, list);
         }
+    }
+
+    if (unsanitized !== "unsanitized") {
+        frag = await sanitizeInput(frag);
     }
 
     return frag;

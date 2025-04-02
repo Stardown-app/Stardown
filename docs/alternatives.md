@@ -35,8 +35,10 @@ You can use this [bookmarklet](https://en.wikipedia.org/wiki/Bookmarklet) I made
 
 - [Slurp](https://github.com/inhumantsar/slurp) saves webpages directly to Obsidian.
 - [Obsidian-NetClip](https://github.com/Elhary/Obsidian-NetClip) lets you browse the web from within Obsidian, and save webpages as markdown files from there.
+- [obsidian-markitdown](https://github.com/ethanolivertroy/obsidian-markitdown) uses [MarkItDown](https://news.ycombinator.com/item?id=42410803) to convert files of many types to markdown.
 - [obsidian-paper-clipper](https://github.com/ras0q/obsidian-paper-clipper) captures and manages academic papers.
 - [import-github-readme](https://github.com/chasebank87/import-github-readme) downloads GitHub readme files directly into Obsidian.
+- [obsidian-epub-importer](https://github.com/aoout/obsidian-epub-importer) imports EPUB files as markdown.
 
 ### Bookmarks managers
 
@@ -54,8 +56,11 @@ You can use this [bookmarklet](https://en.wikipedia.org/wiki/Bookmarklet) I made
 
 ## Convert between markup languages
 
-- [Pandoc](https://pandoc.org/) offers a command-line tool and a Haskell library that can convert between almost any two markup languages.
+- [TableConvert.com](https://tableconvert.com/) converts tables between many formats, file types, and encodings.
+- [Pandoc](https://pandoc.org/) offers a command line tool and a Haskell library that can convert between almost any two markup languages.
+- [Nushell](https://www.nushell.sh/commands/docs/to_md.html) is another command line tool that can convert between many markup languages.
 - [MarkItDown](https://news.ycombinator.com/item?id=42410803) is a Python tool for converting files and office documents to Markdown.
+- [obsidian-markitdown](https://github.com/ethanolivertroy/obsidian-markitdown) uses MarkItDown to convert files of many types to markdown.
 - [Docling](https://github.com/DS4SD/docling) is another Python tool that can convert many file types to markdown.
 - [Marker](https://github.com/vikparuchuri/marker) converts PDF to markdown, optionally using OCRmyPDF.
 - [MinerU](https://github.com/opendatalab/MinerU) converts PDF to markdown or JSON, optionally using PaddleOCR.
@@ -68,9 +73,10 @@ You can use this [bookmarklet](https://en.wikipedia.org/wiki/Bookmarklet) I made
 - [Crawl4AI](https://github.com/unclecode/crawl4ai) is a Python library.
 - [HTML-to-Markdown](https://news.ycombinator.com/item?id=42093511) a REST API, command line tool, and Go library.
 - [UrlToMarkdown.com](https://urltomarkdown.com/)
-- [RedditToMarkdown](https://farnots.github.io/RedditToMarkdown/) export reddit posts to markdown.
+- [RedditToMarkdown](https://farnots.github.io/RedditToMarkdown/) export Reddit posts to markdown.
+- [reddit-markdown](https://github.com/chauduyphanvu/reddit-markdown) is another tool for exporting Reddit posts to markdown.
 - [Mealie](https://github.com/mealie-recipes/mealie) is a self hosted recipe manager and meal planner.
-- [you-get](https://github.com/soimort/you-get) is a tiny command-line utility to download media contents (videos, audios, images) from the Web.
+- [you-get](https://github.com/soimort/you-get) is a tiny command line utility to download media contents (videos, audios, images) from the Web.
 - [Reader-LM](https://jina.ai/news/reader-lm-small-language-models-for-cleaning-and-converting-html-to-markdown/?nocache=1) is small language models that convert HTML to markdown.
 - [Epublifier](https://github.com/maoserr/epublifier) converts some webnovels to epub format.
 - [FanFicFare](https://github.com/JimmXinu/FanFicFare) is a tool for making eBooks from stories on fanfiction and other websites.

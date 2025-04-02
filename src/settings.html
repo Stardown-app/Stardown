@@ -175,6 +175,15 @@ each anchor so that the pages they navigate to are opened in new tabs. -->
             <label for="notifyOnSuccess">Show success notifications</label>
             <br />
             <br />
+            <input id="sanitizeInput" type="checkbox" checked />
+            <label for="sanitizeInput"
+                >Sanitize input with
+                <a href="https://github.com/cure53/DOMPurify"
+                    >DOMPurify</a
+                ></label
+            >
+            <br />
+            <br />
             <hr />
             <h4>Notepad</h4>
             <label for="notepadFontSize">Font size: </label>
@@ -315,6 +324,15 @@ each anchor so that the pages they navigate to are opened in new tabs. -->
                 <option value="clipboard">the clipboard</option>
                 <option value="file">a file</option>
             </select>
+            <br />
+            <br />
+            <hr />
+            <h4>Developer</h4>
+            <label for="codeOption"
+                >Code option: <input id="codeOption" type="text" />. Use this
+                setting to switch between different ways to implement something
+                without having to rebuild and reinstall.</label
+            >
             <br />
             <br />
             <br />

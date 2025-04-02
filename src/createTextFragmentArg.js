@@ -114,11 +114,14 @@ export function createTextFragmentArg(selection) {
 }
 
 /**
- * encodeFragmentComponent URL-encodes a string, but also replaces '-' with '%2D'
- * because the text fragment generator appears to not handle '-' correctly.
- * @param {string} text - the text to encode.
+ * encodeFragmentComponent URL-encodes a string, but also replaces "-" with "%2D" and
+ * "'" with "%27" because the text fragment generator appears to not handle "-" well
+ * and some markdown renderers don't handle URLs with "'" well.
+ * @param {string} text
  * @returns {string}
  */
 function encodeFragmentComponent(text) {
-    return encodeURIComponent(text).replaceAll("-", "%2D");
+    return encodeURIComponent(text)
+        .replaceAll("-", "%2D")
+        .replaceAll("'", "%27");
 }

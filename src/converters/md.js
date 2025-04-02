@@ -66,10 +66,16 @@ export async function htmlToMd(frag, ctx) {
         .trim()
         .replaceAll(/\n{3,}/g, "\n\n")
         .replaceAll(/(\S)\[␞(.*?\w.*?)␟\]\((.+?)\)(\S)/g, "$1 [$2]($3) $4")
-        .replaceAll(/ \[␞(.*?\w.*?)␟\]\((.+?)\) /g, " [$1]($2) ")
-        .replaceAll(/(\S)\[␞(.*?\w.*?)␟\]\((.+?)\) /g, "$1 [$2]($3) ")
-        .replaceAll(/ \[␞(.*?\w.*?)␟\]\((.+?)\)(\S)/g, " [$1]($2) $3")
+        .replaceAll(/(\s)\[␞(.*?\w.*?)␟\]\((.+?)\)(\s)/g, "$1[$2]($3)$4")
+        .replaceAll(/(\S)\[␞(.*?\w.*?)␟\]\((.+?)\)(\s)/g, "$1 [$2]($3)$4")
+        .replaceAll(/(\s)\[␞(.*?\w.*?)␟\]\((.+?)\)(\S)/g, "$1[$2]($3) $4")
+        .replaceAll(/^\[␞(.*?\w.*?)␟\]\((.+?)\)(\s)/g, "[$1]($2)$3")
+        .replaceAll(/^\[␞(.*?\w.*?)␟\]\((.+?)\)(\S)/g, "[$1]($2) $3")
+        .replaceAll(/(\s)\[␞(.*?\w.*?)␟\]\((.+?)\)$/g, "$1[$2]($3)")
+        .replaceAll(/(\S)\[␞(.*?\w.*?)␟\]\((.+?)\)$/g, "$1 [$2]($3)")
+        .replaceAll(/(\s)\[␞␟(.*?)\]\((.+?)\)/g, "$1[$2]($3)")
         .replaceAll(/(\S)\[␞␟(.*?)\]\((.+?)\)/g, "$1 [$2]($3)")
+        .replaceAll(/\[(.*?)␞␟\]\((.+?)\)(\s)/g, "[$1]($2)$3")
         .replaceAll(/\[(.*?)␞␟\]\((.+?)\)(\S)/g, "[$1]($2) $3");
 
     return result + "\n";
@@ -514,10 +520,10 @@ export class MdConverter {
 
     /** @type {ElementConverter} */
     convertLI(ctx, el) {
-        // List items are handled by the parent list element. The selection code should
-        // detect when the selection contains list items outside of a list and wrap them
-        // in a list element.
-        return "";
+        // List items are usually handled by the parent list element. The selection code
+        // should detect when the selection contains list items outside of a list and
+        // wrap them in a list element.
+        return this.convertNodes(ctx, el.childNodes);
     }
 
     /** @type {ElementConverter} */
@@ -632,63 +638,56 @@ export class MdConverter {
             return "";
         }
 
-        // if the PRE contains any anchors, don't convert it to a code block but keep
-        // the formatting
-        const hasAnchor = Boolean(el.querySelector("a"));
-        if (hasAnchor) {
-            const newCtx = { ...ctx, preformatted: true };
-            return this.convertNodes(newCtx, el.childNodes);
+        // if the PRE contains any non-empty anchors, don't convert it to a code block
+        // but keep the formatting
+        const anchors = el.querySelectorAll("a");
+        for (let i = 0; i < anchors.length; i++) {
+            if (anchors.textContent) {
+                const newCtx = { ...ctx, preformatted: true };
+                return this.convertNodes(newCtx, el.childNodes);
+            }
         }
 
-        let text = "";
+        const preContent = [];
         let language = el.getAttribute("syntax") || "";
-        if (el.childNodes.length > 1) {
-            const result = [];
-            for (let i = 0; i < el.childNodes.length; i++) {
-                const child = el.childNodes[i];
-                if (child.nodeName === "BR") {
-                    result.push("\n");
-                } else {
-                    const t = child.textContent;
-                    if (!t) {
-                        continue;
-                    }
-                    result.push(t.replaceAll("\n\n", " "));
-                }
-            }
-            if (result.length === 0) {
-                return "";
-            }
-            text = result.join("");
-        } else {
-            // if there is only one child
-            /** @type {Node} */
-            const child = el.firstChild;
-            if (child.nodeName === "SAMP" || child.nodeName === "KBD") {
-                return this.convertCODE(ctx, child);
-            } else if (
-                child.nodeType !== nodeTypes.TEXT_NODE &&
-                child.nodeName !== "CODE"
-            ) {
-                console.warn(
-                    `Unexpected nodeName of only child in a PRE: "${child.nodeName}"`,
+        for (let i = 0; i < el.childNodes.length; i++) {
+            const child = el.childNodes[i];
+            if (child.nodeType === nodeTypes.TEXT_NODE) {
+                preContent.push(
+                    child.textContent?.replaceAll("\n\n", " ") || "",
                 );
+                continue;
             }
 
-            text = child.textContent;
-            if (!text) {
-                return "";
-            }
+            switch (child.nodeName) {
+                case "BR":
+                    preContent.push("\n");
+                    break;
+                case "SAMP":
+                case "KBD":
+                    return this.convertCODE(ctx, child);
+                case "SPAN":
+                case "DIV":
+                    preContent.push(child.textContent || "");
+                    break;
+                case "CODE":
+                    preContent.push(child.textContent || "");
 
-            if (!language && child.getAttribute) {
-                // if the child is not a text node
-                const class_ = child.getAttribute("class") || "";
-                const languageMatch = class_.match(/language-(\S+)/);
-                if (languageMatch) {
-                    language = languageMatch[1];
-                }
+                    if (!language && child.nodeType !== nodeTypes.TEXT_NODE) {
+                        const class_ = child.getAttribute("class") || "";
+                        const languageMatch = class_.match(/language-(\S+)/);
+                        if (languageMatch) {
+                            language = languageMatch[1];
+                        }
+                    }
+                    break;
+                default:
+                    console.warn(
+                        `Ignoring unexpected node in a PRE: "${child.nodeName}"`,
+                    );
             }
         }
+        let text = preContent.join("");
 
         const result = ["\n\n"];
 
@@ -757,6 +756,9 @@ export class MdConverter {
         while (text.length > 0 && text.slice(-1) === "\n") {
             text = text.slice(0, -1);
         }
+
+        // replace inner newlines with spaces
+        text = text.replaceAll("\n", " ");
 
         // if there's at least one non-whitespace character in the text
         if (/\S/.test(text)) {
@@ -1352,7 +1354,8 @@ export class MdConverter {
 
     /** @type {ElementConverter} */
     convertTD(ctx, el) {
-        return this.convertNodes(ctx, el.childNodes).trim() + " ";
+        const newCtx = { ...ctx, dontTrimText: true };
+        return this.convertNodes(newCtx, el.childNodes).trim() + " ";
     }
 
     /** @type {ElementConverter} */

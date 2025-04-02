@@ -40,6 +40,12 @@ export async function extractMainContent(frag, location) {
         location.href.match(/^https:\/\/github\.com\/[^/]+\/[^/]+\/issues\/\d+/)
     ) {
         newFrag = extractGithubIssue(frag);
+    } else if (location.href.match(/^https:\/\/mastodon.social\/.+/)) {
+        newFrag = extractMastodonPage(frag);
+    } else if (location.href.match(/^https:\/\/discord.com\/channels\/.+/)) {
+        newFrag = extractDiscordPage(frag);
+    } else if (location.href.match(/^https:\/\/www.reddit.com(?:\/.+)?/)) {
+        newFrag = extractRedditPage(frag);
     }
     if (newFrag) {
         return newFrag;
@@ -54,7 +60,7 @@ export async function extractMainContent(frag, location) {
             "Using Readability.js to extract the main content of the page",
         );
 
-        const article = new Readability(doc).parse();
+        const article = new Readability(doc, { keepClasses: true }).parse();
         const htmlStr = article.content;
 
         const div = document.createElement("div");
@@ -64,7 +70,7 @@ export async function extractMainContent(frag, location) {
         return frag;
     }
 
-    console.error("Failed to extract the main content of the page");
+    console.warn("Failed to extract the main content of the page");
     frag.append(doc.body);
     return frag;
 }
@@ -82,9 +88,8 @@ function extractWikipediaArticle(frag) {
         return null;
     }
 
-    content
-        .querySelectorAll(".navbox,.mw-editsection")
-        .forEach((el) => el.remove());
+    const toRemove = [".navbox", ".mw-editsection", "span.citation-comment"];
+    content.querySelectorAll(toRemove.join(",")).forEach((el) => el.remove());
 
     const newFrag = new DocumentFragment();
     newFrag.append(firstHeading, content);
@@ -97,8 +102,10 @@ function extractWikipediaArticle(frag) {
  */
 function extractGithubIssue(frag) {
     console.log("Extracting GitHub issue");
-    const title = frag.querySelector(".gh-header-title");
-    const content = frag.querySelector(".js-quote-selection-container");
+    const title = frag.querySelector("div[data-testid=issue-header]");
+    const content = frag.querySelector(
+        "div[data-testid=issue-viewer-issue-container]",
+    ).parentElement;
     if (!title || !content) {
         console.error("GitHub issue extractor outdated");
         return null;
@@ -108,17 +115,9 @@ function extractGithubIssue(frag) {
         "img",
         "form",
         "button",
-        "reactions-menu",
-        ".js-minimize-comment",
         "tool-tip",
-        ".tooltipped",
         "dialog",
         "dialog-helper",
-        ".js-comment-edit-history",
-        ".Details-content--hidden",
-        ".discussion-timeline-actions",
-        "div.text-right code",
-        "span.State",
     ];
     content.querySelectorAll(toRemove.join(",")).forEach((el) => el.remove());
 
@@ -128,5 +127,65 @@ function extractGithubIssue(frag) {
 
     const newFrag = new DocumentFragment();
     newFrag.append(title, content);
+    return newFrag;
+}
+
+/**
+ * @param {DocumentFragment} frag
+ * @returns {DocumentFragment|null}
+ */
+function extractMastodonPage(frag) {
+    console.log("Extracting Mastodon page");
+    const content = frag.querySelector("div.scrollable");
+    if (!content) {
+        console.error("Mastodon extractor outdated");
+        return null;
+    }
+
+    const newFrag = new DocumentFragment();
+    newFrag.append(content);
+    return newFrag;
+}
+
+/**
+ * @param {DocumentFragment} frag
+ * @returns {DocumentFragment|null}
+ */
+function extractDiscordPage(frag) {
+    console.log("Extracting Discord page");
+    const content = frag.querySelector('ol[data-list-id="chat-messages"]');
+    if (!content) {
+        console.warn(
+            "Discord page extractor outdated, or this isn't a chat messages channel",
+        );
+        return null;
+    }
+
+    const newFrag = new DocumentFragment();
+    for (let i = 0; i < content.childNodes.length; i++) {
+        newFrag.appendChild(content.childNodes[i].cloneNode(true));
+    }
+
+    return newFrag;
+}
+
+/**
+ * @param {DocumentFragment} frag
+ * @returns {DocumentFragment|null}
+ */
+function extractRedditPage(frag) {
+    console.log("Extracting Reddit page");
+    const content = frag.querySelector("main");
+
+    const toRemove = [
+        "button",
+        "shreddit-async-loader",
+        "img[role=presentation]",
+        "zoomable-img",
+    ];
+    content.querySelectorAll(toRemove.join(",")).forEach((el) => el.remove());
+
+    const newFrag = new DocumentFragment();
+    newFrag.append(content);
     return newFrag;
 }

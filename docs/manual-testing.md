@@ -13,7 +13,7 @@ Here are a bunch of web pages with interesting features for testing.
 - [Wikipedia article with math elements](https://en.wikipedia.org/wiki/Kinematics)
 - [Wikipedia location map](https://en.wikipedia.org/wiki/Bush_Kill_%28Pepacton_Reservoir_tributary%29) cannot render well as markdown because two images overlap on the website
 - [tiny table](https://www.markdownguide.org/extended-syntax/#tables)
-- [small table](https://developer.mozilla.org/en-US/docs/Learn/HTML/Tables/Advanced#tables_for_visually_impaired_users)
+- [small table](https://developer.mozilla.org/en-US/docs/Learn_web_development/Core/Structuring_content/Table_accessibility#recap_tables_for_visually_impaired_users)
 - [complex table](https://en.wikipedia.org/wiki/English_modal_auxiliary_verbs#Modal_auxiliary_verbs_distinguished_grammatically)
 - [complex table 2](https://en.wikipedia.org/wiki/Dear_Evan_Hansen#Original_West_End_production)
 - [table with link images](https://en.wikipedia.org/wiki/1926_World_Table_Tennis_Championships)
@@ -25,6 +25,7 @@ Here are a bunch of web pages with interesting features for testing.
 - [code blocks that use `<pre>` but not `<code>`](https://www.cnblogs.com/unity2018/p/8492463.html)
 - [code blocks with inline element headers](https://developer.mozilla.org/en-US/docs/Learn/HTML/Tables/Advanced#the_scope_attribute)
 - [MS doc code blocks](https://devblogs.microsoft.com/dotnet/csharp-13-explore-preview-features/)
+- [MkDocs code blocks](https://squidfunk.github.io/mkdocs-material/reference/)
 - [block quote](https://markdownguide.offshoot.io/basic-syntax/#blockquotes-1)
 - [definition list](https://developer.mozilla.org/en-US/docs/Web/API/Window/setTimeout#Legend)
 - [several definition lists](https://forgottenrealms.fandom.com/wiki/Template:Location)

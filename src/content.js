@@ -102,7 +102,10 @@ function setUpListeners() {
         }
 
         /** @type {DocumentFragment} */
-        const frag = await htmlSelection.getSelectionFragment(selection);
+        const frag = await htmlSelection.getSelectionFragment(
+            selection,
+            "unsanitized",
+        );
         const isTable = frag?.firstChild?.nodeName === "TABLE";
         if (isTable) {
             tableSelection = selection;
@@ -132,7 +135,10 @@ function setUpListeners() {
 
         if (event.target.nodeName === "A") {
             linkText = event.target.textContent;
-        } else if (event.target.parentElement.nodeName === "A") {
+        } else if (
+            event.target.parentElement &&
+            event.target.parentElement.nodeName === "A"
+        ) {
             // Some anchors such as
             // [these](https://developer.mozilla.org/en-US/docs/Learn/HTML/Tables/Advanced#:~:text=is%20by%20using-,%3Cthead%3E%2C%20%3Ctbody%3E%2C%20and%20%3Ctfoot%3E,-%2C%20which%20allow%20you)
             // contain another element. The inner element is the event target, and the

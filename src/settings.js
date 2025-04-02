@@ -163,8 +163,9 @@ const omitFooterEl = document.querySelector("#omitFooter");
 const omitHiddenEl = document.querySelector("#omitHidden");
 const notifyOnWarningEl = document.querySelector("#notifyOnWarning");
 const notifyOnSuccessEl = document.querySelector("#notifyOnSuccess");
+const sanitizeInputEl = document.querySelector("#sanitizeInput");
 
-const mdYoutubeEl = document.querySelector("#mdYoutube");
+// const mdYoutubeEl = document.querySelector("#mdYoutube");
 const templateEl = document.querySelector("#template");
 const templateErrorEl = document.querySelector("#templateError");
 const mdSubBracketsEl = document.querySelector("#mdSubBrackets");
@@ -172,6 +173,8 @@ const mdBulletPointEl = document.querySelector("#mdBulletPoint");
 
 const jsonEmptyCellEl = document.querySelector("#jsonEmptyCell");
 const jsonDestinationEl = document.querySelector("#jsonDestination");
+
+const codeOptionEl = document.querySelector("#codeOption");
 
 // set up setting autosaving
 initAutosave("markupLanguage", markupLanguageEl, "value");
@@ -189,8 +192,9 @@ initAutosave("omitFooter", omitFooterEl, "checked");
 initAutosave("omitHidden", omitHiddenEl, "checked");
 initAutosave("notifyOnWarning", notifyOnWarningEl, "checked");
 initAutosave("notifyOnSuccess", notifyOnSuccessEl, "checked");
+initAutosave("sanitizeInput", sanitizeInputEl, "checked");
 
-initAutosave("mdYoutube", mdYoutubeEl, "value");
+// initAutosave("mdYoutube", mdYoutubeEl, "value");
 initAutosave(
     "mdSelectionWithSourceTemplate",
     templateEl,
@@ -202,6 +206,8 @@ initAutosave("mdBulletPoint", mdBulletPointEl, "value");
 
 initAutosave("jsonEmptyCell", jsonEmptyCellEl, "value");
 initAutosave("jsonDestination", jsonDestinationEl, "value", 0, ["background"]);
+
+initAutosave("codeOption", codeOptionEl, "value");
 
 /**
  * initAutosave initializes autosaving for a setting.
@@ -233,16 +239,21 @@ function initAutosave(settingName, el, valueProperty, wait, ctxNames) {
     };
 
     let timeout = 0;
-    el.addEventListener("input", async (event) => {
-        if (wait) {
-            clearTimeout(timeout);
-            timeout = setTimeout(async () => {
+    try {
+        el.addEventListener("input", async (event) => {
+            if (wait) {
+                clearTimeout(timeout);
+                timeout = setTimeout(async () => {
+                    await saveSetting();
+                }, wait);
+            } else {
                 await saveSetting();
-            }, wait);
-        } else {
-            await saveSetting();
-        }
-    });
+            }
+        });
+    } catch (err) {
+        console.error(`${err}\nsetting name: ${settingName}\nel: ${el}`);
+        throw err;
+    }
 }
 
 /**
@@ -267,14 +278,17 @@ async function loadSettings() {
         omitHiddenEl.checked = await getSetting("omitHidden");
         notifyOnWarningEl.checked = await getSetting("notifyOnWarning");
         notifyOnSuccessEl.checked = await getSetting("notifyOnSuccess");
+        sanitizeInputEl.checked = await getSetting("sanitizeInput");
 
-        mdYoutubeEl.value = await getSetting("mdYoutube");
+        // mdYoutubeEl.value = await getSetting("mdYoutube");
         templateEl.value = await getSetting("mdSelectionWithSourceTemplate");
         mdSubBracketsEl.value = await getSetting("mdSubBrackets");
         mdBulletPointEl.value = await getSetting("mdBulletPoint");
 
         jsonEmptyCellEl.value = (await getSetting("jsonEmptyCell")) || "null";
         jsonDestinationEl.value = await getSetting("jsonDestination");
+
+        codeOptionEl.value = await getSetting("codeOption");
     } catch (err) {
         console.error(err);
         throw err;

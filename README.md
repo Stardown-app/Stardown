@@ -40,6 +40,8 @@ We're still finding sites where Stardown doesn't work as well as it could. If yo
 
 Stardown will never sell any data to anyone and does not collect any personal data. Everything you copy with Stardown is stored in your clipboard, local files, and/or your browser's settings depending on which features you use. Stardown's optional notepad saves to your browser's sync storage by default but can save locally instead.
 
+The use of information will adhere to the Chrome Web Store User Data Policy, including the Limited Use requirements.
+
 ## Permissions
 
 For why Stardown requests the permissions that it does, see [./docs/permissions.md](./docs/permissions.md).

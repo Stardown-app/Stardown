@@ -1354,7 +1354,8 @@ export class MdConverter {
 
     /** @type {ElementConverter} */
     convertTD(ctx, el) {
-        return this.convertNodes(ctx, el.childNodes).trim() + " ";
+        const newCtx = { ...ctx, dontTrimText: true };
+        return this.convertNodes(newCtx, el.childNodes).trim() + " ";
     }
 
     /** @type {ElementConverter} */

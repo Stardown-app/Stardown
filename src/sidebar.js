@@ -399,8 +399,11 @@ async function receiveToNotepad(newText) {
  * @returns {Promise<void>}
  */
 async function changeNotepadStorageLocation() {
+    // save the notepad's content to the new storage location
     saveNotepad();
 
+    // if the notepad's content is within the new storage location's
+    // byte limit, remove the content from the old storage location
     const isWithinByteLimit =
         getJsonByteCount(jar.toString()) <= getByteLimit();
     if (isWithinByteLimit) {
@@ -421,6 +424,9 @@ async function changeNotepadStorageLocation() {
                 );
         }
     }
+
+    // update the byte limit display
+    codejarHighlight(notepadEl, { start: 0, end: 0, dir: "->" });
 }
 
 const defaultLocalSettings = {

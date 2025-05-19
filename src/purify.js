@@ -1,16 +1,16 @@
 /*
     Where this file came from:
 
-    1. https://github.com/cure53/DOMPurify/archive/refs/tags/3.2.4.zip
+    1. https://github.com/cure53/DOMPurify/archive/refs/tags/3.2.6.zip
     2. extract the files
-    3. copy purify.js
+    3. copy DOMPurify-3.2.6/dist/purify.js
     4. delete the ESLint directives
     5. take all the code out of the IIFE and delete the return statement at the end
     6. npm run format
     7. export DOMPurify
 */
 
-/*! @license DOMPurify 3.2.4 | (c) Cure53 and other contributors | Released under the Apache license 2.0 and Mozilla Public License 2.0 | github.com/cure53/DOMPurify/blob/3.2.4/LICENSE */
+/*! @license DOMPurify 3.2.6 | (c) Cure53 and other contributors | Released under the Apache license 2.0 and Mozilla Public License 2.0 | github.com/cure53/DOMPurify/blob/3.2.6/LICENSE */
 
 const {
     entries,
@@ -63,6 +63,9 @@ const typeErrorCreate = unconstruct(TypeError);
  */
 function unapply(func) {
     return function (thisArg) {
+        if (thisArg instanceof RegExp) {
+            thisArg.lastIndex = 0;
+        }
         for (
             var _len = arguments.length,
                 args = new Array(_len > 1 ? _len - 1 : 0),
@@ -841,7 +844,7 @@ const TMPLIT_EXPR = seal(/\$\{[\w\W]*/gm);
 const DATA_ATTR = seal(/^data-[\-\w.\u00B7-\uFFFF]+$/);
 const ARIA_ATTR = seal(/^aria-[\-\w]+$/);
 const IS_ALLOWED_URI = seal(
-    /^(?:(?:(?:f|ht)tps?|mailto|tel|callto|sms|cid|xmpp):|[^a-z]|[a-z+.\-]+(?:[^a-z+.\-:]|$))/i,
+    /^(?:(?:(?:f|ht)tps?|mailto|tel|callto|sms|cid|xmpp|matrix):|[^a-z]|[a-z+.\-]+(?:[^a-z+.\-:]|$))/i,
 );
 const IS_SCRIPT_OR_DATA = seal(/^(?:\w+script|data):/i);
 const ATTR_WHITESPACE = seal(
@@ -949,7 +952,7 @@ function createDOMPurify() {
             ? arguments[0]
             : getGlobal();
     const DOMPurify = (root) => createDOMPurify(root);
-    DOMPurify.version = "3.2.4";
+    DOMPurify.version = "3.2.6";
     DOMPurify.removed = [];
     if (
         !window ||
@@ -1296,10 +1299,10 @@ function createDOMPurify() {
             : DEFAULT_FORBID_CONTENTS;
         FORBID_TAGS = objectHasOwnProperty(cfg, "FORBID_TAGS")
             ? addToSet({}, cfg.FORBID_TAGS, transformCaseFunc)
-            : {};
+            : clone({});
         FORBID_ATTR = objectHasOwnProperty(cfg, "FORBID_ATTR")
             ? addToSet({}, cfg.FORBID_ATTR, transformCaseFunc)
-            : {};
+            : clone({});
         USE_PROFILES = objectHasOwnProperty(cfg, "USE_PROFILES")
             ? cfg.USE_PROFILES
             : false;
@@ -1755,10 +1758,11 @@ function createDOMPurify() {
         });
         /* Detect mXSS attempts abusing namespace confusion */
         if (
+            SAFE_FOR_XML &&
             currentNode.hasChildNodes() &&
             !_isNode(currentNode.firstElementChild) &&
-            regExpTest(/<[/\w]/g, currentNode.innerHTML) &&
-            regExpTest(/<[/\w]/g, currentNode.textContent)
+            regExpTest(/<[/\w!]/g, currentNode.innerHTML) &&
+            regExpTest(/<[/\w!]/g, currentNode.textContent)
         ) {
             _forceRemove(currentNode);
             return true;
@@ -1992,7 +1996,8 @@ function createDOMPurify() {
             const attr = attributes[l];
             const { name, namespaceURI, value: attrValue } = attr;
             const lcName = transformCaseFunc(name);
-            let value = name === "value" ? attrValue : stringTrim(attrValue);
+            const initValue = attrValue;
+            let value = name === "value" ? initValue : stringTrim(initValue);
             /* Execute a hook if present */
             hookEvent.attrName = lcName;
             hookEvent.attrValue = value;
@@ -2024,10 +2029,9 @@ function createDOMPurify() {
             if (hookEvent.forceKeepAttr) {
                 continue;
             }
-            /* Remove attribute */
-            _removeAttribute(name, currentNode);
             /* Did the hooks approve of the attribute? */
             if (!hookEvent.keepAttr) {
+                _removeAttribute(name, currentNode);
                 continue;
             }
             /* Work around a security issue in jQuery 3.0 */
@@ -2044,6 +2048,7 @@ function createDOMPurify() {
             /* Is `value` valid for this attribute? */
             const lcTag = transformCaseFunc(currentNode.nodeName);
             if (!_isValidAttribute(lcTag, lcName, value)) {
+                _removeAttribute(name, currentNode);
                 continue;
             }
             /* Handle attributes that require Trusted Types */
@@ -2067,19 +2072,23 @@ function createDOMPurify() {
                 }
             }
             /* Handle invalid data-* attribute set by try-catching it */
-            try {
-                if (namespaceURI) {
-                    currentNode.setAttributeNS(namespaceURI, name, value);
-                } else {
-                    /* Fallback to setAttribute() for browser-unrecognized namespaces e.g. "x-schema". */
-                    currentNode.setAttribute(name, value);
+            if (value !== initValue) {
+                try {
+                    if (namespaceURI) {
+                        currentNode.setAttributeNS(namespaceURI, name, value);
+                    } else {
+                        /* Fallback to setAttribute() for browser-unrecognized namespaces e.g. "x-schema". */
+                        currentNode.setAttribute(name, value);
+                    }
+                    if (_isClobbered(currentNode)) {
+                        _forceRemove(currentNode);
+                    } else {
+                        arrayPop(DOMPurify.removed);
+                    }
+                } catch (_) {
+                    _removeAttribute(name, currentNode);
                 }
-                if (_isClobbered(currentNode)) {
-                    _forceRemove(currentNode);
-                } else {
-                    arrayPop(DOMPurify.removed);
-                }
-            } catch (_) {}
+            }
         }
         /* Execute a hook if present */
         _executeHooks(hooks.afterSanitizeAttributes, currentNode, null);

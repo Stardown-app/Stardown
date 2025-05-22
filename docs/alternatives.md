@@ -44,7 +44,6 @@ You can use this [bookmarklet](https://en.wikipedia.org/wiki/Bookmarklet) I made
 
 ### Bookmarks managers
 
-- [Pocket](https://getpocket.com/home)
 - [Raindrop.io](https://raindrop.io/)
 - [linkding](https://github.com/sissbruecker/linkding)
 - [Linkwarden](https://github.com/linkwarden/linkwarden)

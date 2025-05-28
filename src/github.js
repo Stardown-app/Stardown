@@ -29,4 +29,27 @@ export class GitHubClient {
         const url = `https://github.com/login/oauth/authorize?client_id=${this.clientId}&redirect_uri=${encodeURIComponent(this.redirectUri)}&scope=${scope}&state=${state}`;
         window.location.href = url;
     }
+
+    /**
+     * Exchanges the OAuth `code` for an access token using your backend.
+     * @param {string} code - The `code` returned from GitHub OAuth redirect.
+     * @param {string} stateFromUrl - The state string returned from GitHub, to verify against local storage.
+     * @returns {Promise<void>}
+     * @throws {Error} If the state doesn't match or token fetch fails.
+     */
+    async exchangeCodeForToken(code, stateFromUrl) {
+        const stateSaved = localStorage.getItem("oauth_state");
+        if (stateFromUrl !== stateSaved) {
+            throw new Error("Invalid OAuth state");
+        }
+
+        const response = await fetch("/api/oauth/github/token", {
+            method: "POST",
+            body: JSON.stringify({ code }),
+            headers: { "Content-Type": "application/json" },
+        });
+
+        const data = await response.json();
+        this.token = data.access_token;
+    }
 }

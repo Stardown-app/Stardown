@@ -88,4 +88,81 @@ export class GitHubClient {
             owner: { login: repo.owner.login },
         }));
     }
+
+    /**
+     * Fetches repositories where the user has write access and where
+     * at least one Markdown (.md) file exists in the entire repository.
+     *
+     * @returns {Promise<Array<{
+     *   name: string,
+     *   full_name: string,
+     *   owner: { login: string },
+     *   markdownFiles: Array<{ path: string }>
+     * }>>}
+     */
+    async getRepositoriesWithMarkdownFiles() {
+        const reposWithMarkdown = [];
+        let page = 1;
+        let hasNext = true;
+
+        while (hasNext) {
+            const res = await fetch(
+                `https://api.github.com/user/repos?affiliation=owner,collaborator,organization_member&per_page=100&page=${page}`,
+                {
+                    headers: { Authorization: `token ${this.token}` },
+                },
+            );
+
+            if (!res.ok) throw new Error("Failed to fetch repositories");
+
+            const repos = await res.json();
+            const writableRepos = repos.filter(
+                (repo) => repo.permissions?.push,
+            );
+
+            for (const repo of writableRepos) {
+                try {
+                    const treeUrl = `https://api.github.com/repos/${repo.owner.login}/${repo.name}/git/trees/main?recursive=1`;
+                    const treeRes = await fetch(treeUrl, {
+                        headers: { Authorization: `token ${this.token}` },
+                    });
+
+                    if (!treeRes.ok) {
+                        console.warn(
+                            `Could not load tree for ${repo.full_name}`,
+                        );
+                        continue;
+                    }
+
+                    const treeData = await treeRes.json();
+
+                    const markdownFiles = treeData.tree
+                        .filter(
+                            (item) =>
+                                item.type === "blob" &&
+                                item.path.endsWith(".md"),
+                        )
+                        .map((item) => ({ path: item.path }));
+
+                    if (markdownFiles.length > 0) {
+                        reposWithMarkdown.push({
+                            name: repo.name,
+                            full_name: repo.full_name,
+                            owner: { login: repo.owner.login },
+                            markdownFiles,
+                        });
+                    }
+                } catch (err) {
+                    console.warn(
+                        `Error checking ${repo.full_name}: ${err.message}`,
+                    );
+                }
+            }
+
+            hasNext = repos.length === 100;
+            page++;
+        }
+
+        return reposWithMarkdown;
+    }
 }

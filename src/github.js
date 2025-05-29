@@ -54,6 +54,36 @@ export class GitHubClient {
     }
 
     /**
+     * @private
+     * Fetches all repos the user can push to.
+     * @returns {Promise<Array<object>>}
+     */
+    async _getWritableRepos() {
+        const repos = [];
+        let page = 1;
+        let hasNext = true;
+
+        while (hasNext) {
+            const res = await fetch(
+                `https://api.github.com/user/repos?affiliation=owner,collaborator,organization_member&per_page=100&page=${page}`,
+                {
+                    headers: { Authorization: `token ${this.token}` },
+                },
+            );
+
+            if (!res.ok) throw new Error("Failed to fetch repositories");
+
+            const data = await res.json();
+            repos.push(...data.filter((repo) => repo.permissions?.push));
+
+            hasNext = data.length === 100;
+            page++;
+        }
+
+        return repos;
+    }
+
+    /**
      * Fetches all repositories where the user has write access (push permission).
      * @returns {Promise<Array<{name: string, full_name: string, owner: { login: string }}>>}
      */

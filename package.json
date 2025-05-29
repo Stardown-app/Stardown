@@ -4,7 +4,8 @@
     "description": "Copy the web as markdown.",
     "type": "module",
     "scripts": {
-        "test": "node --test",
+        "test": "node --test test/*.js && npm run jest",
+        "jest": "node --experimental-vm-modules node_modules/jest/bin/jest.js --config jest.config.mjs",
         "md-diff": "code test/md.diff.html && nodemon ./test/diffMd.js --ext html,md,js --ignore *.diff.html",
         "format": "npx prettier . --write",
         "check-format": "npx prettier . --check",

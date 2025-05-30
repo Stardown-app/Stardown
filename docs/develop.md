@@ -107,7 +107,7 @@ Here's what I do when creating a new release:
 8. Push the tag. This will trigger a GitHub Actions workflow that will build the extension and create a release.
 9. Run `gh workflow run pages.yaml` to rebuild [the instructions page](https://stardown-app.github.io/Stardown/docs/install-and-update-instructions/). I tried to make this step run automatically on new release tags, but for some reason the `deploy` job would always ignore the artifact most recently uploaded by the `build` job and use the previous one instead.
 10. If the new version is a stable release:
-11. Update the extension marketplace pages including adding the release notes. Make sure everything is up to date and accurate.
-12. Submit the changes for review.
+    1. Update the extension marketplace pages including adding the release notes. Make sure everything is up to date and accurate.
+    2. Submit the changes for review.
     - [AMO requires submission of the source code and build instructions](https://extensionworkshop.com/documentation/publish/source-code-submission/#:~:text=tools%20that%20generate%20a%20single%20file%20from%20other%20files) since Stardown uses a bundler.
     - [Update your Chrome Web Store item \| Chrome for Developers](https://developer.chrome.com/docs/webstore/update)

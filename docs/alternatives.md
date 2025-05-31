@@ -23,6 +23,7 @@ You can use this [bookmarklet](https://en.wikipedia.org/wiki/Bookmarklet) I made
 - [ClipperMaster-for-Obsidian](https://github.com/aqeja/ClipperMaster-for-Obsidian)
 - [Omnivore](https://github.com/omnivore-app/omnivore) can save content in a variety of formats.
 - [Readwise](https://readwise.io/) can sync highlights from websites, Kindles, iBooks, and more.
+- [Inkdrop's web clipper](https://docs.inkdrop.app/reference/clip-web-pages-from-browser)
 - [Chrome's page downloader](https://support.google.com/chrome/answer/7343019)
 - [Zotero](https://www.zotero.org/) is one of the best tools for saving and organizing research articles and citations.
 - [mymind](https://mymind.com/browser-extensions)
@@ -60,7 +61,7 @@ You can use this [bookmarklet](https://en.wikipedia.org/wiki/Bookmarklet) I made
 
 ## Convert between markup languages
 
-- [TableConvert.com](https://tableconvert.com/) converts tables between many formats, file types, and encodings.
+- [Markdown Tools](https://www.markdowntools.com/) converts markdown to and from many other languages.
 - [Pandoc](https://pandoc.org/) offers a command line tool and a Haskell library that can convert between almost any two markup languages.
 - [Nushell](https://www.nushell.sh/commands/docs/to_md.html) is another command line tool that can convert between many markup languages.
 - [MarkItDown](https://news.ycombinator.com/item?id=42410803) is a Python tool for converting files and office documents to Markdown.
@@ -69,6 +70,13 @@ You can use this [bookmarklet](https://en.wikipedia.org/wiki/Bookmarklet) I made
 - [Marker](https://github.com/vikparuchuri/marker) converts PDF to markdown, optionally using OCRmyPDF.
 - [MinerU](https://github.com/opendatalab/MinerU) converts PDF to markdown or JSON, optionally using PaddleOCR.
 - [pdf-to-markdown](https://github.com/jzillmann/pdf-to-markdown) has online and downloadable versions.
+
+### Table specialists
+
+- [TableConvert.com](https://tableconvert.com/) converts tables between many formats, file types, and encodings.
+- [Table Capture](https://chromewebstore.google.com/detail/table-capture/iebpjdmgckacbodjpijphcplhebcmeop) is a Chrome extension that copies HTML tables to the clipboard or to Excel, CSV, or many other applications.
+- [Copy Table in Excel and Paste as a Markdown Table \| thisDaveJ](https://thisdavej.com/copy-table-in-excel-and-paste-as-a-markdown-table/).
+- [Excel to Markdown table](https://marketplace.visualstudio.com/items?itemName=csholmq.excel-to-markdown-table) is a VS Code extension.
 
 ## Scrape websites
 

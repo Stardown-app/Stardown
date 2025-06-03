@@ -93,8 +93,14 @@ export function CodeJar(editor, highlight, opt) {
     var doHighlight = function (editor, pos) {
         highlight(editor, pos);
     };
+    var matchFirefoxVersion =
+        window.navigator.userAgent.match(/Firefox\/([0-9]+)\./);
+    var firefoxVersion = matchFirefoxVersion
+        ? parseInt(matchFirefoxVersion[1])
+        : 0;
     var isLegacy = false; // true if plaintext-only is not supported
-    if (editor.contentEditable !== "plaintext-only") isLegacy = true;
+    if (editor.contentEditable !== "plaintext-only" || firefoxVersion >= 136)
+        isLegacy = true;
     if (isLegacy) editor.setAttribute("contenteditable", "true");
     var debounceHighlight = debounce(function () {
         var pos = save();

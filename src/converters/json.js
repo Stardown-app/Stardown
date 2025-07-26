@@ -169,7 +169,10 @@ export function fixLeadingZeros(numStr) {
             numStr[i] === "E"
         ) {
             return "0" + numStr.slice(i);
+        } else {
+            return numStr.slice(i);
         }
-        return numStr.slice(i);
     }
+
+    return "0";
 }

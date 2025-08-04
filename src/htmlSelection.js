@@ -401,15 +401,28 @@ function startBeforeAncestorHeader(startRange, startNode) {
 function startBeforeAncestorTable(startRange, startNode) {
     const tableTags = ["TABLE", "THEAD", "TBODY", "TR", "TH", "TD"];
 
-    // While there is a parent node and it's a table tag...
+    const parent = startNode.parentNode;
+    if (!parent) {
+        return startNode;
+    }
+
+    if (parent.nodeName === "TABLE") {
+        startRange.setStartBefore(parent);
+        return parent;
+    }
+
+    let temp = parent;
+    let i = 0;
     while (
-        startNode.nodeName !== "TABLE" &&
-        startNode.parentNode &&
-        tableTags.includes(startNode.parentNode.nodeName)
+        temp.nodeName !== "TABLE" &&
+        (i < 10 || tableTags.includes(temp.nodeName))
     ) {
-        // ...expand the start of the selection to include the table tag. This makes
-        // tables easier to copy.
-        startNode = startNode.parentNode;
+        temp = temp.parentNode;
+        i++;
+    }
+
+    if (temp && temp.nodeName === "TABLE") {
+        startNode = temp;
         startRange.setStartBefore(startNode);
     }
 

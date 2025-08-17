@@ -414,6 +414,7 @@ function startBeforeAncestorTable(startRange, startNode) {
     let temp = parent;
     let i = 0;
     while (
+        temp &&
         temp.nodeName !== "TABLE" &&
         (i < 10 || tableTags.includes(temp.nodeName))
     ) {
